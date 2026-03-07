@@ -5,8 +5,8 @@
   "useTabs": false,
   "semi": true,
   "singleQuote": false,
+  "jsxSingleQuote": false,
   "trailingComma": "es5",
   "arrowParens": "always",
-  "bracketSpacing": true,
-  "jsxSingleQuote": false
+  "endOfLine": "lf"
 }

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: OpenFireAnalytics
+  docker:
+    compose:
+      file: ./compose.yml
+      lifecycle-management: start_only
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+    path: /api/schema.json
