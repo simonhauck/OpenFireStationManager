@@ -25,3 +25,4 @@ dev-dist
 *.sw?
 
 **/routeTree.gen.ts
+.tanstack/tmp/**

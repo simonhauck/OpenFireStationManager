@@ -1,5 +1,6 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import PWABadge from "../PWABadge";
 
 const RootLayout = () => (
   <>
@@ -13,6 +14,7 @@ const RootLayout = () => (
     </div>
     <hr />
     <Outlet />
+    <PWABadge />
     <TanStackRouterDevtools />
   </>
 );

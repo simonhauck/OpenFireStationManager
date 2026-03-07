@@ -1,5 +1,4 @@
 import { StrictMode } from "react";
-import "./index.css";
 import ReactDOM from "react-dom/client";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
