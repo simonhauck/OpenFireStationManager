@@ -1,0 +1,16 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":dependencyDashboard", ":automergeAll"],
+  "automergeType": "branch",
+  "labels": ["dependencies"],
+  "npm": {
+    "enabled": false
+  },
+  "minimumReleaseAge": "14 days",
+  "packageRules": [
+    {
+      "groupName": "Tanstack packages",
+      "matchPackageNames": ["@tanstack/**"]
+    }
+  ]
+}
