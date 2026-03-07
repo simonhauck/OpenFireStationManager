@@ -1,9 +1,9 @@
-package io.github.simonhauck.openfireanalytics
+package io.github.simonhauck.openfirestationmanager
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
-class OpenfireanalyticsApplicationTests : IntegrationTest(){
+class OpenFireStationManagerApplicationTests : IntegrationTest(){
 
 	@Test
 	fun contextLoads() {

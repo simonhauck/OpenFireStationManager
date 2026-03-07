@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfireanalytics
+package io.github.simonhauck.openfirestationmanager
 
 import org.springframework.boot.test.context.SpringBootTest
 

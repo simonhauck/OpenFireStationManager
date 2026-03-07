@@ -23,8 +23,8 @@ export default defineConfig({
       },
 
       manifest: {
-        name: "OpenFireAnalytics",
-        short_name: "OPA",
+        name: "OpenFireStationManager",
+        short_name: "OFSM",
         description:
           "Manage firefighting stations. Track usage of uniforms, equiements, and much more...",
         theme_color: "#ffffff",

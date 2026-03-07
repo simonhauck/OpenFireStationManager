@@ -1,1 +1,1 @@
-rootProject.name = "openfireanalytics"
+rootProject.name = "openfirestationmanager"

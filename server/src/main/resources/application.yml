@@ -1,6 +1,6 @@
 spring:
   application:
-    name: OpenFireAnalytics
+    name: OpenFireStationManager
   docker:
     compose:
       file: ./compose.yml

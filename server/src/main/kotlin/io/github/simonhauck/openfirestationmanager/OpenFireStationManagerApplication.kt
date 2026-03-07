@@ -1,11 +1,11 @@
-package io.github.simonhauck.openfireanalytics
+package io.github.simonhauck.openfirestationmanager
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class OpenfireanalyticsApplication
+class OpenFireStationManagerApplication
 
 fun main(args: Array<String>) {
-	runApplication<OpenfireanalyticsApplication>(*args)
+	runApplication<OpenFireStationManagerApplication>(*args)
 }

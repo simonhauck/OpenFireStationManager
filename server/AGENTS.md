@@ -9,7 +9,7 @@ Guidance for agentic coding assistants working in the `server/` component.
 
 ## Overview
 
-Spring Boot 4 + Kotlin backend that serves the openfireanalytics REST API. Uses Spring Data
+Spring Boot 4 + Kotlin backend that serves the OpenFireStationManager REST API. Uses Spring Data
 JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API documentation.
 
 **Tech stack:**
@@ -31,8 +31,8 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 | Build (compile + test + JAR) | `./gradlew build` |
 | Run application | `./gradlew bootRun` |
 | Run all tests | `./gradlew test` |
-| Run a single test class | `./gradlew test --tests "io.github.simonhauck.openfireanalytics.MyTest"` |
-| Run a single test method | `./gradlew test --tests "io.github.simonhauck.openfireanalytics.MyTest.myMethod"` |
+| Run a single test class | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
+| Run a single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
 | Run tests with verbose output | `./gradlew test --info` |
 | Clean build artifacts | `./gradlew clean` |
 
@@ -60,16 +60,16 @@ PostgreSQL automatically (`spring.docker.compose.skip.in-tests=false`).
 
 ```
 src/
-├── main/kotlin/io/github/simonhauck/openfireanalytics/
-│   └── OpenfireanalyticsApplication.kt   ← entry point
+├── main/kotlin/io/github/simonhauck/openfirestationmanager/
+│   └── OpenFireStationManagerApplication.kt   ← entry point
 ├── main/resources/
-│   └── application.yml                   ← Spring config
-└── test/kotlin/io/github/simonhauck/openfireanalytics/
-    ├── IntegrationTest.kt                ← base class for integration tests
-    └── OpenfireanalyticsApplicationTests.kt
+│   └── application.yml                        ← Spring config
+└── test/kotlin/io/github/simonhauck/openfirestationmanager/
+    ├── IntegrationTest.kt                     ← base class for integration tests
+    └── OpenFireStationManagerApplicationTests.kt
 ```
 
-Place new source files under `io.github.simonhauck.openfireanalytics` and organise by feature
+Place new source files under `io.github.simonhauck.openfirestationmanager` and organise by feature
 sub-package (e.g. `.station`, `.vehicle`, `.incident`) rather than by layer.
 
 ---
@@ -93,7 +93,7 @@ No Kotlin formatter (ktlint/detekt) is configured. Follow standard IntelliJ/Kotl
 | Functions and properties | `camelCase` | `findById` |
 | Local variables | `camelCase` | `stationId` |
 | Top-level constants | `SCREAMING_SNAKE_CASE` | `DEFAULT_PAGE_SIZE` |
-| Packages | lowercase, reverse-domain | `io.github.simonhauck.openfireanalytics.station` |
+| Packages | lowercase, reverse-domain | `io.github.simonhauck.openfirestationmanager.station` |
 | Test classes | suffix `Test` or `Tests` | `StationServiceTests` |
 
 ### Kotlin Specifics
@@ -114,7 +114,7 @@ Follow standard Kotlin import ordering (IDE-managed):
 1. `java.*` / `javax.*`
 2. `kotlin.*`
 3. Third-party libraries (Spring, Jackson, etc.)
-4. Project-internal packages (`io.github.simonhauck.*`)
+4. Project-internal packages (`io.github.simonhauck.openfirestationmanager.*`)
 
 Remove unused imports before committing. Do not use wildcard imports (`import foo.*`).
 

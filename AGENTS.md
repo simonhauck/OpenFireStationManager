@@ -1,10 +1,10 @@
-# AGENTS.md — openfireanalytics
+# AGENTS.md — OpenFireStationManager
 
 Guidance for agentic coding assistants working in this repository.
 
 ## Project Overview
 
-**openfireanalytics** is an open-source platform for managing firefighting stations. It is a
+**OpenFireStationManager** is an open-source platform for managing firefighting stations. It is a
 monorepo with two independent components:
 
 - `client/` — React 19 + TypeScript frontend (Vite, TanStack Router, Tailwind CSS, DaisyUI)
@@ -44,8 +44,8 @@ testing, code style, API design, and database conventions.
 | Build | `./gradlew build` |
 | Run | `./gradlew bootRun` |
 | Test all | `./gradlew test` |
-| Single test class | `./gradlew test --tests "io.github.simonhauck.openfireanalytics.MyTest"` |
-| Single test method | `./gradlew test --tests "io.github.simonhauck.openfireanalytics.MyTest.myMethod"` |
+| Single test class | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
+| Single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
 
 > **Docker must be running** before executing integration tests.
 
