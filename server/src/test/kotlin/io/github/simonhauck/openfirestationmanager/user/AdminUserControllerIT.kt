@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
 
-class AdminUserControllerIntegrationTest : IntegrationTest() {
+class AdminUserControllerIT : IntegrationTest() {
     @Autowired
     private lateinit var mockMvc: MockMvc
 

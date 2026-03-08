@@ -73,7 +73,6 @@ class JwtTokenUtilityTest {
             AuthenticationProperties(
                 jwtSigningSecret = secret,
                 key = "unused",
-                tokenValiditySeconds = 3600,
             )
         return JwtTokenUtility(properties).also { it.generateSigner() }
     }

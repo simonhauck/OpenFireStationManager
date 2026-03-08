@@ -15,7 +15,6 @@ spring:
 app:
   auth:
     key: ${REMEMBER_ME_KEY:change-me-in-production}
-    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS:31536000}
     jwt-signing-secret: ${JWT_SIGNING_SECRET:local-test}
 
 springdoc:

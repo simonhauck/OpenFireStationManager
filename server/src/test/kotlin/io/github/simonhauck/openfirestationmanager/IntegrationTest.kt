@@ -8,7 +8,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 @SpringBootTest(
     properties = [
-        "spring.docker.compose.skip.in-tests=false"
+        "spring.docker.compose.skip.in-tests=false",
+        "app.auth.jwt-signing-secret=12345678901234567890123456789012",
     ]
 )
 @AutoConfigureMockMvc

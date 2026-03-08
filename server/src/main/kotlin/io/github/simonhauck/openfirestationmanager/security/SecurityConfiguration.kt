@@ -74,7 +74,6 @@ class SecurityConfiguration {
                 persistentTokenRepository,
             )
             .apply {
-                setTokenValiditySeconds(authenticationProperties.tokenValiditySeconds)
                 setParameter("rememberMe")
                 setCookieName("REMEMBER_ME")
                 setAlwaysRemember(true)

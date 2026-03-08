@@ -62,6 +62,8 @@ PostgreSQL automatically (`spring.docker.compose.skip.in-tests=false`).
 **Patterns:**
 
 - Name test classes with a `Test` or `Tests` suffix.
+- If a test class extends `IntegrationTest`, use the `IT` suffix (for example `AuthIT`,
+  `InitialAdminSetupIT`) instead of `IntegrationTest` in the class name.
 - One `@Test` method per behaviour.
 - Prefer backtick test names for longer/descriptive Kotlin test cases, for example
   ``fun `should generate valid jwt token`()``.

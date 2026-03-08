@@ -12,42 +12,45 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-class AuthIntegrationTest : IntegrationTest() {
-    @Autowired
-    private lateinit var mockMvc: MockMvc
+class AuthControllerIT : IntegrationTest() {
+    @Autowired private lateinit var mockMvc: MockMvc
 
     @BeforeEach
     fun createInitialAdmin() {
-        val payload = """
+        val payload =
+            """
             {
               "username": "admin",
               "password": "admin1234"
             }
-        """.trimIndent()
+            """
+                .trimIndent()
 
-        mockMvc.perform(
-            post("/api/public/setup/initial-admin")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload),
-        )
+        mockMvc
+            .perform(
+                post("/api/public/setup/initial-admin")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(payload)
+            )
             .andExpect(status().isCreated)
     }
 
     @Test
     fun loginShouldCreateAuthenticatedSession() {
-        val payload = """
+        val payload =
+            """
             {
               "username": "admin",
               "password": "admin1234",
               "rememberMe": false
             }
-        """.trimIndent()
+            """
+                .trimIndent()
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload),
-        )
+        mockMvc
+            .perform(
+                post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(payload)
+            )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.authenticated").value(true))
             .andExpect(jsonPath("$.user.username").value("admin"))
@@ -56,26 +59,28 @@ class AuthIntegrationTest : IntegrationTest() {
 
     @Test
     fun meShouldReturnAnonymousWhenNoSessionExists() {
-        mockMvc.perform(get("/api/auth/me"))
+        mockMvc
+            .perform(get("/api/auth/me"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.authenticated").value(false))
     }
 
     @Test
     fun loginWithRememberMeShouldSetRememberCookie() {
-        val payload = """
+        val payload =
+            """
             {
               "username": "admin",
               "password": "admin1234",
               "rememberMe": true
             }
-        """.trimIndent()
+            """
+                .trimIndent()
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload),
-        )
+        mockMvc
+            .perform(
+                post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(payload)
+            )
             .andExpect(status().isOk)
             .andExpect(cookie().exists("REMEMBER_ME"))
     }

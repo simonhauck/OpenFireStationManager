@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-class InitialAdminSetupIntegrationTest : IntegrationTest() {
+class InitialAdminSetupIT : IntegrationTest() {
     @Autowired
     private lateinit var mockMvc: MockMvc
 

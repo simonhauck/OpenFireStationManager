@@ -8,5 +8,4 @@ data class AuthenticationProperties(
 
     // TODO 08.03.26 - Simon.Hauck Remvove this properties
     val key: String,
-    val tokenValiditySeconds: Int,
 )
