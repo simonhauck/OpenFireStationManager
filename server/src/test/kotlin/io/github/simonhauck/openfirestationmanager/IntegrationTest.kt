@@ -1,13 +1,8 @@
 package io.github.simonhauck.openfirestationmanager
 
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 
-@SpringBootTest(
-    properties = [
-        "spring.docker.compose.skip.in-tests=false",
-        "app.auth.jwt-signing-secret=12345678901234567890123456789012",
-    ]
-)
+@SpringBootTest(properties = ["spring.docker.compose.skip.in-tests=false"])
 @AutoConfigureMockMvc
 class IntegrationTest

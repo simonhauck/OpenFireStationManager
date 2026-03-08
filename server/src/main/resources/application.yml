@@ -14,8 +14,8 @@ spring:
 
 app:
   auth:
-    key: ${REMEMBER_ME_KEY:change-me-in-production}
-    jwt-signing-secret: ${JWT_SIGNING_SECRET:local-test}
+    cookie-name: OFSM_AUTH
+    jwt-signing-secret: ${JWT_SIGNING_SECRET:SOME_32_CHARACTERS_LONG_KEY_HERE}
 
 springdoc:
   swagger-ui:

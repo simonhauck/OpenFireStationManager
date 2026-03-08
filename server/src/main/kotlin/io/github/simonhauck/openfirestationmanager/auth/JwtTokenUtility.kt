@@ -30,10 +30,9 @@ class JwtTokenUtility(private val authenticationProperties: AuthenticationProper
     fun generateTokenForUser(userAccount: UserAccount, tokenValidity: Duration): String {
         val claimsSet =
             JWTClaimsSet.Builder()
-                .subject("${userAccount.id}")
-                .claim("username", userAccount.username)
+                .subject(userAccount.username)
                 .claim("roles", userAccount.roles.map { it.name })
-                .issuer("OpenFireStationManager")
+                .issuer(authenticationProperties.cookieName)
                 .expirationTime(
                     Date(System.currentTimeMillis() + tokenValidity.inWholeMilliseconds)
                 )
@@ -68,12 +67,15 @@ class JwtTokenUtility(private val authenticationProperties: AuthenticationProper
             return ParseTokenResult.Failure("Token has expired")
         }
 
-        return ParseTokenResult.Success(claims)
+        return ParseTokenResult.Success(
+            userName = claims.subject,
+            roles = claims.getStringListClaim("roles"),
+        )
     }
 }
 
-interface ParseTokenResult {
-    data class Success(val claims: JWTClaimsSet) : ParseTokenResult
+sealed interface ParseTokenResult {
+    data class Success(val userName: String, val roles: List<String>) : ParseTokenResult
 
     data class Failure(val reason: String) : ParseTokenResult
 }

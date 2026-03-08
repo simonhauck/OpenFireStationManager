@@ -1,10 +1,10 @@
 package io.github.simonhauck.openfirestationmanager.auth
 
-import org.assertj.core.api.Assertions.assertThat
 import io.github.simonhauck.openfirestationmanager.security.AuthenticationProperties
 import io.github.simonhauck.openfirestationmanager.user.UserAccount
 import io.github.simonhauck.openfirestationmanager.user.UserRole
 import kotlin.time.Duration.Companion.seconds
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class JwtTokenUtilityTest {
@@ -70,10 +70,7 @@ class JwtTokenUtilityTest {
 
     private fun createUtility(secret: String): JwtTokenUtility {
         val properties =
-            AuthenticationProperties(
-                jwtSigningSecret = secret,
-                key = "unused",
-            )
+            AuthenticationProperties(jwtSigningSecret = secret, cookieName = "OFSM_AUTH")
         return JwtTokenUtility(properties).also { it.generateSigner() }
     }
 }

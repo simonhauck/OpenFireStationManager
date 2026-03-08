@@ -2,7 +2,6 @@ package io.github.simonhauck.openfirestationmanager.user
 
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -17,7 +16,7 @@ class AdminUserController(private val userService: UserService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun createUser(@Valid @RequestBody requestBody: CreateUserRequest): UserAccount {
         return userService.createUser(requestBody)
     }
