@@ -13,12 +13,22 @@ Spring Boot 4 + Kotlin backend that serves the OpenFireStationManager REST API. 
 JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API documentation.
 
 **Tech stack:**
+
 - Kotlin 2.2.21, Java 24
 - Spring Boot 4.0.3 (Spring MVC, Spring Data JDBC, Spring Validation)
 - PostgreSQL (via Docker Compose, `compose.yml`)
-- SpringDoc OpenAPI 3.0.2 — Swagger UI at `/swagger-ui.html`, schema at `/api/schema.json`
+- SpringDoc OpenAPI 3.0.2 — Swagger UI at `/api/public/swagger-ui.html`, schema at `/api/public/schema.json`
 - Jackson + `jackson-module-kotlin`
 - Gradle 9.3.1 (Kotlin DSL, `build.gradle.kts`)
+
+### Core Auth/Config Conventions
+
+- Put **all custom application properties** under the `app.*` root key in `application.yml`.
+- Treat `/api/public/**` as unauthenticated routes (publicly accessible).
+- Keep all endpoints under the `/api/**` namespace.
+- Use `/api/admin/**` for admin-only endpoints.
+- Keep protected API routes outside `/api/public/**` unless there is an explicit exception.
+- Authentication uses server-side session + remember-me cookies; frontend should use cookie credentials, not browser token storage.
 
 All commands below are run from the `server/` directory using the Gradle wrapper.
 
@@ -26,15 +36,15 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 
 ## Commands
 
-| Purpose | Command |
-|---|---|
-| Build (compile + test + JAR) | `./gradlew build` |
-| Run application | `./gradlew bootRun` |
-| Run all tests | `./gradlew test` |
-| Run a single test class | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
-| Run a single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
-| Run tests with verbose output | `./gradlew test --info` |
-| Clean build artifacts | `./gradlew clean` |
+| Purpose                       | Command                                                                                |
+| ----------------------------- | -------------------------------------------------------------------------------------- |
+| Build (compile + test + JAR)  | `./gradlew build`                                                                      |
+| Run application               | `./gradlew bootRun`                                                                    |
+| Run all tests                 | `./gradlew test`                                                                       |
+| Run a single test class       | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
+| Run a single test method      | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
+| Run tests with verbose output | `./gradlew test --info`                                                                |
+| Clean build artifacts         | `./gradlew clean`                                                                      |
 
 ---
 
@@ -45,12 +55,18 @@ integration tests — `IntegrationTest` uses Spring Boot's Docker Compose integr
 PostgreSQL automatically (`spring.docker.compose.skip.in-tests=false`).
 
 **Base classes:**
+
 - Extend `IntegrationTest` for tests that need a running application context and database.
 - Use plain JUnit 5 (no base class) for pure unit tests that don't need Spring context.
 
 **Patterns:**
+
 - Name test classes with a `Test` or `Tests` suffix.
-- One `@Test` method per behaviour; use descriptive method names (`contextLoads`, `shouldReturn404WhenNotFound`).
+- One `@Test` method per behaviour.
+- Prefer backtick test names for longer/descriptive Kotlin test cases, for example
+  ``fun `should generate valid jwt token`()``.
+- For short/simple cases, regular camelCase names are fine (`contextLoads`, `shouldReturn404WhenNotFound`).
+- Prefer AssertJ assertions (`assertThat(...)`) in tests for readability and fluent checks.
 - Prefer `@Test` + assertions over `@ParameterizedTest` unless testing multiple inputs of the
   same behaviour.
 
@@ -87,14 +103,14 @@ No Kotlin formatter (ktlint/detekt) is configured. Follow standard IntelliJ/Kotl
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-|---|---|---|
-| Classes / objects / interfaces | `PascalCase` | `StationController` |
-| Functions and properties | `camelCase` | `findById` |
-| Local variables | `camelCase` | `stationId` |
-| Top-level constants | `SCREAMING_SNAKE_CASE` | `DEFAULT_PAGE_SIZE` |
-| Packages | lowercase, reverse-domain | `io.github.simonhauck.openfirestationmanager.station` |
-| Test classes | suffix `Test` or `Tests` | `StationServiceTests` |
+| Element                        | Convention                | Example                                               |
+| ------------------------------ | ------------------------- | ----------------------------------------------------- |
+| Classes / objects / interfaces | `PascalCase`              | `StationController`                                   |
+| Functions and properties       | `camelCase`               | `findById`                                            |
+| Local variables                | `camelCase`               | `stationId`                                           |
+| Top-level constants            | `SCREAMING_SNAKE_CASE`    | `DEFAULT_PAGE_SIZE`                                   |
+| Packages                       | lowercase, reverse-domain | `io.github.simonhauck.openfirestationmanager.station` |
+| Test classes                   | suffix `Test` or `Tests`  | `StationServiceTests`                                 |
 
 ### Kotlin Specifics
 
@@ -104,13 +120,16 @@ No Kotlin formatter (ktlint/detekt) is configured. Follow standard IntelliJ/Kotl
   `@NotBlank`) on constructor parameters apply to both the field and the constructor parameter,
   so you don't need explicit `@field:` use-site targets.
 - Use Kotlin **data classes** for DTOs and value objects.
+- Keep related small model types together in one file (for example when one model directly uses another).
 - Prefer `val` over `var`; use immutable collections (`listOf`, `mapOf`) where possible.
 - **Avoid `!!`** (non-null assertion); use `?.let { }`, `?: error("…")`, or safe casts instead.
 - Prefer `require()` / `check()` / `error()` for precondition and invariant failures.
+- For Spring Data JDBC entities, use non-null IDs with `0` as default for new records (e.g. `@Id val id: Long = 0`).
 
 ### Imports
 
 Follow standard Kotlin import ordering (IDE-managed):
+
 1. `java.*` / `javax.*`
 2. `kotlin.*`
 3. Third-party libraries (Spring, Jackson, etc.)
@@ -121,6 +140,9 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 ### Error Handling
 
 - Throw specific exception types; never catch `Exception` or `Throwable` broadly.
+- Prefer guard clauses (early returns) to avoid deeply nested conditionals.
+- Prefer `runCatching` when converting library parsing/validation failures into explicit result
+  values (for example auth token parsing), and return early on failure.
 - Use `@ControllerAdvice` + `@ExceptionHandler` to map domain exceptions to HTTP responses;
   do not let exceptions bubble up to Spring's default handler.
 - Return structured error bodies (e.g. a `ProblemDetail` or custom error DTO) consistently.
@@ -132,12 +154,13 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 ## API Design
 
 - All REST endpoints **must** be documented with SpringDoc annotations (`@Operation`,
-  `@ApiResponse`, `@Parameter`, etc.) so they appear correctly in `/api/schema.json`.
+  `@ApiResponse`, `@Parameter`, etc.) so they appear correctly in `/api/public/schema.json`.
 - Follow RESTful conventions:
-  - Resource-oriented URLs: `/stations`, `/stations/{id}`
+  - Resource-oriented URLs: `/api/stations`, `/api/stations/{id}`
   - Use appropriate HTTP verbs: `GET` (read), `POST` (create), `PUT`/`PATCH` (update), `DELETE`
   - Return `201 Created` with `Location` header on successful creation.
   - Return `404 Not Found` for missing resources; `422 Unprocessable Entity` for validation errors.
+- Public endpoints should be namespaced under `/api/public/**`.
 - Validate all request bodies and path variables with Spring Validation annotations; rely on
   the `@ControllerAdvice` to translate `MethodArgumentNotValidException` into 422 responses.
 - Use Kotlin data classes as request/response DTOs; keep them separate from domain/entity classes.
@@ -146,8 +169,11 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 
 ## Database
 
-- Spring Data JDBC is used — **not** JPA/Hibernate. Repositories extend `CrudRepository` or
-  `PagingAndSortingRepository`.
+- Spring Data JDBC is used — **not** JPA/Hibernate.
+- Prefer explicit repository classes with visible SQL methods (for example with `NamedParameterJdbcTemplate`) over
+  `CrudRepository`/`PagingAndSortingRepository` interfaces.
+- Repositories should expose only the concrete operations needed by the feature (for example `findByUsername`,
+  `existsByUsername`, `save`, `count`) to keep behavior obvious.
 - Schema migrations should use Flyway or Liquibase (not yet configured; add when first migration
   is needed).
 - The `compose.yml` spins up `postgres:latest` on a random host port; `application.yml` uses

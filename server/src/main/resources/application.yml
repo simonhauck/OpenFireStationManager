@@ -1,14 +1,27 @@
 spring:
   application:
     name: OpenFireStationManager
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
   docker:
     compose:
       file: ./compose.yml
       lifecycle-management: start_only
+  session:
+    timeout: 12h
+
+app:
+  auth:
+    key: ${REMEMBER_ME_KEY:change-me-in-production}
+    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS:31536000}
+    jwt-signing-secret: ${JWT_SIGNING_SECRET:local-test}
 
 springdoc:
   swagger-ui:
     enabled: true
+    path: /api/public/swagger-ui.html
   api-docs:
     enabled: true
-    path: /api/schema.json
+    path: /api/public/schema.json
