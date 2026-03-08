@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.auth
+package io.github.simonhauck.openfirestationmanager.security.shared
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
@@ -8,7 +8,7 @@ import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jose.crypto.MACVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import io.github.simonhauck.openfirestationmanager.security.AuthenticationProperties
+import io.github.simonhauck.openfirestationmanager.security.config.AuthenticationProperties
 import io.github.simonhauck.openfirestationmanager.user.UserAccount
 import jakarta.annotation.PostConstruct
 import java.util.Date

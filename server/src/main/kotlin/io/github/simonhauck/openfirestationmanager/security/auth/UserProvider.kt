@@ -1,6 +1,7 @@
-package io.github.simonhauck.openfirestationmanager.security
+package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
@@ -11,7 +12,7 @@ class UserProvider {
         val authentication =
             SecurityContextHolder.getContext().authentication
                 ?: throw PublicApiException(
-                    status = org.springframework.http.HttpStatus.UNAUTHORIZED,
+                    status = HttpStatus.UNAUTHORIZED,
                     publicMessage = "You are not authenticated",
                 )
 

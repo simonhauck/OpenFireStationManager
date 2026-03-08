@@ -1,8 +1,8 @@
-package io.github.simonhauck.openfirestationmanager.security
+package io.github.simonhauck.openfirestationmanager.security.config
 
-import io.github.simonhauck.openfirestationmanager.auth.AuthService
-import io.github.simonhauck.openfirestationmanager.auth.JwtTokenUtility
-import io.github.simonhauck.openfirestationmanager.auth.ParseTokenResult
+import io.github.simonhauck.openfirestationmanager.security.auth.AuthService
+import io.github.simonhauck.openfirestationmanager.security.shared.JwtTokenUtility
+import io.github.simonhauck.openfirestationmanager.security.shared.ParseTokenResult
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -41,7 +41,7 @@ class TokenCookieFilter(
                     UsernamePasswordAuthenticationToken(
                         tokenResult.userName,
                         null,
-                        tokenResult.roles.map { SimpleGrantedAuthority("$it") },
+                        tokenResult.roles.map { SimpleGrantedAuthority("ROLE_$it") },
                     )
             }
 

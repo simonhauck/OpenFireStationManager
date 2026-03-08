@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.security
+package io.github.simonhauck.openfirestationmanager.security.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

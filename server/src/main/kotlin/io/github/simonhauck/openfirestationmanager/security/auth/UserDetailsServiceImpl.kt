@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.security
+package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.user.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -9,12 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class UserDetailsServiceImpl(
-    private val userRepository: UserRepository,
-) : UserDetailsService {
+class UserDetailsServiceImpl(private val userRepository: UserRepository) : UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsername(username)
-            ?: throw UsernameNotFoundException("No user found for username: $username")
+        val user =
+            userRepository.findByUsername(username)
+                ?: throw UsernameNotFoundException("No user found for username: $username")
 
         return User.withUsername(user.username)
             .password(user.passwordHash)

@@ -1,14 +1,13 @@
-package io.github.simonhauck.openfirestationmanager.auth
+package io.github.simonhauck.openfirestationmanager.security.auth
 
+import io.github.simonhauck.openfirestationmanager.security.shared.JwtTokenUtility
 import io.github.simonhauck.openfirestationmanager.user.UserService
 import kotlin.time.Duration.Companion.seconds
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 
-data class AuthTokenResponse(
-    val token: String,
-)
+data class AuthTokenResponse(val token: String)
 
 @Service
 class AuthService(
