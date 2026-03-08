@@ -1,6 +1,8 @@
 package io.github.simonhauck.openfirestationmanager.setup
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.user.UserRepository
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -12,6 +14,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class InitialAdminSetupIT : IntegrationTest() {
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
+    @BeforeEach
+    fun deleteAllUsers() {
+        userRepository.deleteAll()
+    }
 
     @Test
     fun shouldCreateInitialAdminWhenNoUsersExist() {

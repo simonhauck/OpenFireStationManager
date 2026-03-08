@@ -3,6 +3,7 @@ package io.github.simonhauck.openfirestationmanager.auth
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import io.github.simonhauck.openfirestationmanager.user.CreateUserRequest
 import io.github.simonhauck.openfirestationmanager.user.UserService
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -18,17 +19,20 @@ class AuthServiceIT : IntegrationTest() {
 
     @Test
     fun `should generate signed jwt token for valid login request`() {
+        val username = "auth.user.${UUID.randomUUID()}"
+        val password = "secure1234"
+
         val user =
             userService.createUser(
-                CreateUserRequest(username = "auth.user", password = "secure1234")
+                CreateUserRequest(username = username, password = password)
             )
 
         val now = System.currentTimeMillis()
         val result =
             authService.login(
                 LoginRequest(
-                    username = "auth.user",
-                    password = "secure1234",
+                    username = username,
+                    password = password,
                     tokenValiditySeconds = 120,
                 )
             )
@@ -38,7 +42,7 @@ class AuthServiceIT : IntegrationTest() {
             ParseTokenResult.Success::class.java
         ) { success ->
             assertThat(success.claims.subject).isEqualTo(user.id.toString())
-            assertThat(success.claims.getStringClaim("username")).isEqualTo("auth.user")
+            assertThat(success.claims.getStringClaim("username")).isEqualTo(username)
             assertThat(success.claims.getStringListClaim("roles")).isEmpty()
             assertThat(success.claims.expirationTime.time).isBetween(now + 110_000, now + 130_000)
         }
@@ -46,12 +50,13 @@ class AuthServiceIT : IntegrationTest() {
 
     @Test
     fun `should fail login when password is invalid`() {
-        userService.createUser(CreateUserRequest(username = "auth.user", password = "secure1234"))
+        val username = "auth.user.${UUID.randomUUID()}"
+        userService.createUser(CreateUserRequest(username = username, password = "secure1234"))
 
         assertThatThrownBy {
                 authService.login(
                     LoginRequest(
-                        username = "auth.user",
+                        username = username,
                         password = "wrong-password",
                         tokenValiditySeconds = 120,
                     )

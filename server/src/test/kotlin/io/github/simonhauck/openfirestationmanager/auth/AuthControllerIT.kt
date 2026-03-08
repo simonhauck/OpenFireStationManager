@@ -1,6 +1,10 @@
 package io.github.simonhauck.openfirestationmanager.auth
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.user.CreateUserRequest
+import io.github.simonhauck.openfirestationmanager.user.UserRole
+import io.github.simonhauck.openfirestationmanager.user.UserService
+import java.util.UUID
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,24 +19,20 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class AuthControllerIT : IntegrationTest() {
     @Autowired private lateinit var mockMvc: MockMvc
 
-    @BeforeEach
-    fun createInitialAdmin() {
-        val payload =
-            """
-            {
-              "username": "admin",
-              "password": "admin1234"
-            }
-            """
-                .trimIndent()
+    @Autowired private lateinit var userService: UserService
 
-        mockMvc
-            .perform(
-                post("/api/public/setup/initial-admin")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
+    private lateinit var adminUsername: String
+
+    @BeforeEach
+    fun createAdminUser() {
+        adminUsername = "admin.${UUID.randomUUID()}"
+        userService.createUser(
+            CreateUserRequest(
+                username = adminUsername,
+                password = "admin1234",
+                roles = listOf(UserRole.ADMIN),
             )
-            .andExpect(status().isCreated)
+        )
     }
 
     @Test
@@ -40,7 +40,7 @@ class AuthControllerIT : IntegrationTest() {
         val payload =
             """
             {
-              "username": "admin",
+              "username": "$adminUsername",
               "password": "admin1234",
               "rememberMe": false
             }
@@ -53,7 +53,7 @@ class AuthControllerIT : IntegrationTest() {
             )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.authenticated").value(true))
-            .andExpect(jsonPath("$.user.username").value("admin"))
+            .andExpect(jsonPath("$.user.username").value(adminUsername))
             .andExpect(jsonPath("$.user.roles[0]").value("ADMIN"))
     }
 
@@ -70,7 +70,7 @@ class AuthControllerIT : IntegrationTest() {
         val payload =
             """
             {
-              "username": "admin",
+              "username": "$adminUsername",
               "password": "admin1234",
               "rememberMe": true
             }

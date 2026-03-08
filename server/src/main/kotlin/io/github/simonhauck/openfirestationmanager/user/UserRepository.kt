@@ -11,4 +11,6 @@ interface UserRepository : Repository<UserAccount, Long> {
   fun existsByUsername(username: String): Boolean
 
   fun count(): Long
+
+  fun deleteAll()
 }
