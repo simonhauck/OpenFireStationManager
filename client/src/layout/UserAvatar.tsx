@@ -35,8 +35,8 @@ export function UserAvatar({ username }: UserAvatarProps) {
           <span>{username}</span>
         </li>
         <li>
-          <button type="button" onClick={() => logout.mutate()} disabled={logout.isPending}>
-            {logout.isPending ? "Abmeldung laeuft..." : "Abmelden"}
+          <button type="button" onClick={() => logout.mutate({})} disabled={logout.isPending}>
+            {logout.isPending ? "Abmeldung läuft..." : "Abmelden"}
           </button>
         </li>
       </ul>

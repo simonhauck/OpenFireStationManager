@@ -23,7 +23,6 @@ data class LoginRequest(
     @field:NotBlank val username: String,
     @field:NotBlank val password: String,
     @field:Positive val tokenValiditySeconds: Long = 3600,
-    val rememberMe: Boolean = false,
 )
 
 data class AuthUserResponse(val username: String, val roles: List<String>)

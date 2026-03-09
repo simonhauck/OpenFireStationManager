@@ -42,11 +42,13 @@ export function LoginPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const years5 = 60 * 60 * 24 * 356 * 5;
+    const hours8 = 60 * 60 * 8;
     login.mutate({
       body: {
         username,
         password,
-        rememberMe,
+        tokenValiditySeconds: rememberMe ? years5 : hours8,
       },
     });
   };
@@ -97,13 +99,13 @@ export function LoginPage() {
                   checked={rememberMe}
                   onChange={(event) => setRememberMe(event.target.checked)}
                 />
-                <span className="label-text">Auf diesem Geraet angemeldet bleiben</span>
+                <span className="label-text">Auf diesem Gerät angemeldet bleiben</span>
               </label>
 
               {errorMessage && <div className="alert alert-error">{errorMessage}</div>}
 
               <button type="submit" className="btn btn-primary" disabled={login.isPending}>
-                {login.isPending ? "Anmeldung laeuft..." : "Anmelden"}
+                {login.isPending ? "Anmeldung läuft..." : "Anmelden"}
               </button>
             </form>
 
