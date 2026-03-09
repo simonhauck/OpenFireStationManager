@@ -25,7 +25,7 @@ class TokenCookieFilter(
         filterChain: FilterChain,
     ) {
 
-        val token = request.cookies.find { it.name == appSecProperties.cookieName }?.value
+        val token = request.cookies?.find { it.name == appSecProperties.cookieName }?.value
 
         if (token == null) {
             filterChain.doFilter(request, response)

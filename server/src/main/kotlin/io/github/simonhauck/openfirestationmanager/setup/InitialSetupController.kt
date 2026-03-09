@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 data class InitialAdminSetupRequest(
@@ -27,7 +26,6 @@ data class InitialAdminSetupRequest(
 class InitialSetupController(private val userService: UserService) {
 
     @PostMapping("/initial-admin")
-    @ResponseStatus(HttpStatus.CREATED)
     fun initializeAdmin(@Valid @RequestBody requestBody: InitialAdminSetupRequest): UserAccount {
         if (userService.hasAnyUsers()) {
             throw PublicApiException(
