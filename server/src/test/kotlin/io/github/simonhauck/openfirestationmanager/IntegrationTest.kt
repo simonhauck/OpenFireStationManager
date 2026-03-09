@@ -28,12 +28,13 @@ open class IntegrationTest {
             setAdminCookieValue()
             hasRunInit = true
         }
+        validCookieHeader = staticCookieHeader
     }
 
     private fun setAdminCookieValue() {
         val authCalls = AuthControllerCalls(http)
         val loginResponse = authCalls.login(LoginRequest(username = "chief", password = "secret"))
-        validCookieHeader =
+        staticCookieHeader =
             authCalls.extractAuthCookie(loginResponse)
                 ?: error("Login failed: no auth cookie returned")
     }
@@ -45,7 +46,7 @@ open class IntegrationTest {
 
     companion object {
         private var hasRunInit = false
-        private var storedCookieHeader: String? = null
+        private var staticCookieHeader: String = ""
 
         private val postgresContainer =
             PostgreSQLContainer("postgres:18")

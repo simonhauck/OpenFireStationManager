@@ -1,10 +1,6 @@
 spring:
   application:
     name: OpenFireStationManager
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
   docker:
     compose:
       file: ./compose.yml
