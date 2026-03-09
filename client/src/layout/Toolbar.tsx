@@ -8,6 +8,7 @@ export function Toolbar() {
 
   const isAuthenticated = data?.authenticated === true;
   const username = data?.user?.username;
+  const isAdmin = data?.user?.roles?.includes("ADMIN") === true;
 
   return (
     <header className="navbar bg-base-200 px-4 shadow-sm">
@@ -22,6 +23,11 @@ export function Toolbar() {
           <Link to="/about" className="btn btn-ghost join-item [&.active]:btn-active">
             Ueber uns
           </Link>
+          {isAdmin && (
+            <Link to="/admin/users" className="btn btn-ghost join-item [&.active]:btn-active">
+              Benutzer
+            </Link>
+          )}
         </nav>
       </div>
 
