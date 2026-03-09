@@ -1,1 +1,338 @@
-{"openapi":"3.1.0","info":{"title":"OpenAPI definition","version":"v0"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"paths":{"/api/public/setup/initial-admin":{"post":{"tags":["initial-setup-controller"],"operationId":"initializeAdmin","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/InitialAdminSetupRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserAccount"}}}}}}},"/api/public/auth/logout":{"post":{"tags":["auth-controller"],"operationId":"logout","responses":{"204":{"description":"No Content","content":{}}}}},"/api/public/auth/login":{"post":{"tags":["auth-controller"],"operationId":"login","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/LoginRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{}}}}},"/api/admin/users":{"post":{"tags":["admin-user-controller"],"operationId":"createUser","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateUserRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserAccount"}}}}}}},"/api/public/auth/me":{"get":{"tags":["auth-controller"],"operationId":"me","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AuthStateResponse"}}}}}}}},"components":{"schemas":{"InitialAdminSetupRequest":{"type":"object","properties":{"username":{"type":"string","minLength":1},"password":{"type":"string","maxLength":32,"minLength":4}},"required":["password","username"]},"UserAccount":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"username":{"type":"string"},"passwordHash":{"type":"string"},"roles":{"type":"array","items":{"type":"string","enum":["USER","ADMIN"]}},"enabled":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"}}},"LoginRequest":{"type":"object","properties":{"username":{"type":"string","minLength":1},"password":{"type":"string","minLength":1},"tokenValiditySeconds":{"type":"integer","format":"int64"}},"required":["password","username"]},"CreateUserRequest":{"type":"object","properties":{"username":{"type":"string","minLength":1},"password":{"type":"string","maxLength":32,"minLength":4},"roles":{"type":"array","items":{"type":"string","enum":["USER","ADMIN"]}}},"required":["password","username"]},"AuthStateResponse":{"type":"object","properties":{"authenticated":{"type":"boolean"},"user":{"$ref":"#/components/schemas/AuthUserResponse"}}},"AuthUserResponse":{"type":"object","properties":{"username":{"type":"string"},"roles":{"type":"array","items":{"type":"string"}}}}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "paths": {
+    "/api/public/setup/initial-admin": {
+      "post": {
+        "tags": ["initial-setup-controller"],
+        "operationId": "initializeAdmin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitialAdminSetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/auth/logout": {
+      "post": {
+        "tags": ["auth-controller"],
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/public/auth/login": {
+      "post": {
+        "tags": ["auth-controller"],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": ["admin-user-controller"],
+        "operationId": "getAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserAccount"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["admin-user-controller"],
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "patch": {
+        "tags": ["admin-user-controller"],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/auth/me": {
+      "get": {
+        "tags": ["auth-controller"],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InitialAdminSetupRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
+          },
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          }
+        },
+        "required": ["firstName", "lastName", "password", "username"]
+      },
+      "UserAccount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "passwordHash": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN"]
+            }
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tokenValiditySeconds": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": ["password", "username"]
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
+          },
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN"]
+            }
+          }
+        },
+        "required": ["firstName", "lastName", "password", "username"]
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN"]
+            }
+          }
+        },
+        "required": ["firstName", "lastName"]
+      },
+      "AuthStateResponse": {
+        "type": "object",
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/AuthUserResponse"
+          }
+        }
+      },
+      "AuthUserResponse": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

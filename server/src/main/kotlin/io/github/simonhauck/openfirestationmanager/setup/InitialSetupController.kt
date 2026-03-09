@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 data class InitialAdminSetupRequest(
     @field:NotBlank val username: String,
     @field:NotBlank @field:Size(min = 4, max = 32) val password: String,
+    @field:NotBlank @field:Size(max = 100) val firstName: String,
+    @field:NotBlank @field:Size(max = 100) val lastName: String,
 )
 
 @RestController
@@ -39,6 +41,8 @@ class InitialSetupController(private val userService: UserService) {
                 CreateUserRequest(
                     username = requestBody.username,
                     password = requestBody.password,
+                    firstName = requestBody.firstName,
+                    lastName = requestBody.lastName,
                     roles = listOf(UserRole.ADMIN),
                 )
             )

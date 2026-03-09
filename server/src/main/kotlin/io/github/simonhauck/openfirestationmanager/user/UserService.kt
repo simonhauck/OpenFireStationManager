@@ -10,6 +10,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
+    fun getAllUsers(): List<UserAccount> = userRepository.findAll().sortedBy { it.id }
+
     fun createUser(createUserRequest: CreateUserRequest): UserAccount {
         if (userRepository.existsByUsername(createUserRequest.username)) {
             throw PublicApiException(status = HttpStatus.CONFLICT, "Username is already taken")
@@ -22,10 +24,30 @@ class UserService(
             UserAccount(
                 username = createUserRequest.username,
                 passwordHash = passwordHash,
+                firstName = createUserRequest.firstName,
+                lastName = createUserRequest.lastName,
                 roles = createUserRequest.roles,
             )
 
         return userRepository.save(entity)
+    }
+
+    fun updateUser(userId: Long, updateUserRequest: UpdateUserRequest): UserAccount {
+        val existingUser =
+            userRepository.findById(userId)
+                ?: throw PublicApiException(
+                    status = HttpStatus.NOT_FOUND,
+                    publicMessage = "User not found for id: $userId",
+                )
+
+        val updatedUser =
+            existingUser.copy(
+                firstName = updateUserRequest.firstName,
+                lastName = updateUserRequest.lastName,
+                roles = updateUserRequest.roles,
+            )
+
+        return userRepository.save(updatedUser)
     }
 
     fun findByUsername(username: String): UserAccount? = userRepository.findByUsername(username)

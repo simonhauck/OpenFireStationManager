@@ -6,6 +6,10 @@ interface UserRepository : Repository<UserAccount, Long> {
 
   fun save(user: UserAccount): UserAccount
 
+  fun findAll(): List<UserAccount>
+
+  fun findById(id: Long): UserAccount?
+
   fun findByUsername(username: String): UserAccount?
 
   fun existsByUsername(username: String): Boolean

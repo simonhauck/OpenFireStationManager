@@ -12,7 +12,13 @@ class InitialSetupControllerIT : IntegrationTest() {
 
     @Test
     fun `second invocation of admin user creation should fail - first invocation happens in test setup`() {
-        val request = InitialAdminSetupRequest(username = "chief", password = "secret")
+        val request =
+            InitialAdminSetupRequest(
+                username = "chief",
+                password = "secret",
+                firstName = "Initial",
+                lastName = "Admin",
+            )
 
         val secondResponse = initialSetupControllerCalls.createInitialAdminExpectingProblem(request)
 

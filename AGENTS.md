@@ -21,14 +21,14 @@ testing, TypeScript rules, code style, routing, and PWA notes.
 
 **Quick reference:**
 
-| Purpose | Command (from `client/`) |
-|---|---|
-| Start dev server | `npm run dev` |
-| Production build | `npm run build` |
-| Lint (auto-fix) | `npm run lint` |
-| Lint (check only) | `npm run lint:check` |
-| Format (auto-fix) | `npm run format` |
-| Format (check only) | `npm run format:check` |
+| Purpose             | Command (from `client/`) |
+| ------------------- | ------------------------ |
+| Start dev server    | `npm run dev`            |
+| Production build    | `npm run build`          |
+| Lint (auto-fix)     | `npm run lint`           |
+| Lint (check only)   | `npm run lint:check`     |
+| Format (auto-fix)   | `npm run format`         |
+| Format (check only) | `npm run format:check`   |
 
 ---
 
@@ -39,12 +39,12 @@ testing, code style, API design, and database conventions.
 
 **Quick reference:**
 
-| Purpose | Command (from `server/`) |
-|---|---|
-| Build | `./gradlew build` |
-| Run | `./gradlew bootRun` |
-| Test all | `./gradlew test` |
-| Single test class | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
+| Purpose            | Command (from `server/`)                                                               |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| Build              | `./gradlew build`                                                                      |
+| Run                | `./gradlew bootRun`                                                                    |
+| Test all           | `./gradlew test`                                                                       |
+| Single test class  | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
 | Single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
 
 > **Docker must be running** before executing integration tests.

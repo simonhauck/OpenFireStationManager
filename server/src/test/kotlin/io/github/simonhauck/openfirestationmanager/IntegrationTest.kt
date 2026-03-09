@@ -41,7 +41,14 @@ open class IntegrationTest {
 
     private fun createAdmin() {
         InitialSetupControllerCalls(http)
-            .createInitialAdmin(InitialAdminSetupRequest(username = "chief", password = "secret"))
+            .createInitialAdmin(
+                InitialAdminSetupRequest(
+                    username = "chief",
+                    password = "secret",
+                    firstName = "Initial",
+                    lastName = "Admin",
+                )
+            )
     }
 
     companion object {

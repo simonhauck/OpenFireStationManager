@@ -25,6 +25,8 @@ class JwtTokenUtilityTest {
             UserAccount(
                 username = "alice",
                 passwordHash = "password-hash",
+                firstName = "Alice",
+                lastName = "Smith",
                 roles = listOf(UserRole.USER, UserRole.ADMIN),
             )
 
@@ -54,7 +56,13 @@ class JwtTokenUtilityTest {
 
     @Test
     fun `should return failure when token signature is invalid`() {
-        val userAccount = UserAccount(username = "alice", passwordHash = "password-hash")
+        val userAccount =
+            UserAccount(
+                username = "alice",
+                passwordHash = "password-hash",
+                firstName = "Alice",
+                lastName = "Smith",
+            )
 
         val otherTokenUtility =
             JwtTokenUtility(
@@ -74,7 +82,13 @@ class JwtTokenUtilityTest {
 
     @Test
     fun `should return failure when token has expired`() {
-        val userAccount = UserAccount(username = "alice", passwordHash = "password-hash")
+        val userAccount =
+            UserAccount(
+                username = "alice",
+                passwordHash = "password-hash",
+                firstName = "Alice",
+                lastName = "Smith",
+            )
 
         val expiredToken = tokenUtility.generateTokenForUser(userAccount, (-10).seconds)
 
