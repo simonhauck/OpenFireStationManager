@@ -26,3 +26,5 @@ dev-dist
 
 **/routeTree.gen.ts
 .tanstack/tmp/**
+
+src/gen/**

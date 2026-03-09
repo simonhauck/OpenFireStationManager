@@ -14,6 +14,7 @@ file-based routing with automatic code-splitting, Tailwind CSS v4 + DaisyUI v5 f
 and ships as a PWA via `vite-plugin-pwa`.
 
 **Tech stack:**
+
 - TypeScript ~5.9 (strict mode), React 19, Vite 7
 - TanStack Router v1 — file-based routing, `autoCodeSplitting: true`
 - Tailwind CSS v4 (via `@tailwindcss/vite` plugin — no `tailwind.config.*` needed) + DaisyUI v5
@@ -22,19 +23,24 @@ and ships as a PWA via `vite-plugin-pwa`.
 
 All commands below are run from the `client/` directory.
 
+## Language
+
+- UI copy must be German-only. Do not introduce English labels, button text, helper text,
+  headings, placeholders, validation messages, or navigation labels in the client.
+
 ---
 
 ## Commands
 
-| Purpose | Command |
-|---|---|
-| Start dev server | `npm run dev` |
-| Production build | `npm run build` |
-| Preview production build | `npm run preview` |
-| Lint (auto-fix) | `npm run lint` |
-| Lint (check only) | `npm run lint:check` |
-| Format (auto-fix) | `npm run format` |
-| Format (check only) | `npm run format:check` |
+| Purpose                  | Command                |
+| ------------------------ | ---------------------- |
+| Start dev server         | `npm run dev`          |
+| Production build         | `npm run build`        |
+| Preview production build | `npm run preview`      |
+| Lint (auto-fix)          | `npm run lint`         |
+| Lint (check only)        | `npm run lint:check`   |
+| Format (auto-fix)        | `npm run format`       |
+| Format (check only)      | `npm run format:check` |
 
 ---
 
@@ -76,6 +82,12 @@ and regenerates `routeTree.gen.ts` on the next `dev` or `build` run.
 Organise new non-route source files by feature (e.g. `src/stations/`, `src/vehicles/`)
 rather than by type (no `src/components/`, `src/hooks/` mega-folders).
 
+**Reusable components:** Decompose UI into small, focused components. Each component should
+do one thing and receive everything it needs via props. Keep components under ~80 lines; if a
+component grows larger, split it into smaller pieces within the same feature folder. Co-locate
+a component with its feature (e.g. `src/home/HeroSection.tsx`) rather than putting everything
+in a generic `src/components/` folder.
+
 ---
 
 ## TypeScript
@@ -84,6 +96,7 @@ All compiler options live in `tsconfig.app.json` (covers `src/`) and `tsconfig.n
 (covers `vite.config.ts` and other tooling files).
 
 **Active strict flags:**
+
 - `"strict": true` — enables all strict type checks
 - `"noUnusedLocals": true` / `"noUnusedParameters": true` — unused code is a compile error
 - `"noFallthroughCasesInSwitch": true`
@@ -92,6 +105,7 @@ All compiler options live in `tsconfig.app.json` (covers `src/`) and `tsconfig.n
 - `"verbatimModuleSyntax": true` — requires `import type` for type-only imports
 
 **Rules:**
+
 - Never use `any`. Use explicit types, generics, or `unknown` with narrowing.
 - Use `import type` for every type-only import — the compiler enforces this:
   ```ts
@@ -113,23 +127,24 @@ All compiler options live in `tsconfig.app.json` (covers `src/`) and `tsconfig.n
 
 ### Formatting — Prettier (`client/.prettierrc.json`)
 
-| Setting | Value |
-|---|---|
-| `printWidth` | 100 |
-| `tabWidth` | 2 |
-| `useTabs` | false |
-| `semi` | true |
-| `singleQuote` | false (double quotes) |
-| `jsxSingleQuote` | false |
-| `trailingComma` | `"es5"` |
-| `arrowParens` | `"always"` |
-| `endOfLine` | `"lf"` |
+| Setting          | Value                 |
+| ---------------- | --------------------- |
+| `printWidth`     | 100                   |
+| `tabWidth`       | 2                     |
+| `useTabs`        | false                 |
+| `semi`           | true                  |
+| `singleQuote`    | false (double quotes) |
+| `jsxSingleQuote` | false                 |
+| `trailingComma`  | `"es5"`               |
+| `arrowParens`    | `"always"`            |
+| `endOfLine`      | `"lf"`                |
 
 Run `npm run format` to auto-fix. CI uses `npm run format:check`.
 
 ### Linting — ESLint v9 (`eslint.config.js`)
 
 Flat config format. Applies to `**/*.{ts,tsx}`, ignores `dist/`:
+
 - `@eslint/js` recommended
 - `typescript-eslint` recommended
 - `eslint-plugin-react-hooks` recommended-latest (enforces Rules of Hooks)
@@ -139,19 +154,20 @@ Run `npm run lint` to auto-fix. Run `npm run lint:check` for a read-only check.
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-|---|---|---|
-| React component files | `PascalCase.tsx` | `StationCard.tsx` |
-| Non-component TS files | `camelCase.ts` | `useStations.ts` |
-| TanStack Router specials | `__` prefix | `__root.tsx` |
-| Route files | `kebab-case.tsx` matching URL segment | `station-detail.tsx` |
-| React component functions | `PascalCase` | `StationCard` |
-| Variables and functions | `camelCase` | `fetchStation` |
-| Route exports | named `Route` constant | `export const Route = ...` |
+| Element                   | Convention                            | Example                    |
+| ------------------------- | ------------------------------------- | -------------------------- |
+| React component files     | `PascalCase.tsx`                      | `StationCard.tsx`          |
+| Non-component TS files    | `camelCase.ts`                        | `useStations.ts`           |
+| TanStack Router specials  | `__` prefix                           | `__root.tsx`               |
+| Route files               | `kebab-case.tsx` matching URL segment | `station-detail.tsx`       |
+| React component functions | `PascalCase`                          | `StationCard`              |
+| Variables and functions   | `camelCase`                           | `fetchStation`             |
+| Route exports             | named `Route` constant                | `export const Route = ...` |
 
 ### Imports
 
 Follow this group order (no enforced sorter — maintain manually):
+
 1. External packages (`react`, `@tanstack/react-router`, etc.)
 2. Absolute internal imports (`../` paths that cross feature boundaries)
 3. Relative imports (`./`)
