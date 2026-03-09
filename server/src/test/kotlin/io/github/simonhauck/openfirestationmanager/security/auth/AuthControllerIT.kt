@@ -4,6 +4,7 @@ import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 
 class AuthControllerIT() : IntegrationTest() {
@@ -32,5 +33,16 @@ class AuthControllerIT() : IntegrationTest() {
         assertThat(meResponse.body?.authenticated).isTrue
         assertThat(meResponse.body?.user?.username).isEqualTo("chief")
         assertThat(meResponse.body?.user?.roles).contains("ADMIN")
+    }
+
+    @Test
+    fun `logout should invalidate the auth cookie`() {
+        val logoutResponse = authControllerCalls.logout(validCookieHeader)
+
+        assertThat(logoutResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+
+        val setCookieHeader = logoutResponse.headers.getFirst(HttpHeaders.SET_COOKIE)
+        assertThat(setCookieHeader).contains("OFSM_AUTH=")
+        assertThat(setCookieHeader).contains("Max-Age=0")
     }
 }

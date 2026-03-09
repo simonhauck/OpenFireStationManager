@@ -1,5 +1,7 @@
 package io.github.simonhauck.openfirestationmanager
 
+import io.github.simonhauck.openfirestationmanager.security.auth.AuthControllerCalls
+import io.github.simonhauck.openfirestationmanager.security.auth.LoginRequest
 import io.github.simonhauck.openfirestationmanager.setup.InitialAdminSetupRequest
 import io.github.simonhauck.openfirestationmanager.setup.InitialSetupControllerCalls
 import org.junit.jupiter.api.BeforeEach
@@ -17,22 +19,34 @@ open class IntegrationTest {
 
     @Autowired protected lateinit var http: TestRestTemplate
 
-    private var hasRunInit = false
-
-    protected lateinit var validToken: String
+    protected lateinit var validCookieHeader: String
 
     @BeforeEach
     fun setUp() {
         if (!hasRunInit) {
-            InitialSetupControllerCalls(http)
-                .createInitialAdmin(
-                    InitialAdminSetupRequest(username = "chief", password = "secret")
-                )
+            createAdmin()
+            setAdminCookieValue()
             hasRunInit = true
         }
     }
 
+    private fun setAdminCookieValue() {
+        val authCalls = AuthControllerCalls(http)
+        val loginResponse = authCalls.login(LoginRequest(username = "chief", password = "secret"))
+        validCookieHeader =
+            authCalls.extractAuthCookie(loginResponse)
+                ?: error("Login failed: no auth cookie returned")
+    }
+
+    private fun createAdmin() {
+        InitialSetupControllerCalls(http)
+            .createInitialAdmin(InitialAdminSetupRequest(username = "chief", password = "secret"))
+    }
+
     companion object {
+        private var hasRunInit = false
+        private var storedCookieHeader: String? = null
+
         private val postgresContainer =
             PostgreSQLContainer("postgres:18")
                 .withDatabaseName("mydatabase")
