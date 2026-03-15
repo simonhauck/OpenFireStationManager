@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NutzermanagementIndexRouteImport } from './routes/nutzermanagement/index'
 import { Route as NutzermanagementNewRouteImport } from './routes/nutzermanagement/new'
+import { Route as NutzermanagementUserIdEditRouteImport } from './routes/nutzermanagement/$userId/edit'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -40,6 +41,12 @@ const NutzermanagementNewRoute = NutzermanagementNewRouteImport.update({
   path: '/nutzermanagement/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NutzermanagementUserIdEditRoute =
+  NutzermanagementUserIdEditRouteImport.update({
+    id: '/nutzermanagement/$userId/edit',
+    path: '/nutzermanagement/$userId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +54,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
   '/nutzermanagement/': typeof NutzermanagementIndexRoute
+  '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +62,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
   '/nutzermanagement': typeof NutzermanagementIndexRoute
+  '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +71,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
   '/nutzermanagement/': typeof NutzermanagementIndexRoute
+  '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,8 +81,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/nutzermanagement/new'
     | '/nutzermanagement/'
+    | '/nutzermanagement/$userId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/login' | '/nutzermanagement/new' | '/nutzermanagement'
+  to:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/nutzermanagement/new'
+    | '/nutzermanagement'
+    | '/nutzermanagement/$userId/edit'
   id:
     | '__root__'
     | '/'
@@ -80,6 +97,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/nutzermanagement/new'
     | '/nutzermanagement/'
+    | '/nutzermanagement/$userId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +106,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NutzermanagementNewRoute: typeof NutzermanagementNewRoute
   NutzermanagementIndexRoute: typeof NutzermanagementIndexRoute
+  NutzermanagementUserIdEditRoute: typeof NutzermanagementUserIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NutzermanagementNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nutzermanagement/$userId/edit': {
+      id: '/nutzermanagement/$userId/edit'
+      path: '/nutzermanagement/$userId/edit'
+      fullPath: '/nutzermanagement/$userId/edit'
+      preLoaderRoute: typeof NutzermanagementUserIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -136,6 +162,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NutzermanagementNewRoute: NutzermanagementNewRoute,
   NutzermanagementIndexRoute: NutzermanagementIndexRoute,
+  NutzermanagementUserIdEditRoute: NutzermanagementUserIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

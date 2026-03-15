@@ -115,6 +115,32 @@
       }
     },
     "/api/admin/users/{id}" : {
+      "get" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "getUserById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch" : {
         "tags" : [ "admin-user-controller" ],
         "operationId" : "updateUser",

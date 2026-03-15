@@ -38,6 +38,20 @@ export const getAllUsersQuery = () =>
     },
   })
 
+export const getUserByIdQuery = (id: number) =>
+  queryOptions({
+    queryKey: queryKeys.user(id),
+    queryFn: async (): Promise<UserAccount> => {
+      const { data, error } = await client.GET("/api/admin/users/{id}", {
+        params: {
+          path: { id },
+        },
+      })
+
+      return ensureData(data, error, "GET /api/admin/users/{id}")
+    },
+  })
+
 export const createUserMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationKey: [...queryKeys.users(), "create"] as const,

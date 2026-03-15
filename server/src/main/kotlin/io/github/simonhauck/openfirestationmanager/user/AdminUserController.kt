@@ -23,6 +23,12 @@ class AdminUserController(private val userService: UserService) {
         return userService.getAllUsers()
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    fun getUserById(@PathVariable @Positive id: Long): UserAccount {
+        return userService.getUserById(id)
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun createUser(@Valid @RequestBody requestBody: CreateUserRequest): UserAccount {

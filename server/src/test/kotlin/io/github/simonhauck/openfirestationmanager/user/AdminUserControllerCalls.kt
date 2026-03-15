@@ -29,6 +29,22 @@ class AdminUserControllerCalls(private val testRestTemplate: TestRestTemplate) {
         )
     }
 
+    fun getUserById(id: Long, authCookie: String? = null): ResponseEntity<UserAccount> {
+        return testRestTemplate.exchange<UserAccount>(
+            "/api/admin/users/$id",
+            HttpMethod.GET,
+            HttpEntity<Unit>(headersWithCookie(authCookie)),
+        )
+    }
+
+    fun getUserByIdExpectingError(id: Long, authCookie: String? = null): ResponseEntity<ProblemDetail> {
+        return testRestTemplate.exchange<ProblemDetail>(
+            "/api/admin/users/$id",
+            HttpMethod.GET,
+            HttpEntity<Unit>(headersWithCookie(authCookie)),
+        )
+    }
+
     fun createUser(
         request: CreateUserRequest,
         authCookie: String? = null,

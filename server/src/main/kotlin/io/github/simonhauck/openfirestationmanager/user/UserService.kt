@@ -12,6 +12,14 @@ class UserService(
 ) {
     fun getAllUsers(): List<UserAccount> = userRepository.findAll().sortedBy { it.id }
 
+    fun getUserById(userId: Long): UserAccount {
+        return userRepository.findById(userId)
+            ?: throw PublicApiException(
+                status = HttpStatus.NOT_FOUND,
+                publicMessage = "User not found for id: $userId",
+            )
+    }
+
     fun createUser(createUserRequest: CreateUserRequest): UserAccount {
         if (userRepository.existsByUsername(createUserRequest.username)) {
             throw PublicApiException(status = HttpStatus.CONFLICT, "Username is already taken")

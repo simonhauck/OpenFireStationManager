@@ -1,5 +1,9 @@
 import type { components } from "#/api/schema"
+import { Pencil } from "lucide-react"
+import { Link } from "@tanstack/react-router"
 import { Badge } from "#/components/ui/badge"
+import { Button } from "#/components/ui/button"
+import { getRoleLabel } from "#/users/roleMetadata"
 import {
     Table,
     TableBody,
@@ -13,10 +17,6 @@ type UserAccount = components["schemas"]["UserAccount"]
 
 interface UsersTableProps {
   users: UserAccount[]
-}
-
-function formatRole(role: UserAccount["roles"][number]): string {
-  return role === "ADMIN" ? "Admin" : "Nutzer"
 }
 
 function formatDate(dateString: string): string {
@@ -39,13 +39,14 @@ export default function UsersTable({ users }: UsersTableProps) {
             <TableHead>Nachname</TableHead>
             <TableHead>Rollen</TableHead>
             <TableHead>Erstellt am</TableHead>
+            <TableHead className="text-right">Aktionen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={6}
+                colSpan={7}
                 className="py-10 text-center text-muted-foreground"
               >
                 Keine Nutzer gefunden.
@@ -64,13 +65,25 @@ export default function UsersTable({ users }: UsersTableProps) {
                   <div className="flex flex-wrap gap-1">
                     {user.roles.map((role) => (
                       <Badge key={`${user.id}-${role}`} variant="secondary">
-                        {formatRole(role)}
+                        {getRoleLabel(role)}
                       </Badge>
                     ))}
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatDate(user.metaData.createdAt)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button asChild size="icon" variant="outline">
+                    <Link
+                      to="/nutzermanagement/$userId/edit"
+                      params={{ userId: String(user.id) }}
+                      aria-label={`Nutzer ${user.username} bearbeiten`}
+                      title="Nutzer bearbeiten"
+                    >
+                      <Pencil className="size-4" />
+                    </Link>
+                  </Button>
                 </TableCell>
               </TableRow>
             ))

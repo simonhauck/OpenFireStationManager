@@ -87,6 +87,48 @@ class AdminUserControllerIT : IntegrationTest() {
     }
 
     @Test
+    fun `getUserById should return one user when authenticated as admin`() {
+        val createdUser =
+            adminUserControllerCalls
+                .createUser(
+                    CreateUserRequest(
+                        username = uniqueUsername(),
+                        password = "password",
+                        firstName = "Alex",
+                        lastName = "Miller",
+                        roles = listOf(UserRole.USER),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val response =
+            adminUserControllerCalls.getUserById(
+                id = createdUser.id,
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNotNull
+        assertThat(response.body?.id).isEqualTo(createdUser.id)
+        assertThat(response.body?.username).isEqualTo(createdUser.username)
+        assertThat(response.body?.firstName).isEqualTo("Alex")
+        assertThat(response.body?.lastName).isEqualTo("Miller")
+        assertThat(response.body?.roles).containsExactly(UserRole.USER)
+    }
+
+    @Test
+    fun `getUserById should return 404 when user does not exist`() {
+        val response =
+            adminUserControllerCalls.getUserByIdExpectingError(
+                id = Long.MAX_VALUE,
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
     fun `updateUser should update first and last name and roles for one user`() {
         val createdUser =
             adminUserControllerCalls
