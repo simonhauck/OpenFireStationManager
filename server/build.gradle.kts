@@ -27,6 +27,7 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:10.8")
 
     implementation("tools.jackson.module:jackson-module-kotlin")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
 
     testAndDevelopmentOnly("org.springframework.boot:spring-boot-docker-compose")
 

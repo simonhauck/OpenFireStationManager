@@ -1,6 +1,7 @@
 package io.github.simonhauck.openfirestationmanager.user
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.testutil.snapshotTest
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -49,24 +50,26 @@ class AdminUserControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `createUser should return 400 when username is blank`() {
-        val request =
-            CreateUserRequest(
-                username = "",
-                password = "password",
-                firstName = "John",
-                lastName = "Smith",
-                roles = listOf(UserRole.USER),
-            )
+    fun `createUser should return 400 when username is blank`() =
+        snapshotTest(this) {
+            val request =
+                CreateUserRequest(
+                    username = "",
+                    password = "password",
+                    firstName = "John",
+                    lastName = "Smith",
+                    roles = listOf(UserRole.USER),
+                )
 
-        val response =
-            adminUserControllerCalls.createUserExpectingError(
-                request,
-                authCookie = validCookieHeader,
-            )
+            val response =
+                adminUserControllerCalls.createUserExpectingError(
+                    request,
+                    authCookie = validCookieHeader,
+                )
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-    }
+            assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+            response.body.shouldEqualSnapshot("expected_failed_create_user_response.json")
+        }
 
     @Test
     fun `getAllUsers should return 403 when no auth cookie is provided`() {
