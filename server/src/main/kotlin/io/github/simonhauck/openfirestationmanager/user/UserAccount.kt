@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table
 enum class UserRole {
     USER,
     ADMIN,
+    GERAETEWART,
 }
 
 data class CreateUserRequest(

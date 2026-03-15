@@ -122,7 +122,7 @@ export interface components {
             username: string;
             firstName: string;
             lastName: string;
-            roles: ("USER" | "ADMIN")[];
+            roles: ("USER" | "ADMIN" | "GERAETEWART")[];
             enabled: boolean;
             /** Format: int64 */
             id: number;
@@ -139,12 +139,12 @@ export interface components {
             password: string;
             firstName: string;
             lastName: string;
-            roles: ("USER" | "ADMIN")[];
+            roles: ("USER" | "ADMIN" | "GERAETEWART")[];
         };
         UpdateUserRequest: {
             firstName: string;
             lastName: string;
-            roles: ("USER" | "ADMIN")[];
+            roles: ("USER" | "ADMIN" | "GERAETEWART")[];
         };
         AuthStateResponse: {
             authenticated: boolean;

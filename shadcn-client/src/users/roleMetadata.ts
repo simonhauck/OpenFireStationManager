@@ -18,6 +18,12 @@ export const ROLE_OPTIONS: Array<{
     description:
       "Kann Nutzer verwalten und administrative Einstellungen bearbeiten.",
   },
+  {
+    value: "GERAETEWART",
+    label: "GERÄTEWART",
+    description:
+      "Kann Feuerwehrgeräte-Konfigurationen erstellen und bearbeiten.",
+  },
 ]
 
 export function getRoleLabel(role: UserRole): string {

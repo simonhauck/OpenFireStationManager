@@ -260,7 +260,7 @@
             "type" : "array",
             "items" : {
               "type" : "string",
-              "enum" : [ "USER", "ADMIN" ]
+              "enum" : [ "USER", "ADMIN", "GERAETEWART" ]
             }
           },
           "enabled" : {
@@ -320,7 +320,7 @@
             "type" : "array",
             "items" : {
               "type" : "string",
-              "enum" : [ "USER", "ADMIN" ]
+              "enum" : [ "USER", "ADMIN", "GERAETEWART" ]
             }
           }
         },
@@ -343,7 +343,7 @@
             "type" : "array",
             "items" : {
               "type" : "string",
-              "enum" : [ "USER", "ADMIN" ]
+              "enum" : [ "USER", "ADMIN", "GERAETEWART" ]
             }
           }
         },
