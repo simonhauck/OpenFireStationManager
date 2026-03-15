@@ -45,7 +45,7 @@ class HttpApiContractIT : IntegrationTest() {
     private fun checkIfApiShouldBeUpdated(actual: JsonNode, throwable: Throwable) {
         if (System.getenv("UPDATE_SNAPSHOT") != "true") throw throwable
 
-        val openApiPath = System.getenv("FILE")
+        val openApiPath = File("src/main/resources/open-api-contract.json").absolutePath
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(File(openApiPath), actual)
     }
 }
