@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.user
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
 import jakarta.validation.constraints.NotBlank
@@ -30,7 +31,7 @@ data class UpdateUserRequest(
 @Table("users")
 data class UserAccount(
     val username: String,
-    val passwordHash: String,
+    @field:JsonIgnore val passwordHash: String = "",
     val firstName: String,
     val lastName: String,
     val roles: List<UserRole> = emptyList(),

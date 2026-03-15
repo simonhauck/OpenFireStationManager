@@ -1,16 +1,15 @@
 package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.security.config.AuthenticationProperties
+import io.github.simonhauck.openfirestationmanager.user.UserService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
-import kotlin.collections.sorted
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,16 +24,13 @@ data class LoginRequest(
     @field:Positive val tokenValiditySeconds: Long = 3600,
 )
 
-data class AuthUserResponse(val username: String, val roles: List<String>)
-
-data class AuthStateResponse(val authenticated: Boolean, val user: AuthUserResponse?)
-
 @RestController
 @RequestMapping("/api/public/auth")
 @Validated
 class AuthController(
     private val authService: AuthService,
     private val appSecurityProperties: AuthenticationProperties,
+    private val userService: UserService,
 ) {
 
     @PostMapping("/login")
@@ -74,27 +70,7 @@ class AuthController(
     }
 
     @GetMapping("/me")
-    fun me(authentication: Authentication?): AuthStateResponse {
-        if (
-            authentication == null ||
-                !authentication.isAuthenticated ||
-                authentication.name == "anonymousUser"
-        ) {
-            return AuthStateResponse(authenticated = false, user = null)
-        }
-
-        return authentication.toAuthStateResponse()
-    }
-
-    private fun Authentication.toAuthStateResponse(): AuthStateResponse {
-        val roles =
-            authorities
-                .mapNotNull { authority -> authority.authority?.removePrefix("ROLE_") }
-                .sorted()
-
-        return AuthStateResponse(
-            authenticated = true,
-            user = AuthUserResponse(username = name, roles = roles),
-        )
+    fun me(): AuthStateResponse {
+        return authService.getUserByAuthentication()
     }
 }

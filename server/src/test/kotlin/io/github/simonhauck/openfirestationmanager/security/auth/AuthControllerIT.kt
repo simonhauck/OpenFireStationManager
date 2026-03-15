@@ -1,6 +1,8 @@
 package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.testutil.snapshotTest
+import java.time.ZonedDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,20 +22,22 @@ class AuthControllerIT() : IntegrationTest() {
     }
 
     @Test
-    fun `login should return an auth cookie that can be used with the 'me' endpoint to get the current user`() {
-        val loginResponse =
-            authControllerCalls.login(LoginRequest(username = "chief", password = "secret"))
-        val authCookie = authControllerCalls.extractAuthCookie(loginResponse)
+    fun `login should return an auth cookie that can be used with the 'me' endpoint to get the current user`() =
+        snapshotTest(this) {
+            val loginResponse =
+                authControllerCalls.login(LoginRequest(username = "chief", password = "secret"))
+            val authCookie = authControllerCalls.extractAuthCookie(loginResponse)
 
-        assertThat(authCookie).isNotNull
+            assertThat(authCookie).isNotNull
 
-        val meResponse = authControllerCalls.me(authCookie)
+            val meResponse = authControllerCalls.me(authCookie)
 
-        assertThat(meResponse.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(meResponse.body?.authenticated).isTrue
-        assertThat(meResponse.body?.user?.username).isEqualTo("chief")
-        assertThat(meResponse.body?.user?.roles).contains("ADMIN")
-    }
+            assertThat(meResponse.statusCode).isEqualTo(HttpStatus.OK)
+            meResponse.body.shouldEqualSnapshot("expected_me_response.json") {
+                it.ignoringFields("user.id")
+                it.ignoringFieldsOfTypes(ZonedDateTime::class.java)
+            }
+        }
 
     @Test
     fun `logout should invalidate the auth cookie`() {

@@ -2,6 +2,7 @@ package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AnonymousAuthenticationProvider
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
@@ -9,18 +10,22 @@ import org.springframework.stereotype.Component
 class UserProvider {
 
     fun getCurrentUserOrThrow(): String {
-        val authentication =
-            SecurityContextHolder.getContext().authentication
-                ?: throw PublicApiException(
-                    status = HttpStatus.UNAUTHORIZED,
-                    publicMessage = "You are not authenticated",
-                )
-
-        return authentication.name
+        return getCurrentUser()
+            ?: throw PublicApiException(
+                status = HttpStatus.UNAUTHORIZED,
+                publicMessage = "You are not authenticated",
+            )
     }
 
     fun getCurrentUser(): String? {
-        val authentication = SecurityContextHolder.getContext().authentication ?: return null
-        return authentication.name
+        val authenticationResult = SecurityContextHolder.getContext().authentication ?: return null
+
+        if (!authenticationResult.isAuthenticated) return null
+
+        if (authenticationResult is AnonymousAuthenticationProvider) return null
+
+        if (authenticationResult.name == "anonymousUser") return null
+
+        return authenticationResult.name
     }
 }

@@ -23,6 +23,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // Workaround until openApi does implement jackson v3 support
+    // https://github.com/swagger-api/swagger-core/issues/4991
+    // https://github.com/swagger-api/swagger-core/pull/5031
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     implementation("com.nimbusds:nimbus-jose-jwt:10.8")
 

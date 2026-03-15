@@ -14,6 +14,7 @@ class AuthService(
     private val authenticationManager: AuthenticationManager,
     private val userService: UserService,
     private val jwtTokenUtility: JwtTokenUtility,
+    private val userProvider: UserProvider,
 ) {
     fun login(loginRequest: LoginRequest): AuthTokenResponse {
         val authentication =
@@ -32,5 +33,11 @@ class AuthService(
         val token = jwtTokenUtility.generateTokenForUser(userAccount, tokenValidity)
 
         return AuthTokenResponse(token = token)
+    }
+
+    fun getUserByAuthentication(): AuthStateResponse {
+        val currentUser = userProvider.getCurrentUser() ?: return AuthStateResponse(false, null)
+
+        return AuthStateResponse(true, userService.findByUsername(currentUser))
     }
 }
