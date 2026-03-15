@@ -1,4 +1,8 @@
-import { type QueryClient, mutationOptions, queryOptions } from "@tanstack/react-query"
+import {
+    type QueryClient,
+    mutationOptions,
+    queryOptions,
+} from "@tanstack/react-query"
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type { components } from "#/api/schema"
@@ -12,7 +16,11 @@ type UpdateUserVariables = {
   body: UpdateUserRequest
 }
 
-const ensureData = <T>(data: T | undefined, error: unknown, requestName: string): T => {
+const ensureData = <T>(
+  data: T | undefined,
+  error: unknown,
+  requestName: string,
+): T => {
   if (error) {
     throw error
   }
@@ -51,7 +59,9 @@ export const createUserMutation = (queryClient: QueryClient) =>
 export const updateUserMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationKey: [...queryKeys.users(), "update"] as const,
-    mutationFn: async (variables: UpdateUserVariables): Promise<UserAccount> => {
+    mutationFn: async (
+      variables: UpdateUserVariables,
+    ): Promise<UserAccount> => {
       const { data, error } = await client.PATCH("/api/admin/users/{id}", {
         params: {
           path: { id: variables.id },
