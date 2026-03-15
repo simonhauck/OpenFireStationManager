@@ -33,14 +33,14 @@ function App() {
 
   return (
     <main className="page-wrap px-4 pb-12 pt-14 sm:pt-16">
-      <section className="island-shell rise-in relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
+      <section className="island-shell rise-in relative overflow-hidden rounded-4xl px-6 py-10 sm:px-10 sm:py-14">
         <Badge variant="secondary" className="mb-4 uppercase tracking-wider">
           Öffentliche Projektübersicht
         </Badge>
-        <h1 className="display-title mb-4 max-w-3xl text-4xl leading-[1.02] font-bold tracking-tight text-[var(--sea-ink)] sm:text-6xl">
+        <h1 className="display-title mb-4 max-w-3xl text-4xl leading-[1.02] font-bold tracking-tight text-(--sea-ink) sm:text-6xl">
           OpenFireStationManager
         </h1>
-        <p className="mb-8 max-w-2xl text-base leading-relaxed text-[var(--sea-ink-soft)] sm:text-lg">
+        <p className="mb-8 max-w-2xl text-base leading-relaxed text-(--sea-ink-soft) sm:text-lg">
           OpenFireStationManager hilft Feuerwehrstationen dabei, Nutzer,
           Aufgaben und die tägliche Verwaltung sicher und zentral in einer
           browserbasierten Plattform zu koordinieren.
@@ -58,7 +58,7 @@ function App() {
               Quellcode ansehen
             </a>
           </Button>
-          <span className="inline-flex items-center gap-2 pl-1 text-sm text-[var(--sea-ink-soft)]">
+          <span className="inline-flex items-center gap-2 pl-1 text-sm text-(--sea-ink-soft)">
             <Flame className="size-4 text-(--palm)" />
             Für transparentes, praktisches Stationsmanagement.
           </span>

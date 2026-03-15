@@ -9,12 +9,12 @@ export default function Header() {
   useQuery(meQuery())
 
   return (
-    <header className="sticky top-0 z-50 border-b border-(--line) bg-[var(--header-bg)] px-4 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 border-b border-(--line) bg-(--header-bg) px-4 backdrop-blur-lg">
       <nav className="page-wrap flex items-center gap-6 py-3 sm:py-4">
         {/* Left: brand + nav links */}
         <Link
           to="/"
-          className="flex-shrink-0 text-sm font-semibold text-[var(--sea-ink)] no-underline"
+          className="shrink-0 text-sm font-semibold text-(--sea-ink) no-underline"
         >
           OpenFireStationManager
         </Link>
@@ -33,6 +33,13 @@ export default function Header() {
             activeProps={{ className: "nav-link is-active" }}
           >
             Über uns
+          </Link>
+          <Link
+            to="/nutzermanagement"
+            className="nav-link"
+            activeProps={{ className: "nav-link is-active" }}
+          >
+            Nutzermanagement
           </Link>
         </div>
 

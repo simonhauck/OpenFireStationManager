@@ -35,7 +35,8 @@ export const logoutMutation = (queryClient: QueryClient) =>
       if (error) throw error
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.me() })
+      await queryClient.invalidateQueries()
+      await queryClient.resetQueries()
     },
   })
 
