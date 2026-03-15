@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "2.2.21"
-    kotlin("plugin.spring") version "2.2.21"
-    id("org.springframework.boot") version "4.0.3"
-    id("io.spring.dependency-management") version "1.1.7"
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.kotlinSpring)
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springDependencyManagement)
 }
 
 group = "io.github.simonhauck"
@@ -15,38 +15,37 @@ java { toolchain { languageVersion = JavaLanguageVersion.of(24) } }
 
 repositories { mavenCentral() }
 
-// TODO 08.03.26 - Simon.Hauck Move dependency defintion to libs.version.toml
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation(libs.springBootStarterDataJdbc)
+    implementation(libs.springBootStarterSecurity)
+    implementation(libs.springBootStarterValidation)
+    implementation(libs.springBootStarterWebmvc)
+    implementation(libs.kotlinReflect)
 
     // Workaround until openApi does implement jackson v3 support
     // https://github.com/swagger-api/swagger-core/issues/4991
     // https://github.com/swagger-api/swagger-core/pull/5031
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
-    implementation("com.nimbusds:nimbus-jose-jwt:10.8")
+    implementation(libs.springdocOpenapiWebmvcUi)
+    implementation(libs.nimbusJoseJwt)
 
-    implementation("tools.jackson.module:jackson-module-kotlin")
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+    implementation(libs.jacksonModuleKotlin)
+    implementation(libs.kotlinLoggingJvm)
 
-    testAndDevelopmentOnly("org.springframework.boot:spring-boot-docker-compose")
+    testAndDevelopmentOnly(libs.springBootDockerCompose)
 
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly(libs.postgresql)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-restclient")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.3")
-    testImplementation("org.testcontainers:postgresql:1.21.3")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.assertj:assertj-core")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.springBootStarterDataJdbcTest)
+    testImplementation(libs.springBootStarterRestclient)
+    testImplementation(libs.springSecurityTest)
+    testImplementation(libs.springBootStarterValidationTest)
+    testImplementation(libs.springBootStarterWebmvcTest)
+    testImplementation(libs.testcontainersJunitJupiter)
+    testImplementation(libs.testcontainersPostgresql)
+    testImplementation(libs.kotlinTestJunit5)
+    testImplementation(libs.assertjCore)
+    testRuntimeOnly(libs.junitPlatformLauncher)
 }
 
 kotlin {
