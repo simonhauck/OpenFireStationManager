@@ -1,8 +1,8 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.spring.boot)
-    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.kotlinSpring)
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springDependencyManagement)
 }
 
 group = "io.github.simonhauck"
@@ -16,32 +16,32 @@ java { toolchain { languageVersion = JavaLanguageVersion.of(24) } }
 repositories { mavenCentral() }
 
 dependencies {
-    implementation(libs.spring.boot.starter.data.jdbc)
-    implementation(libs.spring.boot.starter.security)
-    implementation(libs.spring.boot.starter.validation)
-    implementation(libs.spring.boot.starter.webmvc)
-    implementation(libs.kotlin.reflect)
+    implementation(libs.springBootStarterDataJdbc)
+    implementation(libs.springBootStarterSecurity)
+    implementation(libs.springBootStarterValidation)
+    implementation(libs.springBootStarterWebmvc)
+    implementation(libs.kotlinReflect)
 
-    implementation(libs.springdoc.openapi.webmvc.ui)
-    implementation(libs.nimbus.jose.jwt)
+    implementation(libs.springdocOpenapiWebmvcUi)
+    implementation(libs.nimbusJoseJwt)
 
-    implementation(libs.jackson.module.kotlin)
-    implementation(libs.kotlin.logging.jvm)
+    implementation(libs.jacksonModuleKotlin)
+    implementation(libs.kotlinLoggingJvm)
 
-    testAndDevelopmentOnly(libs.spring.boot.docker.compose)
+    testAndDevelopmentOnly(libs.springBootDockerCompose)
 
     runtimeOnly(libs.postgresql)
 
-    testImplementation(libs.spring.boot.starter.data.jdbc.test)
-    testImplementation(libs.spring.boot.starter.restclient)
-    testImplementation(libs.spring.security.test)
-    testImplementation(libs.spring.boot.starter.validation.test)
-    testImplementation(libs.spring.boot.starter.webmvc.test)
-    testImplementation(libs.testcontainers.junit.jupiter)
-    testImplementation(libs.testcontainers.postgresql)
-    testImplementation(libs.kotlin.test.junit5)
-    testImplementation(libs.assertj.core)
-    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.springBootStarterDataJdbcTest)
+    testImplementation(libs.springBootStarterRestclient)
+    testImplementation(libs.springSecurityTest)
+    testImplementation(libs.springBootStarterValidationTest)
+    testImplementation(libs.springBootStarterWebmvcTest)
+    testImplementation(libs.testcontainersJunitJupiter)
+    testImplementation(libs.testcontainersPostgresql)
+    testImplementation(libs.kotlinTestJunit5)
+    testImplementation(libs.assertjCore)
+    testRuntimeOnly(libs.junitPlatformLauncher)
 }
 
 kotlin {
