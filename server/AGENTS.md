@@ -71,6 +71,16 @@ PostgreSQL automatically (`spring.docker.compose.skip.in-tests=false`).
 - Prefer AssertJ assertions (`assertThat(...)`) in tests for readability and fluent checks.
 - Prefer `@Test` + assertions over `@ParameterizedTest` unless testing multiple inputs of the
   same behaviour.
+- **Do not** add "returns 403 when no auth cookie is provided" tests to every controller IT class.
+  Authentication is a cross-cutting concern covered centrally; only test it once (e.g. in `AuthControllerIT`).
+- **Do not** add validation error tests (e.g. "returns 400 when parameter is invalid") unless
+  explicitly requested. Validation behaviour is covered generically; only test it when the feature
+  has specific validation logic worth verifying.
+- **Do not** add "returns 404 when resource does not exist" tests unless explicitly requested.
+  This error handling is generic and covered centrally.
+- **Focus on happy-path tests only.** Write exactly one test per endpoint covering the successful
+  case. Do not add additional tests (error cases, edge cases, alternate inputs) unless explicitly
+  asked.
 
 ---
 

@@ -1,16 +1,16 @@
 import type { components } from "#/api/schema"
-import { Pencil } from "lucide-react"
+import { KeyRound, Pencil } from "lucide-react"
 import { Link } from "@tanstack/react-router"
 import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
 import { getRoleLabel } from "#/users/roleMetadata"
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "#/components/ui/table"
 
 type UserAccount = components["schemas"]["UserAccount"]
@@ -73,7 +73,17 @@ export default function UsersTable({ users }: UsersTableProps) {
                 <TableCell className="text-muted-foreground">
                   {formatDate(user.metaData.createdAt)}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-1">
+                  <Button asChild size="icon" variant={"outline"}>
+                    <Link
+                      to={"/nutzermanagement/$userId/change-password"}
+                      params={{ userId: String(user.id) }}
+                      aria-label={`Passwort für Nutzer ${user.username} ändern`}
+                      title="Passwort ändern"
+                    >
+                      <KeyRound className="size-4"></KeyRound>
+                    </Link>
+                  </Button>
                   <Button asChild size="icon" variant="outline">
                     <Link
                       to="/nutzermanagement/$userId/edit"

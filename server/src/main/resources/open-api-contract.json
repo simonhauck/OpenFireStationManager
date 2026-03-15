@@ -1,41 +1,43 @@
 {
-  "openapi" : "3.1.0",
-  "info" : {
-    "title" : "OpenAPI definition",
-    "version" : "v0"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
   },
-  "paths" : {
-    "/api/admin/users/{id}/password" : {
-      "put" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "changePassword",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int64",
-            "exclusiveMinimum" : 0
+  "paths": {
+    "/api/admin/users/{id}/password": {
+      "put": {
+        "tags": ["admin-user-controller"],
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
           }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/ChangePasswordRequest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -43,27 +45,27 @@
         }
       }
     },
-    "/api/public/setup/initial-admin" : {
-      "post" : {
-        "tags" : [ "initial-setup-controller" ],
-        "operationId" : "initializeAdmin",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/InitialAdminSetupRequest"
+    "/api/public/setup/initial-admin": {
+      "post": {
+        "tags": ["initial-setup-controller"],
+        "operationId": "initializeAdmin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitialAdminSetupRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -71,53 +73,54 @@
         }
       }
     },
-    "/api/public/auth/logout" : {
-      "post" : {
-        "tags" : [ "auth-controller" ],
-        "operationId" : "logout",
-        "responses" : {
-          "204" : {
-            "description" : "No Content",
-            "content" : { }
+    "/api/public/auth/logout": {
+      "post": {
+        "tags": ["auth-controller"],
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {}
           }
         }
       }
     },
-    "/api/public/auth/login" : {
-      "post" : {
-        "tags" : [ "auth-controller" ],
-        "operationId" : "login",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/LoginRequest"
+    "/api/public/auth/login": {
+      "post": {
+        "tags": ["auth-controller"],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : { }
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
           }
         }
       }
     },
-    "/api/admin/users" : {
-      "get" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "getAllUsers",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/UserAccount"
+    "/api/protectiveclothing/types": {
+      "get": {
+        "tags": ["protective-clothing-type-controller"],
+        "summary": "List all protective clothing types",
+        "operationId": "getAllTypes",
+        "responses": {
+          "200": {
+            "description": "List of protective clothing types",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProtectiveClothingType"
                   }
                 }
               }
@@ -125,26 +128,37 @@
           }
         }
       },
-      "post" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "createUser",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateUserRequest"
+      "post": {
+        "tags": ["protective-clothing-type-controller"],
+        "summary": "Create a new protective clothing type",
+        "operationId": "createType",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProtectiveClothingTypeRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "201": {
+            "description": "Protective clothing type created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
                 }
               }
             }
@@ -152,63 +166,46 @@
         }
       }
     },
-    "/api/admin/users/{id}" : {
-      "get" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "getUserById",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int64",
-            "exclusiveMinimum" : 0
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+    "/api/admin/users": {
+      "get": {
+        "tags": ["admin-user-controller"],
+        "operationId": "getAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserAccount"
+                  }
                 }
               }
             }
           }
         }
       },
-      "patch" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "updateUser",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int64",
-            "exclusiveMinimum" : 0
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/UpdateUserRequest"
+      "post": {
+        "tags": ["admin-user-controller"],
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -216,17 +213,213 @@
         }
       }
     },
-    "/api/public/auth/me" : {
-      "get" : {
-        "tags" : [ "auth-controller" ],
-        "operationId" : "me",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/AuthStateResponse"
+    "/api/protectiveclothing/types/{id}": {
+      "get": {
+        "tags": ["protective-clothing-type-controller"],
+        "summary": "Get a protective clothing type by ID",
+        "operationId": "getTypeById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the protective clothing type",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Protective clothing type found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Protective clothing type not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["protective-clothing-type-controller"],
+        "summary": "Delete a protective clothing type",
+        "operationId": "deleteType",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the protective clothing type",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Protective clothing type deleted"
+          },
+          "404": {
+            "description": "Protective clothing type not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["protective-clothing-type-controller"],
+        "summary": "Update a protective clothing type",
+        "operationId": "updateType",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the protective clothing type",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProtectiveClothingTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Protective clothing type updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Protective clothing type not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectiveClothingType"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "get": {
+        "tags": ["admin-user-controller"],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["admin-user-controller"],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/auth/me": {
+      "get": {
+        "tags": ["auth-controller"],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStateResponse"
                 }
               }
             }
@@ -235,180 +428,218 @@
       }
     }
   },
-  "components" : {
-    "schemas" : {
-      "ChangePasswordRequest" : {
-        "type" : "object",
-        "properties" : {
-          "newPassword" : {
-            "type" : "string",
-            "maxLength" : 32,
-            "minLength" : 4
+  "components": {
+    "schemas": {
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
           }
         },
-        "required" : [ "newPassword" ]
+        "required": ["newPassword"]
       },
-      "EntityMetaData" : {
-        "type" : "object",
-        "properties" : {
-          "createdAt" : {
-            "type" : "string",
-            "format" : "date-time"
+      "EntityMetaData": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           },
-          "createdBy" : {
-            "type" : "string"
+          "createdBy": {
+            "type": "string"
           },
-          "lastModifiedAt" : {
-            "type" : "string",
-            "format" : "date-time"
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time"
           },
-          "lastModifiedBy" : {
-            "type" : "string"
+          "lastModifiedBy": {
+            "type": "string"
           }
         },
-        "required" : [ "createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy" ]
+        "required": ["createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy"]
       },
-      "UserAccount" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string"
+      "UserAccount": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
           },
-          "firstName" : {
-            "type" : "string"
+          "firstName": {
+            "type": "string"
           },
-          "lastName" : {
-            "type" : "string"
+          "lastName": {
+            "type": "string"
           },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "USER", "ADMIN", "GERAETEWART" ]
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN", "GERAETEWART"]
             }
           },
-          "enabled" : {
-            "type" : "boolean"
+          "enabled": {
+            "type": "boolean"
           },
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
+          "id": {
+            "type": "integer",
+            "format": "int64"
           },
-          "metaData" : {
-            "$ref" : "#/components/schemas/EntityMetaData"
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required" : [ "enabled", "firstName", "id", "lastName", "metaData", "roles", "username" ]
+        "required": ["enabled", "firstName", "id", "lastName", "metaData", "roles", "username"]
       },
-      "InitialAdminSetupRequest" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
+      "InitialAdminSetupRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
           },
-          "password" : {
-            "type" : "string",
-            "maxLength" : 32,
-            "minLength" : 4
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
           },
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           }
         },
-        "required" : [ "firstName", "lastName", "password", "username" ]
+        "required": ["firstName", "lastName", "password", "username"]
       },
-      "LoginRequest" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
           },
-          "password" : {
-            "type" : "string",
-            "minLength" : 1
+          "password": {
+            "type": "string",
+            "minLength": 1
           },
-          "tokenValiditySeconds" : {
-            "type" : "integer",
-            "format" : "int64"
+          "tokenValiditySeconds": {
+            "type": "integer",
+            "format": "int64"
           }
         },
-        "required" : [ "password", "tokenValiditySeconds", "username" ]
+        "required": ["password", "tokenValiditySeconds", "username"]
       },
-      "CreateUserRequest" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
+      "CreateProtectiveClothingTypeRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": ["name"]
+      },
+      "ProtectiveClothingType": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
           },
-          "password" : {
-            "type" : "string",
-            "maxLength" : 32,
-            "minLength" : 4
+          "id": {
+            "type": "integer",
+            "format": "int64"
           },
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
+          }
+        },
+        "required": ["id", "metaData", "name"]
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
           },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
           },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "USER", "ADMIN", "GERAETEWART" ]
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN", "GERAETEWART"]
             }
           }
         },
-        "required" : [ "firstName", "lastName", "password", "roles", "username" ]
+        "required": ["firstName", "lastName", "password", "roles", "username"]
       },
-      "UpdateUserRequest" : {
-        "type" : "object",
-        "properties" : {
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+      "UpdateProtectiveClothingTypeRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": ["name"]
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "USER", "ADMIN", "GERAETEWART" ]
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN", "GERAETEWART"]
             }
           }
         },
-        "required" : [ "firstName", "lastName", "roles" ]
+        "required": ["firstName", "lastName", "roles"]
       },
-      "AuthStateResponse" : {
-        "type" : "object",
-        "properties" : {
-          "authenticated" : {
-            "type" : "boolean"
+      "AuthStateResponse": {
+        "type": "object",
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
           },
-          "user" : {
-            "$ref" : "#/components/schemas/UserAccount"
+          "user": {
+            "$ref": "#/components/schemas/UserAccount"
           }
         },
-        "required" : [ "authenticated" ]
+        "required": ["authenticated"]
       }
     }
   }

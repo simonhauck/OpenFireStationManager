@@ -8,16 +8,17 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RoleGuard from "#/components/base/RoleGuard"
 import { Button } from "#/components/ui/button"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "#/components/ui/card"
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
-import { ROLE_OPTIONS, type UserRole } from "#/users/roleMetadata"
+import { ROLE_OPTIONS } from "#/users/roleMetadata"
+import type { UserRole } from "#/users/roleMetadata"
 
 export const Route = createFileRoute("/nutzermanagement/$userId/edit")({
   component: EditUserPage,
@@ -208,14 +209,6 @@ function EditUserPageContent() {
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
                 <Link to="/nutzermanagement">Abbrechen</Link>
-              </Button>
-              <Button type="button" variant="outline" asChild>
-                <Link
-                  to="/nutzermanagement/$userId/change-password"
-                  params={{ userId }}
-                >
-                  Passwort ändern
-                </Link>
               </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? "Wird gespeichert..." : "Änderungen speichern"}
