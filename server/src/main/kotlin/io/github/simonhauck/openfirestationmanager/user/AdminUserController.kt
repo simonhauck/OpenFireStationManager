@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -42,5 +43,14 @@ class AdminUserController(private val userService: UserService) {
         @Valid @RequestBody requestBody: UpdateUserRequest,
     ): UserAccount {
         return userService.updateUser(id, requestBody)
+    }
+
+    @PutMapping("/{id}/password")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    fun changePassword(
+        @PathVariable @Positive id: Long,
+        @Valid @RequestBody requestBody: ChangePasswordRequest,
+    ): UserAccount {
+        return userService.changePassword(id, requestBody)
     }
 }

@@ -29,6 +29,10 @@ data class UpdateUserRequest(
     val roles: List<UserRole> = emptyList(),
 )
 
+data class ChangePasswordRequest(
+    @field:NotBlank @field:Size(min = 4, max = 32) val newPassword: String,
+)
+
 @Table("users")
 data class UserAccount(
     val username: String,

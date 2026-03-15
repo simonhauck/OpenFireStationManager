@@ -58,6 +58,21 @@ class UserService(
         return userRepository.save(updatedUser)
     }
 
+    fun changePassword(userId: Long, changePasswordRequest: ChangePasswordRequest): UserAccount {
+        val existingUser =
+            userRepository.findById(userId)
+                ?: throw PublicApiException(
+                    status = HttpStatus.NOT_FOUND,
+                    publicMessage = "User not found for id: $userId",
+                )
+
+        val newPasswordHash =
+            passwordEncoder.encode(changePasswordRequest.newPassword)
+                ?: error("Failed to encode password")
+
+        return userRepository.save(existingUser.copy(passwordHash = newPasswordHash))
+    }
+
     fun findByUsername(username: String): UserAccount? = userRepository.findByUsername(username)
 
     fun hasAnyUsers(): Boolean = userRepository.count() > 0

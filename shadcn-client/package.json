@@ -16,6 +16,7 @@
     "prepareEnv": "npx openapi-typescript ./../server/src/main/resources/open-api-contract.json -o ./src/api/schema.ts"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-checkbox": "^1.1.5",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.4",

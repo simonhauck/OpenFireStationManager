@@ -181,5 +181,56 @@ class AdminUserControllerIT : IntegrationTest() {
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 
+    @Test
+    fun `changePassword should return 403 when no auth cookie is provided`() {
+        val response =
+            adminUserControllerCalls.changePasswordExpectingError(
+                id = 1L,
+                request = ChangePasswordRequest(newPassword = "newPassword"),
+                authCookie = null,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    fun `changePassword should update the password when authenticated as admin`() {
+        val createdUser =
+            adminUserControllerCalls
+                .createUser(
+                    CreateUserRequest(
+                        username = uniqueUsername(),
+                        password = "oldPassword",
+                        firstName = "Test",
+                        lastName = "User",
+                        roles = listOf(UserRole.USER),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val response =
+            adminUserControllerCalls.changePassword(
+                id = createdUser.id,
+                request = ChangePasswordRequest(newPassword = "newPassword"),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.id).isEqualTo(createdUser.id)
+    }
+
+    @Test
+    fun `changePassword should return 404 when user does not exist`() {
+        val response =
+            adminUserControllerCalls.changePasswordExpectingError(
+                id = Long.MAX_VALUE,
+                request = ChangePasswordRequest(newPassword = "newPassword"),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
     private fun uniqueUsername() = "user-${UUID.randomUUID()}"
 }
