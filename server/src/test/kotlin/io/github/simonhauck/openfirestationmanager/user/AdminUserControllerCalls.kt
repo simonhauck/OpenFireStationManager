@@ -89,6 +89,30 @@ class AdminUserControllerCalls(private val testRestTemplate: TestRestTemplate) {
         )
     }
 
+    fun changePassword(
+        id: Long,
+        request: ChangePasswordRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<UserAccount> {
+        return testRestTemplate.exchange<UserAccount>(
+            "/api/admin/users/$id/password",
+            HttpMethod.PUT,
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
+    fun changePasswordExpectingError(
+        id: Long,
+        request: ChangePasswordRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
+        return testRestTemplate.exchange<ProblemDetail>(
+            "/api/admin/users/$id/password",
+            HttpMethod.PUT,
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
     private fun headersWithCookie(authCookie: String?): HttpHeaders {
         val headers = HttpHeaders()
         if (authCookie != null) {

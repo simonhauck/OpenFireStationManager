@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as NutzermanagementIndexRouteImport } from './routes/nutzermanagement/index'
 import { Route as NutzermanagementNewRouteImport } from './routes/nutzermanagement/new'
 import { Route as NutzermanagementUserIdEditRouteImport } from './routes/nutzermanagement/$userId/edit'
+import { Route as NutzermanagementUserIdChangePasswordRouteImport } from './routes/nutzermanagement/$userId/change-password'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -47,6 +48,12 @@ const NutzermanagementUserIdEditRoute =
     path: '/nutzermanagement/$userId/edit',
     getParentRoute: () => rootRouteImport,
   } as any)
+const NutzermanagementUserIdChangePasswordRoute =
+  NutzermanagementUserIdChangePasswordRouteImport.update({
+    id: '/nutzermanagement/$userId/change-password',
+    path: '/nutzermanagement/$userId/change-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
   '/nutzermanagement/': typeof NutzermanagementIndexRoute
+  '/nutzermanagement/$userId/change-password': typeof NutzermanagementUserIdChangePasswordRoute
   '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
   '/nutzermanagement': typeof NutzermanagementIndexRoute
+  '/nutzermanagement/$userId/change-password': typeof NutzermanagementUserIdChangePasswordRoute
   '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
 }
 export interface FileRoutesById {
@@ -71,6 +80,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
   '/nutzermanagement/': typeof NutzermanagementIndexRoute
+  '/nutzermanagement/$userId/change-password': typeof NutzermanagementUserIdChangePasswordRoute
   '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
 }
 export interface FileRouteTypes {
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/nutzermanagement/new'
     | '/nutzermanagement/'
+    | '/nutzermanagement/$userId/change-password'
     | '/nutzermanagement/$userId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -89,6 +100,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/nutzermanagement/new'
     | '/nutzermanagement'
+    | '/nutzermanagement/$userId/change-password'
     | '/nutzermanagement/$userId/edit'
   id:
     | '__root__'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/nutzermanagement/new'
     | '/nutzermanagement/'
+    | '/nutzermanagement/$userId/change-password'
     | '/nutzermanagement/$userId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -106,6 +119,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NutzermanagementNewRoute: typeof NutzermanagementNewRoute
   NutzermanagementIndexRoute: typeof NutzermanagementIndexRoute
+  NutzermanagementUserIdChangePasswordRoute: typeof NutzermanagementUserIdChangePasswordRoute
   NutzermanagementUserIdEditRoute: typeof NutzermanagementUserIdEditRoute
 }
 
@@ -153,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NutzermanagementUserIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nutzermanagement/$userId/change-password': {
+      id: '/nutzermanagement/$userId/change-password'
+      path: '/nutzermanagement/$userId/change-password'
+      fullPath: '/nutzermanagement/$userId/change-password'
+      preLoaderRoute: typeof NutzermanagementUserIdChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +183,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NutzermanagementNewRoute: NutzermanagementNewRoute,
   NutzermanagementIndexRoute: NutzermanagementIndexRoute,
+  NutzermanagementUserIdChangePasswordRoute:
+    NutzermanagementUserIdChangePasswordRoute,
   NutzermanagementUserIdEditRoute: NutzermanagementUserIdEditRoute,
 }
 export const routeTree = rootRouteImport

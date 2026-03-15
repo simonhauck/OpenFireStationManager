@@ -209,6 +209,14 @@ function EditUserPageContent() {
               <Button type="button" variant="outline" asChild>
                 <Link to="/nutzermanagement">Abbrechen</Link>
               </Button>
+              <Button type="button" variant="outline" asChild>
+                <Link
+                  to="/nutzermanagement/$userId/change-password"
+                  params={{ userId }}
+                >
+                  Passwort ändern
+                </Link>
+              </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? "Wird gespeichert..." : "Änderungen speichern"}
               </Button>

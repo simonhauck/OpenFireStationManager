@@ -6,11 +6,17 @@ import type { components } from "#/api/schema"
 
 type CreateUserRequest = components["schemas"]["CreateUserRequest"]
 type UpdateUserRequest = components["schemas"]["UpdateUserRequest"]
+type ChangePasswordRequest = components["schemas"]["ChangePasswordRequest"]
 type UserAccount = components["schemas"]["UserAccount"]
 
 type UpdateUserVariables = {
   id: number
   body: UpdateUserRequest
+}
+
+type ChangePasswordVariables = {
+  id: number
+  body: ChangePasswordRequest
 }
 
 const ensureData = <T>(
@@ -87,5 +93,28 @@ export const updateUserMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({ queryKey: queryKeys.users() }),
         queryClient.invalidateQueries({ queryKey: queryKeys.me() }),
       ])
+    },
+  })
+
+export const changePasswordMutation = (queryClient: QueryClient) =>
+  mutationOptions({
+    mutationKey: [...queryKeys.users(), "changePassword"] as const,
+    mutationFn: async (
+      variables: ChangePasswordVariables,
+    ): Promise<UserAccount> => {
+      const { data, error } = await client.PUT(
+        "/api/admin/users/{id}/password",
+        {
+          params: {
+            path: { id: variables.id },
+          },
+          body: variables.body,
+        },
+      )
+
+      return ensureData(data, error, "PUT /api/admin/users/{id}/password")
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.users() })
     },
   })

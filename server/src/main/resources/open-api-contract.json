@@ -1,31 +1,31 @@
 {
-  "openapi" : "3.1.0",
-  "info" : {
-    "title" : "OpenAPI definition",
-    "version" : "v0"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
   },
-  "paths" : {
-    "/api/public/setup/initial-admin" : {
-      "post" : {
-        "tags" : [ "initial-setup-controller" ],
-        "operationId" : "initializeAdmin",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/InitialAdminSetupRequest"
+  "paths": {
+    "/api/public/setup/initial-admin": {
+      "post": {
+        "tags": ["initial-setup-controller"],
+        "operationId": "initializeAdmin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitialAdminSetupRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -33,53 +33,53 @@
         }
       }
     },
-    "/api/public/auth/logout" : {
-      "post" : {
-        "tags" : [ "auth-controller" ],
-        "operationId" : "logout",
-        "responses" : {
-          "204" : {
-            "description" : "No Content",
-            "content" : { }
+    "/api/public/auth/logout": {
+      "post": {
+        "tags": ["auth-controller"],
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {}
           }
         }
       }
     },
-    "/api/public/auth/login" : {
-      "post" : {
-        "tags" : [ "auth-controller" ],
-        "operationId" : "login",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/LoginRequest"
+    "/api/public/auth/login": {
+      "post": {
+        "tags": ["auth-controller"],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : { }
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
           }
         }
       }
     },
-    "/api/admin/users" : {
-      "get" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "getAllUsers",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/UserAccount"
+    "/api/admin/users": {
+      "get": {
+        "tags": ["admin-user-controller"],
+        "operationId": "getAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserAccount"
                   }
                 }
               }
@@ -87,26 +87,26 @@
           }
         }
       },
-      "post" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "createUser",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateUserRequest"
+      "post": {
+        "tags": ["admin-user-controller"],
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -114,63 +114,67 @@
         }
       }
     },
-    "/api/admin/users/{id}" : {
-      "get" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "getUserById",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int64",
-            "exclusiveMinimum" : 0
+    "/api/admin/users/{id}": {
+      "get": {
+        "tags": ["admin-user-controller"],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
           }
         }
       },
-      "patch" : {
-        "tags" : [ "admin-user-controller" ],
-        "operationId" : "updateUser",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int64",
-            "exclusiveMinimum" : 0
+      "patch": {
+        "tags": ["admin-user-controller"],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
           }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/UpdateUserRequest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
               }
             }
           },
-          "required" : true
+          "required": true
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserAccount"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -178,17 +182,57 @@
         }
       }
     },
-    "/api/public/auth/me" : {
-      "get" : {
-        "tags" : [ "auth-controller" ],
-        "operationId" : "me",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/AuthStateResponse"
+    "/api/admin/users/{id}/password": {
+      "put": {
+        "tags": ["admin-user-controller"],
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/auth/me": {
+      "get": {
+        "tags": ["auth-controller"],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStateResponse"
                 }
               }
             }
@@ -197,169 +241,180 @@
       }
     }
   },
-  "components" : {
-    "schemas" : {
-      "InitialAdminSetupRequest" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
+  "components": {
+    "schemas": {
+      "InitialAdminSetupRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
           },
-          "password" : {
-            "type" : "string",
-            "maxLength" : 32,
-            "minLength" : 4
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
           },
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           }
         },
-        "required" : [ "firstName", "lastName", "password", "username" ]
+        "required": ["firstName", "lastName", "password", "username"]
       },
-      "EntityMetaData" : {
-        "type" : "object",
-        "properties" : {
-          "createdAt" : {
-            "type" : "string",
-            "format" : "date-time"
+      "EntityMetaData": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           },
-          "createdBy" : {
-            "type" : "string"
+          "createdBy": {
+            "type": "string"
           },
-          "lastModifiedAt" : {
-            "type" : "string",
-            "format" : "date-time"
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time"
           },
-          "lastModifiedBy" : {
-            "type" : "string"
+          "lastModifiedBy": {
+            "type": "string"
           }
         },
-        "required" : [ "createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy" ]
+        "required": ["createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy"]
       },
-      "UserAccount" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string"
+      "UserAccount": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
           },
-          "firstName" : {
-            "type" : "string"
+          "firstName": {
+            "type": "string"
           },
-          "lastName" : {
-            "type" : "string"
+          "lastName": {
+            "type": "string"
           },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "USER", "ADMIN" ]
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN"]
             }
           },
-          "enabled" : {
-            "type" : "boolean"
+          "enabled": {
+            "type": "boolean"
           },
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
+          "id": {
+            "type": "integer",
+            "format": "int64"
           },
-          "metaData" : {
-            "$ref" : "#/components/schemas/EntityMetaData"
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required" : [ "enabled", "firstName", "id", "lastName", "metaData", "roles", "username" ]
+        "required": ["enabled", "firstName", "id", "lastName", "metaData", "roles", "username"]
       },
-      "LoginRequest" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
           },
-          "password" : {
-            "type" : "string",
-            "minLength" : 1
+          "password": {
+            "type": "string",
+            "minLength": 1
           },
-          "tokenValiditySeconds" : {
-            "type" : "integer",
-            "format" : "int64"
+          "tokenValiditySeconds": {
+            "type": "integer",
+            "format": "int64"
           }
         },
-        "required" : [ "password", "tokenValiditySeconds", "username" ]
+        "required": ["password", "tokenValiditySeconds", "username"]
       },
-      "CreateUserRequest" : {
-        "type" : "object",
-        "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1
           },
-          "password" : {
-            "type" : "string",
-            "maxLength" : 32,
-            "minLength" : 4
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
           },
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "USER", "ADMIN" ]
-            }
-          }
-        },
-        "required" : [ "firstName", "lastName", "password", "roles", "username" ]
-      },
-      "UpdateUserRequest" : {
-        "type" : "object",
-        "properties" : {
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "USER", "ADMIN" ]
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN"]
             }
           }
         },
-        "required" : [ "firstName", "lastName", "roles" ]
+        "required": ["firstName", "lastName", "password", "roles", "username"]
       },
-      "AuthStateResponse" : {
-        "type" : "object",
-        "properties" : {
-          "authenticated" : {
-            "type" : "boolean"
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
           },
-          "user" : {
-            "$ref" : "#/components/schemas/UserAccount"
+          "lastName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["USER", "ADMIN"]
+            }
           }
         },
-        "required" : [ "authenticated" ]
+        "required": ["firstName", "lastName", "roles"]
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 4
+          }
+        },
+        "required": ["newPassword"]
+      },
+      "AuthStateResponse": {
+        "type": "object",
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserAccount"
+          }
+        },
+        "required": ["authenticated"]
       }
     }
   }
