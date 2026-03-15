@@ -3,6 +3,7 @@ package io.github.simonhauck.openfirestationmanager.common
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -11,11 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class ApiExceptionHandler {
     private val log = KotlinLogging.logger {}
 
-    data class ValidationError(
-        val field: String,
-        val message: String,
-        val rejectedValue: Any?,
-    )
+    data class ValidationError(val field: String, val message: String, val rejectedValue: Any?)
 
     @ExceptionHandler(PublicApiException::class)
     fun handlePublicApiException(exception: PublicApiException): ProblemDetail {
@@ -52,6 +49,17 @@ class ApiExceptionHandler {
         return ProblemDetail.forStatusAndDetail(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "An unexpected error occurred",
+        )
+    }
+
+    @ExceptionHandler(BadCredentialsException::class)
+    fun handleBadCredentialsException(exception: BadCredentialsException): ProblemDetail {
+        log.warn {
+            "Login attempt with invalid credentials registered for user: ${exception.authenticationRequest?.name}"
+        }
+        return ProblemDetail.forStatusAndDetail(
+            HttpStatus.UNAUTHORIZED,
+            "Invalid username or password",
         )
     }
 }

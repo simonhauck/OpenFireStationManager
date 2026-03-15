@@ -112,48 +112,43 @@ export interface components {
     }
     EntityMetaData: {
       /** Format: date-time */
-      createdAt?: string
-      createdBy?: string
+      createdAt: string
+      createdBy: string
       /** Format: date-time */
-      lastModifiedAt?: string
-      lastModifiedBy?: string
+      lastModifiedAt: string
+      lastModifiedBy: string
     }
     UserAccount: {
-      username?: string
-      passwordHash?: string
-      firstName?: string
-      lastName?: string
-      roles?: ("USER" | "ADMIN")[]
-      enabled?: boolean
+      username: string
+      firstName: string
+      lastName: string
+      roles: ("USER" | "ADMIN")[]
+      enabled: boolean
       /** Format: int64 */
-      id?: number
-      metaData?: components["schemas"]["EntityMetaData"]
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
     }
     LoginRequest: {
       username: string
       password: string
       /** Format: int64 */
-      tokenValiditySeconds?: number
+      tokenValiditySeconds: number
     }
     CreateUserRequest: {
       username: string
       password: string
       firstName: string
       lastName: string
-      roles?: ("USER" | "ADMIN")[]
+      roles: ("USER" | "ADMIN")[]
     }
     UpdateUserRequest: {
       firstName: string
       lastName: string
-      roles?: ("USER" | "ADMIN")[]
+      roles: ("USER" | "ADMIN")[]
     }
     AuthStateResponse: {
-      authenticated?: boolean
-      user?: components["schemas"]["AuthUserResponse"]
-    }
-    AuthUserResponse: {
-      username?: string
-      roles?: string[]
+      authenticated: boolean
+      user?: components["schemas"]["UserAccount"]
     }
   }
   responses: never
