@@ -5,8 +5,6 @@ spring:
     compose:
       file: ./compose.yml
       lifecycle-management: start_only
-  session:
-    timeout: 12h
 
 app:
   auth:

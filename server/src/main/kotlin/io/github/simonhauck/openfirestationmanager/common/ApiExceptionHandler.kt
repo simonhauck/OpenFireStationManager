@@ -14,6 +14,17 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(exception: IllegalArgumentException): ProblemDetail {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.message ?: "Invalid request")
+        return ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST,
+            exception.message ?: "Invalid request",
+        )
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleGenericException(exception: Exception): ProblemDetail {
+        return ProblemDetail.forStatusAndDetail(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "An unexpected error occurred",
+        )
     }
 }

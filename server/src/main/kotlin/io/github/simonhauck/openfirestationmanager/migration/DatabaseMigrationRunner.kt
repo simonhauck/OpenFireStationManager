@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForList
 import org.springframework.stereotype.Component
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -40,12 +41,16 @@ class DatabaseMigrationRunner(
                 id VARCHAR(255) PRIMARY KEY,
                 applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )
-            """.trimIndent()
+            """
+                .trimIndent()
         )
     }
 
     private fun getAppliedMigrations(): Set<String> =
-        jdbcTemplate.queryForList("SELECT id FROM schema_migrations", String::class.java).toSet()
+        jdbcTemplate
+            .queryForList<String>("SELECT id FROM schema_migrations")
+            .filterNotNull()
+            .toSet()
 
     private fun recordMigration(id: String) {
         jdbcTemplate.update("INSERT INTO schema_migrations (id) VALUES (?)", id)

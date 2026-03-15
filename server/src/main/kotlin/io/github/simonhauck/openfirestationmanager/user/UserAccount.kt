@@ -1,9 +1,11 @@
 package io.github.simonhauck.openfirestationmanager.user
 
+import io.github.simonhauck.openfirestationmanager.db.BaseEntity
+import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import java.time.Instant
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
 enum class UserRole {
@@ -27,12 +29,16 @@ data class UpdateUserRequest(
 
 @Table("users")
 data class UserAccount(
-    @Id val id: Long = 0,
     val username: String,
     val passwordHash: String,
     val firstName: String,
     val lastName: String,
     val roles: List<UserRole> = emptyList(),
     val enabled: Boolean = true,
-    val createdAt: Instant = Instant.now(),
-)
+    @Id override val id: Long = 0,
+    @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
+) : BaseEntity {
+    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
+        return copy(metaData = metaData)
+    }
+}

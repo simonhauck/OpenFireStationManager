@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class UserProvider {
 
-    fun getCurrentUserName(): String? {
+    fun getCurrentUserOrThrow(): String {
         val authentication =
             SecurityContextHolder.getContext().authentication
                 ?: throw PublicApiException(
@@ -16,6 +16,11 @@ class UserProvider {
                     publicMessage = "You are not authenticated",
                 )
 
+        return authentication.name
+    }
+
+    fun getCurrentUser(): String? {
+        val authentication = SecurityContextHolder.getContext().authentication ?: return null
         return authentication.name
     }
 }
