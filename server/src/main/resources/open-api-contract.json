@@ -5,6 +5,44 @@
     "version" : "v0"
   },
   "paths" : {
+    "/api/admin/users/{id}/password" : {
+      "put" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "changePassword",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/setup/initial-admin" : {
       "post" : {
         "tags" : [ "initial-setup-controller" ],
@@ -199,30 +237,16 @@
   },
   "components" : {
     "schemas" : {
-      "InitialAdminSetupRequest" : {
+      "ChangePasswordRequest" : {
         "type" : "object",
         "properties" : {
-          "username" : {
-            "type" : "string",
-            "minLength" : 1
-          },
-          "password" : {
+          "newPassword" : {
             "type" : "string",
             "maxLength" : 32,
             "minLength" : 4
-          },
-          "firstName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "lastName" : {
-            "type" : "string",
-            "maxLength" : 100,
-            "minLength" : 0
           }
         },
-        "required" : [ "firstName", "lastName", "password", "username" ]
+        "required" : [ "newPassword" ]
       },
       "EntityMetaData" : {
         "type" : "object",
@@ -275,6 +299,31 @@
           }
         },
         "required" : [ "enabled", "firstName", "id", "lastName", "metaData", "roles", "username" ]
+      },
+      "InitialAdminSetupRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "password" : {
+            "type" : "string",
+            "maxLength" : 32,
+            "minLength" : 4
+          },
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "firstName", "lastName", "password", "username" ]
       },
       "LoginRequest" : {
         "type" : "object",

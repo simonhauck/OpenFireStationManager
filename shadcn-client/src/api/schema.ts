@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/admin/users/{id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["changePassword"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/setup/initial-admin": {
         parameters: {
             query?: never;
@@ -104,11 +120,8 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        InitialAdminSetupRequest: {
-            username: string;
-            password: string;
-            firstName: string;
-            lastName: string;
+        ChangePasswordRequest: {
+            newPassword: string;
         };
         EntityMetaData: {
             /** Format: date-time */
@@ -127,6 +140,12 @@ export interface components {
             /** Format: int64 */
             id: number;
             metaData: components["schemas"]["EntityMetaData"];
+        };
+        InitialAdminSetupRequest: {
+            username: string;
+            password: string;
+            firstName: string;
+            lastName: string;
         };
         LoginRequest: {
             username: string;
@@ -159,6 +178,32 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserAccount"];
+                };
+            };
+        };
+    };
     initializeAdmin: {
         parameters: {
             query?: never;

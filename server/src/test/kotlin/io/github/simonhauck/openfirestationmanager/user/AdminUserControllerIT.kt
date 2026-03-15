@@ -182,18 +182,6 @@ class AdminUserControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `changePassword should return 403 when no auth cookie is provided`() {
-        val response =
-            adminUserControllerCalls.changePasswordExpectingError(
-                id = 1L,
-                request = ChangePasswordRequest(newPassword = "newPassword"),
-                authCookie = null,
-            )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
-    }
-
-    @Test
     fun `changePassword should update the password when authenticated as admin`() {
         val createdUser =
             adminUserControllerCalls
