@@ -45,6 +45,8 @@ All commands below are run from the `shadcn-client/` directory.
 - Prefer **small, reusable components** over large page-local blocks.
 - Compose feature UIs from existing shadcn/ui primitives whenever possible.
 - Avoid building custom-styled UI components when a shadcn equivalent exists.
+- Keep custom visual styling to a minimum; prefer default shadcn look and only use utility classes
+  for layout/alignment/spacing.
 - Keep business logic out of presentational components; pass data and handlers via props.
 
 ### shadcn/ui Update Safety
@@ -67,7 +69,8 @@ npm run prepareEnv
 ```
 
 - Generated output is written to `src/api/schema.ts`; do not hand-edit generated sections.
-- Keep query/mutation definitions in `src/api/*.queries.ts` and reuse shared query keys from
+- Keep feature-specific query/mutation definitions inside the corresponding feature folder
+  (for example `src/clothing/service/queries/*`) and reuse shared query keys from
   `src/api/queryKeys.ts`.
 - Use TanStack Query (`useQuery`, `useMutation`, invalidation) for server state, not ad-hoc
   fetch state in components.
@@ -81,6 +84,14 @@ npm run prepareEnv
 - Keep route files focused on route concerns; extract reusable UI to components when route files
   become large.
 
+### Feature-folder Routing Convention
+
+- Organize domain functionality in feature folders under `src/<feature>/` (for example `src/clothing/`).
+- Keep route files intentionally slim: route declaration + lightweight wiring only.
+- Implement page UI, data-fetching hooks, and feature-specific components inside the feature folder.
+- Prefer route files that delegate to a single feature entry component (for example
+  `src/routes/klamottenmanagement/types.tsx` -> `src/clothing/components/ClothingTypesPage.tsx`).
+
 ---
 
 ## Project Structure (current)
@@ -88,12 +99,13 @@ npm run prepareEnv
 ```text
 src/
 ├── api/                  ← API client, query keys, query/mutation options, generated schema
+├── clothing/             ← feature module (components, model, service/queries)
 ├── components/
 │   ├── ui/               ← shadcn/ui components (treat as managed)
 │   ├── base/             ← app-specific base components
 │   └── layout/           ← layout components
 ├── routes/               ← TanStack Router route files
-├── users/                ← feature-specific domain helpers
+├── users/                ← users feature module (components, service, metadata)
 ├── main.tsx              ← app bootstrap (router/query providers)
 ├── router.tsx            ← router setup
 └── routeTree.gen.ts      ← auto-generated, never edit manually

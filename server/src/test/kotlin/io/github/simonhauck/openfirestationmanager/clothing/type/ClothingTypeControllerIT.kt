@@ -86,6 +86,13 @@ class ClothingTypeControllerIT : IntegrationTest() {
         val response = calls.getAllTypes(authCookie = validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.name }).contains(typeName)
+        assertThat(response.body?.map { it.name })
+            .contains(
+                "Einsatzjacke",
+                "Einsatzhose",
+                "TH-Jacke",
+                "Brandhandschuhe",
+                typeName,
+            )
     }
 }
