@@ -70,8 +70,8 @@ export default function UsersTable({ users }: UsersTableProps) {
                     <Link
                       to="/nutzermanagement/$userId/change-password"
                       params={{ userId: String(user.id) }}
-                      aria-label={`Passwort fuer Nutzer ${user.username} aendern`}
-                      title="Passwort aendern"
+                      aria-label={`Passwort fuer Nutzer ${user.username} ändern`}
+                      title="Passwort ändern"
                     >
                       <KeyRound className="size-4" />
                     </Link>

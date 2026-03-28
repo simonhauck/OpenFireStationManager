@@ -1,8 +1,11 @@
+import { Link } from "@tanstack/react-router"
+
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RoleGuard from "#/components/base/RoleGuard"
 import ClothingTypesTable from "#/clothing/components/ClothingTypesTable"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import { Button } from "#/components/ui/button"
 import {
   Card,
   CardContent,
@@ -26,8 +29,15 @@ function ClothingTypesPageContent() {
     <main className="page-wrap px-4 py-12">
       <Card>
         <CardHeader>
-          <CardTitle>Klamottenmanagement</CardTitle>
-          <CardDescription>Kleidungstypen</CardDescription>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Klamottenmanagement</CardTitle>
+              <CardDescription>Kleidungstypen</CardDescription>
+            </div>
+            <Button asChild>
+              <Link to="/klamottenmanagement/types/new">Kleidungstyp erstellen</Link>
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
