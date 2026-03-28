@@ -191,3 +191,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .nav-link {
+    @apply rounded-md px-2 py-1 text-muted-foreground transition-colors;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    @apply text-foreground outline-none;
+  }
+
+  .nav-link.is-active {
+    @apply bg-accent text-accent-foreground;
+  }
+}
