@@ -41,7 +41,7 @@ class TokenCookieFilter(
                     UsernamePasswordAuthenticationToken(
                         tokenResult.userName,
                         null,
-                        tokenResult.roles.map { SimpleGrantedAuthority("ROLE_$it") },
+                        tokenResult.roles.map { SimpleGrantedAuthority(it) },
                     )
             }
 

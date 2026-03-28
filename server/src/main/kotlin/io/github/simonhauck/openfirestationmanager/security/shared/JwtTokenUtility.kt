@@ -9,7 +9,6 @@ import com.nimbusds.jose.crypto.MACVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.github.simonhauck.openfirestationmanager.security.config.AuthenticationProperties
-import io.github.simonhauck.openfirestationmanager.user.UserAccount
 import jakarta.annotation.PostConstruct
 import java.util.Date
 import kotlin.time.Duration
@@ -27,11 +26,11 @@ class JwtTokenUtility(private val authenticationProperties: AuthenticationProper
         jwsVerifier = MACVerifier(authenticationProperties.jwtSigningSecret)
     }
 
-    fun generateTokenForUser(userAccount: UserAccount, tokenValidity: Duration): String {
+    fun generateToken(userName: String, roles: List<String>, tokenValidity: Duration): String {
         val claimsSet =
             JWTClaimsSet.Builder()
-                .subject(userAccount.username)
-                .claim("roles", userAccount.roles.map { it.name })
+                .subject(userName)
+                .claim("roles", roles)
                 .issuer(authenticationProperties.cookieName)
                 .expirationTime(
                     Date(System.currentTimeMillis() + tokenValidity.inWholeMilliseconds)

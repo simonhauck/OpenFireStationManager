@@ -1,10 +1,10 @@
 package io.github.simonhauck.openfirestationmanager.setup
 
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
-import io.github.simonhauck.openfirestationmanager.user.CreateUserRequest
-import io.github.simonhauck.openfirestationmanager.user.UserAccount
-import io.github.simonhauck.openfirestationmanager.user.UserRole
-import io.github.simonhauck.openfirestationmanager.user.UserService
+import io.github.simonhauck.openfirestationmanager.usermanagement.CreateUserRequest
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserAccount
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size

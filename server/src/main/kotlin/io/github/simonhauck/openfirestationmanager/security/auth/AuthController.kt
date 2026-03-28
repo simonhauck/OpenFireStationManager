@@ -1,7 +1,7 @@
 package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.security.config.AuthenticationProperties
-import io.github.simonhauck.openfirestationmanager.user.UserService
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank

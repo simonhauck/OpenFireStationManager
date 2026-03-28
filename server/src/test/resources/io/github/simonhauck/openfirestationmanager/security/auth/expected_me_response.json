@@ -1,17 +1,17 @@
 {
-  "authenticated" : true,
-  "user" : {
-    "username" : "chief",
-    "firstName" : "Initial",
-    "lastName" : "Admin",
-    "roles" : [ "ADMIN" ],
-    "enabled" : true,
-    "id" : 1,
-    "metaData" : {
-      "createdAt" : "2026-03-15T21:15:36.716347Z",
-      "createdBy" : "System",
-      "lastModifiedAt" : "2026-03-15T21:15:36.716347Z",
-      "lastModifiedBy" : "System"
+  "authenticated": true,
+  "user": {
+    "username": "chief",
+    "firstName": "Initial",
+    "lastName": "Admin",
+    "roles": ["ADMIN"],
+    "enabled": true,
+    "id": 1,
+    "metaData": {
+      "createdAt": "2026-03-15T21:15:36.716347Z",
+      "createdBy": "System",
+      "lastModifiedAt": "2026-03-15T21:15:36.716347Z",
+      "lastModifiedBy": "System"
     }
   }
 }

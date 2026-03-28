@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.protectiveclothing
+package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import org.springframework.data.repository.Repository
 

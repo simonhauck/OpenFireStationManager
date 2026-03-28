@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.user
+package io.github.simonhauck.openfirestationmanager.usermanagement
 
 import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.resttestclient.exchange
@@ -37,7 +37,10 @@ class AdminUserControllerCalls(private val testRestTemplate: TestRestTemplate) {
         )
     }
 
-    fun getUserByIdExpectingError(id: Long, authCookie: String? = null): ResponseEntity<ProblemDetail> {
+    fun getUserByIdExpectingError(
+        id: Long,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
             "/api/admin/users/$id",
             HttpMethod.GET,

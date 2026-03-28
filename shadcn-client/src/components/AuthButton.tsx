@@ -5,12 +5,12 @@ import { LogOut } from "lucide-react"
 import { logoutMutation, meQuery } from "#/api/auth.queries"
 import { Button } from "#/components/ui/button"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu"
 
 export default function AuthButton() {

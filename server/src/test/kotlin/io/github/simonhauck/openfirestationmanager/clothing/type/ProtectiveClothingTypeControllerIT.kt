@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.protectiveclothing
+package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
@@ -24,10 +24,12 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
     @Test
     fun `getTypeById should return the type when it exists`() {
         val created =
-            calls.createType(
-                CreateProtectiveClothingTypeRequest(name = "Gloves"),
-                authCookie = validCookieHeader,
-            ).body!!
+            calls
+                .createType(
+                    CreateProtectiveClothingTypeRequest(name = "Gloves"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
 
         val response = calls.getTypeById(created.id, authCookie = validCookieHeader)
 
@@ -39,10 +41,12 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
     @Test
     fun `updateType should update the name of an existing type`() {
         val created =
-            calls.createType(
-                CreateProtectiveClothingTypeRequest(name = "Old Name"),
-                authCookie = validCookieHeader,
-            ).body!!
+            calls
+                .createType(
+                    CreateProtectiveClothingTypeRequest(name = "Old Name"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
 
         val response =
             calls.updateType(
@@ -59,10 +63,12 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
     @Test
     fun `deleteType should delete an existing type`() {
         val created =
-            calls.createType(
-                CreateProtectiveClothingTypeRequest(name = "To Delete"),
-                authCookie = validCookieHeader,
-            ).body!!
+            calls
+                .createType(
+                    CreateProtectiveClothingTypeRequest(name = "To Delete"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
 
         val deleteResponse = calls.deleteType(created.id, authCookie = validCookieHeader)
 

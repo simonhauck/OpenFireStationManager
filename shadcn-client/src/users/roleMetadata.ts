@@ -19,10 +19,9 @@ export const ROLE_OPTIONS: Array<{
       "Kann Nutzer verwalten und administrative Einstellungen bearbeiten.",
   },
   {
-    value: "GERAETEWART",
-    label: "GERÄTEWART",
-    description:
-      "Kann Feuerwehrgeräte-Konfigurationen erstellen und bearbeiten.",
+    value: "KLEIDERWART",
+    label: "KLEIDERWART",
+    description: "Kann das Schutzklamotten modul administrieren",
   },
 ]
 

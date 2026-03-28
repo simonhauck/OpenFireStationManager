@@ -1,13 +1,11 @@
-package io.github.simonhauck.openfirestationmanager.protectiveclothing
+package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
-class ProtectiveClothingTypeService(
-    private val repository: ProtectiveClothingTypeRepository,
-) {
+class ProtectiveClothingTypeService(private val repository: ProtectiveClothingTypeRepository) {
 
     fun getAllTypes(): List<ProtectiveClothingType> = repository.findAll().sortedBy { it.id }
 

@@ -31,21 +31,19 @@ class HttpApiContractIT : IntegrationTest() {
         expectedJson.remove("servers")
 
         runCatching {
-                assertThat(actualJson)
+                assertThat(actualJson.toString())
                     // TODO 09.10.25 - Simon.Hauck The collection order is a workaround, because the
                     // oneOf values are not sorted deterministically
-                    .usingRecursiveComparison()
-                    .ignoringCollectionOrder()
-                    .isEqualTo(expectedJson)
+                    .isEqualTo(expectedJson.toString())
             }
-            .recover { checkIfApiShouldBeUpdated(actualJson, it) }
+            .recoverCatching { checkIfApiShouldBeUpdated(actualJson, it) }
             .getOrThrow()
     }
 
     private fun checkIfApiShouldBeUpdated(actual: JsonNode, throwable: Throwable) {
         if (System.getenv("UPDATE_SNAPSHOT") != "true") throw throwable
 
-        val openApiPath = File("src/main/resources/open-api-contract.json").absolutePath
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(File(openApiPath), actual)
+        val openApiPath = File("src/main/resources/open-api-contract.json")
+        openApiPath.writeText(actual.toPrettyString())
     }
 }

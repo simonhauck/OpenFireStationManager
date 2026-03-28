@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.user
+package io.github.simonhauck.openfirestationmanager.usermanagement
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table
 enum class UserRole {
     USER,
     ADMIN,
-    GERAETEWART,
+    KLEIDERWART,
 }
 
 data class CreateUserRequest(
@@ -30,7 +30,7 @@ data class UpdateUserRequest(
 )
 
 data class ChangePasswordRequest(
-    @field:NotBlank @field:Size(min = 4, max = 32) val newPassword: String,
+    @field:NotBlank @field:Size(min = 4, max = 32) val newPassword: String
 )
 
 @Table("users")

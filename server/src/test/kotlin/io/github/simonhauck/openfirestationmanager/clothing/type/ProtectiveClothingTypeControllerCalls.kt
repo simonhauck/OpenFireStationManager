@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.protectiveclothing
+package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.resttestclient.exchange
@@ -37,7 +37,10 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
         )
     }
 
-    fun getTypeByIdExpectingError(id: Long, authCookie: String? = null): ResponseEntity<ProblemDetail> {
+    fun getTypeByIdExpectingError(
+        id: Long,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
             "/api/protectiveclothing/types/$id",
             HttpMethod.GET,
@@ -97,7 +100,10 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
         )
     }
 
-    fun deleteTypeExpectingError(id: Long, authCookie: String? = null): ResponseEntity<ProblemDetail> {
+    fun deleteTypeExpectingError(
+        id: Long,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
             "/api/protectiveclothing/types/$id",
             HttpMethod.DELETE,

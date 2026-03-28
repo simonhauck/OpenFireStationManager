@@ -1,12 +1,11 @@
-package io.github.simonhauck.openfirestationmanager.protectiveclothing
+package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,56 +20,46 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/protectiveclothing/types")
 @Validated
-class ProtectiveClothingTypeController(
-    private val service: ProtectiveClothingTypeService,
-) {
+class ProtectiveClothingTypeController(private val service: ProtectiveClothingTypeService) {
 
     @GetMapping
     @Operation(summary = "List all protective clothing types")
-    @ApiResponses(ApiResponse(responseCode = "200", description = "List of protective clothing types"))
     fun getAllTypes(): List<ProtectiveClothingType> = service.getAllTypes()
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a protective clothing type by ID")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Protective clothing type found"),
-        ApiResponse(responseCode = "404", description = "Protective clothing type not found"),
-    )
     fun getTypeById(
-        @Parameter(description = "ID of the protective clothing type") @PathVariable @Positive id: Long,
+        @Parameter(description = "ID of the protective clothing type")
+        @PathVariable
+        @Positive
+        id: Long
     ): ProtectiveClothingType = service.getTypeById(id)
 
     @PostMapping
     @Operation(summary = "Create a new protective clothing type")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Protective clothing type created"),
-        ApiResponse(responseCode = "400", description = "Validation error"),
-    )
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     fun createType(
-        @Valid @RequestBody request: CreateProtectiveClothingTypeRequest,
+        @Valid @RequestBody request: CreateProtectiveClothingTypeRequest
     ): ProtectiveClothingType = service.createType(request)
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update a protective clothing type")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Protective clothing type updated"),
-        ApiResponse(responseCode = "404", description = "Protective clothing type not found"),
-        ApiResponse(responseCode = "400", description = "Validation error"),
-    )
     fun updateType(
-        @Parameter(description = "ID of the protective clothing type") @PathVariable @Positive id: Long,
+        @Parameter(description = "ID of the protective clothing type")
+        @PathVariable
+        @Positive
+        id: Long,
         @Valid @RequestBody request: UpdateProtectiveClothingTypeRequest,
     ): ProtectiveClothingType = service.updateType(id, request)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a protective clothing type")
-    @ApiResponses(
-        ApiResponse(responseCode = "204", description = "Protective clothing type deleted"),
-        ApiResponse(responseCode = "404", description = "Protective clothing type not found"),
-    )
     fun deleteType(
-        @Parameter(description = "ID of the protective clothing type") @PathVariable @Positive id: Long,
+        @Parameter(description = "ID of the protective clothing type")
+        @PathVariable
+        @Positive
+        id: Long
     ) {
         service.deleteType(id)
     }

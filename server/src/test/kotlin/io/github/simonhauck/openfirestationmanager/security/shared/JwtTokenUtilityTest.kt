@@ -2,8 +2,6 @@ package io.github.simonhauck.openfirestationmanager.security.shared
 
 import com.nimbusds.jwt.SignedJWT
 import io.github.simonhauck.openfirestationmanager.security.config.AuthenticationProperties
-import io.github.simonhauck.openfirestationmanager.user.UserAccount
-import io.github.simonhauck.openfirestationmanager.user.UserRole
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -21,16 +19,7 @@ class JwtTokenUtilityTest {
 
     @Test
     fun `should generate token with expected claims and parse it successfully`() {
-        val userAccount =
-            UserAccount(
-                username = "alice",
-                passwordHash = "password-hash",
-                firstName = "Alice",
-                lastName = "Smith",
-                roles = listOf(UserRole.USER, UserRole.ADMIN),
-            )
-
-        val token = tokenUtility.generateTokenForUser(userAccount, 5.minutes)
+        val token = tokenUtility.generateToken("alice", listOf("USER", "ADMIN"), 5.minutes)
 
         val signedToken = SignedJWT.parse(token)
         val claims = signedToken.jwtClaimsSet
@@ -42,7 +31,9 @@ class JwtTokenUtilityTest {
         assertThat(claims.expirationTime).isAfter(java.util.Date())
 
         assertThat(parseResult)
-            .isEqualTo(ParseTokenResult.Success(userName = "alice", roles = listOf("USER", "ADMIN")))
+            .isEqualTo(
+                ParseTokenResult.Success(userName = "alice", roles = listOf("USER", "ADMIN"))
+            )
     }
 
     @Test
@@ -56,14 +47,6 @@ class JwtTokenUtilityTest {
 
     @Test
     fun `should return failure when token signature is invalid`() {
-        val userAccount =
-            UserAccount(
-                username = "alice",
-                passwordHash = "password-hash",
-                firstName = "Alice",
-                lastName = "Smith",
-            )
-
         val otherTokenUtility =
             JwtTokenUtility(
                     AuthenticationProperties(
@@ -73,7 +56,7 @@ class JwtTokenUtilityTest {
                 )
                 .apply { generateSigner() }
 
-        val token = otherTokenUtility.generateTokenForUser(userAccount, 5.minutes)
+        val token = otherTokenUtility.generateToken("alice", emptyList(), 5.minutes)
 
         val parseResult = tokenUtility.parseToken(token)
 
@@ -82,15 +65,7 @@ class JwtTokenUtilityTest {
 
     @Test
     fun `should return failure when token has expired`() {
-        val userAccount =
-            UserAccount(
-                username = "alice",
-                passwordHash = "password-hash",
-                firstName = "Alice",
-                lastName = "Smith",
-            )
-
-        val expiredToken = tokenUtility.generateTokenForUser(userAccount, (-10).seconds)
+        val expiredToken = tokenUtility.generateToken("alive", emptyList(), (-10).seconds)
 
         val parseResult = tokenUtility.parseToken(expiredToken)
 

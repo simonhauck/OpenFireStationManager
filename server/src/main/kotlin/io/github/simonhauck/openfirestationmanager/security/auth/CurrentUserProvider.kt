@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
 @Component
-class UserProvider {
+class CurrentUserProvider {
 
     fun getCurrentUserOrThrow(): String {
         return getCurrentUser()

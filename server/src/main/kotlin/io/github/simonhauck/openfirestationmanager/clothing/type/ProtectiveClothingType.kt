@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.protectiveclothing
+package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
@@ -8,13 +8,9 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
-data class CreateProtectiveClothingTypeRequest(
-    @NotBlank @Size(max = 255) val name: String,
-)
+data class CreateProtectiveClothingTypeRequest(@NotBlank @Size(max = 255) val name: String)
 
-data class UpdateProtectiveClothingTypeRequest(
-    @NotBlank @Size(max = 255) val name: String,
-)
+data class UpdateProtectiveClothingTypeRequest(@NotBlank @Size(max = 255) val name: String)
 
 @Table("protective_clothing_types")
 data class ProtectiveClothingType(

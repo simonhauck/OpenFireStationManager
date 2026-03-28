@@ -1,6 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.setup
 
-import io.github.simonhauck.openfirestationmanager.user.UserAccount
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserAccount
 import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.resttestclient.postForEntity
 import org.springframework.http.ProblemDetail

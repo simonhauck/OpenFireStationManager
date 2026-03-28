@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.user
+package io.github.simonhauck.openfirestationmanager.usermanagement
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import io.github.simonhauck.openfirestationmanager.testutil.snapshotTest
