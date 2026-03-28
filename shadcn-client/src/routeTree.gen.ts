@@ -13,7 +13,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NutzermanagementIndexRouteImport } from './routes/nutzermanagement/index'
+import { Route as KlamottenmanagementIndexRouteImport } from './routes/klamottenmanagement/index'
 import { Route as NutzermanagementNewRouteImport } from './routes/nutzermanagement/new'
+import { Route as KlamottenmanagementTypesRouteImport } from './routes/klamottenmanagement/types'
 import { Route as NutzermanagementUserIdEditRouteImport } from './routes/nutzermanagement/$userId/edit'
 import { Route as NutzermanagementUserIdChangePasswordRouteImport } from './routes/nutzermanagement/$userId/change-password'
 
@@ -37,11 +39,23 @@ const NutzermanagementIndexRoute = NutzermanagementIndexRouteImport.update({
   path: '/nutzermanagement/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KlamottenmanagementIndexRoute =
+  KlamottenmanagementIndexRouteImport.update({
+    id: '/klamottenmanagement/',
+    path: '/klamottenmanagement/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NutzermanagementNewRoute = NutzermanagementNewRouteImport.update({
   id: '/nutzermanagement/new',
   path: '/nutzermanagement/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KlamottenmanagementTypesRoute =
+  KlamottenmanagementTypesRouteImport.update({
+    id: '/klamottenmanagement/types',
+    path: '/klamottenmanagement/types',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NutzermanagementUserIdEditRoute =
   NutzermanagementUserIdEditRouteImport.update({
     id: '/nutzermanagement/$userId/edit',
@@ -59,7 +73,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/klamottenmanagement/types': typeof KlamottenmanagementTypesRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
+  '/klamottenmanagement/': typeof KlamottenmanagementIndexRoute
   '/nutzermanagement/': typeof NutzermanagementIndexRoute
   '/nutzermanagement/$userId/change-password': typeof NutzermanagementUserIdChangePasswordRoute
   '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
@@ -68,7 +84,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/klamottenmanagement/types': typeof KlamottenmanagementTypesRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
+  '/klamottenmanagement': typeof KlamottenmanagementIndexRoute
   '/nutzermanagement': typeof NutzermanagementIndexRoute
   '/nutzermanagement/$userId/change-password': typeof NutzermanagementUserIdChangePasswordRoute
   '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
@@ -78,7 +96,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/klamottenmanagement/types': typeof KlamottenmanagementTypesRoute
   '/nutzermanagement/new': typeof NutzermanagementNewRoute
+  '/klamottenmanagement/': typeof KlamottenmanagementIndexRoute
   '/nutzermanagement/': typeof NutzermanagementIndexRoute
   '/nutzermanagement/$userId/change-password': typeof NutzermanagementUserIdChangePasswordRoute
   '/nutzermanagement/$userId/edit': typeof NutzermanagementUserIdEditRoute
@@ -89,7 +109,9 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/login'
+    | '/klamottenmanagement/types'
     | '/nutzermanagement/new'
+    | '/klamottenmanagement/'
     | '/nutzermanagement/'
     | '/nutzermanagement/$userId/change-password'
     | '/nutzermanagement/$userId/edit'
@@ -98,7 +120,9 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/login'
+    | '/klamottenmanagement/types'
     | '/nutzermanagement/new'
+    | '/klamottenmanagement'
     | '/nutzermanagement'
     | '/nutzermanagement/$userId/change-password'
     | '/nutzermanagement/$userId/edit'
@@ -107,7 +131,9 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/login'
+    | '/klamottenmanagement/types'
     | '/nutzermanagement/new'
+    | '/klamottenmanagement/'
     | '/nutzermanagement/'
     | '/nutzermanagement/$userId/change-password'
     | '/nutzermanagement/$userId/edit'
@@ -117,7 +143,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
+  KlamottenmanagementTypesRoute: typeof KlamottenmanagementTypesRoute
   NutzermanagementNewRoute: typeof NutzermanagementNewRoute
+  KlamottenmanagementIndexRoute: typeof KlamottenmanagementIndexRoute
   NutzermanagementIndexRoute: typeof NutzermanagementIndexRoute
   NutzermanagementUserIdChangePasswordRoute: typeof NutzermanagementUserIdChangePasswordRoute
   NutzermanagementUserIdEditRoute: typeof NutzermanagementUserIdEditRoute
@@ -153,11 +181,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NutzermanagementIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/klamottenmanagement/': {
+      id: '/klamottenmanagement/'
+      path: '/klamottenmanagement'
+      fullPath: '/klamottenmanagement/'
+      preLoaderRoute: typeof KlamottenmanagementIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nutzermanagement/new': {
       id: '/nutzermanagement/new'
       path: '/nutzermanagement/new'
       fullPath: '/nutzermanagement/new'
       preLoaderRoute: typeof NutzermanagementNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/klamottenmanagement/types': {
+      id: '/klamottenmanagement/types'
+      path: '/klamottenmanagement/types'
+      fullPath: '/klamottenmanagement/types'
+      preLoaderRoute: typeof KlamottenmanagementTypesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nutzermanagement/$userId/edit': {
@@ -181,7 +223,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
+  KlamottenmanagementTypesRoute: KlamottenmanagementTypesRoute,
   NutzermanagementNewRoute: NutzermanagementNewRoute,
+  KlamottenmanagementIndexRoute: KlamottenmanagementIndexRoute,
   NutzermanagementIndexRoute: NutzermanagementIndexRoute,
   NutzermanagementUserIdChangePasswordRoute:
     NutzermanagementUserIdChangePasswordRoute,

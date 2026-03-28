@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router"
 import { meQuery } from "#/api/auth.queries"
 import AuthButton from "#/components/AuthButton"
 import ThemeToggle from "./ThemeToggle"
+import RoleGuard from "#/components/base/RoleGuard.tsx"
 
 export default function Header() {
   useQuery(meQuery())
@@ -34,13 +35,25 @@ export default function Header() {
           >
             Über uns
           </Link>
-          <Link
-            to="/nutzermanagement"
-            className="nav-link"
-            activeProps={{ className: "nav-link is-active" }}
-          >
-            Nutzermanagement
-          </Link>
+          <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
+            <Link
+              to="/klamottenmanagement"
+              className="nav-link"
+              activeProps={{ className: "nav-link is-active" }}
+            >
+              Klamotten Management
+            </Link>
+          </RoleGuard>
+
+          <RoleGuard allowedRoles={["ADMIN"]} hideChildComponent={true}>
+            <Link
+              to="/nutzermanagement"
+              className="nav-link"
+              activeProps={{ className: "nav-link is-active" }}
+            >
+              Nutzermanagement
+            </Link>
+          </RoleGuard>
         </div>
 
         {/* Right: auth + theme */}

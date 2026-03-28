@@ -8,34 +8,61 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 
 type UserRole = components["schemas"]["UserAccount"]["roles"][number]
 
-interface RoleGuardProps {
+export interface RoleGuardProps {
   allowedRoles: UserRole[]
   children: ReactNode
   forbiddenMessage?: string
+  hideChildComponent?: boolean
 }
 
-export default function RoleGuard({
-  allowedRoles,
-  children,
-  forbiddenMessage = "Sie haben keine Berechtigung für diesen Bereich.",
-}: RoleGuardProps) {
+export default function RoleGuard(props: RoleGuardProps) {
   const { data, isLoading, isError } = useQuery(meQuery())
 
+  const hideChildOrDefault = props.hideChildComponent ?? false
+  const errorOrDefault =
+    props.forbiddenMessage ??
+    "Du hast nicht die notwendigen Rechte diesen Bereich zu sehen"
+
   if (isLoading) {
-    return <LoadingIndicator label="Berechtigungen werden geprüft..." />
+    return showChildOrNothing(
+      hideChildOrDefault,
+      <LoadingIndicator label="Berechtigungen werden geprüft..." />,
+    )
   }
 
   if (isError) {
-    return <ErrorState message="Berechtigung konnte nicht geprüft werden." />
+    return showChildOrNothing(
+      hideChildOrDefault,
+      <ErrorState message="Berechtigung konnte nicht geprüft werden." />,
+    )
   }
 
   const userRoles = data?.user?.roles ?? []
   const isAuthenticated = data?.authenticated === true
-  const hasRequiredRole = allowedRoles.some((role) => userRoles.includes(role))
+  const hasRequiredRole = props.allowedRoles.some((role) =>
+    userRoles.includes(role),
+  )
+  const hasAdminRole = userRoles.includes("ADMIN")
 
-  if (!isAuthenticated || !hasRequiredRole) {
-    return <ErrorState message={forbiddenMessage} />
+  if (!isAuthenticated && !props.hideChildComponent) {
+    return showChildOrNothing(
+      hideChildOrDefault,
+      <ErrorState message={errorOrDefault} />,
+    )
   }
+
+  if (!(hasRequiredRole || hasAdminRole)) {
+    return showChildOrNothing(
+      hideChildOrDefault,
+      <ErrorState message={errorOrDefault} />,
+    )
+  }
+
+  return <>{props.children}</>
+}
+
+function showChildOrNothing(hide: boolean, children: React.ReactNode) {
+  if (hide) return <></>
 
   return <>{children}</>
 }

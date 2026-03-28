@@ -68,7 +68,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/protectiveclothing/types": {
+    "/api/clothing/types": {
         parameters: {
             query?: never;
             header?: never;
@@ -102,7 +102,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/protectiveclothing/types/{id}": {
+    "/api/clothing/types/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -190,10 +190,10 @@ export interface components {
             /** Format: int64 */
             tokenValiditySeconds: number;
         };
-        CreateProtectiveClothingTypeRequest: {
+        CreateOrUpdateClothingTypeRequest: {
             name: string;
         };
-        ProtectiveClothingType: {
+        ClothingType: {
             name: string;
             /** Format: int64 */
             id: number;
@@ -205,9 +205,6 @@ export interface components {
             firstName: string;
             lastName: string;
             roles: ("USER" | "ADMIN" | "KLEIDERWART")[];
-        };
-        UpdateProtectiveClothingTypeRequest: {
-            name: string;
         };
         UpdateUserRequest: {
             firstName: string;
@@ -326,13 +323,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description List of protective clothing types */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"][];
+                    "*/*": components["schemas"]["ClothingType"][];
                 };
             };
         };
@@ -346,26 +343,17 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateProtectiveClothingTypeRequest"];
+                "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"];
             };
         };
         responses: {
-            /** @description Protective clothing type created */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
-                };
-            };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
+                    "*/*": components["schemas"]["ClothingType"];
                 };
             };
         };
@@ -426,22 +414,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Protective clothing type found */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
-                };
-            };
-            /** @description Protective clothing type not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
+                    "*/*": components["schemas"]["ClothingType"];
                 };
             };
         };
@@ -458,15 +437,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Protective clothing type deleted */
+            /** @description No Content */
             204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Protective clothing type not found */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -486,35 +458,17 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UpdateProtectiveClothingTypeRequest"];
+                "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"];
             };
         };
         responses: {
-            /** @description Protective clothing type updated */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
-                };
-            };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
-                };
-            };
-            /** @description Protective clothing type not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProtectiveClothingType"];
+                    "*/*": components["schemas"]["ClothingType"];
                 };
             };
         };
