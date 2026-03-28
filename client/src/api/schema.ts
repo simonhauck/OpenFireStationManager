@@ -86,6 +86,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clothing/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all clothing items */
+        get: operations["getAllItems"];
+        put?: never;
+        /** Create a new clothing item */
+        post: operations["createItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/users": {
         parameters: {
             query?: never;
@@ -119,6 +137,25 @@ export interface paths {
         head?: never;
         /** Update a protective clothing type */
         patch: operations["updateType"];
+        trace?: never;
+    };
+    "/api/clothing/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a clothing item by ID */
+        get: operations["getItemById"];
+        put?: never;
+        post?: never;
+        /** Delete a clothing item */
+        delete: operations["deleteItem"];
+        options?: never;
+        head?: never;
+        /** Update a clothing item */
+        patch: operations["updateItem"];
         trace?: never;
     };
     "/api/admin/users/{id}": {
@@ -195,6 +232,19 @@ export interface components {
         };
         ClothingType: {
             name: string;
+            /** Format: int64 */
+            id: number;
+            metaData: components["schemas"]["EntityMetaData"];
+        };
+        CreateOrUpdateClothingItemRequest: {
+            /** Format: int64 */
+            typeId: number;
+            size: string;
+        };
+        ClothingItem: {
+            /** Format: int64 */
+            typeId: string;
+            size: string;
             /** Format: int64 */
             id: number;
             metaData: components["schemas"]["EntityMetaData"];
@@ -358,6 +408,50 @@ export interface operations {
             };
         };
     };
+    getAllItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ClothingItem"][];
+                };
+            };
+        };
+    };
+    createItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ClothingItem"];
+                };
+            };
+        };
+    };
     getAllUsers: {
         parameters: {
             query?: never;
@@ -469,6 +563,77 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ClothingType"];
+                };
+            };
+        };
+    };
+    getItemById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the clothing item */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ClothingItem"];
+                };
+            };
+        };
+    };
+    deleteItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the clothing item */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the clothing item */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ClothingItem"];
                 };
             };
         };

@@ -87,12 +87,6 @@ class ClothingTypeControllerIT : IntegrationTest() {
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body?.map { it.name })
-            .contains(
-                "Einsatzjacke",
-                "Einsatzhose",
-                "TH-Jacke",
-                "Brandhandschuhe",
-                typeName,
-            )
+            .contains("Einsatzjacke", "Einsatzhose", "TH-Jacke", "Brandhandschuhe", typeName)
     }
 }

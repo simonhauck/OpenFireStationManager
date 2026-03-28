@@ -95,4 +95,3 @@ export default function UsersTable({ users }: UsersTableProps) {
     </Table>
   )
 }
-

@@ -156,6 +156,55 @@
         }
       }
     },
+    "/api/clothing/items": {
+      "get": {
+        "tags": ["clothing-item-controller"],
+        "summary": "List all clothing items",
+        "operationId": "getAllItems",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClothingItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Create a new clothing item",
+        "operationId": "createItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/users": {
       "get": {
         "tags": ["admin-user-controller"],
@@ -291,6 +340,101 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ClothingType"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/items/{id}": {
+      "get": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Get a clothing item by ID",
+        "operationId": "getItemById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing item",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Delete a clothing item",
+        "operationId": "deleteItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing item",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Update a clothing item",
+        "operationId": "updateItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing item",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingItem"
                 }
               }
             }
@@ -519,6 +663,41 @@
           }
         },
         "required": ["id", "metaData", "name"]
+      },
+      "CreateOrUpdateClothingItemRequest": {
+        "type": "object",
+        "properties": {
+          "typeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": ["size", "typeId"]
+      },
+      "ClothingItem": {
+        "type": "object",
+        "properties": {
+          "typeId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "size": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
+          }
+        },
+        "required": ["id", "metaData", "size", "typeId"]
       },
       "CreateUserRequest": {
         "type": "object",

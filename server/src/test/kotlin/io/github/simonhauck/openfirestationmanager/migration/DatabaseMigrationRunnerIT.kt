@@ -21,6 +21,27 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
             jdbcTemplate.queryForList<String>("SELECT id FROM schema_migrations ORDER BY id")
 
         assertThat(appliedIds).contains("V001__create_users_table")
+        assertThat(appliedIds).contains("V008__seed_example_clothing_items")
+    }
+
+    @Test
+    fun `should seed five example clothing items for each default clothing type`() {
+        val seededItemCountPerType =
+            jdbcTemplate.queryForObject<Int>(
+                """
+                SELECT COALESCE(MIN(type_item_count), 0)
+                FROM (
+                    SELECT COUNT(c.id) AS type_item_count
+                    FROM protective_clothing_types t
+                    LEFT JOIN clothing_items c ON c.type_id = t.id
+                    WHERE t.name IN ('Einsatzjacke', 'Einsatzhose', 'TH-Jacke', 'Brandhandschuhe')
+                    GROUP BY t.id
+                ) counts
+                """
+                    .trimIndent()
+            )
+
+        assertThat(seededItemCountPerType).isGreaterThanOrEqualTo(5)
     }
 
     @Test
