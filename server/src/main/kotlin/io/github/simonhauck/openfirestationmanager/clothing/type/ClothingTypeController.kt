@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/protectiveclothing/types")
+@RequestMapping("/api/clothing/types")
 @Validated
-class ProtectiveClothingTypeController(private val service: ProtectiveClothingTypeService) {
+class ClothingTypeController(private val service: ClothingTypeService) {
 
     @GetMapping
     @Operation(summary = "List all protective clothing types")
-    fun getAllTypes(): List<ProtectiveClothingType> = service.getAllTypes()
+    fun getAllTypes(): List<ClothingType> = service.getAllTypes()
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a protective clothing type by ID")
@@ -33,27 +33,28 @@ class ProtectiveClothingTypeController(private val service: ProtectiveClothingTy
         @PathVariable
         @Positive
         id: Long
-    ): ProtectiveClothingType = service.getTypeById(id)
+    ): ClothingType = service.getTypeById(id)
 
     @PostMapping
     @Operation(summary = "Create a new protective clothing type")
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
-    fun createType(
-        @Valid @RequestBody request: CreateProtectiveClothingTypeRequest
-    ): ProtectiveClothingType = service.createType(request)
+    fun createType(@Valid @RequestBody request: CreateOrUpdateClothingTypeRequest): ClothingType =
+        service.createType(request)
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     @Operation(summary = "Update a protective clothing type")
     fun updateType(
         @Parameter(description = "ID of the protective clothing type")
         @PathVariable
         @Positive
         id: Long,
-        @Valid @RequestBody request: UpdateProtectiveClothingTypeRequest,
-    ): ProtectiveClothingType = service.updateType(id, request)
+        @Valid @RequestBody request: CreateOrUpdateClothingTypeRequest,
+    ): ClothingType = service.updateType(id, request)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     @Operation(summary = "Delete a protective clothing type")
     fun deleteType(
         @Parameter(description = "ID of the protective clothing type")

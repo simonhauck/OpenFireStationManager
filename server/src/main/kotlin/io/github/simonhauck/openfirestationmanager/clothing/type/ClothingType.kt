@@ -8,12 +8,10 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
-data class CreateProtectiveClothingTypeRequest(@NotBlank @Size(max = 255) val name: String)
-
-data class UpdateProtectiveClothingTypeRequest(@NotBlank @Size(max = 255) val name: String)
+data class CreateOrUpdateClothingTypeRequest(@NotBlank @Size(max = 255) val name: String)
 
 @Table("protective_clothing_types")
-data class ProtectiveClothingType(
+data class ClothingType(
     val name: String,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),

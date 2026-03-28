@@ -104,7 +104,7 @@ sub-package (e.g. `.station`, `.vehicle`, `.incident`) rather than by layer.
 
 ## Code Style
 
-No Kotlin formatter (ktlint/detekt) is configured. Follow standard IntelliJ/Kotlin defaults.
+Spotless is configured to format Kotlin code with `ktfmt`. Follow standard IntelliJ/Kotlin defaults for code structure, and use Spotless as the source of truth for final formatting.
 
 ### Formatting
 

@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.usermanagement
 
+import io.github.simonhauck.openfirestationmanager.common.NotFoundException
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -12,13 +13,7 @@ class UserService(
 ) {
     fun getAllUsers(): List<UserAccount> = userRepository.findAll().sortedBy { it.id }
 
-    fun getUserById(userId: Long): UserAccount {
-        return userRepository.findById(userId)
-            ?: throw PublicApiException(
-                status = HttpStatus.NOT_FOUND,
-                publicMessage = "User not found for id: $userId",
-            )
-    }
+    fun getUserById(userId: Long): UserAccount = findOrThrow(userId)
 
     fun createUser(createUserRequest: CreateUserRequest): UserAccount {
         if (userRepository.existsByUsername(createUserRequest.username)) {
@@ -41,12 +36,7 @@ class UserService(
     }
 
     fun updateUser(userId: Long, updateUserRequest: UpdateUserRequest): UserAccount {
-        val existingUser =
-            userRepository.findById(userId)
-                ?: throw PublicApiException(
-                    status = HttpStatus.NOT_FOUND,
-                    publicMessage = "User not found for id: $userId",
-                )
+        val existingUser = findOrThrow(userId)
 
         val updatedUser =
             existingUser.copy(
@@ -59,12 +49,7 @@ class UserService(
     }
 
     fun changePassword(userId: Long, changePasswordRequest: ChangePasswordRequest): UserAccount {
-        val existingUser =
-            userRepository.findById(userId)
-                ?: throw PublicApiException(
-                    status = HttpStatus.NOT_FOUND,
-                    publicMessage = "User not found for id: $userId",
-                )
+        val existingUser = findOrThrow(userId)
 
         val newPasswordHash =
             passwordEncoder.encode(changePasswordRequest.newPassword)
@@ -76,4 +61,9 @@ class UserService(
     fun findByUsername(username: String): UserAccount? = userRepository.findByUsername(username)
 
     fun hasAnyUsers(): Boolean = userRepository.count() > 0
+
+    private fun findOrThrow(userId: Long): UserAccount {
+        return userRepository.findById(userId)
+            ?: throw NotFoundException("User not found for id: $userId")
+    }
 }

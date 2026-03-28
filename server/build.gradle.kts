@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinSpring)
     alias(libs.plugins.springBoot)
     alias(libs.plugins.springDependencyManagement)
+    alias(libs.plugins.spotless)
 }
 
 group = "io.github.simonhauck"
@@ -51,6 +52,28 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
+}
+
+spotless {
+    kotlin {
+        target("src/*/kotlin/**/*.kt")
+        ktfmt().kotlinlangStyle()
+    }
+
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktfmt().kotlinlangStyle()
+    }
+
+    format("json") {
+        target("src/**/*.json")
+        prettier().configFile(file("../.prettierrc.json"))
+    }
+
+    format("yaml") {
+        target("src/**/*.yml", "src/**/*.yaml", "compose.yml")
+        prettier().configFile(file("../.prettierrc.json"))
     }
 }
 

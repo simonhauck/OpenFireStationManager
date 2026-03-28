@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-class ProtectiveClothingTypeControllerIT : IntegrationTest() {
+class ClothingTypeControllerIT : IntegrationTest() {
 
     @Autowired private lateinit var calls: ProtectiveClothingTypeControllerCalls
 
     @Test
     fun `createType should create a new protective clothing type when authenticated`() {
-        val request = CreateProtectiveClothingTypeRequest(name = "Helmet")
+        val request = CreateOrUpdateClothingTypeRequest(name = "Helmet")
 
         val response = calls.createType(request, authCookie = validCookieHeader)
 
@@ -26,7 +26,7 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
         val created =
             calls
                 .createType(
-                    CreateProtectiveClothingTypeRequest(name = "Gloves"),
+                    CreateOrUpdateClothingTypeRequest(name = "Gloves"),
                     authCookie = validCookieHeader,
                 )
                 .body!!
@@ -43,7 +43,7 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
         val created =
             calls
                 .createType(
-                    CreateProtectiveClothingTypeRequest(name = "Old Name"),
+                    CreateOrUpdateClothingTypeRequest(name = "Old Name"),
                     authCookie = validCookieHeader,
                 )
                 .body!!
@@ -51,7 +51,7 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
         val response =
             calls.updateType(
                 created.id,
-                UpdateProtectiveClothingTypeRequest(name = "New Name"),
+                CreateOrUpdateClothingTypeRequest(name = "New Name"),
                 authCookie = validCookieHeader,
             )
 
@@ -65,7 +65,7 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
         val created =
             calls
                 .createType(
-                    CreateProtectiveClothingTypeRequest(name = "To Delete"),
+                    CreateOrUpdateClothingTypeRequest(name = "To Delete"),
                     authCookie = validCookieHeader,
                 )
                 .body!!
@@ -79,7 +79,7 @@ class ProtectiveClothingTypeControllerIT : IntegrationTest() {
     fun `getAllTypes should include created types`() {
         val typeName = "Boots-${System.nanoTime()}"
         calls.createType(
-            CreateProtectiveClothingTypeRequest(name = typeName),
+            CreateOrUpdateClothingTypeRequest(name = typeName),
             authCookie = validCookieHeader,
         )
 

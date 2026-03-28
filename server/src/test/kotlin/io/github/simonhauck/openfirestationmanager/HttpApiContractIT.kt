@@ -30,12 +30,7 @@ class HttpApiContractIT : IntegrationTest() {
         actualJson.remove("servers")
         expectedJson.remove("servers")
 
-        runCatching {
-                assertThat(actualJson.toString())
-                    // TODO 09.10.25 - Simon.Hauck The collection order is a workaround, because the
-                    // oneOf values are not sorted deterministically
-                    .isEqualTo(expectedJson.toString())
-            }
+        runCatching { assertThat(actualJson.toString()).isEqualTo(expectedJson.toString()) }
             .recoverCatching { checkIfApiShouldBeUpdated(actualJson, it) }
             .getOrThrow()
     }

@@ -1,7 +1,7 @@
 package io.github.simonhauck.openfirestationmanager.db
 
-import java.sql.Timestamp
 import java.sql.JDBCType
+import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset

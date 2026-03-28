@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component
 @Component
 class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
-    fun getAllTypes(authCookie: String? = null): ResponseEntity<Array<ProtectiveClothingType>> {
-        return testRestTemplate.exchange<Array<ProtectiveClothingType>>(
-            "/api/protectiveclothing/types",
+    fun getAllTypes(authCookie: String? = null): ResponseEntity<Array<ClothingType>> {
+        return testRestTemplate.exchange<Array<ClothingType>>(
+            "/api/clothing/types",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )
@@ -23,15 +23,15 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
 
     fun getAllTypesExpectingError(authCookie: String? = null): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
-            "/api/protectiveclothing/types",
+            "/api/clothing/types",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )
     }
 
-    fun getTypeById(id: Long, authCookie: String? = null): ResponseEntity<ProtectiveClothingType> {
-        return testRestTemplate.exchange<ProtectiveClothingType>(
-            "/api/protectiveclothing/types/$id",
+    fun getTypeById(id: Long, authCookie: String? = null): ResponseEntity<ClothingType> {
+        return testRestTemplate.exchange<ClothingType>(
+            "/api/clothing/types/$id",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )
@@ -42,39 +42,39 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
         authCookie: String? = null,
     ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
-            "/api/protectiveclothing/types/$id",
+            "/api/clothing/types/$id",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )
     }
 
     fun createType(
-        request: CreateProtectiveClothingTypeRequest,
+        request: CreateOrUpdateClothingTypeRequest,
         authCookie: String? = null,
-    ): ResponseEntity<ProtectiveClothingType> {
-        return testRestTemplate.postForEntity<ProtectiveClothingType>(
-            "/api/protectiveclothing/types",
+    ): ResponseEntity<ClothingType> {
+        return testRestTemplate.postForEntity<ClothingType>(
+            "/api/clothing/types",
             HttpEntity(request, headersWithCookie(authCookie)),
         )
     }
 
     fun createTypeExpectingError(
-        request: CreateProtectiveClothingTypeRequest,
+        request: CreateOrUpdateClothingTypeRequest,
         authCookie: String? = null,
     ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.postForEntity<ProblemDetail>(
-            "/api/protectiveclothing/types",
+            "/api/clothing/types",
             HttpEntity(request, headersWithCookie(authCookie)),
         )
     }
 
     fun updateType(
         id: Long,
-        request: UpdateProtectiveClothingTypeRequest,
+        request: CreateOrUpdateClothingTypeRequest,
         authCookie: String? = null,
-    ): ResponseEntity<ProtectiveClothingType> {
-        return testRestTemplate.exchange<ProtectiveClothingType>(
-            "/api/protectiveclothing/types/$id",
+    ): ResponseEntity<ClothingType> {
+        return testRestTemplate.exchange<ClothingType>(
+            "/api/clothing/types/$id",
             HttpMethod.PATCH,
             HttpEntity(request, headersWithCookie(authCookie)),
         )
@@ -82,11 +82,11 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
 
     fun updateTypeExpectingError(
         id: Long,
-        request: UpdateProtectiveClothingTypeRequest,
+        request: CreateOrUpdateClothingTypeRequest,
         authCookie: String? = null,
     ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
-            "/api/protectiveclothing/types/$id",
+            "/api/clothing/types/$id",
             HttpMethod.PATCH,
             HttpEntity(request, headersWithCookie(authCookie)),
         )
@@ -94,7 +94,7 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
 
     fun deleteType(id: Long, authCookie: String? = null): ResponseEntity<Void> {
         return testRestTemplate.exchange<Void>(
-            "/api/protectiveclothing/types/$id",
+            "/api/clothing/types/$id",
             HttpMethod.DELETE,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )
@@ -105,7 +105,7 @@ class ProtectiveClothingTypeControllerCalls(private val testRestTemplate: TestRe
         authCookie: String? = null,
     ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.exchange<ProblemDetail>(
-            "/api/protectiveclothing/types/$id",
+            "/api/clothing/types/$id",
             HttpMethod.DELETE,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )

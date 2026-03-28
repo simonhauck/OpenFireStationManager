@@ -18,6 +18,7 @@
           <option value=":test" />
           <option value="--tests" />
           <option value="&quot;io.github.simonhauck.openfirestationmanager.HttpApiContractIT&quot;" />
+          <option value="spotlessApply" />
         </list>
       </option>
       <option name="vmOptions" />
