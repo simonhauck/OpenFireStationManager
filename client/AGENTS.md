@@ -1,6 +1,6 @@
-# AGENTS.md — shadcn-client
+# AGENTS.md — OpenFireStationManagerClient
 
-Guidance for agentic coding assistants working in the `shadcn-client/` component.
+Guidance for agentic coding assistants working in the `client/` component.
 
 > For monorepo-level context (project overview, Prettier scoping, CI/CD status) see the
 > root `AGENTS.md`.
@@ -21,7 +21,7 @@ shadcn/ui components.
 - shadcn/ui (Radix + Tailwind) as the default component library
 - OpenAPI-based frontend bindings generated via `prepareEnv`
 
-All commands below are run from the `shadcn-client/` directory.
+All commands below are run from the `client/` directory.
 
 ---
 
