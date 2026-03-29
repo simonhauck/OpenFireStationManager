@@ -49,4 +49,3 @@ export function useClothingItems() {
 export function useClothingTypeSizeSummary() {
   return useQuery(getClothingTypeSizeSummaryQuery())
 }
-

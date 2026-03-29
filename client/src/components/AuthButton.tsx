@@ -30,8 +30,7 @@ export default function AuthButton() {
   }
 
   const initials =
-    `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase() ||
-    "?"
+    `${user?.firstName[0] ?? ""}${user?.lastName[0] ?? ""}`.toUpperCase() || "?"
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ")
 
   return (

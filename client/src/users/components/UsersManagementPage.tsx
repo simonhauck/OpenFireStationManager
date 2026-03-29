@@ -51,4 +51,3 @@ function UsersManagementPageContent() {
     </main>
   )
 }
-

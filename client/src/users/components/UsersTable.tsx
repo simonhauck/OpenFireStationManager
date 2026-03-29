@@ -5,12 +5,12 @@ import FormattedDate from "#/components/base/FormattedDate"
 import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "#/components/ui/table"
 import type { components } from "#/api/schema"
 import { getRoleLabel } from "#/users/roleMetadata"

@@ -27,7 +27,8 @@ export default function ClothingItemsPage() {
 
   const isLoading = isLoadingItems || isLoadingTypes
   const isError = isItemsError || isTypesError
-  const canRenderTable = clothingItems !== undefined && clothingTypes !== undefined
+  const canRenderTable =
+    clothingItems !== undefined && clothingTypes !== undefined
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
@@ -35,9 +36,7 @@ export default function ClothingItemsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Klamottenmanagement</CardTitle>
-            <CardDescription>
-              Alle vorhandenen Kleidungsstuecke
-            </CardDescription>
+            <CardDescription>Alle vorhandenen Kleidungsstuecke</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -50,7 +49,10 @@ export default function ClothingItemsPage() {
             </RenderIf>
 
             <RenderIf when={canRenderTable}>
-              <ClothingItemsTable items={clothingItems!} types={clothingTypes!} />
+              <ClothingItemsTable
+                items={clothingItems!}
+                types={clothingTypes!}
+              />
             </RenderIf>
           </CardContent>
         </Card>
@@ -58,4 +60,3 @@ export default function ClothingItemsPage() {
     </RoleGuard>
   )
 }
-

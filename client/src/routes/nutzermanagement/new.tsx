@@ -16,7 +16,8 @@ import {
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
-import { ROLE_OPTIONS, type UserRole } from "#/users/roleMetadata"
+import { ROLE_OPTIONS } from "#/users/roleMetadata"
+import type { UserRole } from "#/users/roleMetadata"
 
 export const Route = createFileRoute("/nutzermanagement/new")({
   component: CreateUserPage,

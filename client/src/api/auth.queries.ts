@@ -31,8 +31,7 @@ export const meQuery = () =>
 export const logoutMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationFn: async (): Promise<void> => {
-      const { error } = await client.POST("/api/public/auth/logout")
-      if (error) throw error
+      await client.POST("/api/public/auth/logout")
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries()
@@ -43,8 +42,7 @@ export const logoutMutation = (queryClient: QueryClient) =>
 export const loginMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationFn: async (body: LoginRequest): Promise<void> => {
-      const { error } = await client.POST("/api/public/auth/login", { body })
-      if (error) throw error
+      await client.POST("/api/public/auth/login", { body })
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.me() })

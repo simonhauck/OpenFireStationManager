@@ -37,7 +37,9 @@ function ClothingTypesPageContent() {
               <CardDescription>Kleidungstypen</CardDescription>
             </div>
             <Button asChild>
-              <Link to="/klamottenmanagement/types/new">Kleidungstyp erstellen</Link>
+              <Link to="/klamottenmanagement/types/new">
+                Kleidungstyp erstellen
+              </Link>
             </Button>
           </div>
         </CardHeader>

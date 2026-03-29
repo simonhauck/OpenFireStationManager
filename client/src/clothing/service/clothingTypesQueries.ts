@@ -66,7 +66,9 @@ export const createClothingTypeMutation = (queryClient: QueryClient) =>
       return ensureData(data, error, "POST /api/clothing/types")
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.clothingTypes() })
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.clothingTypes(),
+      })
     },
   })
 

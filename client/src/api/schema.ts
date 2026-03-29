@@ -4,751 +4,751 @@
  */
 
 export interface paths {
-    "/api/admin/users/{id}/password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: operations["changePassword"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/public/setup/initial-admin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["initializeAdmin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/public/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/public/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/clothing/types": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all protective clothing types */
-        get: operations["getAllTypes"];
-        put?: never;
-        /** Create a new protective clothing type */
-        post: operations["createType"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/clothing/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all clothing items */
-        get: operations["getAllItems"];
-        put?: never;
-        /** Create a new clothing item */
-        post: operations["createItem"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/admin/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAllUsers"];
-        put?: never;
-        post: operations["createUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/clothing/types/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a protective clothing type by ID */
-        get: operations["getTypeById"];
-        put?: never;
-        post?: never;
-        /** Delete a protective clothing type */
-        delete: operations["deleteType"];
-        options?: never;
-        head?: never;
-        /** Update a protective clothing type */
-        patch: operations["updateType"];
-        trace?: never;
-    };
-    "/api/clothing/items/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a clothing item by ID */
-        get: operations["getItemById"];
-        put?: never;
-        post?: never;
-        /** Delete a clothing item */
-        delete: operations["deleteItem"];
-        options?: never;
-        head?: never;
-        /** Update a clothing item */
-        patch: operations["updateItem"];
-        trace?: never;
-    };
-    "/api/admin/users/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getUserById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["updateUser"];
-        trace?: never;
-    };
-    "/api/public/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["me"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/clothing/items/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List clothing item counts by type and size */
-        get: operations["getSummaryByTypeAndSize"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+  "/api/admin/users/{id}/password": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put: operations["changePassword"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/public/setup/initial-admin": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["initializeAdmin"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/public/auth/logout": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["logout"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/public/auth/login": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["login"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/types": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List all protective clothing types */
+    get: operations["getAllTypes"]
+    put?: never
+    /** Create a new protective clothing type */
+    post: operations["createType"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/items": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List all clothing items */
+    get: operations["getAllItems"]
+    put?: never
+    /** Create a new clothing item */
+    post: operations["createItem"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/admin/users": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["getAllUsers"]
+    put?: never
+    post: operations["createUser"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/types/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a protective clothing type by ID */
+    get: operations["getTypeById"]
+    put?: never
+    post?: never
+    /** Delete a protective clothing type */
+    delete: operations["deleteType"]
+    options?: never
+    head?: never
+    /** Update a protective clothing type */
+    patch: operations["updateType"]
+    trace?: never
+  }
+  "/api/clothing/items/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a clothing item by ID */
+    get: operations["getItemById"]
+    put?: never
+    post?: never
+    /** Delete a clothing item */
+    delete: operations["deleteItem"]
+    options?: never
+    head?: never
+    /** Update a clothing item */
+    patch: operations["updateItem"]
+    trace?: never
+  }
+  "/api/admin/users/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["getUserById"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch: operations["updateUser"]
+    trace?: never
+  }
+  "/api/public/auth/me": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["me"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/items/summary": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List clothing item counts by type and size */
+    get: operations["getSummaryByTypeAndSize"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 export interface components {
-    schemas: {
-        ChangePasswordRequest: {
-            newPassword: string;
-        };
-        EntityMetaData: {
-            /** Format: date-time */
-            createdAt: string;
-            createdBy: string;
-            /** Format: date-time */
-            lastModifiedAt: string;
-            lastModifiedBy: string;
-        };
-        UserAccount: {
-            username: string;
-            firstName: string;
-            lastName: string;
-            roles: ("USER" | "ADMIN" | "KLEIDERWART")[];
-            enabled: boolean;
-            /** Format: int64 */
-            id: number;
-            metaData: components["schemas"]["EntityMetaData"];
-        };
-        InitialAdminSetupRequest: {
-            username: string;
-            password: string;
-            firstName: string;
-            lastName: string;
-        };
-        LoginRequest: {
-            username: string;
-            password: string;
-            /** Format: int64 */
-            tokenValiditySeconds: number;
-        };
-        CreateOrUpdateClothingTypeRequest: {
-            name: string;
-        };
-        ClothingType: {
-            name: string;
-            /** Format: int64 */
-            id: number;
-            metaData: components["schemas"]["EntityMetaData"];
-        };
-        CreateOrUpdateClothingItemRequest: {
-            /** Format: int64 */
-            typeId: number;
-            size: string;
-        };
-        ClothingItem: {
-            /** Format: int64 */
-            typeId: string;
-            size: string;
-            /** Format: int64 */
-            id: number;
-            metaData: components["schemas"]["EntityMetaData"];
-        };
-        CreateUserRequest: {
-            username: string;
-            password: string;
-            firstName: string;
-            lastName: string;
-            roles: ("USER" | "ADMIN" | "KLEIDERWART")[];
-        };
-        UpdateUserRequest: {
-            firstName: string;
-            lastName: string;
-            roles: ("USER" | "ADMIN" | "KLEIDERWART")[];
-        };
-        AuthStateResponse: {
-            authenticated: boolean;
-            user?: components["schemas"]["UserAccount"];
-        };
-        ClothingTypeSizeSummary: {
-            /** Format: int64 */
-            typeId: number;
-            typeName: string;
-            sizeCounts: {
-                [key: string]: number;
-            };
-        };
-    };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+  schemas: {
+    ChangePasswordRequest: {
+      newPassword: string
+    }
+    EntityMetaData: {
+      /** Format: date-time */
+      createdAt: string
+      createdBy: string
+      /** Format: date-time */
+      lastModifiedAt: string
+      lastModifiedBy: string
+    }
+    UserAccount: {
+      username: string
+      firstName: string
+      lastName: string
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+      enabled: boolean
+      /** Format: int64 */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    InitialAdminSetupRequest: {
+      username: string
+      password: string
+      firstName: string
+      lastName: string
+    }
+    LoginRequest: {
+      username: string
+      password: string
+      /** Format: int64 */
+      tokenValiditySeconds: number
+    }
+    CreateOrUpdateClothingTypeRequest: {
+      name: string
+    }
+    ClothingType: {
+      name: string
+      /** Format: int64 */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    CreateOrUpdateClothingItemRequest: {
+      /** Format: int64 */
+      typeId: number
+      size: string
+    }
+    ClothingItem: {
+      /** Format: int64 */
+      typeId: string
+      size: string
+      /** Format: int64 */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    CreateUserRequest: {
+      username: string
+      password: string
+      firstName: string
+      lastName: string
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+    }
+    UpdateUserRequest: {
+      firstName: string
+      lastName: string
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+    }
+    AuthStateResponse: {
+      authenticated: boolean
+      user?: components["schemas"]["UserAccount"]
+    }
+    ClothingTypeSizeSummary: {
+      /** Format: int64 */
+      typeId: number
+      typeName: string
+      sizeCounts: {
+        [key: string]: number
+      }
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
-export type $defs = Record<string, never>;
+export type $defs = Record<string, never>
 export interface operations {
-    changePassword: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangePasswordRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserAccount"];
-                };
-            };
-        };
-    };
-    initializeAdmin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["InitialAdminSetupRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserAccount"];
-                };
-            };
-        };
-    };
-    logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    login: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getAllTypes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingType"][];
-                };
-            };
-        };
-    };
-    createType: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingType"];
-                };
-            };
-        };
-    };
-    getAllItems: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingItem"][];
-                };
-            };
-        };
-    };
-    createItem: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingItem"];
-                };
-            };
-        };
-    };
-    getAllUsers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserAccount"][];
-                };
-            };
-        };
-    };
-    createUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateUserRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserAccount"];
-                };
-            };
-        };
-    };
-    getTypeById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the protective clothing type */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingType"];
-                };
-            };
-        };
-    };
-    deleteType: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the protective clothing type */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    updateType: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the protective clothing type */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingType"];
-                };
-            };
-        };
-    };
-    getItemById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the clothing item */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingItem"];
-                };
-            };
-        };
-    };
-    deleteItem: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the clothing item */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    updateItem: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the clothing item */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingItem"];
-                };
-            };
-        };
-    };
-    getUserById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserAccount"];
-                };
-            };
-        };
-    };
-    updateUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserAccount"];
-                };
-            };
-        };
-    };
-    me: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AuthStateResponse"];
-                };
-            };
-        };
-    };
-    getSummaryByTypeAndSize: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClothingTypeSizeSummary"][];
-                };
-            };
-        };
-    };
+  changePassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChangePasswordRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+    }
+  }
+  initializeAdmin: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InitialAdminSetupRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+    }
+  }
+  logout: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  login: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LoginRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getAllTypes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingType"][]
+        }
+      }
+    }
+  }
+  createType: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+    }
+  }
+  getAllItems: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingItem"][]
+        }
+      }
+    }
+  }
+  createItem: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingItem"]
+        }
+      }
+    }
+  }
+  getAllUsers: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"][]
+        }
+      }
+    }
+  }
+  createUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUserRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+    }
+  }
+  getTypeById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the protective clothing type */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+    }
+  }
+  deleteType: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the protective clothing type */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  updateType: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the protective clothing type */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+    }
+  }
+  getItemById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing item */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingItem"]
+        }
+      }
+    }
+  }
+  deleteItem: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing item */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  updateItem: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing item */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingItem"]
+        }
+      }
+    }
+  }
+  getUserById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+    }
+  }
+  updateUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+    }
+  }
+  me: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["AuthStateResponse"]
+        }
+      }
+    }
+  }
+  getSummaryByTypeAndSize: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingTypeSizeSummary"][]
+        }
+      }
+    }
+  }
 }

@@ -61,7 +61,9 @@ export default function ClothingTypeSizeSummaryCard({
             <TableBody>
               {summaryData.map((entry) => (
                 <TableRow key={entry.typeId}>
-                  <TableCell className="font-medium">{entry.typeName}</TableCell>
+                  <TableCell className="font-medium">
+                    {entry.typeName}
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(entry.sizeCounts)
@@ -69,7 +71,10 @@ export default function ClothingTypeSizeSummaryCard({
                           sizeA.localeCompare(sizeB, "de"),
                         )
                         .map(([size, count]) => (
-                          <Badge key={`${entry.typeId}-${size}`} variant="outline">
+                          <Badge
+                            key={`${entry.typeId}-${size}`}
+                            variant="outline"
+                          >
                             {size}: {Number(count)}
                           </Badge>
                         ))}
@@ -96,4 +101,3 @@ export default function ClothingTypeSizeSummaryCard({
     </Card>
   )
 }
-
