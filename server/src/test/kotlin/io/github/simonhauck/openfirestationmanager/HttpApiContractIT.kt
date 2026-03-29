@@ -21,7 +21,7 @@ class HttpApiContractIT : IntegrationTest() {
 
     @Test
     fun `should match the http api definition specified in the API file`() {
-        val actual = restTemplate.getForObject<String>("/api/public/schema.json")
+        val actual = restTemplate.getForObject<String>("/schema.json")
         val expected = resourceLoader.readFromClassLoader("open-api-contract.json")
 
         val actualJson = objectMapper.readTree(actual) as ObjectNode

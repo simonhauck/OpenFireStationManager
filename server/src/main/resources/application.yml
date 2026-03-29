@@ -21,7 +21,6 @@ app:
 springdoc:
   swagger-ui:
     enabled: true
-    path: /api/public/swagger-ui.html
   api-docs:
     enabled: true
-    path: /api/public/schema.json
+    path: /schema.json

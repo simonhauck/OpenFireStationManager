@@ -25,6 +25,10 @@ jobs:
         working-directory: client
         run: npm ci
 
+      - name: Build client
+        working-directory: client
+        run: npm run build
+
       - name: Publish Docker image
         shell: bash
         working-directory: server

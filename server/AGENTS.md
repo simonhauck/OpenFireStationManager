@@ -17,7 +17,7 @@ JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API 
 - Kotlin 2.2.21, Java 24
 - Spring Boot 4.0.3 (Spring MVC, Spring Data JDBC, Spring Validation)
 - PostgreSQL (via Docker Compose, `compose.yml`)
-- SpringDoc OpenAPI 3.0.2 — Swagger UI at `/api/public/swagger-ui.html`, schema at `/api/public/schema.json`
+- SpringDoc OpenAPI 3.0.2 — Swagger UI at `/swagger-ui.html`, schema at `/schema.json`
 - Jackson + `jackson-module-kotlin`
 - Gradle 9.3.1 (Kotlin DSL, `build.gradle.kts`)
 
@@ -166,7 +166,7 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 ## API Design
 
 - All REST endpoints **must** be documented with SpringDoc annotations (`@Operation`,
-  `@ApiResponse`, `@Parameter`, etc.) so they appear correctly in `/api/public/schema.json`.
+  `@ApiResponse`, `@Parameter`, etc.) so they appear correctly in `/schema.json`.
 - Follow RESTful conventions:
   - Resource-oriented URLs: `/api/stations`, `/api/stations/{id}`
   - Use appropriate HTTP verbs: `GET` (read), `POST` (create), `PUT`/`PATCH` (update), `DELETE`
