@@ -5,6 +5,8 @@ import { queryKeys } from "#/api/queryKeys"
 import type { components } from "#/api/schema"
 
 export type ClothingItem = components["schemas"]["ClothingItem"]
+export type ClothingTypeSizeSummary =
+  components["schemas"]["ClothingTypeSizeSummary"]
 
 const ensureData = <T>(
   data: T | undefined,
@@ -31,6 +33,20 @@ export const getAllClothingItemsQuery = () =>
     },
   })
 
+export const getClothingTypeSizeSummaryQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.clothingTypeSizeSummary(),
+    queryFn: async (): Promise<ClothingTypeSizeSummary[]> => {
+      const { data, error } = await client.GET("/api/clothing/items/summary")
+      return ensureData(data, error, "GET /api/clothing/items/summary")
+    },
+  })
+
 export function useClothingItems() {
   return useQuery(getAllClothingItemsQuery())
 }
+
+export function useClothingTypeSizeSummary() {
+  return useQuery(getClothingTypeSizeSummaryQuery())
+}
+

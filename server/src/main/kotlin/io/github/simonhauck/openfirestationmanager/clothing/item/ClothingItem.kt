@@ -17,6 +17,12 @@ data class CreateOrUpdateClothingItemRequest(
     @NotBlank @Size(max = 255) val size: String,
 )
 
+data class ClothingTypeSizeSummary(
+    val typeId: Long,
+    val typeName: String,
+    val sizeCounts: Map<String, Long>,
+)
+
 @Table("clothing_items")
 data class ClothingItem(
     @field:Schema(type = "integer", format = "int64")

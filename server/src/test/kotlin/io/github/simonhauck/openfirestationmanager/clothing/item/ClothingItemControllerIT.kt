@@ -107,6 +107,33 @@ class ClothingItemControllerIT : IntegrationTest() {
         assertThat(response.body?.map { it.size }).contains(uniqueSize)
     }
 
+    @Test
+    fun `getSummaryByTypeAndSize should group counts by clothing type and size`() {
+        val summaryTypeName = "Summary-Type-${System.nanoTime()}"
+        val type = createType(summaryTypeName)
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
+            authCookie = validCookieHeader,
+        )
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
+            authCookie = validCookieHeader,
+        )
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "L"),
+            authCookie = validCookieHeader,
+        )
+
+        val response = itemCalls.getSummaryByTypeAndSize(authCookie = validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+
+        val summaryForType = response.body?.firstOrNull { it.typeId == type.id }
+        assertThat(summaryForType).isNotNull
+        assertThat(summaryForType?.typeName).isEqualTo(summaryTypeName)
+        assertThat(summaryForType?.sizeCounts).containsEntry("M", 2).containsEntry("L", 1)
+    }
+
     private fun createType(name: String = "Type-${System.nanoTime()}"): ClothingType {
         return typeCalls
             .createType(

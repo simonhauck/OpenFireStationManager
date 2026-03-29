@@ -190,6 +190,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clothing/items/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List clothing item counts by type and size */
+        get: operations["getSummaryByTypeAndSize"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -264,6 +281,14 @@ export interface components {
         AuthStateResponse: {
             authenticated: boolean;
             user?: components["schemas"]["UserAccount"];
+        };
+        ClothingTypeSizeSummary: {
+            /** Format: int64 */
+            typeId: number;
+            typeName: string;
+            sizeCounts: {
+                [key: string]: number;
+            };
         };
     };
     responses: never;
@@ -702,6 +727,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AuthStateResponse"];
+                };
+            };
+        };
+    };
+    getSummaryByTypeAndSize: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ClothingTypeSizeSummary"][];
                 };
             };
         };
