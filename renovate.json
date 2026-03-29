@@ -4,7 +4,7 @@
   "automergeType": "branch",
   "labels": ["dependencies"],
   "npm": {
-    "enabled": false
+    "enabled": true
   },
   "minimumReleaseAge": "14 days",
   "packageRules": [
