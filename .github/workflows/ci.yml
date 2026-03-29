@@ -2,10 +2,8 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+  workflow_run:
 
 jobs:
   check:
@@ -15,21 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "25"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: client/package-lock.json
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
 
       - name: Run backend checks
         working-directory: server

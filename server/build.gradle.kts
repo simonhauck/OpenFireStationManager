@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.springBoot)
     alias(libs.plugins.springDependencyManagement)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.jib)
 }
 
 group = "io.github.simonhauck"
@@ -33,7 +34,7 @@ dependencies {
     implementation(libs.jacksonModuleKotlin)
     implementation(libs.kotlinLoggingJvm)
 
-    testAndDevelopmentOnly(libs.springBootDockerCompose)
+    developmentOnly(libs.springBootDockerCompose)
 
     runtimeOnly(libs.postgresql)
 
@@ -68,12 +69,45 @@ spotless {
 
     format("json") {
         target("src/**/*.json")
+
         prettier().configFile(file("../.prettierrc.json"))
     }
 
     format("yaml") {
         target("src/**/*.yml", "src/**/*.yaml", "compose.yml")
         prettier().configFile(file("../.prettierrc.json"))
+    }
+}
+
+jib {
+    from {
+        platforms {
+            platform {
+                architecture = "amd64"
+                os = "linux"
+            }
+            platform {
+                architecture = "arm64"
+                os = "linux"
+            }
+        }
+    }
+
+    to {
+        image = "ghcr.io/simonhauck/open-fire-station-manager"
+        tags = setOfNotNull("$version", "latest").filterNot { it.isBlank() }.toSet()
+        auth {
+            username = System.getenv("DOCKER_USERNAME")
+            password = System.getenv("DOCKER_PASSWORD")
+        }
+    }
+
+    container {
+        labels =
+            mapOf(
+                "org.opencontainers.image.source" to
+                    "https://github.com/simonhauck/OpenFireStationManager"
+            )
     }
 }
 
