@@ -39,10 +39,6 @@ jobs:
         working-directory: client
         run: npm ci
 
-      - name: Generate client API schema
-        working-directory: client
-        run: npm run prepareEnv
-
       - name: Lint client
         working-directory: client
         run: npm run lint

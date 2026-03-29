@@ -13,7 +13,7 @@
     "lint": "eslint",
     "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix",
-    "prepareEnv": "npx openapi-typescript ./../server/src/main/resources/open-api-contract.json -o ./src/api/schema.ts"
+    "prepareEnv": "npx openapi-typescript ./../server/src/main/resources/open-api-contract.json -o ./src/api/schema.ts && prettier --write ./src/api/schema.ts"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
