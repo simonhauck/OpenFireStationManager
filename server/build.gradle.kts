@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.springDependencyManagement)
     alias(libs.plugins.spotless)
     alias(libs.plugins.jib)
+    alias(libs.plugins.testLoggerPlugin)
 }
 
 group = "io.github.simonhauck"
