@@ -1,0 +1,33 @@
+services:
+  open-fire-station-manager:
+    image: ghcr.io/simonhauck/open-fire-station-manager:latest
+    restart: unless-stopped
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_URL: jdbc:postgresql://db:5432/ofsm
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SIGNING_SECRET: SOME_32_CHARACTERS_LONG_KEY_HERE
+    ports:
+      - "13841:8080"
+
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ofsm
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data: null
