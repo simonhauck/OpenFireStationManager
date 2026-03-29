@@ -16,6 +16,10 @@ const config = defineConfig({
       },
     },
   },
+  build: {
+    outDir: "./../server/src/main/resources/static",
+    emptyOutDir: true,
+  },
   plugins: [
     devtools(),
     tsconfigPaths({ projects: ["./tsconfig.json"] }),
