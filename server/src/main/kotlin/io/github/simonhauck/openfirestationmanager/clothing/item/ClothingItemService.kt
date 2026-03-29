@@ -17,22 +17,25 @@ class ClothingItemService(
 
     fun getSummaryByTypeAndSize(): List<ClothingTypeSizeSummary> {
         val items = repository.findAll()
-        return clothingTypeRepository.findAll().sortedBy { it.id }.map { type ->
-            val sizeCounts =
-                items
-                    .asSequence()
-                    .filter { item -> item.typeId.id == type.id }
-                    .groupingBy { item -> item.size }
-                    .eachCount()
-                    .mapValues { (_, count) -> count.toLong() }
-                    .toSortedMap()
+        return clothingTypeRepository
+            .findAll()
+            .sortedBy { it.id }
+            .map { type ->
+                val sizeCounts =
+                    items
+                        .asSequence()
+                        .filter { item -> item.typeId.id == type.id }
+                        .groupingBy { item -> item.size }
+                        .eachCount()
+                        .mapValues { (_, count) -> count.toLong() }
+                        .toSortedMap()
 
                 ClothingTypeSizeSummary(
                     typeId = type.id,
                     typeName = type.name,
                     sizeCounts = sizeCounts,
                 )
-        }
+            }
     }
 
     fun createItem(request: CreateOrUpdateClothingItemRequest): ClothingItem {

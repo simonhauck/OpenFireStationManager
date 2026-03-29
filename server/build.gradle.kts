@@ -12,7 +12,7 @@ version = "0.0.1-SNAPSHOT"
 
 description = "The server component to manage a firefighting station"
 
-java { toolchain { languageVersion = JavaLanguageVersion.of(24) } }
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
 
 repositories { mavenCentral() }
 

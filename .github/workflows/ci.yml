@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "lts"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Run backend checks
+        working-directory: server
+        run: ./gradlew check
+
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Generate client API schema
+        working-directory: client
+        run: npm run prepareEnv
+
+      - name: Lint client
+        working-directory: client
+        run: npm run lint
+
+      - name: Check client formatting
+        working-directory: client
+        run: npm run format

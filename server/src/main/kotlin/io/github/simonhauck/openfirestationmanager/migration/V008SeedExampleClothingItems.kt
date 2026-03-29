@@ -31,4 +31,3 @@ class V008SeedExampleClothingItems : DatabaseMigration {
         }
     }
 }
-

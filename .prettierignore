@@ -1,5 +1,2 @@
-# Kotlin files
-*.kt
-*.kts
-
 client
+server
