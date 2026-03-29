@@ -19,10 +19,7 @@ class AggregateReferenceJacksonConfiguration {
     fun aggregateReferenceJacksonModule(): JacksonModule {
         val module = SimpleModule()
         @Suppress("UNCHECKED_CAST")
-        module.addSerializer(
-            AggregateReference::class.java as Class<AggregateReference<*, *>>,
-            AggregateReferenceSerializer,
-        )
+        module.addSerializer(AggregateReference::class.java, AggregateReferenceSerializer)
         @Suppress("UNCHECKED_CAST")
         module.addDeserializer(
             AggregateReference::class.java as Class<AggregateReference<*, Long>>,
