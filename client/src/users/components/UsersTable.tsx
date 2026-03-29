@@ -1,15 +1,16 @@
 import { Link } from "@tanstack/react-router"
 import { KeyRound, Pencil } from "lucide-react"
 
+import FormattedDate from "#/components/base/FormattedDate"
 import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "#/components/ui/table"
 import type { components } from "#/api/schema"
 import { getRoleLabel } from "#/users/roleMetadata"
@@ -18,14 +19,6 @@ type UserAccount = components["schemas"]["UserAccount"]
 
 interface UsersTableProps {
   users: UserAccount[]
-}
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  })
 }
 
 export default function UsersTable({ users }: UsersTableProps) {
@@ -63,7 +56,9 @@ export default function UsersTable({ users }: UsersTableProps) {
                   ))}
                 </div>
               </TableCell>
-              <TableCell>{formatDate(user.metaData.createdAt)}</TableCell>
+              <TableCell>
+                <FormattedDate value={user.metaData.createdAt} />
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-1">
                   <Button asChild size="icon" variant="outline">

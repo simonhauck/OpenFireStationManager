@@ -1,7 +1,10 @@
-import { Link } from "@tanstack/react-router"
-
+import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
+import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
+import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import ErrorState from "#/components/base/ErrorState"
+import LoadingIndicator from "#/components/base/LoadingIndicator"
+import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 import {
   Card,
   CardContent,
@@ -11,26 +14,44 @@ import {
 } from "#/components/ui/card"
 
 export default function ClothingItemsPage() {
+  const {
+    data: clothingItems,
+    isLoading: isLoadingItems,
+    isError: isItemsError,
+  } = useClothingItems()
+  const {
+    data: clothingTypes,
+    isLoading: isLoadingTypes,
+    isError: isTypesError,
+  } = useClothingTypes()
+
+  const isLoading = isLoadingItems || isLoadingTypes
+  const isError = isItemsError || isTypesError
+  const canRenderTable = clothingItems !== undefined && clothingTypes !== undefined
+
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
       <main className="page-wrap px-4 py-12">
         <Card>
           <CardHeader>
-            <CardTitle>Kleidungsstuecke</CardTitle>
+            <CardTitle>Klamottenmanagement</CardTitle>
             <CardDescription>
-              Diese Ansicht ist aktuell ein Platzhalter. Hier werden bald alle
-              vorhandenen Kleidungsstuecke angezeigt.
+              Alle vorhandenen Kleidungsstuecke
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground text-sm">
-              Bis dahin kannst du Kleidungstypen verwalten und vorbereiten.
-            </p>
+            <RenderIf when={isLoading}>
+              <LoadingIndicator label="Kleidungsstuecke werden geladen..." />
+            </RenderIf>
 
-            <Button asChild variant="outline">
-              <Link to="/klamottenmanagement/types">Zu den Kleidungstypen</Link>
-            </Button>
+            <RenderIf when={isError}>
+              <ErrorState message="Kleidungsstuecke konnten nicht geladen werden." />
+            </RenderIf>
+
+            <RenderIf when={canRenderTable}>
+              <ClothingItemsTable items={clothingItems!} types={clothingTypes!} />
+            </RenderIf>
           </CardContent>
         </Card>
       </main>

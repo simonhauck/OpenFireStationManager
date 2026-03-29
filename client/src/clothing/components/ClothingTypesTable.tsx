@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router"
 import { Pencil } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
+import FormattedDate from "#/components/base/FormattedDate"
 import { Button } from "#/components/ui/button"
 import {
   Table,
@@ -14,14 +15,6 @@ import {
 
 interface ClothingTypesTableProps {
   types: ClothingType[]
-}
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  })
 }
 
 export default function ClothingTypesTable({ types }: ClothingTypesTableProps) {
@@ -45,7 +38,9 @@ export default function ClothingTypesTable({ types }: ClothingTypesTableProps) {
             <TableRow key={type.id}>
               <TableCell>{type.id}</TableCell>
               <TableCell>{type.name}</TableCell>
-              <TableCell>{formatDate(type.metaData.createdAt)}</TableCell>
+              <TableCell>
+                <FormattedDate value={type.metaData.createdAt} />
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-1">
                   <Button asChild size="icon" variant="outline">

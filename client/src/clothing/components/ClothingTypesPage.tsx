@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router"
 
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
+import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
 import ClothingTypesTable from "#/clothing/components/ClothingTypesTable"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
@@ -24,6 +25,7 @@ export default function ClothingTypesPage() {
 
 function ClothingTypesPageContent() {
   const { data: clothingTypes, isLoading, isError } = useClothingTypes()
+  const canRenderTable = clothingTypes !== undefined
 
   return (
     <main className="page-wrap px-4 py-12">
@@ -41,15 +43,17 @@ function ClothingTypesPageContent() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {isLoading && (
+          <RenderIf when={isLoading}>
             <LoadingIndicator label="Kleidungstypen werden geladen..." />
-          )}
+          </RenderIf>
 
-          {isError && (
+          <RenderIf when={isError}>
             <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
-          )}
+          </RenderIf>
 
-          {clothingTypes && <ClothingTypesTable types={clothingTypes} />}
+          <RenderIf when={canRenderTable}>
+            <ClothingTypesTable types={clothingTypes!} />
+          </RenderIf>
         </CardContent>
       </Card>
     </main>
