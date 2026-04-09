@@ -5,7 +5,7 @@ springDependencyManagement = "1.1.7"
 springdoc = "3.0.2"
 nimbusJoseJwt = "10.8"
 kotlinLogging = "7.0.14"
-testcontainers = "1.21.3"
+testcontainers = "1.21.4"
 
 [libraries]
 springBootStarterDataJdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc" }
