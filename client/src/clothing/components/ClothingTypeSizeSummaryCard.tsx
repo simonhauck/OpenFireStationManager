@@ -33,7 +33,7 @@ export default function ClothingTypeSizeSummaryCard({
   const summaryData = summary ?? []
 
   return (
-    <Card id="klamottenmanagement-content">
+    <Card id="clothing-management-content">
       <CardHeader>
         <CardTitle>Bestandsuebersicht nach Groesse</CardTitle>
         <CardDescription>
