@@ -3,7 +3,6 @@ kotlin = "2.3.10"
 springBoot = "4.0.3"
 springDependencyManagement = "1.1.7"
 springdoc = "3.0.2"
-nimbusJoseJwt = "10.8"
 kotlinLogging = "7.0.14"
 testcontainers = "1.21.4"
 
@@ -24,7 +23,7 @@ assertjCore = { module = "org.assertj:assertj-core" }
 postgresql = { module = "org.postgresql:postgresql" }
 junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 springdocOpenapiWebmvcUi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
-nimbusJoseJwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbusJoseJwt" }
+springSessionJdbc = { module = "org.springframework.session:spring-session-jdbc" }
 kotlinLoggingJvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLogging" }
 testcontainersJunitJupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 testcontainersPostgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
