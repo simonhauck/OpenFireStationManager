@@ -33,5 +33,4 @@ jobs:
 
       # Resolve and cache all Gradle/server dependencies up front.
       - name: Resolve server dependencies
-        working-directory: server
-        run: ./gradlew --no-daemon dependencies
+        run: ./gradlew --no-daemon server:dependencies

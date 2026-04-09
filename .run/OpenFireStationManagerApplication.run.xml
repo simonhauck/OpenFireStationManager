@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="OpenFireStationManagerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="server.main" />
+    <module name="openfirestationmanager.server.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.simonhauck.openfirestationmanager.OpenFireStationManagerApplication" />
     <option name="WORKING_DIRECTORY" value="file://server" />
     <method v="2">
