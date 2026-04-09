@@ -75,7 +75,7 @@ function parseCsv(csv: string): ParseResult {
     rows.push({
       typeName,
       size,
-      userIdentifier: userIdentifier,
+      userIdentifier,
     })
   }
 
@@ -136,7 +136,7 @@ function ClothingItemBatchImportPageContent() {
       requests.push({
         typeId,
         size: row.size,
-        userIdentifier: row.userIdentifier ?? undefined,
+        userIdentifier: row.userIdentifier,
       })
     }
 

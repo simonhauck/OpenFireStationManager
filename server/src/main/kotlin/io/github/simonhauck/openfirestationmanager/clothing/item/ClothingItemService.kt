@@ -65,7 +65,15 @@ class ClothingItemService(
                     }
                 }
         identifiers.forEach { id -> checkUserIdentifierUnique(id, excludeId = null) }
-        return requests.map { createItem(it) }
+        val entities =
+            requests.map { req ->
+                ClothingItem(
+                    typeId = AggregateReference.to(req.typeId),
+                    size = req.size,
+                    userIdentifier = req.userIdentifier,
+                )
+            }
+        return repository.saveAll(entities)
     }
 
     fun updateItem(id: Long, request: CreateOrUpdateClothingItemRequest): ClothingItem {
