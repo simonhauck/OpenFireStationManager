@@ -12,11 +12,10 @@ data class ClothingLocation(
     val comment: String,
     val onlyVisibleForKleiderwart: Boolean,
     val shouldBeShownOnDashboard: Boolean,
-
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
 ) : BaseEntity {
-  override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
-    return copy(metaData = metaData)
-  }
+    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
+        return copy(metaData = metaData)
+    }
 }
