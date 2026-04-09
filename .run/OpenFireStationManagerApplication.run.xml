@@ -1,8 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="OpenFireStationManagerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="server.main" />
+    <module name="openfirestationmanager.server.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.simonhauck.openfirestationmanager.OpenFireStationManagerApplication" />
-    <option name="WORKING_DIRECTORY" value="file://server" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="io.github.simonhauck.openfirestationmanager.*" />
+        <option name="ENABLED" value="false" />
+      </pattern>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
