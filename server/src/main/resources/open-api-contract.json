@@ -205,6 +205,38 @@
         }
       }
     },
+    "/api/clothing/items/batch": {
+      "post": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Create multiple clothing items in a single request",
+        "operationId": "createBatchItems",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchCreateClothingItemsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClothingItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/users": {
       "get": {
         "tags": ["admin-user-controller"],
@@ -697,6 +729,11 @@
             "type": "string",
             "maxLength": 255,
             "minLength": 0
+          },
+          "userIdentifier": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
           }
         },
         "required": ["size", "typeId"]
@@ -711,6 +748,9 @@
           "size": {
             "type": "string"
           },
+          "userIdentifier": {
+            "type": "string"
+          },
           "id": {
             "type": "integer",
             "format": "int64"
@@ -720,6 +760,18 @@
           }
         },
         "required": ["id", "metaData", "size", "typeId"]
+      },
+      "BatchCreateClothingItemsRequest": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
+            }
+          }
+        },
+        "required": ["items"]
       },
       "CreateUserRequest": {
         "type": "object",

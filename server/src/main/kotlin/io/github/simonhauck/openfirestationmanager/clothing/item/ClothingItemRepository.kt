@@ -10,5 +10,7 @@ interface ClothingItemRepository : Repository<ClothingItem, Long> {
 
     fun findById(id: Long): ClothingItem?
 
+    fun findByUserIdentifier(userIdentifier: String): ClothingItem?
+
     fun deleteById(id: Long)
 }

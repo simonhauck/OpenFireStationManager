@@ -104,6 +104,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/items/batch": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create multiple clothing items in a single request */
+    post: operations["createBatchItems"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/admin/users": {
     parameters: {
       query?: never
@@ -257,14 +274,19 @@ export interface components {
       /** Format: int64 */
       typeId: number
       size: string
+      userIdentifier?: string
     }
     ClothingItem: {
       /** Format: int64 */
       typeId: string
       size: string
+      userIdentifier?: string
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+    }
+    BatchCreateClothingItemsRequest: {
+      items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
     }
     CreateUserRequest: {
       username: string
@@ -473,6 +495,30 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingItem"]
+        }
+      }
+    }
+  }
+  createBatchItems: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BatchCreateClothingItemsRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingItem"][]
         }
       }
     }
