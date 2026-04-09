@@ -3,21 +3,37 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
-  "remoteEnv": {
-    "DB_URL": "jdbc:postgresql://localhost:5432/ofsm",
-    "DB_USERNAME": "postgres",
-    "DB_PASSWORD": "postgres"
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/java": {
+      "version": "25"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": {}
   },
-  "forwardPorts": [3000, 8080],
-  "postCreateCommand": "cd /workspace/client && npm install",
   "customizations": {
     "vscode": {
       "extensions": [
-        "vmware.vscode-spring-boot",
-        "vscjava.vscode-java-pack",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
-      ]
-    }
+        "bradlc.vscode-tailwindcss",
+        "YoavBls.pretty-ts-errors",
+        "prettier.prettier-vscode",
+        "usernamehw.errorlens"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      },
+      "mcp": {
+        "servers": {
+          "playwright": {
+            "command": "/bin/bash",
+            "args": ["-c", "npx shadcn@latest mcp"]
+          }
+        }
+      }
+    },
+    "remoteUser": "vscode"
   }
 }
