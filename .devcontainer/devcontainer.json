@@ -10,18 +10,12 @@
     "ghcr.io/devcontainers/features/java": {
       "version": "25"
     },
-    "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+    "ghcr.io/devcontainers/features/git:1": { },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": { }
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "bradlc.vscode-tailwindcss",
-        "YoavBls.pretty-ts-errors",
-        "prettier.prettier-vscode",
-        "usernamehw.errorlens"
-      ],
+      "extensions": [ "dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss", "YoavBls.pretty-ts-errors", "prettier.prettier-vscode", "usernamehw.errorlens" ],
       "settings": {
         "editor.formatOnSave": true
       },
@@ -29,7 +23,7 @@
         "servers": {
           "playwright": {
             "command": "/bin/bash",
-            "args": ["-c", "npx shadcn@latest mcp"]
+            "args": [ "-c", "npx shadcn@latest mcp" ]
           }
         }
       }

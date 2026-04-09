@@ -1,35 +1,31 @@
-name: Setup Build Environment
-description: Setup Java, Gradle and Node.js for CI jobs
-
+name: "Setup Build Environment"
+description: "Setup Java, Gradle and Node.js for CI jobs"
 inputs:
   java-version:
-    description: Java version to install
+    description: "Java version to install"
     required: false
     default: "25"
   node-version-file:
-    description: Path to .nvmrc file
+    description: "Path to .nvmrc file"
     required: false
-    default: .nvmrc
+    default: ".nvmrc"
   cache-dependency-path:
-    description: Path to npm lockfile for cache key
+    description: "Path to npm lockfile for cache key"
     required: false
-    default: client/package-lock.json
-
+    default: "client/package-lock.json"
 runs:
-  using: composite
+  using: "composite"
   steps:
-    - name: Set up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: ${{ inputs.java-version }}
-
-    - name: Set up Gradle
-      uses: gradle/actions/setup-gradle@v4
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: ${{ inputs.node-version-file }}
-        cache: npm
-        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+  - name: "Set up Java"
+    uses: "actions/setup-java@v4"
+    with:
+      distribution: "temurin"
+      java-version: "${{ inputs.java-version }}"
+  - name: "Set up Gradle"
+    uses: "gradle/actions/setup-gradle@v4"
+  - name: "Set up Node.js"
+    uses: "actions/setup-node@v4"
+    with:
+      node-version-file: "${{ inputs.node-version-file }}"
+      cache: "npm"
+      cache-dependency-path: "${{ inputs.cache-dependency-path }}"

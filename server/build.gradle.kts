@@ -66,15 +66,14 @@ spotless {
         ktfmt().kotlinlangStyle()
     }
 
-    format("json") {
+    json {
         target("src/**/*.json")
-
-        prettier().configFile(file("../.prettierrc.json"))
+        jackson()
     }
 
-    format("yaml") {
+    yaml {
         target("src/**/*.yml", "src/**/*.yaml")
-        prettier().configFile(file("../.prettierrc.json"))
+        jackson().yamlFeature("WRITE_DOC_START_MARKER", false)
     }
 }
 

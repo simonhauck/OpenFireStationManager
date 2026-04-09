@@ -1,22 +1,19 @@
 spring:
   application:
-    name: OpenFireStationManager
+    name: "OpenFireStationManager"
   datasource:
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/ofsm}
-
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:postgres}"
+    url: "${DB_URL:jdbc:postgresql://localhost:5432/ofsm}"
 server:
-  forward-headers-strategy: framework
-
+  forward-headers-strategy: "framework"
 app:
   auth:
-    cookie-name: OFSM_AUTH
-    jwt-signing-secret: ${JWT_SIGNING_SECRET:SOME_32_CHARACTERS_LONG_KEY_HERE}
-
+    cookie-name: "OFSM_AUTH"
+    jwt-signing-secret: "${JWT_SIGNING_SECRET:SOME_32_CHARACTERS_LONG_KEY_HERE}"
 springdoc:
   swagger-ui:
     enabled: true
   api-docs:
     enabled: true
-    path: /schema.json
+    path: "/schema.json"

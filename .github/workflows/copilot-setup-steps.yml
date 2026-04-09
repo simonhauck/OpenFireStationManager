@@ -1,36 +1,24 @@
 name: "Copilot Setup Steps"
-
-# Run automatically when this file changes for easy validation.
-# Can also be triggered manually from the Actions tab.
-on:
-  workflow_dispatch:
+"on":
+  workflow_dispatch: null
   push:
     paths:
-      - .github/workflows/copilot-setup-steps.yml
+    - ".github/workflows/copilot-setup-steps.yml"
   pull_request:
     paths:
-      - .github/workflows/copilot-setup-steps.yml
-
+    - ".github/workflows/copilot-setup-steps.yml"
 jobs:
-  # Job name MUST be `copilot-setup-steps` to be picked up by Copilot cloud agent.
   copilot-setup-steps:
-    runs-on: ubuntu-latest
-
+    runs-on: "ubuntu-latest"
     permissions:
-      contents: read
-
+      contents: "read"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup build environment
-        uses: ./.github/actions/setup-build-env
-
-      # Pre-install client dependencies so Copilot doesn't have to.
-      - name: Install client dependencies
-        working-directory: client
-        run: npm ci
-
-      # Resolve and cache all Gradle/server dependencies up front.
-      - name: Resolve server dependencies
-        run: ./gradlew --no-daemon server:dependencies
+    - name: "Checkout code"
+      uses: "actions/checkout@v4"
+    - name: "Setup build environment"
+      uses: "./.github/actions/setup-build-env"
+    - name: "Install client dependencies"
+      working-directory: "client"
+      run: "npm ci"
+    - name: "Resolve server dependencies"
+      run: "./gradlew --no-daemon server:dependencies"

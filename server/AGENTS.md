@@ -2,7 +2,7 @@
 
 Guidance for agentic coding assistants working in the `server/` component.
 
-> For monorepo-level context (project overview, root Prettier config, CI/CD status) see the
+> For monorepo-level context (project overview, root Spotless config, CI/CD status) see the
 > root `AGENTS.md`.
 
 ---
@@ -44,6 +44,8 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 | Run a single test class       | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
 | Run a single test method      | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
 | Run tests with verbose output | `./gradlew test --info`                                                                |
+| Apply formatting              | `./gradlew spotlessApply`                                                              |
+| Check formatting              | `./gradlew spotlessCheck`                                                              |
 | Clean build artifacts         | `./gradlew clean`                                                                      |
 
 ---
@@ -104,7 +106,7 @@ sub-package (e.g. `.station`, `.vehicle`, `.incident`) rather than by layer.
 
 ## Code Style
 
-Spotless is configured to format Kotlin code with `ktfmt`. Follow standard IntelliJ/Kotlin defaults for code structure, and use Spotless as the source of truth for final formatting.
+Spotless is configured to format Kotlin code with `ktfmt`, and JSON/YAML files with Jackson. Follow standard IntelliJ/Kotlin defaults for code structure, and use Spotless as the source of truth for final formatting.
 
 ### Formatting
 

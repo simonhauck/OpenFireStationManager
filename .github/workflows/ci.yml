@@ -1,32 +1,24 @@
-name: CI
-
-on:
-  pull_request:
-  workflow_dispatch:
-  workflow_call:
-
+name: "CI"
+"on":
+  pull_request: null
+  workflow_dispatch: null
+  workflow_call: null
 jobs:
   tests:
-    runs-on: ubuntu-latest
-
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup build environment
-        uses: ./.github/actions/setup-build-env
-
-      - name: Run backend checks
-        run: ./gradlew check
-
-      - name: Install client dependencies
-        working-directory: client
-        run: npm ci
-
-      - name: Lint client
-        working-directory: client
-        run: npm run lint
-
-      - name: Check client formatting
-        working-directory: client
-        run: npm run format
+    - name: "Checkout repository"
+      uses: "actions/checkout@v4"
+    - name: "Setup build environment"
+      uses: "./.github/actions/setup-build-env"
+    - name: "Run backend checks"
+      run: "./gradlew check"
+    - name: "Install client dependencies"
+      working-directory: "client"
+      run: "npm ci"
+    - name: "Lint client"
+      working-directory: "client"
+      run: "npm run lint"
+    - name: "Check client formatting"
+      working-directory: "client"
+      run: "npm run format"

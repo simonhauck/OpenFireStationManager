@@ -14,6 +14,21 @@ There is no root-level build orchestrator. Each component is built and run indep
 
 ---
 
+## Root project
+
+The root project provides Spotless formatting for root-level files (`.kts`, JSON, YAML) via the
+Gradle wrapper.
+
+**Quick reference (from repo root):**
+
+| Purpose              | Command                         |
+| -------------------- | ------------------------------- |
+| Apply formatting     | `./gradlew spotlessApply`       |
+| Check formatting     | `./gradlew spotlessCheck`       |
+| Run all checks       | `./gradlew check`               |
+
+---
+
 ## Client (`client/`)
 
 React 19 + TypeScript frontend. See **`client/AGENTS.md`** for the full guide: commands,
@@ -54,8 +69,10 @@ testing, code style, API design, and database conventions.
 
 ## Repository-level Notes
 
-- **Prettier scoping:** The root `.prettierrc.json` applies to non-client, non-Kotlin files.
-  `client/` has its own `prettier.config.js`. Kotlin files are excluded from Prettier entirely.
+- **Formatting:** The root `build.gradle.kts` uses Spotless to format root-level files: `.kts` files
+  with ktfmt, JSON and YAML files with Jackson. Run `./gradlew spotlessApply` from the root to
+  apply formatting, or `./gradlew spotlessCheck` to verify. The `client/` and `server/` directories
+  are excluded from root-level Spotless — each module manages its own formatting.
 - **Dependency updates:** Managed by Renovate (see `renovate.json`). npm dependencies are
   handled manually; Gradle/Kotlin deps are auto-merged after 14 days.
 - **No CI is configured yet.** Run lint, format checks, and tests locally before committing.
