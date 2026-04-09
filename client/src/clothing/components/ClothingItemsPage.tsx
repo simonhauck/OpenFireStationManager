@@ -37,16 +37,18 @@ export default function ClothingItemsPage() {
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
       <main className="page-wrap px-4 py-12">
         <Card>
-          <CardHeader className="flex flex-row items-start justify-between gap-4">
-            <div>
-              <CardTitle>Klamottenmanagement</CardTitle>
-              <CardDescription>
-                Alle vorhandenen Kleidungsstuecke
-              </CardDescription>
+          <CardHeader>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle>Klamottenmanagement</CardTitle>
+                <CardDescription>
+                  Alle vorhandenen Kleidungsstuecke
+                </CardDescription>
+              </div>
+              <Button asChild>
+                <Link to="/klamottenmanagement/items/batch">Massenimport</Link>
+              </Button>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/klamottenmanagement/items/batch">Massenimport</Link>
-            </Button>
           </CardHeader>
 
           <CardContent className="space-y-4">

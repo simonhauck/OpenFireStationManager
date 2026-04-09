@@ -6,6 +6,7 @@ import type { components } from "#/api/schema"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { createBatchClothingItemsMutation } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import type { ClothingType } from "#/clothing/model/clothingType"
 import ErrorState from "#/components/base/ErrorState"
 import RoleGuard from "#/components/base/RoleGuard"
 import { Button } from "#/components/ui/button"
@@ -16,6 +17,8 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
+import { Label } from "#/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
 import {
   Table,
   TableBody,
@@ -30,7 +33,6 @@ type CreateOrUpdateClothingItemRequest =
   components["schemas"]["CreateOrUpdateClothingItemRequest"]
 
 interface ParsedRow {
-  typeName: string
   size: string
   userIdentifier?: string
 }
@@ -53,26 +55,14 @@ function parseCsv(csv: string): ParseResult {
     const line = lines[i]
     const parts = line.split(",").map((p) => p.trim())
 
-    if (parts.length < 2) {
-      errors.push(
-        `Zeile ${i + 1}: Mindestens zwei Spalten erwartet (Typ, Groesse).`,
-      )
-      continue
-    }
-
-    const [typeName, size, userIdentifier] = parts
-
-    if (!typeName) {
-      errors.push(`Zeile ${i + 1}: Kleidungstyp darf nicht leer sein.`)
-      continue
-    }
+    const [size, userIdentifier] = parts
 
     if (!size) {
       errors.push(`Zeile ${i + 1}: Groesse darf nicht leer sein.`)
       continue
     }
 
-    rows.push({ typeName, size, userIdentifier })
+    rows.push({ size, userIdentifier })
   }
 
   return { rows, errors }
@@ -89,6 +79,7 @@ export default function ClothingItemBatchImportPage() {
 function ClothingItemBatchImportPageContent() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null)
   const [csvInput, setCsvInput] = useState("")
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [preview, setPreview] = useState<
@@ -104,43 +95,22 @@ function ClothingItemBatchImportPageContent() {
     data: createdItems,
   } = useMutation(createBatchClothingItemsMutation(queryClient))
 
-  const typeNameToId = new Map(
-    (clothingTypes ?? []).map((t) => [t.name.toLowerCase(), t.id]),
-  )
   const typeIdToName = new Map((clothingTypes ?? []).map((t) => [t.id, t.name]))
 
   function handlePreview() {
+    if (selectedTypeId === null) return
+
     const { rows, errors } = parseCsv(csvInput)
     setParseErrors(errors)
     setPreview(null)
 
     if (errors.length > 0 || rows.length === 0) return
 
-    const requests: CreateOrUpdateClothingItemRequest[] = []
-    const resolveErrors: string[] = []
-
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i]
-      const typeId = typeNameToId.get(row.typeName.toLowerCase())
-
-      if (typeId === undefined) {
-        resolveErrors.push(
-          `Zeile ${i + 1}: Kleidungstyp "${row.typeName}" wurde nicht gefunden.`,
-        )
-        continue
-      }
-
-      requests.push({
-        typeId,
-        size: row.size,
-        userIdentifier: row.userIdentifier,
-      })
-    }
-
-    if (resolveErrors.length > 0) {
-      setParseErrors(resolveErrors)
-      return
-    }
+    const requests: CreateOrUpdateClothingItemRequest[] = rows.map((row) => ({
+      typeId: selectedTypeId,
+      size: row.size,
+      userIdentifier: row.userIdentifier,
+    }))
 
     setPreview(requests)
   }
@@ -162,23 +132,35 @@ function ClothingItemBatchImportPageContent() {
         <CardHeader>
           <CardTitle>Massenimport von Kleidungsstuecken</CardTitle>
           <CardDescription>
-            Importiere mehrere Kleidungsstuecke auf einmal. Gib die Daten im
-            CSV-Format ein: <code>Typ,Groesse,Kennung</code>. Die Kennung ist
-            optional.
+            Importiere mehrere Kleidungsstuecke auf einmal. Waehle zuerst einen
+            Kleidungstyp, dann gib die Daten im CSV-Format ein:{" "}
+            <code>Groesse,Kennung</code>. Die Kennung ist optional.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          <CsvInputSection
-            value={csvInput}
-            onChange={(val) => {
-              setCsvInput(val)
+        <CardContent className="space-y-6">
+          <TypeSelectionSection
+            clothingTypes={clothingTypes ?? []}
+            selectedTypeId={selectedTypeId}
+            onSelect={(id) => {
+              setSelectedTypeId(id)
               setPreview(null)
               setParseErrors([])
             }}
-            onPreview={handlePreview}
-            disabled={!csvInput.trim() || !clothingTypes}
           />
+
+          {selectedTypeId !== null && (
+            <CsvInputSection
+              value={csvInput}
+              onChange={(val) => {
+                setCsvInput(val)
+                setPreview(null)
+                setParseErrors([])
+              }}
+              onPreview={handlePreview}
+              disabled={!csvInput.trim()}
+            />
+          )}
 
           {parseErrors.length > 0 && (
             <ErrorState
@@ -212,6 +194,42 @@ function ClothingItemBatchImportPageContent() {
   )
 }
 
+interface TypeSelectionSectionProps {
+  clothingTypes: ClothingType[]
+  selectedTypeId: number | null
+  onSelect: (id: number) => void
+}
+
+function TypeSelectionSection({
+  clothingTypes,
+  selectedTypeId,
+  onSelect,
+}: TypeSelectionSectionProps) {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium">Schritt 1: Kleidungstyp auswaehlen</p>
+      {clothingTypes.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Keine Kleidungstypen vorhanden.
+        </p>
+      ) : (
+        <RadioGroup
+          value={selectedTypeId !== null ? String(selectedTypeId) : undefined}
+          onValueChange={(val) => onSelect(Number(val))}
+          className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+        >
+          {clothingTypes.map((type) => (
+            <div key={type.id} className="flex items-center gap-2">
+              <RadioGroupItem value={String(type.id)} id={`type-${type.id}`} />
+              <Label htmlFor={`type-${type.id}`}>{type.name}</Label>
+            </div>
+          ))}
+        </RadioGroup>
+      )}
+    </div>
+  )
+}
+
 interface CsvInputSectionProps {
   value: string
   onChange: (value: string) => void
@@ -228,9 +246,9 @@ function CsvInputSection({
   return (
     <>
       <div className="space-y-1.5">
-        <p className="text-sm font-medium">CSV-Eingabe</p>
+        <p className="text-sm font-medium">Schritt 2: CSV-Daten eingeben</p>
         <Textarea
-          placeholder={"Jacke,L,BARCODE001\nHose,M\nJacke,XL,BARCODE003"}
+          placeholder={"L,BARCODE001\nM\nXL,BARCODE003"}
           rows={8}
           value={value}
           onChange={(e) => onChange(e.target.value)}
