@@ -4,9 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.context.SecurityContextRepository
@@ -46,21 +44,9 @@ class AuthController(
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun logout(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Unit> {
+    fun logout(request: HttpServletRequest): ResponseEntity<Unit> {
         SecurityContextHolder.clearContext()
         request.getSession(false)?.invalidate()
-
-        val cookieName = request.servletContext.sessionCookieConfig.name ?: "OFSM_AUTH"
-        val expiredCookie =
-            ResponseCookie.from(cookieName, "")
-                .path("/")
-                .httpOnly(true)
-                .secure(true)
-                .maxAge(0)
-                .sameSite("Strict")
-                .build()
-        response.setHeader(HttpHeaders.SET_COOKIE, expiredCookie.toString())
-
         return ResponseEntity.noContent().build()
     }
 

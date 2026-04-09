@@ -6,7 +6,6 @@ import java.time.ZonedDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 
 class AuthControllerIT() : IntegrationTest() {
@@ -40,7 +39,7 @@ class AuthControllerIT() : IntegrationTest() {
         }
 
     @Test
-    fun `logout should invalidate the auth cookie`() {
+    fun `logout should return no content`() {
         val loginResponse =
             authControllerCalls.login(LoginRequest(username = "chief", password = "secret"))
         val freshCookie = authControllerCalls.extractAuthCookie(loginResponse)
@@ -48,9 +47,5 @@ class AuthControllerIT() : IntegrationTest() {
         val logoutResponse = authControllerCalls.logout(freshCookie)
 
         assertThat(logoutResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
-
-        val setCookieHeader = logoutResponse.headers.getFirst(HttpHeaders.SET_COOKIE)
-        assertThat(setCookieHeader).contains("OFSM_AUTH=")
-        assertThat(setCookieHeader).contains("Max-Age=0")
     }
 }
