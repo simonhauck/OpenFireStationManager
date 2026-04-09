@@ -1,29 +1,8 @@
 {
   "mcpServers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "tools": [
-        "get_me",
-        "search_repositories",
-        "get_repository",
-        "list_branches",
-        "get_file_contents",
-        "search_code",
-        "list_issues",
-        "get_issue",
-        "create_issue",
-        "list_pull_requests",
-        "get_pull_request",
-        "get_pull_request_diff",
-        "search_issues"
-      ]
-    },
-    "fetch": {
-      "type": "local",
+    "shadcn": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
-      "tools": ["fetch"]
+      "args": ["shadcn@latest", "mcp"]
+    },
     }
-  }
 }
