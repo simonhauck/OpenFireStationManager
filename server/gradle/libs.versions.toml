@@ -4,7 +4,7 @@ springBoot = "4.0.3"
 springDependencyManagement = "1.1.7"
 springdoc = "3.0.2"
 nimbusJoseJwt = "10.8"
-kotlinLogging = "7.0.3"
+kotlinLogging = "7.0.14"
 testcontainers = "1.21.3"
 
 [libraries]
