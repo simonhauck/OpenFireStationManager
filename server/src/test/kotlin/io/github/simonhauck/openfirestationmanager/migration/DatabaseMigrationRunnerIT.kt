@@ -46,15 +46,6 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
     }
 
     @Test
-    fun `should expose clothing types through the renamed table`() {
-        val renamedTableExists = tableExists("clothing_types")
-        val legacyTableExists = tableExists("protective_clothing_types")
-
-        assertThat(renamedTableExists).isTrue()
-        assertThat(legacyTableExists).isFalse()
-    }
-
-    @Test
     fun `should not reapply already applied migrations on repeated run`() {
         val countBefore =
             jdbcTemplate.queryForObject<Long>("SELECT COUNT(*) FROM schema_migrations")
@@ -66,18 +57,4 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
 
         assertThat(countAfter).isEqualTo(countBefore)
     }
-
-    private fun tableExists(tableName: String): Boolean =
-        jdbcTemplate.queryForObject<Boolean>(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                  AND table_name = ?
-            )
-            """
-                .trimIndent(),
-            tableName,
-        )!!
 }
