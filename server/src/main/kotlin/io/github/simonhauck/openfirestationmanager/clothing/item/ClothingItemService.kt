@@ -40,14 +40,22 @@ class ClothingItemService(
 
     fun createItem(request: CreateOrUpdateClothingItemRequest): ClothingItem {
         val entity =
-            ClothingItem(typeId = AggregateReference.to(request.typeId), size = request.size)
+            ClothingItem(
+                typeId = AggregateReference.to(request.typeId),
+                size = request.size,
+                locationId = request.locationId?.let { AggregateReference.to(it) },
+            )
         return repository.save(entity)
     }
 
     fun updateItem(id: Long, request: CreateOrUpdateClothingItemRequest): ClothingItem {
         val existing = findOrThrow(id)
         return repository.save(
-            existing.copy(typeId = AggregateReference.to(request.typeId), size = request.size)
+            existing.copy(
+                typeId = AggregateReference.to(request.typeId),
+                size = request.size,
+                locationId = request.locationId?.let { AggregateReference.to(it) },
+            )
         )
     }
 

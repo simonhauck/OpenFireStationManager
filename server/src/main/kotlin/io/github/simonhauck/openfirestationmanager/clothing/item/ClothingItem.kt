@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.clothing.item
 
+import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
@@ -15,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table
 data class CreateOrUpdateClothingItemRequest(
     @Positive val typeId: Long,
     @NotBlank @Size(max = 255) val size: String,
+    val locationId: Long? = null,
 )
 
 data class ClothingTypeSizeSummary(
@@ -28,6 +30,8 @@ data class ClothingItem(
     @field:Schema(type = "integer", format = "int64")
     val typeId: AggregateReference<ClothingType, Long>,
     val size: String,
+    @field:Schema(type = "integer", format = "int64")
+    val locationId: AggregateReference<ClothingLocation, Long>? = null,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
 ) : BaseEntity {

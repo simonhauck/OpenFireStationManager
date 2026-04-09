@@ -156,6 +156,55 @@
         }
       }
     },
+    "/api/clothing/locations": {
+      "get": {
+        "tags": ["clothing-location-controller"],
+        "summary": "List all clothing locations",
+        "operationId": "getAllLocations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClothingLocation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Create a new clothing location",
+        "operationId": "createLocation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateClothingLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clothing/items": {
       "get": {
         "tags": ["clothing-item-controller"],
@@ -340,6 +389,101 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ClothingType"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/locations/{id}": {
+      "get": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Get a clothing location by ID",
+        "operationId": "getLocationById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing location",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Delete a clothing location",
+        "operationId": "deleteLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing location",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Update a clothing location",
+        "operationId": "updateLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing location",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateClothingLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingLocation"
                 }
               }
             }
@@ -686,6 +830,60 @@
         },
         "required": ["id", "metaData", "name"]
       },
+      "CreateOrUpdateClothingLocationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "onlyVisibleForKleiderwart": {
+            "type": "boolean"
+          },
+          "shouldBeShownOnDashboard": {
+            "type": "boolean"
+          }
+        },
+        "required": ["comment", "name", "onlyVisibleForKleiderwart", "shouldBeShownOnDashboard"]
+      },
+      "ClothingLocation": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "onlyVisibleForKleiderwart": {
+            "type": "boolean"
+          },
+          "shouldBeShownOnDashboard": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
+          }
+        },
+        "required": [
+          "comment",
+          "id",
+          "metaData",
+          "name",
+          "onlyVisibleForKleiderwart",
+          "shouldBeShownOnDashboard"
+        ]
+      },
       "CreateOrUpdateClothingItemRequest": {
         "type": "object",
         "properties": {
@@ -697,6 +895,10 @@
             "type": "string",
             "maxLength": 255,
             "minLength": 0
+          },
+          "locationId": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "required": ["size", "typeId"]
@@ -710,6 +912,10 @@
           },
           "size": {
             "type": "string"
+          },
+          "locationId": {
+            "type": "string",
+            "format": "int64"
           },
           "id": {
             "type": "integer",

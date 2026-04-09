@@ -86,6 +86,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/locations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List all clothing locations */
+    get: operations["getAllLocations"]
+    put?: never
+    /** Create a new clothing location */
+    post: operations["createLocation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/items": {
     parameters: {
       query?: never
@@ -137,6 +155,25 @@ export interface paths {
     head?: never
     /** Update a protective clothing type */
     patch: operations["updateType"]
+    trace?: never
+  }
+  "/api/clothing/locations/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a clothing location by ID */
+    get: operations["getLocationById"]
+    put?: never
+    post?: never
+    /** Delete a clothing location */
+    delete: operations["deleteLocation"]
+    options?: never
+    head?: never
+    /** Update a clothing location */
+    patch: operations["updateLocation"]
     trace?: never
   }
   "/api/clothing/items/{id}": {
@@ -253,15 +290,34 @@ export interface components {
       id: number
       metaData: components["schemas"]["EntityMetaData"]
     }
+    CreateOrUpdateClothingLocationRequest: {
+      name: string
+      comment: string
+      onlyVisibleForKleiderwart: boolean
+      shouldBeShownOnDashboard: boolean
+    }
+    ClothingLocation: {
+      name: string
+      comment: string
+      onlyVisibleForKleiderwart: boolean
+      shouldBeShownOnDashboard: boolean
+      /** Format: int64 */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
     CreateOrUpdateClothingItemRequest: {
       /** Format: int64 */
       typeId: number
       size: string
+      /** Format: int64 */
+      locationId?: number
     }
     ClothingItem: {
       /** Format: int64 */
       typeId: string
       size: string
+      /** Format: int64 */
+      locationId?: string
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
@@ -433,6 +489,50 @@ export interface operations {
       }
     }
   }
+  getAllLocations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"][]
+        }
+      }
+    }
+  }
+  createLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingLocationRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
+        }
+      }
+    }
+  }
   getAllItems: {
     parameters: {
       query?: never
@@ -588,6 +688,77 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+    }
+  }
+  getLocationById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing location */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
+        }
+      }
+    }
+  }
+  deleteLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing location */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  updateLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing location */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingLocationRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
         }
       }
     }
