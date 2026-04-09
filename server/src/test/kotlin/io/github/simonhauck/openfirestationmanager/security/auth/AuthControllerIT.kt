@@ -41,7 +41,11 @@ class AuthControllerIT() : IntegrationTest() {
 
     @Test
     fun `logout should invalidate the auth cookie`() {
-        val logoutResponse = authControllerCalls.logout(validCookieHeader)
+        val loginResponse =
+            authControllerCalls.login(LoginRequest(username = "chief", password = "secret"))
+        val freshCookie = authControllerCalls.extractAuthCookie(loginResponse)
+
+        val logoutResponse = authControllerCalls.logout(freshCookie)
 
         assertThat(logoutResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
 

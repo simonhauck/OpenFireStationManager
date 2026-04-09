@@ -8,11 +8,13 @@ spring:
 
 server:
   forward-headers-strategy: framework
-
-app:
-  auth:
-    cookie-name: OFSM_AUTH
-    jwt-signing-secret: ${JWT_SIGNING_SECRET:SOME_32_CHARACTERS_LONG_KEY_HERE}
+  servlet:
+    session:
+      cookie:
+        name: OFSM_AUTH
+        http-only: true
+        secure: true
+        same-site: strict
 
 springdoc:
   swagger-ui:

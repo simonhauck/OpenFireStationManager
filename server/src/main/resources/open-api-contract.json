@@ -651,13 +651,9 @@
           "password": {
             "type": "string",
             "minLength": 1
-          },
-          "tokenValiditySeconds": {
-            "type": "integer",
-            "format": "int64"
           }
         },
-        "required": ["password", "tokenValiditySeconds", "username"]
+        "required": ["password", "username"]
       },
       "CreateOrUpdateClothingTypeRequest": {
         "type": "object",

@@ -1,6 +1,5 @@
 package io.github.simonhauck.openfirestationmanager.security.config
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -12,27 +11,35 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.context.SecurityContextRepository
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@EnableConfigurationProperties(AuthenticationProperties::class)
 class SecurityConfiguration {
+
+    @Bean
+    fun securityContextRepository(): SecurityContextRepository =
+        HttpSessionSecurityContextRepository()
+
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
-        tokenCookieFilter: TokenCookieFilter,
+        securityContextRepository: SecurityContextRepository,
     ): SecurityFilterChain {
         return http
             .csrf { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                it.sessionFixation().changeSessionId()
+            }
             .authorizeHttpRequests {
                 it.requestMatchers("/api/public/**").permitAll()
                 it.requestMatchers("/api/**").authenticated()
                 it.anyRequest().permitAll()
             }
-            .addFilterBefore(tokenCookieFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .securityContext { it.securityContextRepository(securityContextRepository) }
             .build()
     }
 

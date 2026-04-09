@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
-import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 
@@ -19,18 +18,12 @@ export const Route = createFileRoute("/login")({
   component: Login,
 })
 
-// 8 hours in seconds
-const SESSION_DURATION_SECONDS = 8 * 60 * 60
-// 5 years in seconds
-const REMEMBER_ME_DURATION_SECONDS = 5 * 365 * 24 * 60 * 60
-
 function Login() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
 
   const {
     mutate: login,
@@ -41,13 +34,7 @@ function Login() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     login(
-      {
-        username,
-        password,
-        tokenValiditySeconds: rememberMe
-          ? REMEMBER_ME_DURATION_SECONDS
-          : SESSION_DURATION_SECONDS,
-      },
+      { username, password },
       {
         onSuccess: () => {
           void navigate({ to: "/" })
@@ -91,20 +78,6 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="remember-me"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked === true)}
-              />
-              <Label
-                htmlFor="remember-me"
-                className="cursor-pointer font-normal"
-              >
-                Angemeldet bleiben
-              </Label>
             </div>
 
             {error && (
