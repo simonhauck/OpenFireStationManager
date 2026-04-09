@@ -21,6 +21,7 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
             jdbcTemplate.queryForList<String>("SELECT id FROM schema_migrations ORDER BY id")
 
         assertThat(appliedIds).contains("V001__create_users_table")
+        assertThat(appliedIds).contains("V009__rename_protective_clothing_types_to_clothing_types")
         assertThat(appliedIds).contains("V008__seed_example_clothing_items")
     }
 
@@ -32,7 +33,7 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
                 SELECT COALESCE(MIN(type_item_count), 0)
                 FROM (
                     SELECT COUNT(c.id) AS type_item_count
-                    FROM protective_clothing_types t
+                    FROM clothing_types t
                     LEFT JOIN clothing_items c ON c.type_id = t.id
                     WHERE t.name IN ('Einsatzjacke', 'Einsatzhose', 'TH-Jacke', 'Brandhandschuhe')
                     GROUP BY t.id
@@ -42,6 +43,24 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
             )
 
         assertThat(seededItemCountPerType).isGreaterThanOrEqualTo(5)
+    }
+
+    @Test
+    fun `should expose clothing types through the renamed table`() {
+        val tableExists =
+            jdbcTemplate.queryForObject<Boolean>(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                      AND table_name = 'clothing_types'
+                )
+                """
+                    .trimIndent()
+            )
+
+        assertThat(tableExists).isTrue()
     }
 
     @Test

@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Table
 
 data class CreateOrUpdateClothingTypeRequest(@NotBlank @Size(max = 255) val name: String)
 
-@Table("protective_clothing_types")
+@Table("clothing_types")
 data class ClothingType(
     val name: String,
     @Id override val id: Long = 0,
