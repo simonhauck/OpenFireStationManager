@@ -50,7 +50,7 @@ class AuthController(
         SecurityContextHolder.clearContext()
         request.getSession(false)?.invalidate()
 
-        val cookieName = request.servletContext.sessionCookieConfig.name ?: "JSESSIONID"
+        val cookieName = request.servletContext.sessionCookieConfig.name ?: "OFSM_AUTH"
         val expiredCookie =
             ResponseCookie.from(cookieName, "")
                 .path("/")
