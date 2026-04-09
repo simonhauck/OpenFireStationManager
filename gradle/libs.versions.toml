@@ -1,0 +1,39 @@
+[versions]
+kotlin = "2.3.10"
+springBoot = "4.0.3"
+springDependencyManagement = "1.1.7"
+springdoc = "3.0.2"
+nimbusJoseJwt = "10.8"
+kotlinLogging = "7.0.14"
+testcontainers = "1.21.4"
+
+[libraries]
+springBootStarterDataJdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc" }
+springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
+springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+springBootStarterWebmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+springBootStarterDataJdbcTest = { module = "org.springframework.boot:spring-boot-starter-data-jdbc-test" }
+springBootStarterRestclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
+springBootStarterValidationTest = { module = "org.springframework.boot:spring-boot-starter-validation-test" }
+springBootStarterWebmvcTest = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+springSecurityTest = { module = "org.springframework.security:spring-security-test" }
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlinTestJunit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+jacksonModuleKotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
+assertjCore = { module = "org.assertj:assertj-core" }
+postgresql = { module = "org.postgresql:postgresql" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
+springdocOpenapiWebmvcUi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+nimbusJoseJwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbusJoseJwt" }
+kotlinLoggingJvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLogging" }
+testcontainersJunitJupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainersPostgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+
+[plugins]
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+spotless = { id = "com.diffplug.spotless", version = "8.4.0" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.5.3" }
+testLoggerPlugin = { id = "com.adarshr.test-logger", version = "4.0.0" }
