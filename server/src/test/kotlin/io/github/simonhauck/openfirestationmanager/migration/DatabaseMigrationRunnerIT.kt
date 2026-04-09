@@ -21,8 +21,8 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
             jdbcTemplate.queryForList<String>("SELECT id FROM schema_migrations ORDER BY id")
 
         assertThat(appliedIds).contains("V001__create_users_table")
-        assertThat(appliedIds).contains("V009__rename_protective_clothing_types_to_clothing_types")
         assertThat(appliedIds).contains("V008__seed_example_clothing_items")
+        assertThat(appliedIds).contains("V009__rename_protective_clothing_types_to_clothing_types")
     }
 
     @Test

@@ -12,7 +12,10 @@ class V009RenameProtectiveClothingTypesToClothingTypes : DatabaseMigration {
             """
             DO $$
             BEGIN
-                IF to_regclass('public.clothing_types') IS NULL
+                IF to_regclass('public.clothing_types') IS NOT NULL
+                    AND to_regclass('public.protective_clothing_types') IS NOT NULL THEN
+                    RAISE EXCEPTION 'Both clothing_types and protective_clothing_types exist; manual resolution required before V009 can continue.';
+                ELSIF to_regclass('public.clothing_types') IS NULL
                     AND to_regclass('public.protective_clothing_types') IS NOT NULL THEN
                     ALTER TABLE protective_clothing_types RENAME TO clothing_types;
                 END IF;
