@@ -47,7 +47,7 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
 
     @Test
     fun `should expose clothing types through the renamed table`() {
-        val tableExists =
+        val renamedTableExists =
             jdbcTemplate.queryForObject<Boolean>(
                 """
                 SELECT EXISTS (
@@ -59,8 +59,21 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
                 """
                     .trimIndent()
             )
+        val legacyTableExists =
+            jdbcTemplate.queryForObject<Boolean>(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                      AND table_name = 'protective_clothing_types'
+                )
+                """
+                    .trimIndent()
+            )
 
-        assertThat(tableExists).isTrue()
+        assertThat(renamedTableExists).isTrue()
+        assertThat(legacyTableExists).isFalse()
     }
 
     @Test
