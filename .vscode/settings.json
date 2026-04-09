@@ -7,5 +7,6 @@
   },
   "search.exclude": {
     "**/routeTree.gen.ts": true
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "disabled"
 }

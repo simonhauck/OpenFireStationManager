@@ -12,7 +12,6 @@ springBootStarterDataJdbc = { module = "org.springframework.boot:spring-boot-sta
 springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarterWebmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
-springBootDockerCompose = { module = "org.springframework.boot:spring-boot-docker-compose" }
 springBootStarterDataJdbcTest = { module = "org.springframework.boot:spring-boot-starter-data-jdbc-test" }
 springBootStarterRestclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 springBootStarterValidationTest = { module = "org.springframework.boot:spring-boot-starter-validation-test" }

@@ -1,0 +1,23 @@
+{
+  "name": "OpenFireStationManager",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "remoteEnv": {
+    "DB_URL": "jdbc:postgresql://localhost:5432/ofsm",
+    "DB_USERNAME": "postgres",
+    "DB_PASSWORD": "postgres"
+  },
+  "forwardPorts": [3000, 8080],
+  "postCreateCommand": "cd /workspace/client && npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-java-pack",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

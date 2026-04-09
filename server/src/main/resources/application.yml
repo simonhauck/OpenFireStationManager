@@ -1,10 +1,6 @@
 spring:
   application:
     name: OpenFireStationManager
-  docker:
-    compose:
-      file: ./compose.yml
-      lifecycle-management: start_only
   datasource:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}

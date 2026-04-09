@@ -35,8 +35,6 @@ dependencies {
     implementation(libs.jacksonModuleKotlin)
     implementation(libs.kotlinLoggingJvm)
 
-    developmentOnly(libs.springBootDockerCompose)
-
     runtimeOnly(libs.postgresql)
 
     testImplementation(libs.springBootStarterDataJdbcTest)
@@ -75,7 +73,7 @@ spotless {
     }
 
     format("yaml") {
-        target("src/**/*.yml", "src/**/*.yaml", "compose.yml")
+        target("src/**/*.yml", "src/**/*.yaml")
         prettier().configFile(file("../.prettierrc.json"))
     }
 }

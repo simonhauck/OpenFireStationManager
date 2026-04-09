@@ -16,7 +16,7 @@ JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API 
 
 - Kotlin 2.2.21, Java 24
 - Spring Boot 4.0.3 (Spring MVC, Spring Data JDBC, Spring Validation)
-- PostgreSQL (via Docker Compose, `compose.yml`)
+- PostgreSQL (via Testcontainers in tests; provide via env vars `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` for local dev)
 - SpringDoc OpenAPI 3.0.2 — Swagger UI at `/swagger-ui.html`, schema at `/schema.json`
 - Jackson + `jackson-module-kotlin`
 - Gradle 9.3.1 (Kotlin DSL, `build.gradle.kts`)
@@ -51,8 +51,8 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 ## Testing
 
 Tests use **JUnit 5** via `useJUnitPlatform()`. **Docker must be running** before executing
-integration tests — `IntegrationTest` uses Spring Boot's Docker Compose integration to spin up
-PostgreSQL automatically (`spring.docker.compose.skip.in-tests=false`).
+integration tests — `IntegrationTest` uses Testcontainers to automatically start a PostgreSQL
+container.
 
 **Base classes:**
 
