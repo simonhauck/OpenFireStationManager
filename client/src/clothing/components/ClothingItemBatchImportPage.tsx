@@ -72,11 +72,7 @@ function parseCsv(csv: string): ParseResult {
       continue
     }
 
-    rows.push({
-      typeName,
-      size,
-      userIdentifier,
-    })
+    rows.push({ typeName, size, userIdentifier })
   }
 
   return { rows, errors }
@@ -111,6 +107,7 @@ function ClothingItemBatchImportPageContent() {
   const typeNameToId = new Map(
     (clothingTypes ?? []).map((t) => [t.name.toLowerCase(), t.id]),
   )
+  const typeIdToName = new Map((clothingTypes ?? []).map((t) => [t.id, t.name]))
 
   function handlePreview() {
     const { rows, errors } = parseCsv(csvInput)
@@ -159,10 +156,8 @@ function ClothingItemBatchImportPageContent() {
     })
   }
 
-  const typeIdToName = new Map((clothingTypes ?? []).map((t) => [t.id, t.name]))
-
   return (
-    <main className="page-wrap px-4 py-12 space-y-6">
+    <main className="page-wrap space-y-6 px-4 py-12">
       <Card className="mx-auto w-full max-w-3xl">
         <CardHeader>
           <CardTitle>Massenimport von Kleidungsstuecken</CardTitle>
@@ -174,19 +169,16 @@ function ClothingItemBatchImportPageContent() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="space-y-1.5">
-            <p className="text-sm font-medium">CSV-Eingabe</p>
-            <Textarea
-              placeholder={"Jacke,L,BARCODE001\nHose,M\nJacke,XL,BARCODE003"}
-              rows={8}
-              value={csvInput}
-              onChange={(e) => {
-                setCsvInput(e.target.value)
-                setPreview(null)
-                setParseErrors([])
-              }}
-            />
-          </div>
+          <CsvInputSection
+            value={csvInput}
+            onChange={(val) => {
+              setCsvInput(val)
+              setPreview(null)
+              setParseErrors([])
+            }}
+            onPreview={handlePreview}
+            disabled={!csvInput.trim() || !clothingTypes}
+          />
 
           {parseErrors.length > 0 && (
             <ErrorState
@@ -194,47 +186,17 @@ function ClothingItemBatchImportPageContent() {
             />
           )}
 
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handlePreview}
-              disabled={!csvInput.trim() || !clothingTypes}
-            >
-              Vorschau
-            </Button>
-          </div>
-
           {preview !== null && preview.length > 0 && !createdItems && (
-            <>
-              <p className="text-sm font-medium">
-                Vorschau ({preview.length} Eintraege)
-              </p>
-              <PreviewTable items={preview} typeIdToName={typeIdToName} />
-
-              {mutationError && (
-                <ErrorState message="Die Kleidungsstuecke konnten nicht erstellt werden." />
-              )}
-
-              <div className="flex flex-wrap justify-end gap-2 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    void navigate({ to: "/klamottenmanagement/items" })
-                  }
-                >
-                  Abbrechen
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isPending}
-                >
-                  {isPending ? "Wird importiert..." : "Importieren"}
-                </Button>
-              </div>
-            </>
+            <BatchPreviewSection
+              items={preview}
+              typeIdToName={typeIdToName}
+              isPending={isPending}
+              hasError={mutationError !== null}
+              onSubmit={handleSubmit}
+              onCancel={() =>
+                void navigate({ to: "/klamottenmanagement/items" })
+              }
+            />
           )}
 
           {createdItems && (
@@ -247,6 +209,83 @@ function ClothingItemBatchImportPageContent() {
         </CardContent>
       </Card>
     </main>
+  )
+}
+
+interface CsvInputSectionProps {
+  value: string
+  onChange: (value: string) => void
+  onPreview: () => void
+  disabled: boolean
+}
+
+function CsvInputSection({
+  value,
+  onChange,
+  onPreview,
+  disabled,
+}: CsvInputSectionProps) {
+  return (
+    <>
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium">CSV-Eingabe</p>
+        <Textarea
+          placeholder={"Jacke,L,BARCODE001\nHose,M\nJacke,XL,BARCODE003"}
+          rows={8}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onPreview}
+          disabled={disabled}
+        >
+          Vorschau
+        </Button>
+      </div>
+    </>
+  )
+}
+
+interface BatchPreviewSectionProps {
+  items: CreateOrUpdateClothingItemRequest[]
+  typeIdToName: Map<number, string>
+  isPending: boolean
+  hasError: boolean
+  onSubmit: () => void
+  onCancel: () => void
+}
+
+function BatchPreviewSection({
+  items,
+  typeIdToName,
+  isPending,
+  hasError,
+  onSubmit,
+  onCancel,
+}: BatchPreviewSectionProps) {
+  return (
+    <>
+      <p className="text-sm font-medium">Vorschau ({items.length} Eintraege)</p>
+      <PreviewTable items={items} typeIdToName={typeIdToName} />
+
+      {hasError && (
+        <ErrorState message="Die Kleidungsstuecke konnten nicht erstellt werden." />
+      )}
+
+      <div className="flex flex-wrap justify-end gap-2 pt-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Abbrechen
+        </Button>
+        <Button type="button" onClick={onSubmit} disabled={isPending}>
+          {isPending ? "Wird importiert..." : "Importieren"}
+        </Button>
+      </div>
+    </>
   )
 }
 
