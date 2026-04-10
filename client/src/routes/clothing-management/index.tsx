@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router"
 
 import ClothingManagementOverviewPage from "#/clothing/components/ClothingManagementOverviewPage"
 
-export const Route = createFileRoute("/klamottenmanagement/")({
-  component: KlamottenManagementIndexRoute,
+export const Route = createFileRoute("/clothing-management/")({
+  component: ClothingManagementIndexRoute,
 })
 
-function KlamottenManagementIndexRoute() {
+function ClothingManagementIndexRoute() {
   return <ClothingManagementOverviewPage />
 }

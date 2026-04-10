@@ -45,7 +45,7 @@ export default function ClothingTypesTable({ types }: ClothingTypesTableProps) {
                 <div className="flex justify-end gap-1">
                   <Button asChild size="icon" variant="outline">
                     <Link
-                      to="/klamottenmanagement/types/$clothingTypeId/edit"
+                      to="/clothing-management/types/$clothingTypeId/edit"
                       params={{ clothingTypeId: String(type.id) }}
                       aria-label={`Kleidungstyp ${type.name} bearbeiten`}
                       title="Kleidungstyp bearbeiten"
