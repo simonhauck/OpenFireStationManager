@@ -8,6 +8,7 @@ import { createBatchClothingItemsMutation } from "#/clothing/service/clothingIte
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import type { ClothingType } from "#/clothing/model/clothingType"
 import ErrorState from "#/components/base/ErrorState"
+import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
 import { Button } from "#/components/ui/button"
 import {
@@ -149,7 +150,7 @@ function ClothingItemBatchImportPageContent() {
             }}
           />
 
-          {selectedTypeId !== null && (
+          <RenderIf when={selectedTypeId !== null}>
             <CsvInputSection
               value={csvInput}
               onChange={(val) => {
@@ -160,17 +161,19 @@ function ClothingItemBatchImportPageContent() {
               onPreview={handlePreview}
               disabled={!csvInput.trim()}
             />
-          )}
+          </RenderIf>
 
-          {parseErrors.length > 0 && (
+          <RenderIf when={parseErrors.length > 0}>
             <ErrorState
               message={`Fehler in der Eingabe:\n${parseErrors.join("\n")}`}
             />
-          )}
+          </RenderIf>
 
-          {preview !== null && preview.length > 0 && !createdItems && (
+          <RenderIf
+            when={preview !== null && preview.length > 0 && !createdItems}
+          >
             <BatchPreviewSection
-              items={preview}
+              items={preview ?? []}
               typeIdToName={typeIdToName}
               isPending={isPending}
               hasError={mutationError !== null}
@@ -179,15 +182,15 @@ function ClothingItemBatchImportPageContent() {
                 void navigate({ to: "/klamottenmanagement/items" })
               }
             />
-          )}
+          </RenderIf>
 
-          {createdItems && (
+          <RenderIf when={createdItems !== undefined}>
             <ImportSuccessResult
-              items={createdItems}
+              items={createdItems ?? []}
               typeIdToName={typeIdToName}
               onDone={() => void navigate({ to: "/klamottenmanagement/items" })}
             />
-          )}
+          </RenderIf>
         </CardContent>
       </Card>
     </main>
