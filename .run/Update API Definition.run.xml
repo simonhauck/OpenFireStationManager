@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="UpdateApiDefinition" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Update API Definition" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="env">
         <map>
@@ -7,7 +7,7 @@
         </map>
       </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/server" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":test" />
+          <option value=":server:test" />
           <option value="--tests" />
           <option value="&quot;io.github.simonhauck.openfirestationmanager.HttpApiContractIT&quot;" />
           <option value="spotlessApply" />
