@@ -32,7 +32,7 @@ function CreateClothingTypePageContent() {
       { name },
       {
         onSuccess: () => {
-          void navigate({ to: "/klamottenmanagement/types" })
+          void navigate({ to: "/clothing-management/types" })
         },
       },
     )

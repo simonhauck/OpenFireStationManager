@@ -58,7 +58,7 @@ export default function ClothingTypeForm({
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
-                <Link to="/klamottenmanagement/types">Abbrechen</Link>
+                <Link to="/clothing-management/types">Abbrechen</Link>
               </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? pendingLabel : submitLabel}

@@ -28,7 +28,7 @@ import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 
 export const Route = createFileRoute(
-  "/nutzermanagement/$userId/change-password",
+  "/user-management/$userId/change-password",
 )({
   component: ChangePasswordPage,
 })
@@ -89,7 +89,7 @@ function ChangePasswordPageContent() {
       },
       {
         onSuccess: () => {
-          void navigate({ to: "/nutzermanagement" })
+          void navigate({ to: "/user-management" })
         },
       },
     )
@@ -174,7 +174,7 @@ function ChangePasswordPageContent() {
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
-                <Link to="/nutzermanagement/$userId/edit" params={{ userId }}>
+                <Link to="/user-management/$userId/edit" params={{ userId }}>
                   Abbrechen
                 </Link>
               </Button>

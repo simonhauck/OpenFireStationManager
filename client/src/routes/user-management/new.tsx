@@ -1,10 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
-import { getUserByIdQuery, updateUserMutation } from "#/api/users.queries"
+import { createUserMutation } from "#/api/users.queries"
 import ErrorState from "#/components/base/ErrorState"
-import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RoleGuard from "#/components/base/RoleGuard"
 import { Button } from "#/components/ui/button"
 import {
@@ -20,53 +19,36 @@ import { Label } from "#/components/ui/label"
 import { ROLE_OPTIONS } from "#/users/roleMetadata"
 import type { UserRole } from "#/users/roleMetadata"
 
-export const Route = createFileRoute("/nutzermanagement/$userId/edit")({
-  component: EditUserPage,
+export const Route = createFileRoute("/user-management/new")({
+  component: CreateUserPage,
 })
 
-function EditUserPage() {
+function CreateUserPage() {
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
-      <EditUserPageContent />
+      <CreateUserPageContent />
     </RoleGuard>
   )
 }
 
-function EditUserPageContent() {
-  const { userId } = Route.useParams()
+function CreateUserPageContent() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const numericUserId = Number(userId)
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = useQuery({
-    ...getUserByIdQuery(numericUserId),
-    enabled: Number.isFinite(numericUserId),
-  })
-
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [roles, setRoles] = useState<UserRole[]>([])
+  const [roles, setRoles] = useState<UserRole[]>(["USER"])
+  const [passwordError, setPasswordError] = useState<string | null>(null)
   const [rolesError, setRolesError] = useState<string | null>(null)
 
   const {
-    mutate: updateUser,
+    mutate: createUser,
     isPending,
     error,
-  } = useMutation(updateUserMutation(queryClient))
-
-  useEffect(() => {
-    if (!user) {
-      return
-    }
-
-    setFirstName(user.firstName)
-    setLastName(user.lastName)
-    setRoles(user.roles)
-  }, [user])
+  } = useMutation(createUserMutation(queryClient))
 
   function toggleRole(role: UserRole, checked: boolean) {
     setRolesError(null)
@@ -84,50 +66,33 @@ function EditUserPageContent() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setPasswordError(null)
 
     if (roles.length === 0) {
       setRolesError("Bitte wählen Sie mindestens eine Rolle aus.")
       return
     }
 
-    updateUser(
+    if (password !== confirmPassword) {
+      setPasswordError(
+        "Passwort und Passwortbestätigung stimmen nicht überein.",
+      )
+      return
+    }
+
+    createUser(
       {
-        id: numericUserId,
-        body: {
-          firstName,
-          lastName,
-          roles,
-        },
+        username,
+        password,
+        firstName,
+        lastName,
+        roles,
       },
       {
         onSuccess: () => {
-          void navigate({ to: "/nutzermanagement" })
+          void navigate({ to: "/user-management" })
         },
       },
-    )
-  }
-
-  if (!Number.isFinite(numericUserId)) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <ErrorState message="Ungültige Nutzer-ID." />
-      </main>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <LoadingIndicator label="Nutzerdaten werden geladen..." />
-      </main>
-    )
-  }
-
-  if (isError || !user) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <ErrorState message="Nutzerdaten konnten nicht geladen werden." />
-      </main>
     )
   }
 
@@ -135,16 +100,52 @@ function EditUserPageContent() {
     <main className="page-wrap px-4 py-12">
       <Card className="mx-auto w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Nutzer bearbeiten</CardTitle>
+          <CardTitle>Nutzer erstellen</CardTitle>
           <CardDescription>
-            Bearbeiten Sie Vorname, Nachname und Rollen des Nutzers.
+            Erfassen Sie die Daten für ein neues Nutzerkonto.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="username">Benutzername</Label>
-              <Input id="username" value={user.username} disabled readOnly />
+              <Input
+                id="username"
+                autoComplete="username"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Passwort</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setPasswordError(null)
+                }}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirm-password">Passwort bestätigen</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value)
+                  setPasswordError(null)
+                }}
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -200,18 +201,20 @@ function EditUserPageContent() {
               </div>
             </div>
 
+            {passwordError && <ErrorState message={passwordError} />}
+
             {rolesError && <ErrorState message={rolesError} />}
 
             {error && (
-              <ErrorState message="Der Nutzer konnte nicht aktualisiert werden." />
+              <ErrorState message="Der Nutzer konnte nicht erstellt werden." />
             )}
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
-                <Link to="/nutzermanagement">Abbrechen</Link>
+                <Link to="/user-management">Abbrechen</Link>
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Wird gespeichert..." : "Änderungen speichern"}
+                {isPending ? "Wird erstellt..." : "Nutzer erstellen"}
               </Button>
             </div>
           </form>

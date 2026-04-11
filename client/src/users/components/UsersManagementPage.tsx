@@ -35,7 +35,7 @@ function UsersManagementPageContent() {
               <CardDescription>Nutzer und Rollen</CardDescription>
             </div>
             <Button asChild>
-              <Link to="/nutzermanagement/new">Nutzer erstellen</Link>
+              <Link to="/user-management/new">Nutzer erstellen</Link>
             </Button>
           </div>
         </CardHeader>
