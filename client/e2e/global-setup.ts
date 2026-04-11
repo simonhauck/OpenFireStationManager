@@ -20,8 +20,9 @@ const KLEIDERWART_LAST_NAME = "Kleiderwart"
 
 async function globalSetup() {
   // Step 1: Try to create the initial admin user via the setup endpoint.
-  // If this fails the user is already created — that is fine.
-  await fetch(`${BASE_URL}/api/public/setup/initial-admin`, {
+  // A 4xx response means the user is already created — that is fine.
+  // Any other error is logged as a warning.
+  const setupRes = await fetch(`${BASE_URL}/api/public/setup/initial-admin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -30,9 +31,18 @@ async function globalSetup() {
       firstName: ADMIN_FIRST_NAME,
       lastName: ADMIN_LAST_NAME,
     }),
-  }).catch(() => {
-    // ignore network errors
+  }).catch((err: unknown) => {
+    console.warn(
+      `[global-setup] Could not reach setup endpoint: ${String(err)}`,
+    )
+    return null
   })
+
+  if (setupRes !== null && !setupRes.ok && setupRes.status < 400) {
+    console.warn(
+      `[global-setup] Unexpected status ${setupRes.status} from setup endpoint.`,
+    )
+  }
 
   // Step 2: Log in as admin to obtain a session cookie.
   const loginRes = await fetch(`${BASE_URL}/api/public/auth/login`, {
@@ -56,8 +66,9 @@ async function globalSetup() {
   const sessionCookie = setCookieHeader.split(";")[0]
 
   // Step 3: Try to create the KLEIDERWART test user.
-  // If this fails the user is already created — that is fine.
-  await fetch(`${BASE_URL}/api/admin/users`, {
+  // A 4xx response means the user is already created — that is fine.
+  // Any other error is logged as a warning.
+  const createKleiderwartRes = await fetch(`${BASE_URL}/api/admin/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -70,9 +81,22 @@ async function globalSetup() {
       lastName: KLEIDERWART_LAST_NAME,
       roles: ["KLEIDERWART"],
     }),
-  }).catch(() => {
-    // ignore network errors
+  }).catch((err: unknown) => {
+    console.warn(
+      `[global-setup] Could not reach create-user endpoint: ${String(err)}`,
+    )
+    return null
   })
+
+  if (
+    createKleiderwartRes !== null &&
+    !createKleiderwartRes.ok &&
+    createKleiderwartRes.status < 400
+  ) {
+    console.warn(
+      `[global-setup] Unexpected status ${createKleiderwartRes.status} when creating KLEIDERWART user.`,
+    )
+  }
 }
 
 export default globalSetup
