@@ -17,7 +17,8 @@ class AuthControllerCalls(private val testRestTemplate: TestRestTemplate) {
         password: String = "secret",
         rememberMe: Boolean = false,
     ): ResponseEntity<Void> {
-        val request = LoginRequest(username = username, password = password, rememberMe = rememberMe)
+        val request =
+            LoginRequest(username = username, password = password, rememberMe = rememberMe)
         return testRestTemplate.postForEntity<Void>("/api/public/auth/login", request)
     }
 
@@ -47,9 +48,7 @@ class AuthControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
     private fun extractCookie(response: ResponseEntity<*>, cookieName: String): String? {
         return response.headers[HttpHeaders.SET_COOKIE]?.firstNotNullOfOrNull { setCookieHeader ->
-            setCookieHeader
-                .split("; ")
-                .find { cookiePart -> cookiePart.startsWith("$cookieName=") }
+            setCookieHeader.split("; ").find { cookiePart -> cookiePart.startsWith("$cookieName=") }
         }
     }
 

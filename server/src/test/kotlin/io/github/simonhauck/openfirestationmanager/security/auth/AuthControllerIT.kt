@@ -3,8 +3,6 @@ package io.github.simonhauck.openfirestationmanager.security.auth
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import io.github.simonhauck.openfirestationmanager.testutil.snapshotTest
 import io.github.simonhauck.openfirestationmanager.usermanagement.AdminUserControllerCalls
-import io.github.simonhauck.openfirestationmanager.usermanagement.CreateUserRequest
-import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import java.time.ZonedDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -59,7 +57,8 @@ class AuthControllerIT() : IntegrationTest() {
         assertThat(rememberMeCookieWithoutRememberMe).isNull()
 
         val loginWithRememberMe = authControllerCalls.login(rememberMe = true)
-        val rememberMeCookieWithRememberMe = authControllerCalls.extractRememberMeCookie(loginWithRememberMe)
+        val rememberMeCookieWithRememberMe =
+            authControllerCalls.extractRememberMeCookie(loginWithRememberMe)
         assertThat(rememberMeCookieWithRememberMe).isNotNull
     }
 
