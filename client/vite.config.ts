@@ -6,6 +6,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite"
 
 import viteReact from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
+import { VitePWA } from "vite-plugin-pwa"
 
 const config = defineConfig({
   server: {
@@ -26,6 +27,13 @@ const config = defineConfig({
     tailwindcss(),
     tanstackRouter({ target: "react", autoCodeSplitting: true }),
     viteReact(),
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: false,
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+      },
+    }),
   ],
 })
 
