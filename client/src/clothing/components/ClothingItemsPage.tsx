@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router"
-
 import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
@@ -50,23 +48,20 @@ export default function ClothingItemsPage() {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            <RenderIf when={isLoading}>
-              <LoadingIndicator label="Kleidungsstuecke werden geladen..." />
-            </RenderIf>
+        <CardContent className="space-y-4">
+          <RenderIf when={isLoading}>
+            <LoadingIndicator label="Kleidungsstuecke werden geladen..." />
+          </RenderIf>
 
-            <RenderIf when={isError}>
-              <ErrorState message="Kleidungsstuecke konnten nicht geladen werden." />
-            </RenderIf>
+          <RenderIf when={isError}>
+            <ErrorState message="Kleidungsstuecke konnten nicht geladen werden." />
+          </RenderIf>
 
-            <RenderIf when={canRenderTable}>
-              <ClothingItemsTable
-                items={clothingItems!}
-                types={clothingTypes!}
-              />
-            </RenderIf>
-          </CardContent>
-        </Card>
+          <RenderIf when={canRenderTable}>
+            <ClothingItemsTable items={clothingItems!} types={clothingTypes!} />
+          </RenderIf>
+        </CardContent>
+      </Card>
     </RoleGuard>
   )
 }

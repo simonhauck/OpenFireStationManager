@@ -37,34 +37,34 @@ export default function ClothingTypeForm({
 }: ClothingTypeFormProps) {
   return (
     <Card className="mx-auto w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="name">Bezeichnung</Label>
-              <Input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => onNameChange(e.target.value)}
-              />
-            </div>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="name">Bezeichnung</Label>
+            <Input
+              id="name"
+              required
+              value={name}
+              onChange={(e) => onNameChange(e.target.value)}
+            />
+          </div>
 
-            {errorMessage && <ErrorState message={errorMessage} />}
+          {errorMessage && <ErrorState message={errorMessage} />}
 
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/clothing-management/types">Abbrechen</Link>
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? pendingLabel : submitLabel}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" asChild>
+              <Link to="/clothing-management/types">Abbrechen</Link>
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? pendingLabel : submitLabel}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

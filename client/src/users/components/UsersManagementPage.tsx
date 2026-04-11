@@ -27,25 +27,25 @@ function UsersManagementPageContent() {
 
   return (
     <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <CardTitle>Nutzermanagement</CardTitle>
-              <CardDescription>Nutzer und Rollen</CardDescription>
-            </div>
-            <Button asChild>
-              <Link to="/user-management/new">Nutzer erstellen</Link>
-            </Button>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <CardTitle>Nutzermanagement</CardTitle>
+            <CardDescription>Nutzer und Rollen</CardDescription>
           </div>
-        </CardHeader>
+          <Button asChild>
+            <Link to="/user-management/new">Nutzer erstellen</Link>
+          </Button>
+        </div>
+      </CardHeader>
 
-        <CardContent className="space-y-4">
-          {isLoading && <LoadingIndicator label="Nutzer werden geladen..." />}
+      <CardContent className="space-y-4">
+        {isLoading && <LoadingIndicator label="Nutzer werden geladen..." />}
 
-          {isError && <ErrorState message="Fehler beim Laden der Nutzer." />}
+        {isError && <ErrorState message="Fehler beim Laden der Nutzer." />}
 
-          {users && <UsersTable users={users} />}
-        </CardContent>
-      </Card>
+        {users && <UsersTable users={users} />}
+      </CardContent>
+    </Card>
   )
 }

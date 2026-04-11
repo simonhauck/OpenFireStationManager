@@ -29,33 +29,33 @@ function ClothingTypesPageContent() {
 
   return (
     <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <CardTitle>Klamottenmanagement</CardTitle>
-              <CardDescription>Kleidungstypen</CardDescription>
-            </div>
-            <Button asChild>
-              <Link to="/clothing-management/types/new">
-                Kleidungstyp erstellen
-              </Link>
-            </Button>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <CardTitle>Klamottenmanagement</CardTitle>
+            <CardDescription>Kleidungstypen</CardDescription>
           </div>
-        </CardHeader>
+          <Button asChild>
+            <Link to="/clothing-management/types/new">
+              Kleidungstyp erstellen
+            </Link>
+          </Button>
+        </div>
+      </CardHeader>
 
-        <CardContent className="space-y-4">
-          <RenderIf when={isLoading}>
-            <LoadingIndicator label="Kleidungstypen werden geladen..." />
-          </RenderIf>
+      <CardContent className="space-y-4">
+        <RenderIf when={isLoading}>
+          <LoadingIndicator label="Kleidungstypen werden geladen..." />
+        </RenderIf>
 
-          <RenderIf when={isError}>
-            <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
-          </RenderIf>
+        <RenderIf when={isError}>
+          <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
+        </RenderIf>
 
-          <RenderIf when={canRenderTable}>
-            <ClothingTypesTable types={clothingTypes!} />
-          </RenderIf>
-        </CardContent>
-      </Card>
+        <RenderIf when={canRenderTable}>
+          <ClothingTypesTable types={clothingTypes!} />
+        </RenderIf>
+      </CardContent>
+    </Card>
   )
 }
