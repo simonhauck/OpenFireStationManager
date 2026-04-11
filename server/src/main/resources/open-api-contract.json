@@ -651,9 +651,12 @@
           "password": {
             "type": "string",
             "minLength": 1
+          },
+          "rememberMe": {
+            "type": "boolean"
           }
         },
-        "required": ["password", "username"]
+        "required": ["password", "rememberMe", "username"]
       },
       "CreateOrUpdateClothingTypeRequest": {
         "type": "object",
