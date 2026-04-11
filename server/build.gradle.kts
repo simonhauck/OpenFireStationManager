@@ -67,13 +67,12 @@ spotless {
 
     format("json") {
         target("src/**/*.json")
-
-        prettier().configFile(file("../.prettierrc.json"))
+        prettier()
     }
 
     format("yaml") {
         target("src/**/*.yml", "src/**/*.yaml")
-        prettier().configFile(file("../.prettierrc.json"))
+        prettier()
     }
 }
 

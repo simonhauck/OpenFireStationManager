@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:18
     restart: unless-stopped

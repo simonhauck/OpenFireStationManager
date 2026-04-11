@@ -582,7 +582,12 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy"]
+        "required": [
+          "createdAt",
+          "createdBy",
+          "lastModifiedAt",
+          "lastModifiedBy"
+        ]
       },
       "UserAccount": {
         "type": "object",
@@ -614,7 +619,15 @@
             "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required": ["enabled", "firstName", "id", "lastName", "metaData", "roles", "username"]
+        "required": [
+          "enabled",
+          "firstName",
+          "id",
+          "lastName",
+          "metaData",
+          "roles",
+          "username"
+        ]
       },
       "InitialAdminSetupRequest": {
         "type": "object",
