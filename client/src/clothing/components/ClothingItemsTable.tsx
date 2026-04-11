@@ -1,9 +1,22 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { Pencil } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
+import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "#/components/ui/alert-dialog"
 import { Button } from "#/components/ui/button"
 import {
   Table,
@@ -23,6 +36,11 @@ export default function ClothingItemsTable({
   items,
   types,
 }: ClothingItemsTableProps) {
+  const queryClient = useQueryClient()
+  const { mutate: deleteItem } = useMutation(
+    deleteClothingItemMutation(queryClient),
+  )
+
   const typeNameById = new Map(
     types.map((type) => [String(type.id), type.name]),
   )
@@ -57,16 +75,48 @@ export default function ClothingItemsTable({
                 <FormattedDate value={item.metaData.createdAt} />
               </TableCell>
               <TableCell className="text-right">
-                <Button asChild size="icon" variant="outline">
-                  <Link
-                    to="/clothing-management/items/$clothingItemId/edit"
-                    params={{ clothingItemId: String(item.id) }}
-                    aria-label={`Kleidungsstueck ${item.id} bearbeiten`}
-                    title="Bearbeiten"
-                  >
-                    <Pencil className="size-4" />
-                  </Link>
-                </Button>
+                <div className="flex justify-end gap-1">
+                  <Button asChild size="icon" variant="outline">
+                    <Link
+                      to="/clothing-management/items/$clothingItemId/edit"
+                      params={{ clothingItemId: String(item.id) }}
+                      aria-label={`Kleidungsstueck ${item.id} bearbeiten`}
+                      title="Bearbeiten"
+                    >
+                      <Pencil className="size-4" />
+                    </Link>
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        aria-label={`Kleidungsstueck ${item.id} loeschen`}
+                        title="Loeschen"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Kleidungsstueck loeschen
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Moechten Sie das Kleidungsstueck mit der ID {item.id}{" "}
+                          wirklich loeschen? Diese Aktion kann nicht
+                          rueckgaengig gemacht werden.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteItem(item.id)}>
+                          Loeschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </TableCell>
             </TableRow>
           ))
