@@ -46,8 +46,8 @@ function Login() {
   }
 
   return (
-    <main className="page-wrap flex min-h-[calc(100vh-4rem)] items-center px-4 py-12">
-      <Card className="mx-auto w-full max-w-sm">
+    <div className="flex items-center">
+      <Card className="mx-auto w-full max-w-lg">
         <CardHeader>
           <CardTitle>Anmelden</CardTitle>
           <CardDescription>
@@ -104,6 +104,6 @@ function Login() {
           </form>
         </CardContent>
       </Card>
-    </main>
+    </div>
   )
 }
