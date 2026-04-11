@@ -13,3 +13,7 @@ __unconfig*
 todos.json
 
 src/routeTree.gen.ts
+
+# Playwright
+playwright-report/
+test-results/
