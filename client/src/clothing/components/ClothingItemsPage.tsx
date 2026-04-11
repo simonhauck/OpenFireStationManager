@@ -46,7 +46,7 @@ export default function ClothingItemsPage() {
                 </CardDescription>
               </div>
               <Button asChild>
-                <Link to="/klamottenmanagement/items/batch">Massenimport</Link>
+                <Link to="/clothing-management/items/batch">Massenimport</Link>
               </Button>
             </div>
           </CardHeader>

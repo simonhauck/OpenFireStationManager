@@ -179,7 +179,7 @@ function ClothingItemBatchImportPageContent() {
               hasError={mutationError !== null}
               onSubmit={handleSubmit}
               onCancel={() =>
-                void navigate({ to: "/klamottenmanagement/items" })
+                void navigate({ to: "/clothing-management/items" })
               }
             />
           </RenderIf>
@@ -188,7 +188,7 @@ function ClothingItemBatchImportPageContent() {
             <ImportSuccessResult
               items={createdItems ?? []}
               typeIdToName={typeIdToName}
-              onDone={() => void navigate({ to: "/klamottenmanagement/items" })}
+              onDone={() => void navigate({ to: "/clothing-management/items" })}
             />
           </RenderIf>
         </CardContent>
