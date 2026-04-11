@@ -19,11 +19,6 @@ export const Route = createFileRoute("/login")({
   component: Login,
 })
 
-// 8 hours in seconds
-const SESSION_DURATION_SECONDS = 8 * 60 * 60
-// 5 years in seconds
-const REMEMBER_ME_DURATION_SECONDS = 5 * 365 * 24 * 60 * 60
-
 function Login() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -41,13 +36,7 @@ function Login() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     login(
-      {
-        username,
-        password,
-        tokenValiditySeconds: rememberMe
-          ? REMEMBER_ME_DURATION_SECONDS
-          : SESSION_DURATION_SECONDS,
-      },
+      { username, password, rememberMe },
       {
         onSuccess: () => {
           void navigate({ to: "/" })
@@ -99,12 +88,7 @@ function Login() {
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked === true)}
               />
-              <Label
-                htmlFor="remember-me"
-                className="cursor-pointer font-normal"
-              >
-                Angemeldet bleiben
-              </Label>
+              <Label htmlFor="remember-me">Angemeldet bleiben</Label>
             </div>
 
             {error && (

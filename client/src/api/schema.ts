@@ -241,8 +241,7 @@ export interface components {
     LoginRequest: {
       username: string
       password: string
-      /** Format: int64 */
-      tokenValiditySeconds: number
+      rememberMe?: boolean
     }
     CreateOrUpdateClothingTypeRequest: {
       name: string

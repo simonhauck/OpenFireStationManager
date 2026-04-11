@@ -1,7 +1,6 @@
 package io.github.simonhauck.openfirestationmanager
 
 import io.github.simonhauck.openfirestationmanager.security.auth.AuthControllerCalls
-import io.github.simonhauck.openfirestationmanager.security.auth.LoginRequest
 import io.github.simonhauck.openfirestationmanager.setup.InitialAdminSetupRequest
 import io.github.simonhauck.openfirestationmanager.setup.InitialSetupControllerCalls
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +32,7 @@ open class IntegrationTest {
 
     private fun setAdminCookieValue() {
         val authCalls = AuthControllerCalls(http)
-        val loginResponse = authCalls.login(LoginRequest(username = "chief", password = "secret"))
+        val loginResponse = authCalls.login()
         staticCookieHeader =
             authCalls.extractAuthCookie(loginResponse)
                 ?: error("Login failed: no auth cookie returned")
