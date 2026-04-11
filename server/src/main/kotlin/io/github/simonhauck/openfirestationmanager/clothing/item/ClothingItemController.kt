@@ -42,6 +42,13 @@ class ClothingItemController(private val service: ClothingItemService) {
     fun createItem(@Valid @RequestBody request: CreateOrUpdateClothingItemRequest): ClothingItem =
         service.createItem(request)
 
+    @PostMapping("/batch")
+    @Operation(summary = "Create multiple clothing items in a single request")
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
+    fun createBatchItems(
+        @Valid @RequestBody request: BatchCreateClothingItemsRequest
+    ): List<ClothingItem> = service.createBatchItems(request.items)
+
     @PatchMapping("/{id}")
     @Operation(summary = "Update a clothing item")
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")

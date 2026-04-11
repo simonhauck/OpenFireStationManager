@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router"
+
 import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
@@ -12,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
+import { Button } from "#/components/ui/button"
 
 export default function ClothingItemsPage() {
   const {
@@ -35,8 +38,17 @@ export default function ClothingItemsPage() {
       <main className="page-wrap px-4 py-12">
         <Card>
           <CardHeader>
-            <CardTitle>Klamottenmanagement</CardTitle>
-            <CardDescription>Alle vorhandenen Kleidungsstuecke</CardDescription>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle>Klamottenmanagement</CardTitle>
+                <CardDescription>
+                  Alle vorhandenen Kleidungsstuecke
+                </CardDescription>
+              </div>
+              <Button asChild>
+                <Link to="/clothing-management/items/batch">Massenimport</Link>
+              </Button>
+            </div>
           </CardHeader>
 
           <CardContent className="space-y-4">
