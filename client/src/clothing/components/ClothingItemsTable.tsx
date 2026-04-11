@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { Pencil } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, Pencil } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
@@ -14,28 +14,75 @@ import {
   TableRow,
 } from "#/components/ui/table"
 
+export type SortKey = "id" | "barcode" | "type" | "size" | "createdAt"
+export type SortDirection = "asc" | "desc"
+
 interface ClothingItemsTableProps {
   items: ClothingItem[]
   types: ClothingType[]
+  sortKey: SortKey
+  sortDir: SortDirection
+  onSort: (key: SortKey) => void
+}
+
+function SortIcon({
+  column,
+  sortKey,
+  sortDir,
+}: {
+  column: SortKey
+  sortKey: SortKey
+  sortDir: SortDirection
+}) {
+  if (column !== sortKey)
+    return <ArrowUpDown className="ml-1 inline size-3 opacity-50" />
+  if (sortDir === "asc") return <ArrowUp className="ml-1 inline size-3" />
+  return <ArrowDown className="ml-1 inline size-3" />
 }
 
 export default function ClothingItemsTable({
   items,
   types,
+  sortKey,
+  sortDir,
+  onSort,
 }: ClothingItemsTableProps) {
   const typeNameById = new Map(
     types.map((type) => [String(type.id), type.name]),
   )
 
+  function SortableHead({
+    column,
+    children,
+    className,
+  }: {
+    column: SortKey
+    children: React.ReactNode
+    className?: string
+  }) {
+    return (
+      <TableHead className={className}>
+        <button
+          type="button"
+          className="flex cursor-pointer items-center font-medium"
+          onClick={() => onSort(column)}
+        >
+          {children}
+          <SortIcon column={column} sortKey={sortKey} sortDir={sortDir} />
+        </button>
+      </TableHead>
+    )
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>Barcode</TableHead>
-          <TableHead>Typ</TableHead>
-          <TableHead>Groesse</TableHead>
-          <TableHead>Erstellt am</TableHead>
+          <SortableHead column="id">ID</SortableHead>
+          <SortableHead column="barcode">Barcode</SortableHead>
+          <SortableHead column="type">Typ</SortableHead>
+          <SortableHead column="size">Groesse</SortableHead>
+          <SortableHead column="createdAt">Erstellt am</SortableHead>
           <TableHead className="text-right"></TableHead>
         </TableRow>
       </TableHeader>
