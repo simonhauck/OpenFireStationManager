@@ -28,36 +28,34 @@ function ClothingTypesPageContent() {
   const canRenderTable = clothingTypes !== undefined
 
   return (
-    <main className="page-wrap px-4 py-12">
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <CardTitle>Klamottenmanagement</CardTitle>
-              <CardDescription>Kleidungstypen</CardDescription>
-            </div>
-            <Button asChild>
-              <Link to="/clothing-management/types/new">
-                Kleidungstyp erstellen
-              </Link>
-            </Button>
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <CardTitle>Klamottenmanagement</CardTitle>
+            <CardDescription>Kleidungstypen</CardDescription>
           </div>
-        </CardHeader>
+          <Button asChild>
+            <Link to="/clothing-management/types/new">
+              Kleidungstyp erstellen
+            </Link>
+          </Button>
+        </div>
+      </CardHeader>
 
-        <CardContent className="space-y-4">
-          <RenderIf when={isLoading}>
-            <LoadingIndicator label="Kleidungstypen werden geladen..." />
-          </RenderIf>
+      <CardContent className="space-y-4">
+        <RenderIf when={isLoading}>
+          <LoadingIndicator label="Kleidungstypen werden geladen..." />
+        </RenderIf>
 
-          <RenderIf when={isError}>
-            <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
-          </RenderIf>
+        <RenderIf when={isError}>
+          <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
+        </RenderIf>
 
-          <RenderIf when={canRenderTable}>
-            <ClothingTypesTable types={clothingTypes!} />
-          </RenderIf>
-        </CardContent>
-      </Card>
-    </main>
+        <RenderIf when={canRenderTable}>
+          <ClothingTypesTable types={clothingTypes!} />
+        </RenderIf>
+      </CardContent>
+    </Card>
   )
 }

@@ -66,27 +66,15 @@ function EditClothingTypePageContent() {
   }
 
   if (!Number.isFinite(numericClothingTypeId)) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <ErrorState message="Ungueltige Kleidungstyp-ID." />
-      </main>
-    )
+    return <ErrorState message="Ungueltige Kleidungstyp-ID." />
   }
 
   if (isLoading) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <LoadingIndicator label="Kleidungstyp wird geladen..." />
-      </main>
-    )
+    return <LoadingIndicator label="Kleidungstyp wird geladen..." />
   }
 
   if (isError || !clothingType) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <ErrorState message="Kleidungstyp konnte nicht geladen werden." />
-      </main>
-    )
+    return <ErrorState message="Kleidungstyp konnte nicht geladen werden." />
   }
 
   return (

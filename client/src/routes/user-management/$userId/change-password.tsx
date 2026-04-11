@@ -96,31 +96,19 @@ function ChangePasswordPageContent() {
   }
 
   if (!Number.isFinite(numericUserId)) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <ErrorState message="Ungültige Nutzer-ID." />
-      </main>
-    )
+    return <ErrorState message="Ungültige Nutzer-ID." />
   }
 
   if (isLoading) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <LoadingIndicator label="Nutzerdaten werden geladen..." />
-      </main>
-    )
+    return <LoadingIndicator label="Nutzerdaten werden geladen..." />
   }
 
   if (isError || !user) {
-    return (
-      <main className="page-wrap px-4 py-12">
-        <ErrorState message="Nutzerdaten konnten nicht geladen werden." />
-      </main>
-    )
+    return <ErrorState message="Nutzerdaten konnten nicht geladen werden." />
   }
 
   return (
-    <main className="page-wrap px-4 py-12">
+    <>
       <Card className="mx-auto w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Passwort ändern</CardTitle>
@@ -208,6 +196,6 @@ function ChangePasswordPageContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </main>
+    </>
   )
 }
