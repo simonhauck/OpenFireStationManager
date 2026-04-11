@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import CreateClothingItemPage from "#/clothing/components/CreateClothingItemPage"
 import RoleGuard from "#/components/base/RoleGuard"
+import ClothingItemForm from "#/clothing/components/ClothingItemForm.tsx"
 
 export const Route = createFileRoute("/clothing-management/items/new")({
   component: CreateClothingItemRoute,
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/clothing-management/items/new")({
 function CreateClothingItemRoute() {
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
-      <CreateClothingItemPage />
+      <ClothingItemForm existingItem={undefined} />
     </RoleGuard>
   )
 }

@@ -21,6 +21,7 @@ import {
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/CreateOrUpdateClothingItemRequest.tsx"
 
 type ClothingItemFormProps = {
   existingItem?: ClothingItem
@@ -63,14 +64,10 @@ export default function ClothingItemForm({
   const description = isEditing
     ? "Bearbeiten Sie die Daten des Kleidungsstuecks."
     : "Erfassen Sie die Daten fuer ein neues Kleidungsstueck."
-  const submitLabel = isEditing
-    ? "Aenderungen speichern"
-    : "Kleidungsstueck erstellen"
-  const pendingLabel = isEditing ? "Wird gespeichert..." : "Wird erstellt..."
+  const submitLabel = "Speichern"
+  const pendingLabel = "Wird gespeichert..."
   const errorMessage = error
-    ? isEditing
-      ? "Das Kleidungsstueck konnte nicht aktualisiert werden."
-      : "Das Kleidungsstueck konnte nicht erstellt werden."
+    ? "Das Kleidungsstueck konnte nicht gespeichert werden."
     : null
 
   function handleSubmit(e: React.FormEvent) {
@@ -78,11 +75,17 @@ export default function ClothingItemForm({
 
     if (typeId === null) return
 
+    const body: CreateOrUpdateClothingItemRequest = {
+      typeId,
+      size,
+      barcode: barcode,
+    }
+
     if (isEditing) {
       updateItem(
         {
           id: Number(existingItem.id),
-          body: { typeId, size, barcode: barcode || undefined },
+          body: body,
         },
         {
           onSuccess: () => {
@@ -91,14 +94,11 @@ export default function ClothingItemForm({
         },
       )
     } else {
-      createItem(
-        { typeId, size, barcode: barcode || undefined },
-        {
-          onSuccess: () => {
-            void navigate({ to: "/clothing-management/items" })
-          },
+      createItem(body, {
+        onSuccess: () => {
+          void navigate({ to: "/clothing-management/items" })
         },
-      )
+      })
     }
   }
 
