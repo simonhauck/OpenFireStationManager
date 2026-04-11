@@ -46,15 +46,15 @@ export default function ClothingItemsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link to="/clothing-management/items/new">
-                <Plus className="size-4" />
-                Kleidungsstueck erstellen
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/clothing-management/items/batch">Massenimport</Link>
-            </Button>
+              <Button asChild variant="outline">
+                <Link to="/clothing-management/items/new">
+                  <Plus className="size-4" />
+                  Kleidungsstueck erstellen
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link to="/clothing-management/items/batch">Massenimport</Link>
+              </Button>
             </div>
           </div>
         </CardHeader>

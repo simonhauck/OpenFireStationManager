@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 
 import EditClothingItemPage from "#/clothing/components/EditClothingItemPage"
+import RoleGuard from "#/components/base/RoleGuard"
 
 export const Route = createFileRoute(
   "/clothing-management/items/$clothingItemId/edit",
@@ -9,5 +10,9 @@ export const Route = createFileRoute(
 })
 
 function EditClothingItemRoute() {
-  return <EditClothingItemPage />
+  return (
+    <RoleGuard allowedRoles={["KLEIDERWART"]}>
+      <EditClothingItemPage />
+    </RoleGuard>
+  )
 }
