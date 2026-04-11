@@ -1,3 +1,6 @@
+import com.google.cloud.tools.jib.gradle.JibTask
+import org.gradle.kotlin.dsl.withType
+
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinSpring)
@@ -106,6 +109,12 @@ jib {
                     "https://github.com/simonhauck/OpenFireStationManager"
             )
     }
+}
+
+tasks.withType<JibTask> {
+    notCompatibleWithConfigurationCache(
+        "because https://github.com/GoogleContainerTools/jib/issues/3132"
+    )
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
