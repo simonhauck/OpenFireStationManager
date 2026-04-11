@@ -51,4 +51,3 @@ class V010RenameUserIdentifierToBarcodeOnClothingItems : DatabaseMigration {
         )
     }
 }
-
