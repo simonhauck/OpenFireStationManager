@@ -45,9 +45,18 @@ export default function ClothingItemsPage() {
                   Alle vorhandenen Kleidungsstuecke
                 </CardDescription>
               </div>
-              <Button asChild>
-                <Link to="/clothing-management/items/batch">Massenimport</Link>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild variant="outline">
+                  <Link to="/clothing-management/items/new">
+                    Kleidungsstueck erstellen
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/clothing-management/items/batch">
+                    Massenimport
+                  </Link>
+                </Button>
+              </div>
             </div>
           </CardHeader>
 

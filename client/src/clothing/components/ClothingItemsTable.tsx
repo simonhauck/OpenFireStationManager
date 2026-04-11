@@ -1,6 +1,9 @@
+import { Link } from "@tanstack/react-router"
+
 import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
+import { Button } from "#/components/ui/button"
 import {
   Table,
   TableBody,
@@ -32,12 +35,13 @@ export default function ClothingItemsTable({
           <TableHead>Typ</TableHead>
           <TableHead>Groesse</TableHead>
           <TableHead>Erstellt am</TableHead>
+          <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {items.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5}>Keine Kleidungsstuecke gefunden.</TableCell>
+            <TableCell colSpan={6}>Keine Kleidungsstuecke gefunden.</TableCell>
           </TableRow>
         ) : (
           items.map((item) => (
@@ -50,6 +54,16 @@ export default function ClothingItemsTable({
               <TableCell>{item.size}</TableCell>
               <TableCell>
                 <FormattedDate value={item.metaData.createdAt} />
+              </TableCell>
+              <TableCell>
+                <Button variant="outline" size="sm" asChild>
+                  <Link
+                    to="/clothing-management/items/$clothingItemId/edit"
+                    params={{ clothingItemId: String(item.id) }}
+                  >
+                    Bearbeiten
+                  </Link>
+                </Button>
               </TableCell>
             </TableRow>
           ))
