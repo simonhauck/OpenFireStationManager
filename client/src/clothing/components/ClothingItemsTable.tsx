@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { Pencil } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
@@ -35,7 +36,7 @@ export default function ClothingItemsTable({
           <TableHead>Typ</TableHead>
           <TableHead>Groesse</TableHead>
           <TableHead>Erstellt am</TableHead>
-          <TableHead></TableHead>
+          <TableHead className="text-right"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -55,13 +56,15 @@ export default function ClothingItemsTable({
               <TableCell>
                 <FormattedDate value={item.metaData.createdAt} />
               </TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm" asChild>
+              <TableCell className="text-right">
+                <Button asChild size="icon" variant="outline">
                   <Link
                     to="/clothing-management/items/$clothingItemId/edit"
                     params={{ clothingItemId: String(item.id) }}
+                    aria-label={`Kleidungsstueck ${item.id} bearbeiten`}
+                    title="Bearbeiten"
                   >
-                    Bearbeiten
+                    <Pencil className="size-4" />
                   </Link>
                 </Button>
               </TableCell>

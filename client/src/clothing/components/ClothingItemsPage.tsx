@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { Plus } from "lucide-react"
 
 import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
@@ -48,6 +49,7 @@ export default function ClothingItemsPage() {
               <div className="flex flex-wrap gap-2">
                 <Button asChild variant="outline">
                   <Link to="/clothing-management/items/new">
+                    <Plus className="size-4" />
                     Kleidungsstueck erstellen
                   </Link>
                 </Button>
