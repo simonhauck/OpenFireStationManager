@@ -1,3 +1,6 @@
+import { Link } from "@tanstack/react-router"
+import { Plus } from "lucide-react"
+
 import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
@@ -13,7 +16,8 @@ import {
   CardTitle,
 } from "#/components/ui/card"
 import { Button } from "#/components/ui/button"
-import { Link } from "@tanstack/react-router"
+import { Input } from "#/components/ui/input"
+import { useState } from "react"
 
 export default function ClothingItemsPage() {
   const {
@@ -27,10 +31,23 @@ export default function ClothingItemsPage() {
     isError: isTypesError,
   } = useClothingTypes()
 
+  const [searchTerm, setSearchTerm] = useState("")
+
   const isLoading = isLoadingItems || isLoadingTypes
   const isError = isItemsError || isTypesError
   const canRenderTable =
     clothingItems !== undefined && clothingTypes !== undefined
+
+  const filteredItems =
+    clothingItems?.filter((item) => {
+      const term = searchTerm.trim().toLowerCase()
+      if (term === "") return true
+      return (
+        String(item.id).includes(term) ||
+        (item.barcode ?? "").toLowerCase().includes(term) ||
+        item.size.toLowerCase().includes(term)
+      )
+    }) ?? []
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
@@ -43,9 +60,17 @@ export default function ClothingItemsPage() {
                 Alle vorhandenen Kleidungsstuecke
               </CardDescription>
             </div>
-            <Button asChild>
-              <Link to="/clothing-management/items/batch">Massenimport</Link>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline">
+                <Link to="/clothing-management/items/new">
+                  <Plus className="size-4" />
+                  Kleidungsstueck erstellen
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link to="/clothing-management/items/batch">Massenimport</Link>
+              </Button>
+            </div>
           </div>
         </CardHeader>
 
@@ -59,7 +84,12 @@ export default function ClothingItemsPage() {
           </RenderIf>
 
           <RenderIf when={canRenderTable}>
-            <ClothingItemsTable items={clothingItems!} types={clothingTypes!} />
+            <Input
+              placeholder="Suche nach ID, Barcode oder Groesse..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <ClothingItemsTable items={filteredItems} types={clothingTypes!} />
           </RenderIf>
         </CardContent>
       </Card>
