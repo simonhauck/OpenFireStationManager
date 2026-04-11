@@ -15,7 +15,15 @@ import org.springframework.data.relational.core.mapping.Table
 data class CreateOrUpdateClothingItemRequest(
     @Positive val typeId: Long,
     @NotBlank @Size(max = 255) val size: String,
-)
+    @Size(max = 255) val barcode: String? = null,
+) {
+    fun barcodeSanitized(): String? {
+        if (barcode?.isBlank() == true) return null
+        return barcode
+    }
+}
+
+data class BatchCreateClothingItemsRequest(val items: List<CreateOrUpdateClothingItemRequest>)
 
 data class ClothingTypeSizeSummary(
     val typeId: Long,
@@ -28,6 +36,7 @@ data class ClothingItem(
     @field:Schema(type = "integer", format = "int64")
     val typeId: AggregateReference<ClothingType, Long>,
     val size: String,
+    val barcode: String? = null,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
 ) : BaseEntity {

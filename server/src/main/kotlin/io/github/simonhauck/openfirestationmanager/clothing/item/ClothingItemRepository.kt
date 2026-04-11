@@ -6,9 +6,13 @@ interface ClothingItemRepository : Repository<ClothingItem, Long> {
 
     fun save(clothingItem: ClothingItem): ClothingItem
 
+    fun saveAll(clothingItems: Iterable<ClothingItem>): List<ClothingItem>
+
     fun findAll(): List<ClothingItem>
 
     fun findById(id: Long): ClothingItem?
+
+    fun findByBarcode(barcode: String): ClothingItem?
 
     fun deleteById(id: Long)
 }
