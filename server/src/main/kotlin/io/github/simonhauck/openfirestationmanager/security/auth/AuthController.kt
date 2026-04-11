@@ -1,15 +1,14 @@
 package io.github.simonhauck.openfirestationmanager.security.auth
 
-import io.github.simonhauck.openfirestationmanager.security.config.AuthenticationProperties
-import io.github.simonhauck.openfirestationmanager.usermanagement.UserService
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Positive
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
+import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 data class LoginRequest(
     @field:NotBlank val username: String,
     @field:NotBlank val password: String,
-    @field:Positive val tokenValiditySeconds: Long = 3600,
+    val rememberMe: Boolean = false,
 )
 
 @RestController
@@ -29,43 +28,37 @@ data class LoginRequest(
 @Validated
 class AuthController(
     private val authService: AuthService,
-    private val appSecurityProperties: AuthenticationProperties,
-    private val userService: UserService,
+    private val securityContextRepository: SecurityContextRepository,
+    private val rememberMeServices: TokenBasedRememberMeServices,
 ) {
 
     @PostMapping("/login")
     fun login(
         @Valid @RequestBody requestBody: LoginRequest,
+        request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Unit> {
-        val tokenResult = authService.login(requestBody)
+        val authentication = authService.login(requestBody)
 
-        val cookie =
-            ResponseCookie.from(appSecurityProperties.cookieName, tokenResult.token)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(requestBody.tokenValiditySeconds)
-                .sameSite("Strict")
-                .build()
+        val securityContext = SecurityContextHolder.createEmptyContext()
+        securityContext.authentication = authentication
+        SecurityContextHolder.setContext(securityContext)
+        securityContextRepository.saveContext(securityContext, request, response)
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+        if (requestBody.rememberMe) {
+            rememberMeServices.loginSuccess(request, response, authentication)
+        }
+
         return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun logout(response: HttpServletResponse): ResponseEntity<Unit> {
-        val expiredCookie =
-            ResponseCookie.from(appSecurityProperties.cookieName, "")
-                .path("/")
-                .httpOnly(true)
-                .secure(true)
-                .maxAge(0)
-                .sameSite("Strict")
-                .build()
-
-        response.setHeader(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+    fun logout(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Unit> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        rememberMeServices.logout(request, response, authentication)
+        SecurityContextHolder.clearContext()
+        request.getSession(false)?.invalidate()
         return ResponseEntity.noContent().build()
     }
 

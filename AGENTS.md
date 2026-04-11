@@ -56,7 +56,10 @@ testing, code style, API design, and database conventions.
 
 - **Prettier scoping:** The root `.prettierrc.json` applies to non-client, non-Kotlin files.
   `client/` has its own `prettier.config.js`. Kotlin files are excluded from Prettier entirely.
-- **Dependency updates:** Managed by Renovate (see `renovate.json`). npm dependencies are
-  handled manually; Gradle/Kotlin deps are auto-merged after 14 days.
+- **Root Gradle usage:** Root `./gradlew` is mainly for Spotless checks/formatting on
+  repo-level files (`*.gradle.kts`, JSON, YAML). Build/run/test workflows remain component-local
+  in `client/` and `server/`.
+- **Dependency updates:** Managed by Renovate (see `renovate.json`) with auto-merge enabled and
+  a 14-day minimum release age. npm updates are enabled (including grouped `@tanstack/**` updates).
 - **No CI is configured yet.** Run lint, format checks, and tests locally before committing.
 - **No git hooks are installed.** Discipline is manual at this stage.

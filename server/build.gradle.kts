@@ -30,7 +30,6 @@ dependencies {
     // https://github.com/swagger-api/swagger-core/pull/5031
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.springdocOpenapiWebmvcUi)
-    implementation(libs.nimbusJoseJwt)
 
     implementation(libs.jacksonModuleKotlin)
     implementation(libs.kotlinLoggingJvm)
@@ -68,13 +67,12 @@ spotless {
 
     format("json") {
         target("src/**/*.json")
-
-        prettier().configFile(file("../.prettierrc.json"))
+        prettier()
     }
 
     format("yaml") {
         target("src/**/*.yml", "src/**/*.yaml")
-        prettier().configFile(file("../.prettierrc.json"))
+        prettier()
     }
 }
 
