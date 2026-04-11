@@ -32,8 +32,7 @@ export default function ClothingItemsPage() {
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
-      <main className="page-wrap px-4 py-12">
-        <Card>
+      <Card>
           <CardHeader>
             <CardTitle>Klamottenmanagement</CardTitle>
             <CardDescription>Alle vorhandenen Kleidungsstuecke</CardDescription>
@@ -56,7 +55,6 @@ export default function ClothingItemsPage() {
             </RenderIf>
           </CardContent>
         </Card>
-      </main>
     </RoleGuard>
   )
 }

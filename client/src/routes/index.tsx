@@ -32,7 +32,7 @@ function App() {
   ]
 
   return (
-    <main className="page-wrap px-4 pb-12 pt-14 sm:pt-16">
+    <>
       <section className="island-shell rise-in relative overflow-hidden rounded-4xl px-6 py-10 sm:px-10 sm:py-14">
         <Badge variant="secondary" className="mb-4 uppercase tracking-wider">
           Öffentliche Projektübersicht
@@ -85,6 +85,6 @@ function App() {
           </Card>
         ))}
       </section>
-    </main>
+    </>
   )
 }

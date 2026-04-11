@@ -97,8 +97,7 @@ function CreateUserPageContent() {
   }
 
   return (
-    <main className="page-wrap px-4 py-12">
-      <Card className="mx-auto w-full max-w-2xl">
+    <Card className="mx-auto w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Nutzer erstellen</CardTitle>
           <CardDescription>
@@ -219,7 +218,6 @@ function CreateUserPageContent() {
             </div>
           </form>
         </CardContent>
-      </Card>
-    </main>
+        </Card>
   )
 }

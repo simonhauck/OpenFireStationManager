@@ -36,8 +36,7 @@ export default function ClothingTypeForm({
   errorMessage,
 }: ClothingTypeFormProps) {
   return (
-    <main className="page-wrap px-4 py-12">
-      <Card className="mx-auto w-full max-w-2xl">
+    <Card className="mx-auto w-full max-w-2xl">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
@@ -67,6 +66,5 @@ export default function ClothingTypeForm({
           </form>
         </CardContent>
       </Card>
-    </main>
   )
 }

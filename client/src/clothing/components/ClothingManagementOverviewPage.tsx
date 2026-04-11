@@ -39,7 +39,7 @@ export default function ClothingManagementOverviewPage() {
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
-      <main className="page-wrap space-y-6 px-4 py-12">
+      <div className="space-y-6">
         <ClothingManagementSubNavigation entries={overviewEntries} />
 
         <ClothingTypeSizeSummaryCard
@@ -47,7 +47,7 @@ export default function ClothingManagementOverviewPage() {
           isLoading={isLoading}
           isError={isError}
         />
-      </main>
+      </div>
     </RoleGuard>
   )
 }

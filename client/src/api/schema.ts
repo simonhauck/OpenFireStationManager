@@ -241,7 +241,7 @@ export interface components {
     LoginRequest: {
       username: string
       password: string
-      rememberMe?: boolean
+      rememberMe: boolean
     }
     CreateOrUpdateClothingTypeRequest: {
       name: string

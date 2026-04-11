@@ -11,7 +11,9 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
     <div className="flex h-dvh flex-col">
       <Header />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto">
+        <div className="min-h-full w-full p-2">{children}</div>
+      </main>
       <Footer />
     </div>
   )

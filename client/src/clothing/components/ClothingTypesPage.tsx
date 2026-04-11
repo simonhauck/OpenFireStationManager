@@ -28,8 +28,7 @@ function ClothingTypesPageContent() {
   const canRenderTable = clothingTypes !== undefined
 
   return (
-    <main className="page-wrap px-4 py-12">
-      <Card>
+    <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -58,6 +57,5 @@ function ClothingTypesPageContent() {
           </RenderIf>
         </CardContent>
       </Card>
-    </main>
   )
 }

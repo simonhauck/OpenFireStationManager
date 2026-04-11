@@ -26,8 +26,7 @@ function UsersManagementPageContent() {
   const { data: users, isLoading, isError } = useUsers()
 
   return (
-    <main className="page-wrap px-4 py-12">
-      <Card>
+    <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -48,6 +47,5 @@ function UsersManagementPageContent() {
           {users && <UsersTable users={users} />}
         </CardContent>
       </Card>
-    </main>
   )
 }
