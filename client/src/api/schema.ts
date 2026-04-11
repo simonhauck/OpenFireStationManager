@@ -258,7 +258,7 @@ export interface components {
     LoginRequest: {
       username: string
       password: string
-      rememberMe?: boolean
+      rememberMe: boolean
     }
     CreateOrUpdateClothingTypeRequest: {
       name: string
@@ -273,13 +273,13 @@ export interface components {
       /** Format: int64 */
       typeId: number
       size: string
-      userIdentifier?: string
+      barcode?: string
     }
     ClothingItem: {
       /** Format: int64 */
       typeId: string
       size: string
-      userIdentifier?: string
+      barcode?: string
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]

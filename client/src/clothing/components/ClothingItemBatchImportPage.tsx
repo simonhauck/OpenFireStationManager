@@ -35,7 +35,7 @@ type CreateOrUpdateClothingItemRequest =
 
 interface ParsedRow {
   size: string
-  userIdentifier?: string
+  barcode?: string
 }
 
 interface ParseResult {
@@ -56,14 +56,14 @@ function parseCsv(csv: string): ParseResult {
     const line = lines[i]
     const parts = line.split(",").map((p) => p.trim())
 
-    const [size, userIdentifier] = parts
+    const [size, barcode] = parts
 
     if (!size) {
       errors.push(`Zeile ${i + 1}: Groesse darf nicht leer sein.`)
       continue
     }
 
-    rows.push({ size, userIdentifier })
+    rows.push({ size, barcode })
   }
 
   return { rows, errors }
@@ -110,7 +110,7 @@ function ClothingItemBatchImportPageContent() {
     const requests: CreateOrUpdateClothingItemRequest[] = rows.map((row) => ({
       typeId: selectedTypeId,
       size: row.size,
-      userIdentifier: row.userIdentifier,
+      barcode: row.barcode,
     }))
 
     setPreview(requests)
@@ -135,7 +135,7 @@ function ClothingItemBatchImportPageContent() {
           <CardDescription>
             Importiere mehrere Kleidungsstuecke auf einmal. Waehle zuerst einen
             Kleidungstyp, dann gib die Daten im CSV-Format ein:{" "}
-            <code>Groesse,Kennung</code>. Die Kennung ist optional.
+            <code>Groesse,Barcode</code>. Der Barcode ist optional.
           </CardDescription>
         </CardHeader>
 
@@ -250,6 +250,7 @@ function CsvInputSection({
     <>
       <div className="space-y-1.5">
         <p className="text-sm font-medium">Schritt 2: CSV-Daten eingeben</p>
+        <p className="text-sm italic">Example: L,ExampleBarcode1</p>
         <Textarea
           placeholder={"L,BARCODE001\nM\nXL,BARCODE003"}
           rows={8}
@@ -322,7 +323,7 @@ function PreviewTable({ items, typeIdToName }: PreviewTableProps) {
         <TableRow>
           <TableHead>Typ</TableHead>
           <TableHead>Groesse</TableHead>
-          <TableHead>Kennung</TableHead>
+          <TableHead>Barcode</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -332,7 +333,7 @@ function PreviewTable({ items, typeIdToName }: PreviewTableProps) {
               {typeIdToName.get(item.typeId) ?? String(item.typeId)}
             </TableCell>
             <TableCell>{item.size}</TableCell>
-            <TableCell>{item.userIdentifier ?? "—"}</TableCell>
+            <TableCell>{item.barcode ?? "—"}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -362,7 +363,7 @@ function ImportSuccessResult({
             <TableHead>ID</TableHead>
             <TableHead>Typ</TableHead>
             <TableHead>Groesse</TableHead>
-            <TableHead>Kennung</TableHead>
+            <TableHead>Barcode</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -373,7 +374,7 @@ function ImportSuccessResult({
                 {typeIdToName.get(Number(item.typeId)) ?? String(item.typeId)}
               </TableCell>
               <TableCell>{item.size}</TableCell>
-              <TableCell>{item.userIdentifier ?? "—"}</TableCell>
+              <TableCell>{item.barcode ?? "—"}</TableCell>
             </TableRow>
           ))}
         </TableBody>

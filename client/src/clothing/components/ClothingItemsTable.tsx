@@ -28,7 +28,7 @@ export default function ClothingItemsTable({
       <TableHeader>
         <TableRow>
           <TableHead>ID</TableHead>
-          <TableHead>Kennung</TableHead>
+          <TableHead>Barcode</TableHead>
           <TableHead>Typ</TableHead>
           <TableHead>Groesse</TableHead>
           <TableHead>Erstellt am</TableHead>
@@ -43,7 +43,7 @@ export default function ClothingItemsTable({
           items.map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.id}</TableCell>
-              <TableCell>{item.userIdentifier ?? "—"}</TableCell>
+              <TableCell>{item.barcode ?? "—"}</TableCell>
               <TableCell>
                 {typeNameById.get(String(item.typeId)) ?? String(item.typeId)}
               </TableCell>

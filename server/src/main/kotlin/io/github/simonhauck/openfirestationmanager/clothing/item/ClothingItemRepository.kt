@@ -12,7 +12,7 @@ interface ClothingItemRepository : Repository<ClothingItem, Long> {
 
     fun findById(id: Long): ClothingItem?
 
-    fun findByUserIdentifier(userIdentifier: String): ClothingItem?
+    fun findByBarcode(barcode: String): ClothingItem?
 
     fun deleteById(id: Long)
 }

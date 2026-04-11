@@ -742,7 +742,7 @@
             "maxLength": 255,
             "minLength": 0
           },
-          "userIdentifier": {
+          "barcode": {
             "type": "string",
             "maxLength": 255,
             "minLength": 0
@@ -760,7 +760,7 @@
           "size": {
             "type": "string"
           },
-          "userIdentifier": {
+          "barcode": {
             "type": "string"
           },
           "id": {
