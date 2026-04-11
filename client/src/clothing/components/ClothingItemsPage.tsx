@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "#/components/ui/card"
 import { Button } from "#/components/ui/button"
+import { Link } from "@tanstack/react-router"
 
 export default function ClothingItemsPage() {
   const {
@@ -34,19 +35,19 @@ export default function ClothingItemsPage() {
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
       <Card>
-          <CardHeader>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <CardTitle>Klamottenmanagement</CardTitle>
-                <CardDescription>
-                  Alle vorhandenen Kleidungsstuecke
-                </CardDescription>
-              </div>
-              <Button asChild>
-                <Link to="/clothing-management/items/batch">Massenimport</Link>
-              </Button>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Klamottenmanagement</CardTitle>
+              <CardDescription>
+                Alle vorhandenen Kleidungsstuecke
+              </CardDescription>
             </div>
-          </CardHeader>
+            <Button asChild>
+              <Link to="/clothing-management/items/batch">Massenimport</Link>
+            </Button>
+          </div>
+        </CardHeader>
 
         <CardContent className="space-y-4">
           <RenderIf when={isLoading}>
