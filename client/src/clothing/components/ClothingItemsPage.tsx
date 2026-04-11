@@ -41,7 +41,7 @@ export default function ClothingItemsPage() {
       const term = searchTerm.trim().toLowerCase()
       if (term === "") return true
       return (
-        String(item.id).toLowerCase().includes(term) ||
+        String(item.id).includes(term) ||
         (item.barcode ?? "").toLowerCase().includes(term) ||
         item.size.toLowerCase().includes(term)
       )
