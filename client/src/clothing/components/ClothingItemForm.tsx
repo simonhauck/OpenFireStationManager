@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
 import ErrorState from "#/components/base/ErrorState"
+import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
 import {
   Card,
@@ -58,11 +59,12 @@ export default function ClothingItemForm({
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label>Kleidungstyp</Label>
-              {clothingTypes.length === 0 ? (
+              <RenderIf when={clothingTypes.length === 0}>
                 <p className="text-sm text-muted-foreground">
                   Keine Kleidungstypen vorhanden.
                 </p>
-              ) : (
+              </RenderIf>
+              <RenderIf when={clothingTypes.length > 0}>
                 <RadioGroup
                   value={typeId !== null ? String(typeId) : undefined}
                   onValueChange={(val) => onTypeIdChange(Number(val))}
@@ -78,7 +80,7 @@ export default function ClothingItemForm({
                     </div>
                   ))}
                 </RadioGroup>
-              )}
+              </RenderIf>
             </div>
 
             <div className="space-y-1.5">
@@ -100,7 +102,9 @@ export default function ClothingItemForm({
               />
             </div>
 
-            {errorMessage && <ErrorState message={errorMessage} />}
+            <RenderIf when={errorMessage !== null}>
+              <ErrorState message={errorMessage!} />
+            </RenderIf>
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>

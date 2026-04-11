@@ -49,6 +49,30 @@ All commands below are run from the `client/` directory.
   for layout/alignment/spacing.
 - Keep business logic out of presentational components; pass data and handlers via props.
 
+### Conditional Rendering
+
+- **Always** use the `RenderIf` component (`src/components/base/RenderIf.tsx`) for conditional
+  rendering inside JSX. Do **not** use inline `&&` short-circuits or ternary expressions to
+  conditionally render elements.
+- For ternary (either/or) cases, use two adjacent `<RenderIf>` components with complementary
+  `when` conditions.
+- Guard-clause early returns (loading/error states at the top of a component function) are fine
+  and do not need `RenderIf`.
+
+```tsx
+// ✅ correct
+<RenderIf when={isLoading}>
+  <LoadingIndicator />
+</RenderIf>
+<RenderIf when={!isLoading}>
+  <Content />
+</RenderIf>
+
+// ❌ avoid
+{isLoading ? <LoadingIndicator /> : <Content />}
+{isLoading && <LoadingIndicator />}
+```
+
 ### shadcn/ui Update Safety
 
 - Treat files in `src/components/ui/*` as shadcn-managed building blocks.
