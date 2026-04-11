@@ -63,7 +63,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                 <div className="flex justify-end gap-1">
                   <Button asChild size="icon" variant="outline">
                     <Link
-                      to="/nutzermanagement/$userId/change-password"
+                      to="/user-management/$userId/change-password"
                       params={{ userId: String(user.id) }}
                       aria-label={`Passwort fuer Nutzer ${user.username} ändern`}
                       title="Passwort ändern"
@@ -73,7 +73,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                   </Button>
                   <Button asChild size="icon" variant="outline">
                     <Link
-                      to="/nutzermanagement/$userId/edit"
+                      to="/user-management/$userId/edit"
                       params={{ userId: String(user.id) }}
                       aria-label={`Nutzer ${user.username} bearbeiten`}
                       title="Nutzer bearbeiten"

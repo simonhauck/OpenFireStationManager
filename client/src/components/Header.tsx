@@ -30,7 +30,7 @@ export default function Header() {
           </Link>
           <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
             <Link
-              to="/klamottenmanagement"
+              to="/clothing-management"
               className="nav-link"
               activeProps={{ className: "nav-link is-active" }}
             >
@@ -40,7 +40,7 @@ export default function Header() {
 
           <RoleGuard allowedRoles={["ADMIN"]} hideChildComponent={true}>
             <Link
-              to="/nutzermanagement"
+              to="/user-management"
               className="nav-link"
               activeProps={{ className: "nav-link is-active" }}
             >

@@ -14,7 +14,7 @@ import {
 interface ClothingManagementEntry {
   title: string
   description: string
-  to: "/klamottenmanagement/items" | "/klamottenmanagement/types"
+  to: "/clothing-management/items" | "/clothing-management/types"
 }
 
 interface ClothingManagementSubNavigationProps {
@@ -25,12 +25,12 @@ const overviewEntries: ClothingManagementEntry[] = [
   {
     title: "Kleidungsstuecke",
     description: "Platzhalteransicht fuer vorhandene Kleidungsstuecke.",
-    to: "/klamottenmanagement/items",
+    to: "/clothing-management/items",
   },
   {
     title: "Kleidungstypen",
     description: "Verwalte alle verfügbaren Kleidungstypen.",
-    to: "/klamottenmanagement/types",
+    to: "/clothing-management/types",
   },
 ]
 
