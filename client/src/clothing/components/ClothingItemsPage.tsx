@@ -1,3 +1,6 @@
+import { Link } from "@tanstack/react-router"
+import { Plus } from "lucide-react"
+
 import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
@@ -14,7 +17,6 @@ import {
 } from "#/components/ui/card"
 import { Button } from "#/components/ui/button"
 import { Input } from "#/components/ui/input"
-import { Link } from "@tanstack/react-router"
 import { useState } from "react"
 
 export default function ClothingItemsPage() {
@@ -58,9 +60,17 @@ export default function ClothingItemsPage() {
                 Alle vorhandenen Kleidungsstuecke
               </CardDescription>
             </div>
-            <Button asChild>
-              <Link to="/clothing-management/items/batch">Massenimport</Link>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline">
+                <Link to="/clothing-management/items/new">
+                  <Plus className="size-4" />
+                  Kleidungsstueck erstellen
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link to="/clothing-management/items/batch">Massenimport</Link>
+              </Button>
+            </div>
           </div>
         </CardHeader>
 

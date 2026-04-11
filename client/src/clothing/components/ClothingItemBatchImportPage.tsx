@@ -1,8 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
-
-import type { components } from "#/api/schema"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { createBatchClothingItemsMutation } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
@@ -29,9 +27,7 @@ import {
   TableRow,
 } from "#/components/ui/table"
 import { Textarea } from "#/components/ui/textarea"
-
-type CreateOrUpdateClothingItemRequest =
-  components["schemas"]["CreateOrUpdateClothingItemRequest"]
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/CreateOrUpdateClothingItemRequest.tsx"
 
 interface ParsedRow {
   size: string
