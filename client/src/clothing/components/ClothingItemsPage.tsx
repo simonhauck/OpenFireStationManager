@@ -17,7 +17,6 @@ import {
 } from "#/components/ui/card"
 import { Button } from "#/components/ui/button"
 import { Input } from "#/components/ui/input"
-import { Link } from "@tanstack/react-router"
 import { useState } from "react"
 
 export default function ClothingItemsPage() {
