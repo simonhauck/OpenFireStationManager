@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate, useParams } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 
-import ClothingTypeForm from "#/clothing/components/ClothingTypeForm"
+import ClothingTypeForm from "#/clothing/components/shared/ClothingTypeForm"
 import {
   updateClothingTypeMutation,
   useClothingTypeById,

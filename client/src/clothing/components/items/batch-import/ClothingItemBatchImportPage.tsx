@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "#/components/ui/table"
 import { Textarea } from "#/components/ui/textarea"
-import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/CreateOrUpdateClothingItemRequest.tsx"
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
 
 interface ParsedRow {
   size: string
