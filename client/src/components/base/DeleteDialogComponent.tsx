@@ -39,7 +39,9 @@ export default function DeleteDialogComponent({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete}>{confirmText}</AlertDialogAction>
+          <AlertDialogAction onClick={onDelete}>
+            {confirmText}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
