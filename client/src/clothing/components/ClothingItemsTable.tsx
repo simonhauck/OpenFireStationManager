@@ -1,11 +1,14 @@
 import { Link } from "@tanstack/react-router"
-import { Pencil } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
+import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
 import { Button } from "#/components/ui/button"
+import DeleteDialogComponent from "#/components/base/DeleteDialogComponent.tsx"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 interface ClothingItemsTableProps {
   items: ClothingItem[]
@@ -16,6 +19,11 @@ export default function ClothingItemsTable({
   items,
   types,
 }: ClothingItemsTableProps) {
+  const queryClient = useQueryClient()
+  const { mutate: deleteItem } = useMutation(
+    deleteClothingItemMutation(queryClient),
+  )
+
   const typeNameById = new Map(
     types.map((type) => [String(type.id), type.name]),
   )
@@ -56,16 +64,33 @@ export default function ClothingItemsTable({
       showSearch={true}
       actionColumn={({ row: item }) => {
         return (
-          <Button asChild size="icon" variant="outline">
-            <Link
-              to="/clothing-management/items/$clothingItemId/edit"
-              params={{ clothingItemId: String(item.id) }}
-              aria-label={`Kleidungsstueck ${item.id} bearbeiten`}
-              title="Bearbeiten"
+          <div className=" flex justify-end gap-1">
+            <Button asChild size="icon" variant="outline">
+              <Link
+                to="/clothing-management/items/$clothingItemId/edit"
+                params={{ clothingItemId: String(item.id) }}
+                aria-label={`Kleidungsstueck ${item.id} bearbeiten`}
+                title="Bearbeiten"
+              >
+                <Pencil className="size-4" />
+              </Link>
+            </Button>
+
+            <DeleteDialogComponent
+              onDelete={() => deleteItem(item.id)}
+              headline="Kleidungsstueck loeschen"
+              bodyText={`Moechten Sie das Kleidungsstueck mit der ID ${item.id} wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
             >
-              <Pencil className="size-4" />
-            </Link>
-          </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                aria-label={`Kleidungsstueck ${item.id} loeschen`}
+                title="Loeschen"
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </DeleteDialogComponent>
+          </div>
         )
       }}
       emptyMessage="Keine Kleidungsstuecke gefunden."
