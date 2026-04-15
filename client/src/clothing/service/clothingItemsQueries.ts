@@ -99,6 +99,24 @@ export const updateClothingItemMutation = (queryClient: QueryClient) =>
     },
   })
 
+export const deleteClothingItemMutation = (queryClient: QueryClient) =>
+  mutationOptions({
+    mutationKey: [...queryKeys.clothingItems(), "delete"] as const,
+    mutationFn: async (id: number): Promise<void> => {
+      await client.DELETE("/api/clothing/items/{id}", {
+        params: { path: { id } },
+      })
+    },
+    onSuccess: async (_, id) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.clothingItems() }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingItem(id),
+        }),
+      ])
+    },
+  })
+
 export const createBatchClothingItemsMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationKey: [...queryKeys.clothingItems(), "batch"] as const,

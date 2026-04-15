@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import EditClothingTypePage from "#/clothing/components/EditClothingTypePage"
+import EditClothingTypePage from "#/clothing/components/types/edit/EditClothingTypePage"
 
 export const Route = createFileRoute(
   "/clothing-management/types/$clothingTypeId/edit",

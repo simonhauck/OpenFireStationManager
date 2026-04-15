@@ -21,7 +21,7 @@ import {
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
-import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/CreateOrUpdateClothingItemRequest.tsx"
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
 
 type ClothingItemFormProps = {
   existingItem?: ClothingItem
