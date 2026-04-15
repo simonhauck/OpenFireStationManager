@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
 
-import ClothingItemsTable from "#/clothing/components/ClothingItemsTable"
+import ClothingItemsTable from "#/clothing/components/items/list/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import ErrorState from "#/components/base/ErrorState"

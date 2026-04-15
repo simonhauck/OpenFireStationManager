@@ -1,6 +1,6 @@
 import { useParams } from "@tanstack/react-router"
 
-import ClothingItemForm from "#/clothing/components/ClothingItemForm"
+import ClothingItemForm from "#/clothing/components/shared/ClothingItemForm"
 import { useClothingItemById } from "#/clothing/service/clothingItemsQueries"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"

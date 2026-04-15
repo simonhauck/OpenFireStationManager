@@ -4,7 +4,7 @@ import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import ClothingTypesTable from "#/clothing/components/ClothingTypesTable"
+import ClothingTypesTable from "#/clothing/components/types/list/ClothingTypesTable"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import { Button } from "#/components/ui/button"
 import {

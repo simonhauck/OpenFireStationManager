@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
-import ClothingTypeForm from "#/clothing/components/ClothingTypeForm"
+import ClothingTypeForm from "#/clothing/components/shared/ClothingTypeForm"
 import { createClothingTypeMutation } from "#/clothing/service/clothingTypesQueries"
 import RoleGuard from "#/components/base/RoleGuard"
 
