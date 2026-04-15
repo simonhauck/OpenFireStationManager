@@ -5,18 +5,8 @@ import { Pencil, Trash2 } from "lucide-react"
 import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
+import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import FormattedDate from "#/components/base/FormattedDate"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "#/components/ui/alert-dialog"
 import { Button } from "#/components/ui/button"
 import {
   Table,
@@ -86,36 +76,20 @@ export default function ClothingItemsTable({
                       <Pencil className="size-4" />
                     </Link>
                   </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        aria-label={`Kleidungsstueck ${item.id} loeschen`}
-                        title="Loeschen"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Kleidungsstueck loeschen
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Moechten Sie das Kleidungsstueck mit der ID {item.id}{" "}
-                          wirklich loeschen? Diese Aktion kann nicht
-                          rueckgaengig gemacht werden.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => deleteItem(item.id)}>
-                          Loeschen
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <DeleteDialogComponent
+                    onDelete={() => deleteItem(item.id)}
+                    headline="Kleidungsstueck loeschen"
+                    bodyText={`Moechten Sie das Kleidungsstueck mit der ID ${item.id} wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
+                  >
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      aria-label={`Kleidungsstueck ${item.id} loeschen`}
+                      title="Loeschen"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </DeleteDialogComponent>
                 </div>
               </TableCell>
             </TableRow>
