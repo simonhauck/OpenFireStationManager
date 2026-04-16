@@ -1,10 +1,13 @@
-import { queryOptions, useQuery } from "@tanstack/react-query"
+import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query"
+import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type { components } from "#/api/schema"
 
 type ClothingLocation = components["schemas"]["ClothingLocation"]
+type CreateClothingLocationRequest =
+  components["schemas"]["CreateClothingLocationRequest"]
 
 const ensureData = <T>(
   data: T | undefined,
@@ -31,8 +34,26 @@ export const getAllClothingLocationsQuery = () =>
     },
   })
 
+export const createClothingLocationMutation = (queryClient: QueryClient) =>
+  mutationOptions({
+    mutationKey: [...queryKeys.clothingLocations(), "create"] as const,
+    mutationFn: async (
+      body: CreateClothingLocationRequest,
+    ): Promise<ClothingLocation> => {
+      const { data, error } = await client.POST("/api/clothing/locations", {
+        body,
+      })
+      return ensureData(data, error, "POST /api/clothing/locations")
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.clothingLocations(),
+      })
+    },
+  })
+
 export function useClothingLocations() {
   return useQuery(getAllClothingLocationsQuery())
 }
 
-export type { ClothingLocation }
+export type { ClothingLocation, CreateClothingLocationRequest }
