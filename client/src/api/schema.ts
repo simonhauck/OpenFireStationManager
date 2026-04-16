@@ -86,6 +86,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/locations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List all clothing locations */
+    get: operations["getAllLocations"]
+    put?: never
+    /** Create a new clothing location */
+    post: operations["createLocation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/items": {
     parameters: {
       query?: never
@@ -207,6 +225,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/locations/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a clothing location by ID */
+    get: operations["getLocationById"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/items/summary": {
     parameters: {
       query?: never
@@ -265,6 +300,21 @@ export interface components {
     }
     ClothingType: {
       name: string
+      /** Format: int64 */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    CreateClothingLocationRequest: {
+      name: string
+      comment: string
+      onlyVisibleForKleiderwart: boolean
+      shouldBeShownOnDashboard: boolean
+    }
+    ClothingLocation: {
+      name: string
+      comment: string
+      onlyVisibleForKleiderwart: boolean
+      shouldBeShownOnDashboard: boolean
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
@@ -450,6 +500,50 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+    }
+  }
+  getAllLocations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"][]
+        }
+      }
+    }
+  }
+  createLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateClothingLocationRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
         }
       }
     }
@@ -772,6 +866,29 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["AuthStateResponse"]
+        }
+      }
+    }
+  }
+  getLocationById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing location */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
         }
       }
     }

@@ -6,5 +6,7 @@ export const queryKeys = {
   clothingTypeSizeSummary: () => ["clothing", "type-size-summary"] as const,
   clothingItems: () => ["clothing", "items"] as const,
   clothingItem: (id: number) => ["clothing", "items", id] as const,
+  clothingLocations: () => ["clothing", "locations"] as const,
+  clothingLocation: (id: number) => ["clothing", "locations", id] as const,
   me: () => ["auth", "me"] as const,
 }
