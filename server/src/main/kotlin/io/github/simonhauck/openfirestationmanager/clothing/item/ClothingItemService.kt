@@ -48,6 +48,7 @@ class ClothingItemService(
                 typeId = AggregateReference.to(request.typeId),
                 size = request.size,
                 barcode = request.barcode,
+                locationId = request.locationId,
             )
         return repository.save(entity)
     }
@@ -66,6 +67,7 @@ class ClothingItemService(
                     typeId = AggregateReference.to(req.typeId),
                     size = req.size,
                     barcode = req.barcodeSanitized(),
+                    locationId = req.locationId,
                 )
             }
         return repository.saveAll(entities)
@@ -96,6 +98,7 @@ class ClothingItemService(
                 typeId = AggregateReference.to(request.typeId),
                 size = request.size,
                 barcode = request.barcode,
+                locationId = request.locationId,
             )
         )
     }

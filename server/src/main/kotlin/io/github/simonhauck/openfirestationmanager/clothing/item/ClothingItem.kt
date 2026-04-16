@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.clothing.item
 
+import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
@@ -16,6 +17,7 @@ data class CreateOrUpdateClothingItemRequest(
     @Positive val typeId: Long,
     @NotBlank @Size(max = 255) val size: String,
     @Size(max = 255) val barcode: String? = null,
+    val locationId: AggregateReference<ClothingLocation, Long>? = null,
 ) {
     fun barcodeSanitized(): String? {
         if (barcode?.isBlank() == true) return null
@@ -37,6 +39,8 @@ data class ClothingItem(
     val typeId: AggregateReference<ClothingType, Long>,
     val size: String,
     val barcode: String? = null,
+    @field:Schema(type = "integer", format = "int64")
+    val locationId: AggregateReference<ClothingLocation, Long>? = null,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
 ) : BaseEntity {
