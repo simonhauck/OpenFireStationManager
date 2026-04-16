@@ -2,9 +2,18 @@ package io.github.simonhauck.openfirestationmanager.clothing.location
 
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
+
+data class CreateClothingLocationRequest(
+    @NotBlank @Size(max = 255) val name: String,
+    @Size(max = 255) val comment: String,
+    val onlyVisibleForKleiderwart: Boolean,
+    val shouldBeShownOnDashboard: Boolean,
+)
 
 @Table("clothing_locations")
 data class ClothingLocation(
