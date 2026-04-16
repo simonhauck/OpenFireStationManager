@@ -825,6 +825,15 @@
         },
         "required" : [ "comment", "id", "metaData", "name", "onlyVisibleForKleiderwart", "shouldBeShownOnDashboard" ]
       },
+      "AggregateReferenceClothingLocationLong" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "CreateOrUpdateClothingItemRequest" : {
         "type" : "object",
         "properties" : {
@@ -841,6 +850,9 @@
             "type" : "string",
             "maxLength" : 255,
             "minLength" : 0
+          },
+          "locationId" : {
+            "$ref" : "#/components/schemas/AggregateReferenceClothingLocationLong"
           }
         },
         "required" : [ "size", "typeId" ]
@@ -857,6 +869,10 @@
           },
           "barcode" : {
             "type" : "string"
+          },
+          "locationId" : {
+            "type" : "string",
+            "format" : "int64"
           },
           "id" : {
             "type" : "integer",

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/clothing/locations")
 @Validated
 class ClothingLocationController(private val service: ClothingLocationService) {
-
+    //
     @GetMapping
     @Operation(summary = "List all clothing locations")
     fun getAllLocations(): List<ClothingLocation> = service.getAllLocations()
@@ -31,6 +31,7 @@ class ClothingLocationController(private val service: ClothingLocationService) {
     @PostMapping
     @Operation(summary = "Create a new clothing location")
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
-    fun createLocation(@Valid @RequestBody request: CreateClothingLocationRequest): ClothingLocation =
-        service.createLocation(request)
+    fun createLocation(
+        @Valid @RequestBody request: CreateClothingLocationRequest
+    ): ClothingLocation = service.createLocation(request)
 }
