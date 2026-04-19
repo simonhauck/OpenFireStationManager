@@ -8,11 +8,9 @@ import {
   SelectValue,
 } from "#/components/ui/select"
 
-const NO_LOCATION_VALUE = "__none__"
-
 type ClothingLocationSelectProps = {
-  selectedLocationId: string
-  onLocationChange: (id: string) => void
+  selectedLocationId: number | undefined
+  onLocationChange: (id: number) => void
 }
 
 export default function ClothingLocationSelect({
@@ -27,16 +25,13 @@ export default function ClothingLocationSelect({
     <div className="space-y-1.5">
       <Label htmlFor="location">Standort (optional)</Label>
       <Select
-        value={selectedLocationId}
-        onValueChange={(val) =>
-          onLocationChange(val === NO_LOCATION_VALUE ? "" : val)
-        }
+        value={String(selectedLocationId)}
+        onValueChange={(val) => onLocationChange(Number(val))}
       >
         <SelectTrigger id="location">
           <SelectValue placeholder="Kein Standort" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={NO_LOCATION_VALUE}>Kein Standort</SelectItem>
           {locations.map((location) => (
             <SelectItem key={location.id} value={String(location.id)}>
               {location.name}

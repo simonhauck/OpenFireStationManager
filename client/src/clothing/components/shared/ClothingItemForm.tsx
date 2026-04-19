@@ -41,8 +41,8 @@ export default function ClothingItemForm({
   )
   const [size, setSize] = useState(existingItem?.size ?? "")
   const [barcode, setBarcode] = useState(existingItem?.barcode ?? "")
-  const [locationId, setLocationId] = useState<string>(
-    existingItem?.locationId ?? "",
+  const [locationId, setLocationId] = useState<number | undefined>(
+    existingItem?.locationId,
   )
 
   const { data: clothingTypes } = useClothingTypes()
@@ -83,7 +83,7 @@ export default function ClothingItemForm({
       typeId,
       size,
       barcode: barcode,
-      ...(locationId !== "" ? { locationId: { id: Number(locationId) } } : {}),
+      locationId: locationId,
     }
 
     if (isEditing) {

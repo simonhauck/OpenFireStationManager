@@ -954,15 +954,6 @@
         },
         "required": ["items"]
       },
-      "AggregateReferenceClothingLocationLong": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "CreateOrUpdateClothingItemRequest": {
         "type": "object",
         "properties": {
@@ -981,7 +972,8 @@
             "minLength": 0
           },
           "locationId": {
-            "$ref": "#/components/schemas/AggregateReferenceClothingLocationLong"
+            "type": "integer",
+            "format": "int64"
           }
         },
         "required": ["size", "typeId"]
@@ -990,7 +982,7 @@
         "type": "object",
         "properties": {
           "typeId": {
-            "type": "string",
+            "type": "integer",
             "format": "int64"
           },
           "size": {
@@ -1000,7 +992,7 @@
             "type": "string"
           },
           "locationId": {
-            "type": "string",
+            "type": "integer",
             "format": "int64"
           },
           "id": {
