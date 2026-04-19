@@ -38,6 +38,16 @@ export default function Header() {
             </Link>
           </RoleGuard>
 
+          <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
+            <Link
+              to="/pool-klamotten"
+              className="nav-link"
+              activeProps={{ className: "nav-link is-active" }}
+            >
+              Pool Klamotten
+            </Link>
+          </RoleGuard>
+
           <RoleGuard allowedRoles={["ADMIN"]} hideChildComponent={true}>
             <Link
               to="/user-management"
