@@ -80,8 +80,11 @@ function MobileMenu() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Navigationsmenü öffnen"
-          className="rounded-full border border-(--chip-line) bg-(--chip-bg) p-2 text-(--sea-ink) shadow-[0_8px_22px_rgba(30,90,72,0.08)] transition hover:-translate-y-0.5"
+          aria-label={
+            open ? "Navigationsmenü schließen" : "Navigationsmenü öffnen"
+          }
+          aria-expanded={open}
+          className="rounded-full border border-(--chip-line) bg-(--chip-bg) p-2 text-(--sea-ink) shadow-[0_8px_22px_rgba(30,90,72,0.08)] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <RenderIf when={open}>
             <X className="size-4" aria-hidden="true" />
