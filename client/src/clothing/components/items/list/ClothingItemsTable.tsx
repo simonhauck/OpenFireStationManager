@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from "lucide-react"
 import type { ClothingType } from "#/clothing/model/clothingType"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
+import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
 import { Button } from "#/components/ui/button"
@@ -13,11 +14,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 interface ClothingItemsTableProps {
   items: ClothingItem[]
   types: ClothingType[]
+  locations: ClothingLocation[]
 }
 
 export default function ClothingItemsTable({
   items,
   types,
+  locations,
 }: ClothingItemsTableProps) {
   const queryClient = useQueryClient()
   const { mutate: deleteItem } = useMutation(
@@ -26,6 +29,10 @@ export default function ClothingItemsTable({
 
   const typeNameById = new Map(
     types.map((type) => [String(type.id), type.name]),
+  )
+
+  const locationNameById = new Map(
+    locations.map((location) => [String(location.id), location.name]),
   )
 
   const columns: DataTableColumn<ClothingItem>[] = [
@@ -49,6 +56,14 @@ export default function ClothingItemsTable({
       id: "size",
       header: "Groesse",
       getValue: (item: ClothingItem) => item.size,
+    },
+    {
+      id: "location",
+      header: "Standort",
+      getValue: (item: ClothingItem) =>
+        item.locationId != null
+          ? (locationNameById.get(String(item.locationId)) ?? "-")
+          : "-",
     },
     {
       id: "createdAt",

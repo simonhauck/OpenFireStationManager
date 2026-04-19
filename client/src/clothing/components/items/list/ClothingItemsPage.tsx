@@ -1,5 +1,6 @@
 import ClothingItemsTable from "#/clothing/components/items/list/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
+import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import CreateWithImportButton from "#/components/base/CreateWithImportButton"
 import ErrorState from "#/components/base/ErrorState"
@@ -25,11 +26,18 @@ export default function ClothingItemsPage() {
     isLoading: isLoadingTypes,
     isError: isTypesError,
   } = useClothingTypes()
+  const {
+    data: clothingLocations,
+    isLoading: isLoadingLocations,
+    isError: isLocationsError,
+  } = useClothingLocations()
 
-  const isLoading = isLoadingItems || isLoadingTypes
-  const isError = isItemsError || isTypesError
+  const isLoading = isLoadingItems || isLoadingTypes || isLoadingLocations
+  const isError = isItemsError || isTypesError || isLocationsError
   const canRenderTable =
-    clothingItems !== undefined && clothingTypes !== undefined
+    clothingItems !== undefined &&
+    clothingTypes !== undefined &&
+    clothingLocations !== undefined
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
@@ -65,6 +73,7 @@ export default function ClothingItemsPage() {
             <ClothingItemsTable
               items={clothingItems ?? []}
               types={clothingTypes!}
+              locations={clothingLocations!}
             />
           </RenderIf>
         </CardContent>

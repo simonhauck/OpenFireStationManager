@@ -8,6 +8,7 @@ import {
   updateClothingItemMutation,
 } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
@@ -21,6 +22,13 @@ import {
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "#/components/ui/select"
 import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
 
 type ClothingItemFormProps = {
@@ -40,8 +48,12 @@ export default function ClothingItemForm({
   )
   const [size, setSize] = useState(existingItem?.size ?? "")
   const [barcode, setBarcode] = useState(existingItem?.barcode ?? "")
+  const [locationId, setLocationId] = useState<string>(
+    existingItem?.locationId ?? "",
+  )
 
   const { data: clothingTypes } = useClothingTypes()
+  const { data: clothingLocations } = useClothingLocations()
 
   const {
     mutate: createItem,
@@ -79,6 +91,7 @@ export default function ClothingItemForm({
       typeId,
       size,
       barcode: barcode,
+      ...(locationId !== "" ? { locationId: { id: Number(locationId) } } : {}),
     }
 
     if (isEditing) {
@@ -103,6 +116,7 @@ export default function ClothingItemForm({
   }
 
   const types = clothingTypes ?? []
+  const locations = clothingLocations ?? []
 
   return (
     <main className="page-wrap px-4 py-12">
@@ -156,6 +170,26 @@ export default function ClothingItemForm({
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="location">Standort (optional)</Label>
+              <Select
+                value={locationId}
+                onValueChange={(val) => setLocationId(val === "__none__" ? "" : val)}
+              >
+                <SelectTrigger id="location">
+                  <SelectValue placeholder="Kein Standort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Kein Standort</SelectItem>
+                  {locations.map((location) => (
+                    <SelectItem key={location.id} value={String(location.id)}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <RenderIf when={errorMessage !== null}>
