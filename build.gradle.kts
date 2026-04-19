@@ -10,13 +10,13 @@ spotless {
 
     json {
         target("**/*.json")
-        targetExclude("client/**", "server/**", "build/**", ".gradle/**")
+        targetExclude("client/**", "server/**","conventions", "build/**", ".gradle/**")
         prettier()
     }
 
     yaml {
         target("**/*.yml", "**/*.yaml")
-        targetExclude("client/**", "server/**", "build/**", ".gradle/**")
+        targetExclude("client/**", "server/**", "conventions","build/**", ".gradle/**")
         prettier()
     }
 }
