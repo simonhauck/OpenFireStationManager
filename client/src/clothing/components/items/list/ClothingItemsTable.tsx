@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { useMemo } from "react"
 import { Pencil, Trash2 } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
@@ -27,12 +28,15 @@ export default function ClothingItemsTable({
     deleteClothingItemMutation(queryClient),
   )
 
-  const typeNameById = new Map(
-    types.map((type) => [String(type.id), type.name]),
+  const typeNameById = useMemo(
+    () => new Map(types.map((type) => [String(type.id), type.name])),
+    [types],
   )
 
-  const locationNameById = new Map(
-    locations.map((location) => [String(location.id), location.name]),
+  const locationNameById = useMemo(
+    () =>
+      new Map(locations.map((location) => [String(location.id), location.name])),
+    [locations],
   )
 
   const columns: DataTableColumn<ClothingItem>[] = [

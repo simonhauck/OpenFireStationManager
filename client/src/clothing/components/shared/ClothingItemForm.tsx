@@ -31,6 +31,8 @@ import {
 } from "#/components/ui/select"
 import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
 
+const NO_LOCATION_VALUE = "__none__"
+
 type ClothingItemFormProps = {
   existingItem?: ClothingItem
 }
@@ -176,13 +178,13 @@ export default function ClothingItemForm({
               <Label htmlFor="location">Standort (optional)</Label>
               <Select
                 value={locationId}
-                onValueChange={(val) => setLocationId(val === "__none__" ? "" : val)}
+                onValueChange={(val) => setLocationId(val === NO_LOCATION_VALUE ? "" : val)}
               >
                 <SelectTrigger id="location">
                   <SelectValue placeholder="Kein Standort" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">Kein Standort</SelectItem>
+                  <SelectItem value={NO_LOCATION_VALUE}>Kein Standort</SelectItem>
                   {locations.map((location) => (
                     <SelectItem key={location.id} value={String(location.id)}>
                       {location.name}
