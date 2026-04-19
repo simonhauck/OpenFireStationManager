@@ -34,8 +34,7 @@ export default function ClothingItemsTable({
   )
 
   const locationNameById = useMemo(
-    () =>
-      new Map(locations.map((location) => [String(location.id), location.name])),
+    () => new Map(locations.map((location) => [location.id, location.name])),
     [locations],
   )
 
@@ -66,7 +65,7 @@ export default function ClothingItemsTable({
       header: "Standort",
       getValue: (item: ClothingItem) =>
         item.locationId != null
-          ? (locationNameById.get(String(item.locationId)) ?? "-")
+          ? (locationNameById.get(item.locationId) ?? "-")
           : "-",
     },
     {
