@@ -45,10 +45,9 @@ export const getClothingLocationByIdQuery = (id: number) =>
   queryOptions({
     queryKey: queryKeys.clothingLocation(id),
     queryFn: async (): Promise<ClothingLocation> => {
-      const { data, error } = await client.GET(
-        "/api/clothing/locations/{id}",
-        { params: { path: { id } } },
-      )
+      const { data, error } = await client.GET("/api/clothing/locations/{id}", {
+        params: { path: { id } },
+      })
       return ensureData(data, error, "GET /api/clothing/locations/{id}")
     },
   })
