@@ -85,8 +85,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
             authCookie = validCookieHeader,
         )
 
-        val response =
-            overviewCalls.getDashboardLocationSummaries(authCookie = validCookieHeader)
+        val response = overviewCalls.getDashboardLocationSummaries(authCookie = validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 

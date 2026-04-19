@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class ClothingOverviewControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
-    fun getSummariesByType(
-        authCookie: String? = null
-    ): ResponseEntity<Array<ClothingTypeSummary>> {
+    fun getSummariesByType(authCookie: String? = null): ResponseEntity<Array<ClothingTypeSummary>> {
         return testRestTemplate.exchange<Array<ClothingTypeSummary>>(
             "/api/clothing/overview/summary/type",
             HttpMethod.GET,

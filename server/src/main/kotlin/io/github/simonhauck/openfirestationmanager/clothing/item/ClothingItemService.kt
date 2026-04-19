@@ -34,14 +34,15 @@ class ClothingItemService(private val repository: ClothingItemRepository) {
 
         checkBarcodesNotAlreadyKnown(barcodes)
 
-        val entities = requests.map { req ->
-            ClothingItem(
-                typeId = AggregateReference.to(req.typeId),
-                size = req.size,
-                barcode = req.barcodeSanitized(),
-                locationId = req.locationId,
-            )
-        }
+        val entities =
+            requests.map { req ->
+                ClothingItem(
+                    typeId = AggregateReference.to(req.typeId),
+                    size = req.size,
+                    barcode = req.barcodeSanitized(),
+                    locationId = req.locationId,
+                )
+            }
         return repository.saveAll(entities)
     }
 
