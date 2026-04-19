@@ -102,18 +102,18 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
           <TableRow>
             <TableCell>
               <div className="flex flex-wrap gap-2">
-                {Object.entries(summary.sizeCounts)
-                  .sort(([sizeA], [sizeB]) => sizeA.localeCompare(sizeB, "de"))
-                  .map(([size, count]) => (
+                {[...summary.sizeCounts]
+                  .sort((a, b) => a.size.localeCompare(b.size, "de"))
+                  .map(({ size, count }) => (
                     <Badge
                       key={`${summary.locationId}-${size}`}
                       variant="outline"
                     >
-                      {size}: {Number(count)}
+                      {size}: {count}
                     </Badge>
                   ))}
 
-                <RenderIf when={Object.keys(summary.sizeCounts).length === 0}>
+                <RenderIf when={summary.sizeCounts.length === 0}>
                   <span className="text-muted-foreground text-sm">
                     Keine Kleidungsstuecke vorhanden.
                   </span>

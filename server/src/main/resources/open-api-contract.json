@@ -1059,6 +1059,19 @@
         },
         "required" : [ "authenticated" ]
       },
+      "SizeSummary" : {
+        "type" : "object",
+        "properties" : {
+          "size" : {
+            "type" : "string"
+          },
+          "count" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "count", "size" ]
+      },
       "ClothingLocationSizeSummary" : {
         "type" : "object",
         "properties" : {
@@ -1070,10 +1083,9 @@
             "type" : "string"
           },
           "sizeCounts" : {
-            "type" : "object",
-            "additionalProperties" : {
-              "type" : "integer",
-              "format" : "int64"
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SizeSummary"
             }
           }
         },
@@ -1090,10 +1102,9 @@
             "type" : "string"
           },
           "sizeCounts" : {
-            "type" : "object",
-            "additionalProperties" : {
-              "type" : "integer",
-              "format" : "int64"
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SizeSummary"
             }
           }
         },

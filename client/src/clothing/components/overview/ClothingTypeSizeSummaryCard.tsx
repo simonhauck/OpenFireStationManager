@@ -66,20 +66,18 @@ export default function ClothingTypeSizeSummaryCard({
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-2">
-                      {Object.entries(entry.sizeCounts)
-                        .sort(([sizeA], [sizeB]) =>
-                          sizeA.localeCompare(sizeB, "de"),
-                        )
-                        .map(([size, count]) => (
+                      {[...entry.sizeCounts]
+                        .sort((a, b) => a.size.localeCompare(b.size, "de"))
+                        .map(({ size, count }) => (
                           <Badge
                             key={`${entry.typeId}-${size}`}
                             variant="outline"
                           >
-                            {size}: {Number(count)}
+                            {size}: {count}
                           </Badge>
                         ))}
 
-                      {Object.keys(entry.sizeCounts).length === 0 && (
+                      {entry.sizeCounts.length === 0 && (
                         <span className="text-muted-foreground text-sm">
                           Keine Kleidungsstuecke vorhanden.
                         </span>

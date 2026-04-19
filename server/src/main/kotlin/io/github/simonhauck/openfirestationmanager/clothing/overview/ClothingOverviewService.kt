@@ -24,8 +24,9 @@ class ClothingOverviewService(
                         .filter { item -> item.typeId.id == type.id }
                         .groupingBy { item -> item.size }
                         .eachCount()
-                        .mapValues { (_, count) -> count.toLong() }
-                        .toSortedMap()
+                        .entries
+                        .sortedBy { it.key }
+                        .map { (size, count) -> SizeSummary(size = size, count = count) }
 
                 ClothingTypeSizeSummary(
                     typeId = type.id,
@@ -48,8 +49,9 @@ class ClothingOverviewService(
                         .filter { item -> item.locationId?.id == location.id }
                         .groupingBy { item -> item.size }
                         .eachCount()
-                        .mapValues { (_, count) -> count.toLong() }
-                        .toSortedMap()
+                        .entries
+                        .sortedBy { it.key }
+                        .map { (size, count) -> SizeSummary(size = size, count = count) }
 
                 ClothingLocationSizeSummary(
                     locationId = location.id,

@@ -49,7 +49,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
         val summaryForType = response.body?.firstOrNull { it.typeId == type.id }
         assertThat(summaryForType).isNotNull
         assertThat(summaryForType?.typeName).isEqualTo(summaryTypeName)
-        assertThat(summaryForType?.sizeCounts).containsEntry("M", 2).containsEntry("L", 1)
+        assertThat(summaryForType?.sizeCounts).contains(SizeSummary("M", 2)).contains(SizeSummary("L", 1))
     }
 
     @Test
@@ -94,7 +94,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
         val summaryForLocation = response.body?.firstOrNull { it.locationId == dashboardLocation.id }
         assertThat(summaryForLocation).isNotNull
         assertThat(summaryForLocation?.locationName).isEqualTo(dashboardLocation.name)
-        assertThat(summaryForLocation?.sizeCounts).containsEntry("M", 2).containsEntry("L", 1)
+        assertThat(summaryForLocation?.sizeCounts).contains(SizeSummary("M", 2)).contains(SizeSummary("L", 1))
     }
 
     private fun createLocation(

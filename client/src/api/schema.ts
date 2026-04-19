@@ -395,21 +395,22 @@ export interface components {
       authenticated: boolean
       user?: components["schemas"]["UserAccount"]
     }
+    SizeSummary: {
+      size: string
+      /** Format: int32 */
+      count: number
+    }
     ClothingLocationSizeSummary: {
       /** Format: int64 */
       locationId: number
       locationName: string
-      sizeCounts: {
-        [key: string]: number
-      }
+      sizeCounts: components["schemas"]["SizeSummary"][]
     }
     ClothingTypeSizeSummary: {
       /** Format: int64 */
       typeId: number
       typeName: string
-      sizeCounts: {
-        [key: string]: number
-      }
+      sizeCounts: components["schemas"]["SizeSummary"][]
     }
   }
   responses: never
