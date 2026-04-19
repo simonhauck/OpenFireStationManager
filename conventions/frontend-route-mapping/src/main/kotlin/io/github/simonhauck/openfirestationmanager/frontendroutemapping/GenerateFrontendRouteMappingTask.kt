@@ -7,13 +7,13 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -25,9 +25,9 @@ abstract class GenerateFrontendRouteMappingTask : DefaultTask() {
     @get:Inject abstract val fileSystemOperations: FileSystemOperations
 
     @get:Optional
-    @get:InputFile
+    @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val routeTreeFile: RegularFileProperty
+    abstract val routeTreeFiles: ConfigurableFileCollection
 
     @get:Input abstract val generatedPackage: Property<String>
 
@@ -39,7 +39,7 @@ abstract class GenerateFrontendRouteMappingTask : DefaultTask() {
     fun generate() {
         clearOutputDirectory()
 
-        val routeTree = routeTreeFile.orNull?.asFile
+        val routeTree = routeTreeFiles.files.firstOrNull { it.exists() }
         val routes =
             if (routeTree != null && routeTree.exists()) {
                 RouteTreeParser.parseRoutes(routeTree.readText())

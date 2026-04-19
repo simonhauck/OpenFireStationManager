@@ -22,7 +22,7 @@ class FrontendRouteMappingPlugin : Plugin<Project> {
                 "generateFrontendRouteMapping",
                 GenerateFrontendRouteMappingTask::class.java,
             ) { task ->
-                task.routeTreeFile.set(extension.routeTreeFile)
+                task.routeTreeFiles.from(extension.routeTreeFile)
                 task.generatedPackage.set(extension.generatedPackage)
                 task.generatedControllerClassName.set(extension.generatedControllerClassName)
                 task.outputDirectory.set(
