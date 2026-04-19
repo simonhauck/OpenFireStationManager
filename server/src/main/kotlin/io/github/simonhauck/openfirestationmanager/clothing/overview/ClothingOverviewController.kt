@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/clothing/overview")
 class ClothingOverviewController(private val service: ClothingOverviewService) {
 
+    @GetMapping("/summary")
+    @Operation(summary = "List clothing item counts by type and size")
+    fun getSummaryByTypeAndSize(): List<ClothingTypeSizeSummary> = service.getSummaryByTypeAndSize()
+
     @GetMapping
     @Operation(summary = "Get clothing availability overview for dashboard locations")
     fun getOverview(): List<ClothingLocationSizeSummary> =

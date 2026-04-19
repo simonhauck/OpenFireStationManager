@@ -11,6 +11,16 @@ import org.springframework.stereotype.Component
 @Component
 class ClothingOverviewControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
+    fun getSummaryByTypeAndSize(
+        authCookie: String? = null
+    ): ResponseEntity<Array<ClothingTypeSizeSummary>> {
+        return testRestTemplate.exchange<Array<ClothingTypeSizeSummary>>(
+            "/api/clothing/overview/summary",
+            HttpMethod.GET,
+            HttpEntity<Unit>(headersWithCookie(authCookie)),
+        )
+    }
+
     fun getOverview(
         authCookie: String? = null
     ): ResponseEntity<Array<ClothingLocationSizeSummary>> {

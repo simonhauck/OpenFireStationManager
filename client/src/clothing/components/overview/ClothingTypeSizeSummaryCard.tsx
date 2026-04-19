@@ -1,4 +1,4 @@
-import type { ClothingTypeSizeSummary } from "#/clothing/service/clothingItemsQueries"
+import type { ClothingTypeSizeSummary } from "#/clothing/service/clothingOverviewQueries"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"

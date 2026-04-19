@@ -26,6 +26,33 @@ class ClothingOverviewControllerIT : IntegrationTest() {
     @Autowired private lateinit var locationCalls: ClothingLocationControllerCalls
 
     @Test
+    fun `getSummaryByTypeAndSize should group counts by clothing type and size`() {
+        val summaryTypeName = "Summary-Type-${System.nanoTime()}"
+        val type = createType(summaryTypeName)
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
+            authCookie = validCookieHeader,
+        )
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
+            authCookie = validCookieHeader,
+        )
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "L"),
+            authCookie = validCookieHeader,
+        )
+
+        val response = overviewCalls.getSummaryByTypeAndSize(authCookie = validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+
+        val summaryForType = response.body?.firstOrNull { it.typeId == type.id }
+        assertThat(summaryForType).isNotNull
+        assertThat(summaryForType?.typeName).isEqualTo(summaryTypeName)
+        assertThat(summaryForType?.sizeCounts).containsEntry("M", 2).containsEntry("L", 1)
+    }
+
+    @Test
     fun `getOverview should return size counts grouped by size for dashboard locations only`() {
         val type = createType()
         val dashboardLocation = createLocation(shouldBeShownOnDashboard = true)

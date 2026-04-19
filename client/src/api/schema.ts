@@ -277,7 +277,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clothing/items/summary": {
+  "/api/clothing/overview/summary": {
     parameters: {
       query?: never
       header?: never

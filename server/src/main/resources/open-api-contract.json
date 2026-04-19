@@ -713,9 +713,9 @@
         }
       }
     },
-    "/api/clothing/items/summary" : {
+    "/api/clothing/overview/summary" : {
       "get" : {
-        "tags" : [ "clothing-item-controller" ],
+        "tags" : [ "clothing-overview-controller" ],
         "summary" : "List clothing item counts by type and size",
         "operationId" : "getSummaryByTypeAndSize",
         "responses" : {
@@ -929,12 +929,12 @@
         },
         "required" : [ "items" ]
       },
-      "CreateOrUpdateClothingItemRequest": {
-        "type": "object",
-        "properties": {
-          "typeId": {
-            "type": "integer",
-            "format": "int64"
+      "CreateOrUpdateClothingItemRequest" : {
+        "type" : "object",
+        "properties" : {
+          "typeId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
           "size" : {
             "type" : "string",
@@ -946,19 +946,19 @@
             "maxLength" : 255,
             "minLength" : 0
           },
-          "locationId": {
-            "type": "integer",
-            "format": "int64"
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         },
         "required" : [ "size", "typeId" ]
       },
-      "ClothingItem": {
-        "type": "object",
-        "properties": {
-          "typeId": {
-            "type": "integer",
-            "format": "int64"
+      "ClothingItem" : {
+        "type" : "object",
+        "properties" : {
+          "typeId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
           "size" : {
             "type" : "string"
@@ -966,9 +966,9 @@
           "barcode" : {
             "type" : "string"
           },
-          "locationId": {
-            "type": "integer",
-            "format": "int64"
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
           "id" : {
             "type" : "integer",
