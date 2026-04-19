@@ -4,7 +4,6 @@ import { useState } from "react"
 
 import ClothingTypeForm from "#/clothing/components/shared/ClothingTypeForm"
 import { createClothingTypeMutation } from "#/clothing/service/clothingTypesQueries"
-import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import RoleGuard from "#/components/base/RoleGuard"
 
 export default function CreateClothingTypePage() {

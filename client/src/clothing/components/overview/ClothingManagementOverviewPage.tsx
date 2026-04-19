@@ -55,13 +55,15 @@ export default function ClothingManagementOverviewPage() {
             { label: "Klamotten Management" },
           ]}
         />
-        <ClothingManagementSubNavigation entries={overviewEntries} />
+        <div className="space-y-6">
+          <ClothingManagementSubNavigation entries={overviewEntries} />
 
-        <ClothingTypeSizeSummaryCard
-          summary={summary}
-          isLoading={isLoading}
-          isError={isError}
-        />
+          <ClothingTypeSizeSummaryCard
+            summary={summary}
+            isLoading={isLoading}
+            isError={isError}
+          />
+        </div>
       </div>
     </RoleGuard>
   )
