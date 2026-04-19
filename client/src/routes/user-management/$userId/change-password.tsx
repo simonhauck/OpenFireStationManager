@@ -3,6 +3,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
 import { changePasswordMutation, getUserByIdQuery } from "#/api/users.queries"
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RoleGuard from "#/components/base/RoleGuard"
@@ -109,6 +110,13 @@ function ChangePasswordPageContent() {
 
   return (
     <>
+      <AppBreadcrumb
+        items={[
+          { label: "Startseite", to: "/" },
+          { label: "Nutzermanagement", to: "/user-management" },
+          { label: "Passwort ändern" },
+        ]}
+      />
       <Card className="mx-auto w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Passwort ändern</CardTitle>

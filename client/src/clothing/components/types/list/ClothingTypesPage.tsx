@@ -4,6 +4,7 @@ import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import ClothingTypesTable from "#/clothing/components/types/list/ClothingTypesTable"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import { Button } from "#/components/ui/button"
@@ -28,34 +29,43 @@ function ClothingTypesPageContent() {
   const canRenderTable = clothingTypes !== undefined
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <CardTitle>Klamottenmanagement</CardTitle>
-            <CardDescription>Kleidungstypen</CardDescription>
+    <div className="space-y-4">
+      <AppBreadcrumb
+        items={[
+          { label: "Startseite", to: "/" },
+          { label: "Klamotten Management", to: "/clothing-management" },
+          { label: "Kleidungstypen" },
+        ]}
+      />
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Klamottenmanagement</CardTitle>
+              <CardDescription>Kleidungstypen</CardDescription>
+            </div>
+            <Button asChild>
+              <Link to="/clothing-management/types/new">
+                Kleidungstyp erstellen
+              </Link>
+            </Button>
           </div>
-          <Button asChild>
-            <Link to="/clothing-management/types/new">
-              Kleidungstyp erstellen
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardContent className="space-y-4">
-        <RenderIf when={isLoading}>
-          <LoadingIndicator label="Kleidungstypen werden geladen..." />
-        </RenderIf>
+        <CardContent className="space-y-4">
+          <RenderIf when={isLoading}>
+            <LoadingIndicator label="Kleidungstypen werden geladen..." />
+          </RenderIf>
 
-        <RenderIf when={isError}>
-          <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
-        </RenderIf>
+          <RenderIf when={isError}>
+            <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
+          </RenderIf>
 
-        <RenderIf when={canRenderTable}>
-          <ClothingTypesTable types={clothingTypes!} />
-        </RenderIf>
-      </CardContent>
-    </Card>
+          <RenderIf when={canRenderTable}>
+            <ClothingTypesTable types={clothingTypes!} />
+          </RenderIf>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

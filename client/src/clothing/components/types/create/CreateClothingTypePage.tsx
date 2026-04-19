@@ -4,6 +4,7 @@ import { useState } from "react"
 
 import ClothingTypeForm from "#/clothing/components/shared/ClothingTypeForm"
 import { createClothingTypeMutation } from "#/clothing/service/clothingTypesQueries"
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import RoleGuard from "#/components/base/RoleGuard"
 
 export default function CreateClothingTypePage() {
@@ -40,6 +41,12 @@ function CreateClothingTypePageContent() {
 
   return (
     <ClothingTypeForm
+      breadcrumbItems={[
+        { label: "Startseite", to: "/" },
+        { label: "Klamotten Management", to: "/clothing-management" },
+        { label: "Kleidungstypen", to: "/clothing-management/types" },
+        { label: "Erstellen" },
+      ]}
       title="Kleidungstyp erstellen"
       description="Erfassen Sie die Daten fuer einen neuen Kleidungstyp."
       name={name}

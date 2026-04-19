@@ -1,22 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router"
 
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
+
 export const Route = createFileRoute("/about")({
   component: About,
 })
 
 function About() {
   return (
-    <section className="island-shell rounded-2xl p-6 sm:p-8">
-      <p className="island-kicker mb-2">Über das Projekt</p>
-      <h1 className="display-title mb-3 text-4xl font-bold text-(--sea-ink) sm:text-5xl">
-        OpenFireStationManager
-      </h1>
-      <p className="m-0 max-w-3xl text-base leading-8 text-(--sea-ink-soft)">
-        OpenFireStationManager ist eine browserbasierte Open-Source-Plattform
-        zur Verwaltung von Feuerwehrstationen. Das Projekt bietet eine sichere
-        Nutzerverwaltung, rollenbasierten Zugriff und eine erweiterbare
-        Grundlage für Einsatzplanung und Berichtswesen.
-      </p>
-    </section>
+    <div className="space-y-4">
+      <AppBreadcrumb
+        items={[{ label: "Startseite", to: "/" }, { label: "Über uns" }]}
+      />
+      <section className="island-shell rounded-2xl p-6 sm:p-8">
+        <p className="island-kicker mb-2">Über das Projekt</p>
+        <h1 className="display-title mb-3 text-4xl font-bold text-(--sea-ink) sm:text-5xl">
+          OpenFireStationManager
+        </h1>
+        <p className="m-0 max-w-3xl text-base leading-8 text-(--sea-ink-soft)">
+          OpenFireStationManager ist eine browserbasierte Open-Source-Plattform
+          zur Verwaltung von Feuerwehrstationen. Das Projekt bietet eine sichere
+          Nutzerverwaltung, rollenbasierten Zugriff und eine erweiterbare
+          Grundlage für Einsatzplanung und Berichtswesen.
+        </p>
+      </section>
+    </div>
   )
 }

@@ -79,6 +79,12 @@ function EditClothingTypePageContent() {
 
   return (
     <ClothingTypeForm
+      breadcrumbItems={[
+        { label: "Startseite", to: "/" },
+        { label: "Klamotten Management", to: "/clothing-management" },
+        { label: "Kleidungstypen", to: "/clothing-management/types" },
+        { label: "Bearbeiten" },
+      ]}
       title="Kleidungstyp bearbeiten"
       description="Bearbeiten Sie die Bezeichnung des Kleidungstyps."
       name={name}

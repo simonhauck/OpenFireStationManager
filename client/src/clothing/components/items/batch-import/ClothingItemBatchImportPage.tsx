@@ -5,6 +5,7 @@ import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { createBatchClothingItemsMutation } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import type { ClothingType } from "#/clothing/model/clothingType"
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
@@ -125,6 +126,17 @@ function ClothingItemBatchImportPageContent() {
 
   return (
     <main className="page-wrap space-y-6 px-4 py-12">
+      <AppBreadcrumb
+        items={[
+          { label: "Startseite", to: "/" },
+          { label: "Klamotten Management", to: "/clothing-management" },
+          {
+            label: "Kleidungsstücke",
+            to: "/clothing-management/items",
+          },
+          { label: "Massenimport" },
+        ]}
+      />
       <Card className="mx-auto w-full max-w-3xl">
         <CardHeader>
           <CardTitle>Massenimport von Kleidungsstuecken</CardTitle>

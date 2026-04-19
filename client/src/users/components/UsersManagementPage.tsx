@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RoleGuard from "#/components/base/RoleGuard"
@@ -26,26 +27,34 @@ function UsersManagementPageContent() {
   const { data: users, isLoading, isError } = useUsers()
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <CardTitle>Nutzermanagement</CardTitle>
-            <CardDescription>Nutzer und Rollen</CardDescription>
+    <div className="space-y-4">
+      <AppBreadcrumb
+        items={[
+          { label: "Startseite", to: "/" },
+          { label: "Nutzermanagement" },
+        ]}
+      />
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Nutzermanagement</CardTitle>
+              <CardDescription>Nutzer und Rollen</CardDescription>
+            </div>
+            <Button asChild>
+              <Link to="/user-management/new">Nutzer erstellen</Link>
+            </Button>
           </div>
-          <Button asChild>
-            <Link to="/user-management/new">Nutzer erstellen</Link>
-          </Button>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardContent className="space-y-4">
-        {isLoading && <LoadingIndicator label="Nutzer werden geladen..." />}
+        <CardContent className="space-y-4">
+          {isLoading && <LoadingIndicator label="Nutzer werden geladen..." />}
 
-        {isError && <ErrorState message="Fehler beim Laden der Nutzer." />}
+          {isError && <ErrorState message="Fehler beim Laden der Nutzer." />}
 
-        {users && <UsersTable users={users} />}
-      </CardContent>
-    </Card>
+          {users && <UsersTable users={users} />}
+        </CardContent>
+      </Card>
+    </div>
   )
 }

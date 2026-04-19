@@ -8,6 +8,7 @@ import {
   updateClothingItemMutation,
 } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
@@ -106,73 +107,86 @@ export default function ClothingItemForm({
 
   return (
     <main className="page-wrap px-4 py-12">
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Kleidungstyp</Label>
-              <RenderIf when={types.length === 0}>
-                <p className="text-sm text-muted-foreground">
-                  Keine Kleidungstypen vorhanden.
-                </p>
+      <div className="mx-auto w-full max-w-2xl space-y-4">
+        <AppBreadcrumb
+          items={[
+            { label: "Startseite", to: "/" },
+            { label: "Klamotten Management", to: "/clothing-management" },
+            {
+              label: "Kleidungsstücke",
+              to: "/clothing-management/items",
+            },
+            { label: isEditing ? "Bearbeiten" : "Erstellen" },
+          ]}
+        />
+        <Card>
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>{description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label>Kleidungstyp</Label>
+                <RenderIf when={types.length === 0}>
+                  <p className="text-sm text-muted-foreground">
+                    Keine Kleidungstypen vorhanden.
+                  </p>
+                </RenderIf>
+                <RenderIf when={types.length > 0}>
+                  <RadioGroup
+                    value={typeId !== null ? String(typeId) : ""}
+                    onValueChange={(val) => setTypeId(Number(val))}
+                    className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+                  >
+                    {types.map((type) => (
+                      <div key={type.id} className="flex items-center gap-2">
+                        <RadioGroupItem
+                          value={String(type.id)}
+                          id={`type-${type.id}`}
+                        />
+                        <Label htmlFor={`type-${type.id}`}>{type.name}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </RenderIf>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="size">Groesse</Label>
+                <Input
+                  id="size"
+                  required
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="barcode">Barcode (optional)</Label>
+                <Input
+                  id="barcode"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                />
+              </div>
+
+              <RenderIf when={errorMessage !== null}>
+                <ErrorState message={errorMessage!} />
               </RenderIf>
-              <RenderIf when={types.length > 0}>
-                <RadioGroup
-                  value={typeId !== null ? String(typeId) : ""}
-                  onValueChange={(val) => setTypeId(Number(val))}
-                  className="grid grid-cols-2 gap-2 sm:grid-cols-3"
-                >
-                  {types.map((type) => (
-                    <div key={type.id} className="flex items-center gap-2">
-                      <RadioGroupItem
-                        value={String(type.id)}
-                        id={`type-${type.id}`}
-                      />
-                      <Label htmlFor={`type-${type.id}`}>{type.name}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </RenderIf>
-            </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="size">Groesse</Label>
-              <Input
-                id="size"
-                required
-                value={size}
-                onChange={(e) => setSize(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="barcode">Barcode (optional)</Label>
-              <Input
-                id="barcode"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
-              />
-            </div>
-
-            <RenderIf when={errorMessage !== null}>
-              <ErrorState message={errorMessage!} />
-            </RenderIf>
-
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/clothing-management/items">Abbrechen</Link>
-              </Button>
-              <Button type="submit" disabled={isPending || typeId === null}>
-                {isPending ? pendingLabel : submitLabel}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="flex flex-wrap justify-end gap-2 pt-2">
+                <Button type="button" variant="outline" asChild>
+                  <Link to="/clothing-management/items">Abbrechen</Link>
+                </Button>
+                <Button type="submit" disabled={isPending || typeId === null}>
+                  {isPending ? pendingLabel : submitLabel}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </main>
   )
 }

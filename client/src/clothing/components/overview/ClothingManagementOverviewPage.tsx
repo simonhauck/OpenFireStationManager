@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router"
 
 import ClothingTypeSizeSummaryCard from "#/clothing/components/overview/ClothingTypeSizeSummaryCard"
 import { useClothingTypeSizeSummary } from "#/clothing/service/clothingItemsQueries"
+import AppBreadcrumb from "#/components/base/AppBreadcrumb"
 import RoleGuard from "#/components/base/RoleGuard"
 import {
   Card,
@@ -47,7 +48,13 @@ export default function ClothingManagementOverviewPage() {
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
-      <div className="space-y-6">
+      <div className="space-y-4">
+        <AppBreadcrumb
+          items={[
+            { label: "Startseite", to: "/" },
+            { label: "Klamotten Management" },
+          ]}
+        />
         <ClothingManagementSubNavigation entries={overviewEntries} />
 
         <ClothingTypeSizeSummaryCard
