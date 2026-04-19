@@ -89,38 +89,54 @@ interface LocationSizeSummaryTableProps {
 }
 
 function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
+  const typeSummaries = [...summary.types].sort((a, b) =>
+    a.typeName.localeCompare(b.typeName, "de"),
+  )
+
   return (
     <div className="space-y-2">
       <h3 className="font-semibold">{summary.locationName}</h3>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Kleidungstyp</TableHead>
             <TableHead>Groessen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>
-              <div className="flex flex-wrap gap-2">
-                {[...summary.sizeCounts]
-                  .sort((a, b) => a.size.localeCompare(b.size, "de"))
-                  .map(({ size, count }) => (
-                    <Badge
-                      key={`${summary.locationId}-${size}`}
-                      variant="outline"
-                    >
-                      {size}: {count}
-                    </Badge>
-                  ))}
+          {typeSummaries.map((typeSummary) => (
+            <TableRow key={`${summary.locationId}-${typeSummary.typeId}`}>
+              <TableCell className="font-medium">{typeSummary.typeName}</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-2">
+                  {[...typeSummary.sizeCounts]
+                    .sort((a, b) => a.size.localeCompare(b.size, "de"))
+                    .map(({ size, count }) => (
+                      <Badge
+                        key={`${summary.locationId}-${typeSummary.typeId}-${size}`}
+                        variant="outline"
+                      >
+                        {size}: {count}
+                      </Badge>
+                    ))}
 
-                <RenderIf when={summary.sizeCounts.length === 0}>
-                  <span className="text-muted-foreground text-sm">
-                    Keine Kleidungsstuecke vorhanden.
-                  </span>
-                </RenderIf>
-              </div>
-            </TableCell>
-          </TableRow>
+                  <RenderIf when={typeSummary.sizeCounts.length === 0}>
+                    <span className="text-muted-foreground text-sm">
+                      Keine Kleidungsstuecke vorhanden.
+                    </span>
+                  </RenderIf>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+
+          <RenderIf when={typeSummaries.length === 0}>
+            <TableRow>
+              <TableCell colSpan={2} className="text-muted-foreground text-sm">
+                Keine Kleidungstypen vorhanden.
+              </TableCell>
+            </TableRow>
+          </RenderIf>
         </TableBody>
       </Table>
     </div>

@@ -26,7 +26,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
     @Autowired private lateinit var locationCalls: ClothingLocationControllerCalls
 
     @Test
-    fun `getSummaryByTypeAndSize should group counts by clothing type and size`() {
+    fun `getSummariesByType should group counts by clothing type and size`() {
         val summaryTypeName = "Summary-Type-${System.nanoTime()}"
         val type = createType(summaryTypeName)
         itemCalls.createItem(
@@ -42,7 +42,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
             authCookie = validCookieHeader,
         )
 
-        val response = overviewCalls.getSummaryByTypeAndSize(authCookie = validCookieHeader)
+        val response = overviewCalls.getSummariesByType(authCookie = validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 
@@ -55,7 +55,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `getOverview should return size counts grouped by size for dashboard locations only`() {
+    fun `getDashboardLocationSummaries should return type and size summaries for dashboard locations only`() {
         val type = createType()
         val dashboardLocation = createLocation(shouldBeShownOnDashboard = true)
         val hiddenLocation = createLocation(shouldBeShownOnDashboard = false)
@@ -85,7 +85,8 @@ class ClothingOverviewControllerIT : IntegrationTest() {
             authCookie = validCookieHeader,
         )
 
-        val response = overviewCalls.getOverview(authCookie = validCookieHeader)
+        val response =
+            overviewCalls.getDashboardLocationSummaries(authCookie = validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 
@@ -97,7 +98,10 @@ class ClothingOverviewControllerIT : IntegrationTest() {
             response.body?.firstOrNull { it.locationId == dashboardLocation.id }
         assertThat(summaryForLocation).isNotNull
         assertThat(summaryForLocation?.locationName).isEqualTo(dashboardLocation.name)
-        assertThat(summaryForLocation?.sizeCounts)
+        val typeSummary = summaryForLocation?.types?.firstOrNull { it.typeId == type.id }
+        assertThat(typeSummary).isNotNull
+        assertThat(typeSummary?.typeName).isEqualTo(type.name)
+        assertThat(typeSummary?.sizeCounts)
             .contains(SizeSummary("M", 2))
             .contains(SizeSummary("L", 1))
     }
