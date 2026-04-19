@@ -14,9 +14,11 @@ import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
 data class CreateOrUpdateClothingItemRequest(
+    // TODO 19.04.26 - Simon.Hauck Conver the typeId also to an aggregate reference type
     @Positive val typeId: Long,
     @NotBlank @Size(max = 255) val size: String,
     @Size(max = 255) val barcode: String? = null,
+    @field:Schema(implementation = Long::class)
     val locationId: AggregateReference<ClothingLocation, Long>? = null,
 ) {
     fun barcodeSanitized(): String? {
@@ -35,11 +37,10 @@ data class ClothingTypeSizeSummary(
 
 @Table("clothing_items")
 data class ClothingItem(
-    @field:Schema(type = "integer", format = "int64")
-    val typeId: AggregateReference<ClothingType, Long>,
+    @field:Schema(implementation = Long::class) val typeId: AggregateReference<ClothingType, Long>,
     val size: String,
     val barcode: String? = null,
-    @field:Schema(type = "integer", format = "int64")
+    @field:Schema(implementation = Long::class)
     val locationId: AggregateReference<ClothingLocation, Long>? = null,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
