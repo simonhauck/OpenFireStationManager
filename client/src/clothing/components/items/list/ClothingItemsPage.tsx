@@ -1,14 +1,11 @@
-import { Link } from "@tanstack/react-router"
-import { Plus } from "lucide-react"
-
 import ClothingItemsTable from "#/clothing/components/items/list/ClothingItemsTable"
 import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import CreateWithImportButton from "#/components/base/CreateWithImportButton"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 import {
   Card,
   CardContent,
@@ -46,15 +43,11 @@ export default function ClothingItemsPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline">
-                <Link to="/clothing-management/items/new">
-                  <Plus className="size-4" />
-                  Kleidungsstueck erstellen
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link to="/clothing-management/items/batch">Massenimport</Link>
-              </Button>
+              <CreateWithImportButton
+                label="Neues Kleidungsstueck"
+                createTo="/clothing-management/items/new"
+                importTo="/clothing-management/items/batch"
+              />
             </div>
           </div>
         </CardHeader>

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -34,4 +35,19 @@ class ClothingLocationController(private val service: ClothingLocationService) {
     fun createLocation(
         @Valid @RequestBody request: CreateClothingLocationRequest
     ): ClothingLocation = service.createLocation(request)
+
+    @PostMapping("/batch")
+    @Operation(summary = "Create multiple clothing locations in a single request")
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
+    fun createBatchLocations(
+        @Valid @RequestBody request: BatchCreateClothingLocationsRequest
+    ): List<ClothingLocation> = service.createBatchLocations(request.items)
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "Update a clothing location")
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
+    fun updateLocation(
+        @Parameter(description = "ID of the clothing location") @PathVariable @Positive id: Long,
+        @Valid @RequestBody request: CreateClothingLocationRequest,
+    ): ClothingLocation = service.updateLocation(id, request)
 }

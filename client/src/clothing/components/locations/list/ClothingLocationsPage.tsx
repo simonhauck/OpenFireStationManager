@@ -1,5 +1,6 @@
 import ClothingLocationsTable from "#/clothing/components/locations/list/ClothingLocationsTable"
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
+import CreateWithImportButton from "#/components/base/CreateWithImportButton"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
@@ -20,8 +21,19 @@ export default function ClothingLocationsPage() {
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
       <Card>
         <CardHeader>
-          <CardTitle>Klamottenmanagement</CardTitle>
-          <CardDescription>Alle vorhandenen Standorte</CardDescription>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Klamottenmanagement</CardTitle>
+              <CardDescription>Alle vorhandenen Standorte</CardDescription>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <CreateWithImportButton
+                label="Neuen Standort"
+                createTo="/clothing-management/locations/new"
+                importTo="/clothing-management/locations/batch"
+              />
+            </div>
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-4">

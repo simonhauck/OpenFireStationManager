@@ -15,6 +15,8 @@ data class CreateClothingLocationRequest(
     val shouldBeShownOnDashboard: Boolean,
 )
 
+data class BatchCreateClothingLocationsRequest(val items: List<CreateClothingLocationRequest>)
+
 @Table("clothing_locations")
 data class ClothingLocation(
     val name: String,
