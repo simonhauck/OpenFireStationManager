@@ -38,8 +38,8 @@ data class ClothingItem(
     val locationId: AggregateReference<ClothingLocation, Long>? = null,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
-) : BaseEntity {
-    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
+) : BaseEntity<ClothingItem> {
+    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity<ClothingItem> {
         return copy(metaData = metaData)
     }
 }

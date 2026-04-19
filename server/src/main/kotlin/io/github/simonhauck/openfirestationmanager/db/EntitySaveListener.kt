@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class EntitySaveListener(private val currentUserProvider: CurrentUserProvider) :
-    BeforeSaveCallback<BaseEntity> {
+    BeforeSaveCallback<BaseEntity<*>> {
 
     override fun onBeforeSave(
-        aggregate: BaseEntity,
-        aggregateChange: MutableAggregateChange<BaseEntity>,
-    ): BaseEntity {
+        aggregate: BaseEntity<*>,
+        aggregateChange: MutableAggregateChange<BaseEntity<*>>,
+    ): BaseEntity<*> {
         val now = ZonedDateTime.now()
         val currentUser = currentUserProvider.getCurrentUser() ?: "System"
 

@@ -13,18 +13,16 @@ class ClothingOverviewControllerCalls(private val testRestTemplate: TestRestTemp
 
     fun getSummaryByTypeAndSize(
         authCookie: String? = null
-    ): ResponseEntity<Array<ClothingTypeSizeSummary>> {
-        return testRestTemplate.exchange<Array<ClothingTypeSizeSummary>>(
+    ): ResponseEntity<Array<ClothingTypeSummary>> {
+        return testRestTemplate.exchange<Array<ClothingTypeSummary>>(
             "/api/clothing/overview/summary",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
         )
     }
 
-    fun getOverview(
-        authCookie: String? = null
-    ): ResponseEntity<Array<ClothingLocationSizeSummary>> {
-        return testRestTemplate.exchange<Array<ClothingLocationSizeSummary>>(
+    fun getOverview(authCookie: String? = null): ResponseEntity<Array<ClothingLocationSummary>> {
+        return testRestTemplate.exchange<Array<ClothingLocationSummary>>(
             "/api/clothing/overview",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),

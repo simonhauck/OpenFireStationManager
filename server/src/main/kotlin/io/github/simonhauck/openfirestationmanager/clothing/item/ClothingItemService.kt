@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ClothingItemService(
-    private val repository: ClothingItemRepository,
-) {
+class ClothingItemService(private val repository: ClothingItemRepository) {
 
     fun getAllItems(): List<ClothingItem> = repository.findAll().sortedBy { it.id }
 
