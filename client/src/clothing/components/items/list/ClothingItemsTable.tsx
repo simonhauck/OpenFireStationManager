@@ -29,7 +29,7 @@ export default function ClothingItemsTable({
   )
 
   const typeNameById = useMemo(
-    () => new Map(types.map((type) => [String(type.id), type.name])),
+    () => new Map(types.map((type) => [type.id, type.name])),
     [types],
   )
 
@@ -53,7 +53,7 @@ export default function ClothingItemsTable({
       id: "type",
       header: "Typ",
       getValue: (item: ClothingItem) =>
-        typeNameById.get(String(item.typeId)) ?? String(item.typeId),
+        typeNameById.get(item.typeId) ?? String(item.typeId),
     },
     {
       id: "size",
