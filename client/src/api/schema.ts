@@ -260,23 +260,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clothing/overview": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get clothing availability overview for dashboard locations */
-    get: operations["getOverview"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/clothing/items/summary": {
     parameters: {
       query?: never
@@ -357,24 +340,21 @@ export interface components {
     BatchCreateClothingLocationsRequest: {
       items: components["schemas"]["CreateClothingLocationRequest"][]
     }
-    AggregateReferenceClothingLocationLong: {
-      /** Format: int64 */
-      id?: number
-    }
     CreateOrUpdateClothingItemRequest: {
       /** Format: int64 */
       typeId: number
       size: string
       barcode?: string
-      locationId?: components["schemas"]["AggregateReferenceClothingLocationLong"]
+      /** Format: int64 */
+      locationId?: number
     }
     ClothingItem: {
       /** Format: int64 */
-      typeId: string
+      typeId: number
       size: string
       barcode?: string
       /** Format: int64 */
-      locationId?: string
+      locationId?: number
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
@@ -993,26 +973,6 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["AuthStateResponse"]
-        }
-      }
-    }
-  }
-  getOverview: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["ClothingLocationSizeSummary"][]
         }
       }
     }

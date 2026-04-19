@@ -8,6 +8,7 @@ import {
   updateClothingItemMutation,
 } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
+import ClothingLocationSelect from "#/clothing/components/shared/ClothingLocationSelect"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
@@ -40,6 +41,9 @@ export default function ClothingItemForm({
   )
   const [size, setSize] = useState(existingItem?.size ?? "")
   const [barcode, setBarcode] = useState(existingItem?.barcode ?? "")
+  const [locationId, setLocationId] = useState<number | undefined>(
+    existingItem?.locationId,
+  )
 
   const { data: clothingTypes } = useClothingTypes()
 
@@ -79,6 +83,7 @@ export default function ClothingItemForm({
       typeId,
       size,
       barcode: barcode,
+      locationId: locationId,
     }
 
     if (isEditing) {
@@ -157,6 +162,11 @@ export default function ClothingItemForm({
                 onChange={(e) => setBarcode(e.target.value)}
               />
             </div>
+
+            <ClothingLocationSelect
+              selectedLocationId={locationId}
+              onLocationChange={setLocationId}
+            />
 
             <RenderIf when={errorMessage !== null}>
               <ErrorState message={errorMessage!} />

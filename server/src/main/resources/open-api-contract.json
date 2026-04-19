@@ -929,21 +929,12 @@
         },
         "required" : [ "items" ]
       },
-      "AggregateReferenceClothingLocationLong" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
-          }
-        }
-      },
-      "CreateOrUpdateClothingItemRequest" : {
-        "type" : "object",
-        "properties" : {
-          "typeId" : {
-            "type" : "integer",
-            "format" : "int64"
+      "CreateOrUpdateClothingItemRequest": {
+        "type": "object",
+        "properties": {
+          "typeId": {
+            "type": "integer",
+            "format": "int64"
           },
           "size" : {
             "type" : "string",
@@ -955,18 +946,19 @@
             "maxLength" : 255,
             "minLength" : 0
           },
-          "locationId" : {
-            "$ref" : "#/components/schemas/AggregateReferenceClothingLocationLong"
+          "locationId": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "required" : [ "size", "typeId" ]
       },
-      "ClothingItem" : {
-        "type" : "object",
-        "properties" : {
-          "typeId" : {
-            "type" : "string",
-            "format" : "int64"
+      "ClothingItem": {
+        "type": "object",
+        "properties": {
+          "typeId": {
+            "type": "integer",
+            "format": "int64"
           },
           "size" : {
             "type" : "string"
@@ -974,9 +966,9 @@
           "barcode" : {
             "type" : "string"
           },
-          "locationId" : {
-            "type" : "string",
-            "format" : "int64"
+          "locationId": {
+            "type": "integer",
+            "format": "int64"
           },
           "id" : {
             "type" : "integer",
