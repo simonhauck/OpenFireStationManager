@@ -23,4 +23,29 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
             )
         return repository.save(entity)
     }
+
+    fun createBatchLocations(requests: List<CreateClothingLocationRequest>): List<ClothingLocation> {
+        val entities =
+            requests.map { req ->
+                ClothingLocation(
+                    name = req.name,
+                    comment = req.comment,
+                    onlyVisibleForKleiderwart = req.onlyVisibleForKleiderwart,
+                    shouldBeShownOnDashboard = req.shouldBeShownOnDashboard,
+                )
+            }
+        return repository.saveAll(entities)
+    }
+
+    fun updateLocation(id: Long, request: CreateClothingLocationRequest): ClothingLocation {
+        val existing = getLocationById(id)
+        return repository.save(
+            existing.copy(
+                name = request.name,
+                comment = request.comment,
+                onlyVisibleForKleiderwart = request.onlyVisibleForKleiderwart,
+                shouldBeShownOnDashboard = request.shouldBeShownOnDashboard,
+            )
+        )
+    }
 }

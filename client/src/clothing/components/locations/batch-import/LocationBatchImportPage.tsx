@@ -6,7 +6,9 @@ import type {
   ClothingLocation,
   CreateClothingLocationRequest,
 } from "#/clothing/service/clothingLocationsQueries"
-import { createClothingLocationMutation } from "#/clothing/service/clothingLocationsQueries"
+import { batchCreateClothingLocationsMutation } from "#/clothing/service/clothingLocationsQueries"
+import DataTable from "#/components/base/DataTable"
+import type { DataTableColumn } from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
@@ -18,14 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "#/components/ui/table"
 import { Textarea } from "#/components/ui/textarea"
 
 interface ParsedRow {
@@ -64,6 +58,37 @@ function parseCsv(csv: string): ParseResult {
   return { rows, errors }
 }
 
+const previewColumns: DataTableColumn<CreateClothingLocationRequest>[] = [
+  {
+    id: "name",
+    header: "Bezeichnung",
+    getValue: (item) => item.name,
+  },
+  {
+    id: "comment",
+    header: "Kommentar",
+    getValue: (item) => item.comment || "—",
+  },
+]
+
+const resultColumns: DataTableColumn<ClothingLocation>[] = [
+  {
+    id: "id",
+    header: "ID",
+    getValue: (location) => location.id,
+  },
+  {
+    id: "name",
+    header: "Bezeichnung",
+    getValue: (location) => location.name,
+  },
+  {
+    id: "comment",
+    header: "Kommentar",
+    getValue: (location) => location.comment || "—",
+  },
+]
+
 export default function LocationBatchImportPage() {
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
@@ -84,8 +109,8 @@ function LocationBatchImportPageContent() {
     ClothingLocation[] | null
   >(null)
 
-  const { mutateAsync: createLocation, isPending } = useMutation(
-    createClothingLocationMutation(queryClient),
+  const { mutateAsync: createBatchLocations, isPending } = useMutation(
+    batchCreateClothingLocationsMutation(queryClient),
   )
 
   const [mutationError, setMutationError] = useState<Error | null>(null)
@@ -113,9 +138,7 @@ function LocationBatchImportPageContent() {
     setMutationError(null)
 
     try {
-      const results = await Promise.all(
-        preview.map((req) => createLocation(req)),
-      )
+      const results = await createBatchLocations({ items: preview })
       setCreatedLocations(results)
       setCsvInput("")
       setPreview(null)
@@ -245,7 +268,12 @@ function BatchPreviewSection({
   return (
     <>
       <p className="text-sm font-medium">Vorschau ({items.length} Eintraege)</p>
-      <PreviewTable items={items} />
+      <DataTable
+        columns={previewColumns}
+        rows={items}
+        showSearch={false}
+        emptyMessage="Keine Eintraege vorhanden."
+      />
 
       <RenderIf when={hasError}>
         <ErrorState message="Die Standorte konnten nicht erstellt werden." />
@@ -263,31 +291,6 @@ function BatchPreviewSection({
   )
 }
 
-interface PreviewTableProps {
-  items: CreateClothingLocationRequest[]
-}
-
-function PreviewTable({ items }: PreviewTableProps) {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Bezeichnung</TableHead>
-          <TableHead>Kommentar</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {items.map((item, idx) => (
-          <TableRow key={idx}>
-            <TableCell>{item.name}</TableCell>
-            <TableCell>{item.comment || "—"}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-}
-
 interface ImportSuccessResultProps {
   locations: ClothingLocation[]
   onDone: () => void
@@ -299,24 +302,12 @@ function ImportSuccessResult({ locations, onDone }: ImportSuccessResultProps) {
       <p className="text-sm font-medium text-green-600">
         {locations.length} Standort(e) erfolgreich erstellt.
       </p>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Bezeichnung</TableHead>
-            <TableHead>Kommentar</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {locations.map((location) => (
-            <TableRow key={location.id}>
-              <TableCell>{location.id}</TableCell>
-              <TableCell>{location.name}</TableCell>
-              <TableCell>{location.comment || "—"}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable
+        columns={resultColumns}
+        rows={locations}
+        showSearch={false}
+        emptyMessage="Keine Standorte erstellt."
+      />
       <div className="flex justify-end">
         <Button type="button" onClick={onDone}>
           Zur Uebersicht

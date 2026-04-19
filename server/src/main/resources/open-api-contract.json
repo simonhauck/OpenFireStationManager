@@ -205,6 +205,38 @@
         }
       }
     },
+    "/api/clothing/locations/batch": {
+      "post": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Create multiple clothing locations in a single request",
+        "operationId": "createBatchLocations",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchCreateClothingLocationsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClothingLocation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clothing/items": {
       "get": {
         "tags": ["clothing-item-controller"],
@@ -639,6 +671,46 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Update a clothing location",
+        "operationId": "updateLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing location",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClothingLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/clothing/items/summary": {
@@ -928,6 +1000,18 @@
           }
         },
         "required": ["id", "metaData", "size", "typeId"]
+      },
+      "BatchCreateClothingLocationsRequest": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateClothingLocationRequest"
+            }
+          }
+        },
+        "required": ["items"]
       },
       "BatchCreateClothingItemsRequest": {
         "type": "object",

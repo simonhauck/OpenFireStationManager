@@ -1,12 +1,10 @@
-import { Link } from "@tanstack/react-router"
-
 import ClothingLocationsTable from "#/clothing/components/locations/list/ClothingLocationsTable"
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
+import CreateWithImportButton from "#/components/base/CreateWithImportButton"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 import {
   Card,
   CardContent,
@@ -29,16 +27,11 @@ export default function ClothingLocationsPage() {
               <CardDescription>Alle vorhandenen Standorte</CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button asChild>
-                <Link to="/clothing-management/locations/new">
-                  Standort erstellen
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link to="/clothing-management/locations/batch">
-                  Massenimport
-                </Link>
-              </Button>
+              <CreateWithImportButton
+                label="Neuen Standort"
+                createTo="/clothing-management/locations/new"
+                importTo="/clothing-management/locations/batch"
+              />
             </div>
           </div>
         </CardHeader>

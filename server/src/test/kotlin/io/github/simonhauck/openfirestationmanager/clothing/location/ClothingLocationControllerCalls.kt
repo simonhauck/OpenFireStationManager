@@ -38,6 +38,28 @@ class ClothingLocationControllerCalls(private val testRestTemplate: TestRestTemp
         )
     }
 
+    fun createBatchLocations(
+        request: BatchCreateClothingLocationsRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<Array<ClothingLocation>> {
+        return testRestTemplate.postForEntity<Array<ClothingLocation>>(
+            "/api/clothing/locations/batch",
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
+    fun updateLocation(
+        id: Long,
+        request: CreateClothingLocationRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<ClothingLocation> {
+        return testRestTemplate.exchange<ClothingLocation>(
+            "/api/clothing/locations/$id",
+            HttpMethod.PATCH,
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
     private fun headersWithCookie(authCookie: String?): HttpHeaders {
         val headers = HttpHeaders()
         if (authCookie != null) {

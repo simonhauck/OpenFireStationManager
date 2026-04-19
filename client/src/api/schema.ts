@@ -104,6 +104,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/locations/batch": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create multiple clothing locations in a single request */
+    post: operations["createBatchLocations"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/items": {
     parameters: {
       query?: never
@@ -239,7 +256,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** Update a clothing location */
+    patch: operations["updateLocation"]
     trace?: never
   }
   "/api/clothing/items/summary": {
@@ -319,11 +337,16 @@ export interface components {
       id: number
       metaData: components["schemas"]["EntityMetaData"]
     }
+    AggregateReferenceClothingLocationLong: {
+      /** Format: int64 */
+      id?: number
+    }
     CreateOrUpdateClothingItemRequest: {
       /** Format: int64 */
       typeId: number
       size: string
       barcode?: string
+      locationId?: components["schemas"]["AggregateReferenceClothingLocationLong"]
     }
     ClothingItem: {
       /** Format: int64 */
@@ -331,8 +354,13 @@ export interface components {
       size: string
       barcode?: string
       /** Format: int64 */
+      locationId?: string
+      /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+    }
+    BatchCreateClothingLocationsRequest: {
+      items: components["schemas"]["CreateClothingLocationRequest"][]
     }
     BatchCreateClothingItemsRequest: {
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
@@ -544,6 +572,30 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingLocation"]
+        }
+      }
+    }
+  }
+  createBatchLocations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BatchCreateClothingLocationsRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"][]
         }
       }
     }
@@ -881,6 +933,33 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
+        }
+      }
+    }
+  }
+  updateLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing location */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateClothingLocationRequest"]
+      }
+    }
     responses: {
       /** @description OK */
       200: {
