@@ -20,7 +20,7 @@ class ClothingItemService(private val repository: ClothingItemRepository) {
             ClothingItem(
                 typeId = AggregateReference.to(request.typeId),
                 size = request.size,
-                barcode = request.barcode,
+                barcode = request.barcodeSanitized(),
                 locationId = request.locationId,
             )
         return repository.save(entity)
@@ -34,15 +34,14 @@ class ClothingItemService(private val repository: ClothingItemRepository) {
 
         checkBarcodesNotAlreadyKnown(barcodes)
 
-        val entities =
-            requests.map { req ->
-                ClothingItem(
-                    typeId = AggregateReference.to(req.typeId),
-                    size = req.size,
-                    barcode = req.barcodeSanitized(),
-                    locationId = req.locationId,
-                )
-            }
+        val entities = requests.map { req ->
+            ClothingItem(
+                typeId = AggregateReference.to(req.typeId),
+                size = req.size,
+                barcode = req.barcodeSanitized(),
+                locationId = req.locationId,
+            )
+        }
         return repository.saveAll(entities)
     }
 
@@ -65,12 +64,12 @@ class ClothingItemService(private val repository: ClothingItemRepository) {
 
     fun updateItem(id: Long, request: CreateOrUpdateClothingItemRequest): ClothingItem {
         val existing = findOrThrow(id)
-        checkBarcodeUnique(request.barcode, excludeId = id)
+        checkBarcodeUnique(request.barcodeSanitized(), excludeId = id)
         return repository.save(
             existing.copy(
                 typeId = AggregateReference.to(request.typeId),
                 size = request.size,
-                barcode = request.barcode,
+                barcode = request.barcodeSanitized(),
                 locationId = request.locationId,
             )
         )
