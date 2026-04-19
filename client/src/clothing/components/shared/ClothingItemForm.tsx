@@ -8,7 +8,7 @@ import {
   updateClothingItemMutation,
 } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
-import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
+import ClothingLocationSelect from "#/clothing/components/shared/ClothingLocationSelect"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
@@ -22,16 +22,7 @@ import {
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "#/components/ui/select"
 import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
-
-const NO_LOCATION_VALUE = "__none__"
 
 type ClothingItemFormProps = {
   existingItem?: ClothingItem
@@ -55,7 +46,6 @@ export default function ClothingItemForm({
   )
 
   const { data: clothingTypes } = useClothingTypes()
-  const { data: clothingLocations } = useClothingLocations()
 
   const {
     mutate: createItem,
@@ -118,7 +108,6 @@ export default function ClothingItemForm({
   }
 
   const types = clothingTypes ?? []
-  const locations = clothingLocations ?? []
 
   return (
     <main className="page-wrap px-4 py-12">
@@ -174,25 +163,10 @@ export default function ClothingItemForm({
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="location">Standort (optional)</Label>
-              <Select
-                value={locationId}
-                onValueChange={(val) => setLocationId(val === NO_LOCATION_VALUE ? "" : val)}
-              >
-                <SelectTrigger id="location">
-                  <SelectValue placeholder="Kein Standort" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_LOCATION_VALUE}>Kein Standort</SelectItem>
-                  {locations.map((location) => (
-                    <SelectItem key={location.id} value={String(location.id)}>
-                      {location.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <ClothingLocationSelect
+              selectedLocationId={locationId}
+              onLocationChange={setLocationId}
+            />
 
             <RenderIf when={errorMessage !== null}>
               <ErrorState message={errorMessage!} />
