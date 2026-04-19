@@ -9,10 +9,10 @@ class UiController {
     @RequestMapping(
         value =
             [
-                "/klamottenmanagement",
-                "/klamottenmanagement/**",
-                "/nutzermanagement",
-                "/nutzermanagement/**",
+                "/user-management",
+                "/user-management/**",
+                "/clothing-management",
+                "/clothing-management/**",
             ]
     )
     fun forwardToIndex(): String {

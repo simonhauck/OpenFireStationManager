@@ -30,7 +30,7 @@ function UsersManagementPageContent() {
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <CardTitle>Nutzermanagement</CardTitle>
+            <CardTitle>Nutzer Management</CardTitle>
             <CardDescription>Nutzer und Rollen</CardDescription>
           </div>
           <Button asChild>
