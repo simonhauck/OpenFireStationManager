@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.spotless)
     alias(libs.plugins.jib)
     alias(libs.plugins.testLoggerPlugin)
+    id("io.github.simonhauck.frontend-route-mapping")
 }
 
 group = "io.github.simonhauck"
@@ -118,3 +119,9 @@ tasks.withType<JibTask> {
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
+
+frontendRouteMapping {
+    routeTreeFile.set(layout.projectDirectory.file("../client/src/routeTree.gen.ts"))
+    generatedPackage.set("io.github.simonhauck.openfirestationmanager.ui.generated")
+    generatedControllerClassName.set("UiController")
+}

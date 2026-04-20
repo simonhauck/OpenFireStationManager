@@ -1,3 +1,5 @@
+pluginManagement { includeBuild("conventions") }
+
 rootProject.name = "openfirestationmanager"
 
 plugins {
