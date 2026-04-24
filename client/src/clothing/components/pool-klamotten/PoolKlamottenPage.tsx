@@ -117,7 +117,11 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
                       {typeSummary.typeName}
                     </CardTitle>
                     <span className="text-muted-foreground text-xs uppercase tracking-wide">
-                      Summe {typeSummary.sizeCounts.reduce((sum, entry) => sum + entry.count, 0)}
+                      Summe{" "}
+                      {typeSummary.sizeCounts.reduce(
+                        (sum, entry) => sum + entry.count,
+                        0,
+                      )}
                     </span>
                   </div>
                 </CardHeader>

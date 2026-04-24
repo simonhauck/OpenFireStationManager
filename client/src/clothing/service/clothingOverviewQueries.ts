@@ -32,7 +32,11 @@ export const getClothingOverviewQuery = () =>
       const { data, error } = await client.GET(
         "/api/clothing/overview/dashboard/location",
       )
-      return ensureData(data, error, "GET /api/clothing/overview/dashboard/location")
+      return ensureData(
+        data,
+        error,
+        "GET /api/clothing/overview/dashboard/location",
+      )
     },
   })
 
@@ -40,7 +44,9 @@ export const getClothingTypeSizeSummaryQuery = () =>
   queryOptions({
     queryKey: queryKeys.clothingTypeSizeSummary(),
     queryFn: async (): Promise<ClothingTypeSizeSummary[]> => {
-      const { data, error } = await client.GET("/api/clothing/overview/summary/type")
+      const { data, error } = await client.GET(
+        "/api/clothing/overview/summary/type",
+      )
       return ensureData(data, error, "GET /api/clothing/overview/summary/type")
     },
   })
