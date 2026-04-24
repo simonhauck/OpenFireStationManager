@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.3.10"
+    kotlin("jvm") version "2.3.20"
     `java-gradle-plugin`
 }
 
@@ -9,7 +9,7 @@ version = "0.1.0"
 
 repositories { mavenCentral() }
 
-dependencies { implementation("com.squareup:kotlinpoet:2.2.0") }
+dependencies { implementation("com.squareup:kotlinpoet:2.3.0") }
 
 gradlePlugin {
     plugins {
