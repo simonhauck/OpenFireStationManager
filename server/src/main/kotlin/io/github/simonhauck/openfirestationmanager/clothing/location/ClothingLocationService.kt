@@ -50,4 +50,9 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
             )
         )
     }
+
+    fun deleteLocation(id: Long) {
+        getLocationById(id)
+        repository.deleteById(id)
+    }
 }

@@ -202,7 +202,8 @@ export interface paths {
     get: operations["getLocationById"]
     put?: never
     post?: never
-    delete?: never
+    /** Delete a clothing location */
+    delete: operations["deleteLocation"]
     options?: never
     head?: never
     /** Update a clothing location */
@@ -800,6 +801,27 @@ export interface operations {
         content: {
           "*/*": components["schemas"]["ClothingLocation"]
         }
+      }
+    }
+  }
+  deleteLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description ID of the clothing location */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

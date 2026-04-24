@@ -60,6 +60,14 @@ class ClothingLocationControllerCalls(private val testRestTemplate: TestRestTemp
         )
     }
 
+    fun deleteLocation(id: Long, authCookie: String? = null): ResponseEntity<Void> {
+        return testRestTemplate.exchange<Void>(
+            "/api/clothing/locations/$id",
+            HttpMethod.DELETE,
+            HttpEntity<Unit>(headersWithCookie(authCookie)),
+        )
+    }
+
     private fun headersWithCookie(authCookie: String?): HttpHeaders {
         val headers = HttpHeaders()
         if (authCookie != null) {
