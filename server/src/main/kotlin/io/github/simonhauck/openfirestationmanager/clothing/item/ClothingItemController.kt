@@ -26,10 +26,6 @@ class ClothingItemController(private val service: ClothingItemService) {
     @Operation(summary = "List all clothing items")
     fun getAllItems(): List<ClothingItem> = service.getAllItems()
 
-    @GetMapping("/summary")
-    @Operation(summary = "List clothing item counts by type and size")
-    fun getSummaryByTypeAndSize(): List<ClothingTypeSizeSummary> = service.getSummaryByTypeAndSize()
-
     @GetMapping("/{id}")
     @Operation(summary = "Get a clothing item by ID")
     fun getItemById(

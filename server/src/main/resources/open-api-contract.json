@@ -713,11 +713,11 @@
         }
       }
     },
-    "/api/clothing/items/summary": {
+    "/api/clothing/overview/summary/type": {
       "get": {
-        "tags": ["clothing-item-controller"],
+        "tags": ["clothing-overview-controller"],
         "summary": "List clothing item counts by type and size",
-        "operationId": "getSummaryByTypeAndSize",
+        "operationId": "getSummariesByType",
         "responses": {
           "200": {
             "description": "OK",
@@ -726,7 +726,29 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ClothingTypeSizeSummary"
+                    "$ref": "#/components/schemas/ClothingTypeSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/overview/dashboard/location": {
+      "get": {
+        "tags": ["clothing-overview-controller"],
+        "summary": "Get clothing availability overview for dashboard locations",
+        "operationId": "getDashboardLocationSummaries",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClothingLocationSummary"
                   }
                 }
               }
@@ -748,6 +770,15 @@
           }
         },
         "required": ["newPassword"]
+      },
+      "AggregateReferenceUserAccountLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       },
       "EntityMetaData": {
         "type": "object",
@@ -802,12 +833,16 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
+          },
+          "idAsReference": {
+            "$ref": "#/components/schemas/AggregateReferenceUserAccountLong"
           }
         },
         "required": [
           "enabled",
           "firstName",
           "id",
+          "idAsReference",
           "lastName",
           "metaData",
           "roles",
@@ -867,6 +902,15 @@
         },
         "required": ["name"]
       },
+      "AggregateReferenceClothingTypeLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "ClothingType": {
         "type": "object",
         "properties": {
@@ -879,9 +923,12 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
+          },
+          "idAsReference": {
+            "$ref": "#/components/schemas/AggregateReferenceClothingTypeLong"
           }
         },
-        "required": ["id", "metaData", "name"]
+        "required": ["id", "idAsReference", "metaData", "name"]
       },
       "CreateClothingLocationRequest": {
         "type": "object",
@@ -910,6 +957,15 @@
           "shouldBeShownOnDashboard"
         ]
       },
+      "AggregateReferenceClothingLocationLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "ClothingLocation": {
         "type": "object",
         "properties": {
@@ -931,11 +987,15 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
+          },
+          "idAsReference": {
+            "$ref": "#/components/schemas/AggregateReferenceClothingLocationLong"
           }
         },
         "required": [
           "comment",
           "id",
+          "idAsReference",
           "metaData",
           "name",
           "onlyVisibleForKleiderwart",
@@ -978,6 +1038,15 @@
         },
         "required": ["size", "typeId"]
       },
+      "AggregateReferenceClothingItemLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "ClothingItem": {
         "type": "object",
         "properties": {
@@ -1001,9 +1070,12 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
+          },
+          "idAsReference": {
+            "$ref": "#/components/schemas/AggregateReferenceClothingItemLong"
           }
         },
-        "required": ["id", "metaData", "size", "typeId"]
+        "required": ["id", "idAsReference", "metaData", "size", "typeId"]
       },
       "BatchCreateClothingItemsRequest": {
         "type": "object",
@@ -1084,7 +1156,7 @@
         },
         "required": ["authenticated"]
       },
-      "ClothingTypeSizeSummary": {
+      "ClothingTypeSummary": {
         "type": "object",
         "properties": {
           "typeId": {
@@ -1095,14 +1167,45 @@
             "type": "string"
           },
           "sizeCounts": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SizeSummary"
             }
           }
         },
         "required": ["sizeCounts", "typeId", "typeName"]
+      },
+      "SizeSummary": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": ["count", "size"]
+      },
+      "ClothingLocationSummary": {
+        "type": "object",
+        "properties": {
+          "locationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "locationName": {
+            "type": "string"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClothingTypeSummary"
+            }
+          }
+        },
+        "required": ["locationId", "locationName", "types"]
       }
     }
   }

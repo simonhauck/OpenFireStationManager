@@ -1,6 +1,5 @@
 package io.github.simonhauck.openfirestationmanager.clothing.item
 
-import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingTypeRepository
 import io.github.simonhauck.openfirestationmanager.common.ConflictException
 import io.github.simonhauck.openfirestationmanager.common.NotFoundException
 import org.springframework.data.jdbc.core.mapping.AggregateReference
@@ -8,37 +7,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ClothingItemService(
-    private val repository: ClothingItemRepository,
-    private val clothingTypeRepository: ClothingTypeRepository,
-) {
+class ClothingItemService(private val repository: ClothingItemRepository) {
 
     fun getAllItems(): List<ClothingItem> = repository.findAll().sortedBy { it.id }
 
     fun getItemById(id: Long): ClothingItem = findOrThrow(id)
-
-    fun getSummaryByTypeAndSize(): List<ClothingTypeSizeSummary> {
-        val items = repository.findAll()
-        return clothingTypeRepository
-            .findAll()
-            .sortedBy { it.id }
-            .map { type ->
-                val sizeCounts =
-                    items
-                        .asSequence()
-                        .filter { item -> item.typeId.id == type.id }
-                        .groupingBy { item -> item.size }
-                        .eachCount()
-                        .mapValues { (_, count) -> count.toLong() }
-                        .toSortedMap()
-
-                ClothingTypeSizeSummary(
-                    typeId = type.id,
-                    typeName = type.name,
-                    sizeCounts = sizeCounts,
-                )
-            }
-    }
 
     fun createItem(request: CreateOrUpdateClothingItemRequest): ClothingItem {
         checkBarcodesNotAlreadyKnown(listOfNotNull(request.barcodeSanitized()))
@@ -47,7 +20,7 @@ class ClothingItemService(
             ClothingItem(
                 typeId = AggregateReference.to(request.typeId),
                 size = request.size,
-                barcode = request.barcode,
+                barcode = request.barcodeSanitized(),
                 locationId = request.locationId,
             )
         return repository.save(entity)
@@ -92,12 +65,12 @@ class ClothingItemService(
 
     fun updateItem(id: Long, request: CreateOrUpdateClothingItemRequest): ClothingItem {
         val existing = findOrThrow(id)
-        checkBarcodeUnique(request.barcode, excludeId = id)
+        checkBarcodeUnique(request.barcodeSanitized(), excludeId = id)
         return repository.save(
             existing.copy(
                 typeId = AggregateReference.to(request.typeId),
                 size = request.size,
-                barcode = request.barcode,
+                barcode = request.barcodeSanitized(),
                 locationId = request.locationId,
             )
         )

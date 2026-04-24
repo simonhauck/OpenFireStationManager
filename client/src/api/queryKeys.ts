@@ -8,5 +8,6 @@ export const queryKeys = {
   clothingItem: (id: number) => ["clothing", "items", id] as const,
   clothingLocations: () => ["clothing", "locations"] as const,
   clothingLocation: (id: number) => ["clothing", "locations", id] as const,
+  clothingOverview: () => ["clothing", "overview"] as const,
   me: () => ["auth", "me"] as const,
 }

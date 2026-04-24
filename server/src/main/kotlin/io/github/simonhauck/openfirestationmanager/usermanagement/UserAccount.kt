@@ -43,8 +43,8 @@ data class UserAccount(
     val enabled: Boolean = true,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
-) : BaseEntity {
-    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
+) : BaseEntity<UserAccount> {
+    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity<UserAccount> {
         return copy(metaData = metaData)
     }
 }
