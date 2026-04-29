@@ -8,6 +8,7 @@ import {
   updateClothingLocationMutation,
 } from "#/clothing/service/clothingLocationsQueries"
 import ErrorState from "#/components/base/ErrorState"
+import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
 import {
   Card,
@@ -19,6 +20,18 @@ import {
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
+import type { components } from "#/api/schema"
+
+type LocationType =
+  components["schemas"]["CreateClothingLocationRequest"]["type"]
+
+const locationTypeOptions: { value: LocationType; label: string }[] = [
+  { value: "POOL", label: "Pool" },
+  { value: "WAESCHE", label: "Wäsche" },
+  { value: "PERSONAL", label: "Persönlicher Standort" },
+  { value: "OTHER", label: "Sonstiges" },
+]
 
 type ClothingLocationFormProps = {
   existingLocation?: ClothingLocation
@@ -37,8 +50,8 @@ export default function ClothingLocationForm({
   const [onlyVisibleForKleiderwart, setOnlyVisibleForKleiderwart] = useState(
     existingLocation?.onlyVisibleForKleiderwart ?? false,
   )
-  const [shouldBeShownOnDashboard, setShouldBeShownOnDashboard] = useState(
-    existingLocation?.shouldBeShownOnDashboard ?? false,
+  const [locationType, setLocationType] = useState<LocationType | "">(
+    existingLocation?.type ?? "",
   )
 
   const {
@@ -64,11 +77,13 @@ export default function ClothingLocationForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (!locationType) return
+
     const body = {
       name,
       comment,
       onlyVisibleForKleiderwart,
-      shouldBeShownOnDashboard,
+      type: locationType,
     }
 
     if (isEditing) {
@@ -98,6 +113,28 @@ export default function ClothingLocationForm({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Standorttyp</Label>
+              <RadioGroup
+                value={locationType}
+                onValueChange={(val) => setLocationType(val as LocationType)}
+                required
+                className="flex flex-wrap gap-4"
+              >
+                {locationTypeOptions.map((option) => (
+                  <div key={option.value} className="flex items-center gap-2">
+                    <RadioGroupItem
+                      id={`type-${option.value}`}
+                      value={option.value}
+                    />
+                    <Label htmlFor={`type-${option.value}`}>
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="name">Bezeichnung</Label>
               <Input
@@ -130,28 +167,15 @@ export default function ClothingLocationForm({
               </Label>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="shouldBeShownOnDashboard"
-                checked={shouldBeShownOnDashboard}
-                onCheckedChange={(checked) =>
-                  setShouldBeShownOnDashboard(checked === true)
-                }
-              />
-              <Label htmlFor="shouldBeShownOnDashboard">
-                Auf Dashboard anzeigen
-              </Label>
-            </div>
-
-            {error && (
+            <RenderIf condition={!!error}>
               <ErrorState message="Der Standort konnte nicht gespeichert werden." />
-            )}
+            </RenderIf>
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
                 <Link to="/clothing-management/locations">Abbrechen</Link>
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending || !locationType}>
                 {isPending ? "Wird gespeichert..." : "Speichern"}
               </Button>
             </div>

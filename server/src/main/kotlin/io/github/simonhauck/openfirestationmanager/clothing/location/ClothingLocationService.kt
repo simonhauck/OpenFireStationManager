@@ -19,7 +19,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
                 name = request.name,
                 comment = request.comment,
                 onlyVisibleForKleiderwart = request.onlyVisibleForKleiderwart,
-                shouldBeShownOnDashboard = request.shouldBeShownOnDashboard,
+                type = request.type,
             )
         return repository.save(entity)
     }
@@ -33,7 +33,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
                     name = req.name,
                     comment = req.comment,
                     onlyVisibleForKleiderwart = req.onlyVisibleForKleiderwart,
-                    shouldBeShownOnDashboard = req.shouldBeShownOnDashboard,
+                    type = req.type,
                 )
             }
         return repository.saveAll(entities)
@@ -46,7 +46,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
                 name = request.name,
                 comment = request.comment,
                 onlyVisibleForKleiderwart = request.onlyVisibleForKleiderwart,
-                shouldBeShownOnDashboard = request.shouldBeShownOnDashboard,
+                type = request.type,
             )
         )
     }

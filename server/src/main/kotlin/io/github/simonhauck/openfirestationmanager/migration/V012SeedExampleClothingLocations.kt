@@ -18,8 +18,8 @@ class V012SeedExampleClothingLocations : DatabaseMigration {
     private fun insertLocationIfMissing(jdbcTemplate: JdbcTemplate, name: String) {
         jdbcTemplate.update(
             """
-            INSERT INTO clothing_locations (name, comment)
-            SELECT ?, ''
+            INSERT INTO clothing_locations (name, comment, should_be_shown_on_dashboard)
+            SELECT ?, '', FALSE
             WHERE NOT EXISTS (
                 SELECT 1
                 FROM clothing_locations

@@ -20,7 +20,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                     name = uniqueName,
                     comment = "Main storage",
                     onlyVisibleForKleiderwart = true,
-                    shouldBeShownOnDashboard = false,
+                    type = LocationType.PERSONAL,
                 ),
                 authCookie = validCookieHeader,
             )
@@ -31,7 +31,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
         assertThat(created.name).isEqualTo(uniqueName)
         assertThat(created.comment).isEqualTo("Main storage")
         assertThat(created.onlyVisibleForKleiderwart).isTrue()
-        assertThat(created.shouldBeShownOnDashboard).isFalse()
+        assertThat(created.type).isEqualTo(LocationType.PERSONAL)
 
         val byIdResponse = calls.getLocationById(created.id, authCookie = validCookieHeader)
 
@@ -56,13 +56,13 @@ class ClothingLocationControllerIT : IntegrationTest() {
                             name = "BatchLoc-A-$suffix",
                             comment = "First",
                             onlyVisibleForKleiderwart = false,
-                            shouldBeShownOnDashboard = true,
+                            type = LocationType.POOL,
                         ),
                         CreateClothingLocationRequest(
                             name = "BatchLoc-B-$suffix",
                             comment = "Second",
                             onlyVisibleForKleiderwart = true,
-                            shouldBeShownOnDashboard = false,
+                            type = LocationType.OTHER,
                         ),
                     )
             )
@@ -86,7 +86,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                         name = "Original-${System.nanoTime()}",
                         comment = "Old comment",
                         onlyVisibleForKleiderwart = false,
-                        shouldBeShownOnDashboard = false,
+                        type = LocationType.OTHER,
                     ),
                     authCookie = validCookieHeader,
                 )
@@ -100,7 +100,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                     name = updatedName,
                     comment = "New comment",
                     onlyVisibleForKleiderwart = true,
-                    shouldBeShownOnDashboard = true,
+                    type = LocationType.WAESCHE,
                 ),
                 authCookie = validCookieHeader,
             )
@@ -111,7 +111,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
         assertThat(updated.name).isEqualTo(updatedName)
         assertThat(updated.comment).isEqualTo("New comment")
         assertThat(updated.onlyVisibleForKleiderwart).isTrue()
-        assertThat(updated.shouldBeShownOnDashboard).isTrue()
+        assertThat(updated.type).isEqualTo(LocationType.WAESCHE)
     }
 
     @Test
@@ -123,7 +123,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                         name = "ToDelete-${System.nanoTime()}",
                         comment = "",
                         onlyVisibleForKleiderwart = false,
-                        shouldBeShownOnDashboard = false,
+                        type = LocationType.OTHER,
                     ),
                     authCookie = validCookieHeader,
                 )
