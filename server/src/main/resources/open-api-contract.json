@@ -491,6 +491,29 @@
           }
         }
       },
+      "delete": {
+        "tags": ["clothing-location-controller"],
+        "summary": "Delete a clothing location",
+        "operationId": "deleteLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the clothing location",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
       "patch": {
         "tags": ["clothing-location-controller"],
         "summary": "Update a clothing location",

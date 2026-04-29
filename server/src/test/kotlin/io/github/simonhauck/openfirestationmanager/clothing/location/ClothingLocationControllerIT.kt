@@ -113,4 +113,24 @@ class ClothingLocationControllerIT : IntegrationTest() {
         assertThat(updated.onlyVisibleForKleiderwart).isTrue()
         assertThat(updated.shouldBeShownOnDashboard).isTrue()
     }
+
+    @Test
+    fun `should delete an existing clothing location`() {
+        val created =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        name = "ToDelete-${System.nanoTime()}",
+                        comment = "",
+                        onlyVisibleForKleiderwart = false,
+                        shouldBeShownOnDashboard = false,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val deleteResponse = calls.deleteLocation(created.id, authCookie = validCookieHeader)
+
+        assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
 }
