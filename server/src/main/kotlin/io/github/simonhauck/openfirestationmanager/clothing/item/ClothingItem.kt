@@ -29,12 +29,6 @@ data class CreateOrUpdateClothingItemRequest(
 
 data class BatchCreateClothingItemsRequest(val items: List<CreateOrUpdateClothingItemRequest>)
 
-data class ClothingTypeSizeSummary(
-    val typeId: Long,
-    val typeName: String,
-    val sizeCounts: Map<String, Long>,
-)
-
 @Table("clothing_items")
 data class ClothingItem(
     @field:Schema(implementation = Long::class) val typeId: AggregateReference<ClothingType, Long>,
@@ -44,8 +38,8 @@ data class ClothingItem(
     val locationId: AggregateReference<ClothingLocation, Long>? = null,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
-) : BaseEntity {
-    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
+) : BaseEntity<ClothingItem> {
+    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity<ClothingItem> {
         return copy(metaData = metaData)
     }
 }

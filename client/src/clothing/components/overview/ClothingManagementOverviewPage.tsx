@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router"
 
 import ClothingTypeSizeSummaryCard from "#/clothing/components/overview/ClothingTypeSizeSummaryCard"
-import { useClothingTypeSizeSummary } from "#/clothing/service/clothingItemsQueries"
+import { useClothingTypeSizeSummary } from "#/clothing/service/clothingOverviewQueries"
 import RoleGuard from "#/components/base/RoleGuard"
 import {
   Card,

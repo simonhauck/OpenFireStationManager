@@ -15,8 +15,8 @@ data class ClothingType(
     val name: String,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
-) : BaseEntity {
-    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity {
+) : BaseEntity<ClothingType> {
+    override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity<ClothingType> {
         return copy(metaData = metaData)
     }
 }

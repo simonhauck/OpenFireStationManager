@@ -261,7 +261,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clothing/items/summary": {
+  "/api/clothing/overview/summary/type": {
     parameters: {
       query?: never
       header?: never
@@ -269,7 +269,24 @@ export interface paths {
       cookie?: never
     }
     /** List clothing item counts by type and size */
-    get: operations["getSummaryByTypeAndSize"]
+    get: operations["getSummariesByType"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/overview/dashboard/location": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get clothing availability overview for dashboard locations */
+    get: operations["getDashboardLocationSummaries"]
     put?: never
     post?: never
     delete?: never
@@ -284,6 +301,10 @@ export interface components {
   schemas: {
     ChangePasswordRequest: {
       newPassword: string
+    }
+    AggregateReferenceUserAccountLong: {
+      /** Format: int64 */
+      id?: number
     }
     EntityMetaData: {
       /** Format: date-time */
@@ -302,6 +323,7 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+      idAsReference: components["schemas"]["AggregateReferenceUserAccountLong"]
     }
     InitialAdminSetupRequest: {
       username: string
@@ -317,17 +339,26 @@ export interface components {
     CreateOrUpdateClothingTypeRequest: {
       name: string
     }
+    AggregateReferenceClothingTypeLong: {
+      /** Format: int64 */
+      id?: number
+    }
     ClothingType: {
       name: string
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+      idAsReference: components["schemas"]["AggregateReferenceClothingTypeLong"]
     }
     CreateClothingLocationRequest: {
       name: string
       comment: string
       onlyVisibleForKleiderwart: boolean
       shouldBeShownOnDashboard: boolean
+    }
+    AggregateReferenceClothingLocationLong: {
+      /** Format: int64 */
+      id?: number
     }
     ClothingLocation: {
       name: string
@@ -337,6 +368,7 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+      idAsReference: components["schemas"]["AggregateReferenceClothingLocationLong"]
     }
     BatchCreateClothingLocationsRequest: {
       items: components["schemas"]["CreateClothingLocationRequest"][]
@@ -349,6 +381,10 @@ export interface components {
       /** Format: int64 */
       locationId?: number
     }
+    AggregateReferenceClothingItemLong: {
+      /** Format: int64 */
+      id?: number
+    }
     ClothingItem: {
       /** Format: int64 */
       typeId: number
@@ -359,6 +395,7 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+      idAsReference: components["schemas"]["AggregateReferenceClothingItemLong"]
     }
     BatchCreateClothingItemsRequest: {
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
@@ -379,13 +416,22 @@ export interface components {
       authenticated: boolean
       user?: components["schemas"]["UserAccount"]
     }
-    ClothingTypeSizeSummary: {
+    ClothingTypeSummary: {
       /** Format: int64 */
       typeId: number
       typeName: string
-      sizeCounts: {
-        [key: string]: number
-      }
+      sizeCounts: components["schemas"]["SizeSummary"][]
+    }
+    SizeSummary: {
+      size: string
+      /** Format: int32 */
+      count: number
+    }
+    ClothingLocationSummary: {
+      /** Format: int64 */
+      locationId: number
+      locationName: string
+      types: components["schemas"]["ClothingTypeSummary"][]
     }
   }
   responses: never
@@ -991,7 +1037,7 @@ export interface operations {
       }
     }
   }
-  getSummaryByTypeAndSize: {
+  getSummariesByType: {
     parameters: {
       query?: never
       header?: never
@@ -1006,7 +1052,27 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ClothingTypeSizeSummary"][]
+          "*/*": components["schemas"]["ClothingTypeSummary"][]
+        }
+      }
+    }
+  }
+  getDashboardLocationSummaries: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocationSummary"][]
         }
       }
     }
