@@ -63,3 +63,19 @@ testing, code style, API design, and database conventions.
   a 14-day minimum release age. npm updates are enabled (including grouped `@tanstack/**` updates).
 - **No CI is configured yet.** Run lint, format checks, and tests locally before committing.
 - **No git hooks are installed.** Discipline is manual at this stage.
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues at `simonhauck/OpenFireStationManager`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Multi-context: `CONTEXT-MAP.md` at the root, with per-component `CONTEXT.md` and `docs/adr/` under `client/` and `server/`. See `docs/agents/domain.md`.
