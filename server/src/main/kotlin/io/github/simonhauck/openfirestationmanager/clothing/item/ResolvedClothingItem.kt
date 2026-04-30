@@ -1,13 +1,10 @@
 package io.github.simonhauck.openfirestationmanager.clothing.item
 
-import io.github.simonhauck.openfirestationmanager.clothing.location.LocationType
+import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
+import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 
 data class ResolvedClothingItem(
-    val id: Long,
-    val barcode: String?,
-    val typeName: String,
-    val size: String,
-    val currentLocationId: Long?,
-    val currentLocationName: String?,
-    val currentLocationType: LocationType?,
+    val clothingItem: ClothingItem,
+    val location: ClothingLocation?,
+    val clothingType: ClothingType,
 )

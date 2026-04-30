@@ -53,12 +53,12 @@ class ClothingItemLookupIT : IntegrationTest() {
         val response = getByBarcode(barcode, validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.barcode).isEqualTo(barcode)
-        assertThat(response.body?.typeName).isEqualTo(type.name)
-        assertThat(response.body?.size).isEqualTo("L")
-        assertThat(response.body?.currentLocationId).isEqualTo(location.id)
-        assertThat(response.body?.currentLocationName).isEqualTo(location.name)
-        assertThat(response.body?.currentLocationType).isEqualTo(LocationType.POOL)
+        assertThat(response.body?.clothingItem?.barcode).isEqualTo(barcode)
+        assertThat(response.body?.clothingType?.name).isEqualTo(type.name)
+        assertThat(response.body?.clothingItem?.size).isEqualTo("L")
+        assertThat(response.body?.location?.id).isEqualTo(location.id)
+        assertThat(response.body?.location?.name).isEqualTo(location.name)
+        assertThat(response.body?.location?.type).isEqualTo(LocationType.POOL)
     }
 
     @Test
@@ -71,7 +71,8 @@ class ClothingItemLookupIT : IntegrationTest() {
     @Test
     fun `by-barcode returns 404 for item at Kleiderwart-only location when caller is not Kleiderwart`() {
         val type = createType()
-        val restrictedLocation = createLocation(LocationType.PERSONAL, onlyVisibleForKleiderwart = true)
+        val restrictedLocation =
+            createLocation(LocationType.PERSONAL, onlyVisibleForKleiderwart = true)
         val barcode = "RESTRICTED-${System.nanoTime()}"
         itemCalls.createItem(
             CreateOrUpdateClothingItemRequest(
@@ -103,7 +104,7 @@ class ClothingItemLookupIT : IntegrationTest() {
         val response = search(uniqueName.lowercase(), validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.typeName }).contains(uniqueName)
+        assertThat(response.body?.map { it.clothingType.name }).contains(uniqueName)
     }
 
     @Test
@@ -118,7 +119,7 @@ class ClothingItemLookupIT : IntegrationTest() {
         val response = search(uniqueSize.uppercase(), validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.size }).contains(uniqueSize)
+        assertThat(response.body?.map { it.clothingItem.size }).contains(uniqueSize)
     }
 
     @Test
@@ -126,14 +127,18 @@ class ClothingItemLookupIT : IntegrationTest() {
         val type = createType()
         val uniqueBarcode = "BC-${System.nanoTime()}"
         itemCalls.createItem(
-            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "S", barcode = uniqueBarcode),
+            CreateOrUpdateClothingItemRequest(
+                typeId = type.id,
+                size = "S",
+                barcode = uniqueBarcode,
+            ),
             authCookie = validCookieHeader,
         )
 
         val response = search(uniqueBarcode.lowercase(), validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.barcode }).contains(uniqueBarcode)
+        assertThat(response.body?.map { it.clothingItem.barcode }).contains(uniqueBarcode)
     }
 
     @Test
@@ -142,7 +147,10 @@ class ClothingItemLookupIT : IntegrationTest() {
         // Create 55 items to exceed the cap
         repeat(55) {
             itemCalls.createItem(
-                CreateOrUpdateClothingItemRequest(typeId = type.id, size = "CAP-TEST-${System.nanoTime()}"),
+                CreateOrUpdateClothingItemRequest(
+                    typeId = type.id,
+                    size = "CAP-TEST-${System.nanoTime()}",
+                ),
                 authCookie = validCookieHeader,
             )
         }
@@ -156,7 +164,8 @@ class ClothingItemLookupIT : IntegrationTest() {
     @Test
     fun `search filters out items at Kleiderwart-only locations for non-Kleiderwart callers`() {
         val type = createType()
-        val restrictedLocation = createLocation(LocationType.PERSONAL, onlyVisibleForKleiderwart = true)
+        val restrictedLocation =
+            createLocation(LocationType.PERSONAL, onlyVisibleForKleiderwart = true)
         val uniqueBarcode = "FILTERED-${System.nanoTime()}"
         itemCalls.createItem(
             CreateOrUpdateClothingItemRequest(
@@ -172,7 +181,7 @@ class ClothingItemLookupIT : IntegrationTest() {
         val response = search(uniqueBarcode, regularUserCookie)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.barcode }).doesNotContain(uniqueBarcode)
+        assertThat(response.body?.map { it.clothingItem.barcode }).doesNotContain(uniqueBarcode)
     }
 
     // --- helpers ---
@@ -226,8 +235,7 @@ class ClothingItemLookupIT : IntegrationTest() {
         )
         val authCalls = AuthControllerCalls(testRestTemplate)
         val loginResponse = authCalls.login(username = username, password = password)
-        return authCalls.extractAuthCookie(loginResponse)
-            ?: error("Login failed for $username")
+        return authCalls.extractAuthCookie(loginResponse) ?: error("Login failed for $username")
     }
 
     private fun createLocation(

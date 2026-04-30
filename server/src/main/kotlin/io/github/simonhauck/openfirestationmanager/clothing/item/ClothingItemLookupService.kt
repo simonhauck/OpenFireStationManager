@@ -26,17 +26,13 @@ class ClothingItemLookupService(
         }
 
         val type =
-            typeRepository.findById(item.typeId.id!!)
+            typeRepository.findById(item.typeId.id)
                 ?: throw NotFoundException("Type not found for item ${item.id}")
 
         return ResolvedClothingItem(
-            id = item.id,
-            barcode = item.barcode,
-            typeName = type.name,
-            size = item.size,
-            currentLocationId = location?.id,
-            currentLocationName = location?.name,
-            currentLocationType = location?.type,
+            clothingItem = item,
+            location = location,
+            clothingType = type,
         )
     }
 
@@ -62,15 +58,10 @@ class ClothingItemLookupService(
             .take(effectiveLimit)
             .map { item ->
                 val location = item.locationId?.id?.let { locations[it] }
-                val typeName = types[item.typeId.id]?.name ?: ""
                 ResolvedClothingItem(
-                    id = item.id,
-                    barcode = item.barcode,
-                    typeName = typeName,
-                    size = item.size,
-                    currentLocationId = location?.id,
-                    currentLocationName = location?.name,
-                    currentLocationType = location?.type,
+                    clothingItem = item,
+                    location = location,
+                    clothingType = types[item.typeId.id] ?: error("Type not found for item ${item.id}"),
                 )
             }
             .toList()

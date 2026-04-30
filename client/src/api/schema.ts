@@ -470,16 +470,9 @@ export interface components {
       types: components["schemas"]["ClothingTypeSummary"][]
     }
     ResolvedClothingItem: {
-      /** Format: int64 */
-      id: number
-      barcode?: string
-      typeName: string
-      size: string
-      /** Format: int64 */
-      currentLocationId?: number
-      currentLocationName?: string
-      /** @enum {string} */
-      currentLocationType?: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+      clothingItem: components["schemas"]["ClothingItem"]
+      location?: components["schemas"]["ClothingLocation"]
+      clothingType: components["schemas"]["ClothingType"]
     }
   }
   responses: never
