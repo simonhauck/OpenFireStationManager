@@ -29,11 +29,7 @@ class ClothingItemLookupService(
             typeRepository.findById(item.typeId.id)
                 ?: throw NotFoundException("Type not found for item ${item.id}")
 
-        return ResolvedClothingItem(
-            clothingItem = item,
-            location = location,
-            clothingType = type,
-        )
+        return ResolvedClothingItem(clothingItem = item, location = location, clothingType = type)
     }
 
     fun search(q: String, limit: Int, isKleiderwart: Boolean): List<ResolvedClothingItem> {
@@ -61,7 +57,8 @@ class ClothingItemLookupService(
                 ResolvedClothingItem(
                     clothingItem = item,
                     location = location,
-                    clothingType = types[item.typeId.id] ?: error("Type not found for item ${item.id}"),
+                    clothingType =
+                        types[item.typeId.id] ?: error("Type not found for item ${item.id}"),
                 )
             }
             .toList()
