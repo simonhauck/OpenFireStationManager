@@ -779,6 +779,77 @@
           }
         }
       }
+    },
+    "/api/clothing/items/search": {
+      "get": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Search clothing items by type name, size, or barcode",
+        "operationId": "searchItems",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedClothingItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/items/by-barcode/{barcode}": {
+      "get": {
+        "tags": ["clothing-item-controller"],
+        "summary": "Look up a clothing item by barcode",
+        "operationId": "getItemByBarcode",
+        "parameters": [
+          {
+            "name": "barcode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedClothingItem"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1226,6 +1297,21 @@
           }
         },
         "required": ["locationId", "locationName", "types"]
+      },
+      "ResolvedClothingItem": {
+        "type": "object",
+        "properties": {
+          "clothingItem": {
+            "$ref": "#/components/schemas/ClothingItem"
+          },
+          "location": {
+            "$ref": "#/components/schemas/ClothingLocation"
+          },
+          "clothingType": {
+            "$ref": "#/components/schemas/ClothingType"
+          }
+        },
+        "required": ["clothingItem", "clothingType"]
       }
     }
   }

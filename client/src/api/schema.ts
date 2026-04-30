@@ -295,6 +295,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/items/search": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Search clothing items by type name, size, or barcode */
+    get: operations["searchItems"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/items/by-barcode/{barcode}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Look up a clothing item by barcode */
+    get: operations["getItemByBarcode"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -434,6 +468,11 @@ export interface components {
       locationId: number
       locationName: string
       types: components["schemas"]["ClothingTypeSummary"][]
+    }
+    ResolvedClothingItem: {
+      clothingItem: components["schemas"]["ClothingItem"]
+      location?: components["schemas"]["ClothingLocation"]
+      clothingType: components["schemas"]["ClothingType"]
     }
   }
   responses: never
@@ -1075,6 +1114,51 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingLocationSummary"][]
+        }
+      }
+    }
+  }
+  searchItems: {
+    parameters: {
+      query: {
+        q: string
+        limit?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ResolvedClothingItem"][]
+        }
+      }
+    }
+  }
+  getItemByBarcode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        barcode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ResolvedClothingItem"]
         }
       }
     }
