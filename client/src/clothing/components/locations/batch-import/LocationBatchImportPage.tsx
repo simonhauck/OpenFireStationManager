@@ -126,7 +126,7 @@ function LocationBatchImportPageContent() {
       name: row.name,
       comment: row.comment,
       onlyVisibleForKleiderwart: false,
-      shouldBeShownOnDashboard: false,
+      type: "OTHER" as const,
     }))
 
     setPreview(requests)
