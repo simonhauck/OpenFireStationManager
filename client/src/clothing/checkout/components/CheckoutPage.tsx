@@ -1,4 +1,3 @@
-import { useNavigate } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useRef, useState } from "react"
@@ -15,6 +14,8 @@ import {
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
+import { VerticalStepper } from "#/components/base/VerticalStepper"
+import type { Step } from "#/components/base/VerticalStepper"
 import RenderIf from "#/components/base/RenderIf"
 import { Input } from "#/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
@@ -30,6 +31,21 @@ import {
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
 
+const CHECKOUT_STEPS: Step[] = [
+  { label: "Spind wählen", description: "PERSONAL-Standort auswählen" },
+  {
+    label: "Kleidung scannen",
+    description: "Barcode scannen oder manuell suchen",
+  },
+  {
+    label: "Rückgabe wählen",
+    description: "Kleidung aus dem Spind zurückgeben",
+  },
+  { label: "Wäsche-Ziel wählen", description: "Ziel-Wäschekorb auswählen" },
+  { label: "Überprüfen", description: "Ausgabe und Rückgabe prüfen" },
+  { label: "Bestätigen", description: "Vorgang abschließen" },
+]
+
 export default function CheckoutPage() {
   const { state, selectTarget, addItem, reset } = useCheckoutWizard()
 
@@ -42,13 +58,23 @@ export default function CheckoutPage() {
         </TouchButton>
       </div>
 
-      <RenderIf when={state.step === 1}>
-        <StepTargetPicker onSelect={selectTarget} />
-      </RenderIf>
+      <div className="flex gap-8">
+        {/* Step indicator */}
+        <aside className="hidden shrink-0 sm:block">
+          <VerticalStepper steps={CHECKOUT_STEPS} currentStep={state.step} />
+        </aside>
 
-      <RenderIf when={state.step === 2}>
-        <StepItemScanner state={state} onAddItem={addItem} />
-      </RenderIf>
+        {/* Step content */}
+        <div className="min-w-0 flex-1">
+          <RenderIf when={state.step === 1}>
+            <StepTargetPicker onSelect={selectTarget} />
+          </RenderIf>
+
+          <RenderIf when={state.step === 2}>
+            <StepItemScanner state={state} onAddItem={addItem} />
+          </RenderIf>
+        </div>
+      </div>
     </div>
   )
 }
