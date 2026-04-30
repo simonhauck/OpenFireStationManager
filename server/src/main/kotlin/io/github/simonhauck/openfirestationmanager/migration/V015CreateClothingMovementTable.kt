@@ -15,12 +15,10 @@ class V015CreateClothingMovementTable : DatabaseMigration {
                 item_id BIGINT NOT NULL REFERENCES clothing_items(id) ON DELETE CASCADE,
                 from_location_id BIGINT REFERENCES clothing_locations(id) ON DELETE SET NULL,
                 to_location_id BIGINT REFERENCES clothing_locations(id) ON DELETE SET NULL,
+                performed_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                performed_by_user_id VARCHAR(255) NOT NULL,
                 reason VARCHAR(50) NOT NULL,
-                batch_id VARCHAR(255),
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                created_by VARCHAR(100) NOT NULL DEFAULT 'System',
-                last_modified_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                last_modified_by VARCHAR(100) NOT NULL DEFAULT 'System'
+                batch_id VARCHAR(255)
             )
             """
                 .trimIndent()
