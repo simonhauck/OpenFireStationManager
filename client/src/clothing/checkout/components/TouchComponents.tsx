@@ -45,6 +45,7 @@ export interface TouchComboboxProps {
   options: ComboboxOption[]
   value: string | null
   onSelect: (value: string) => void
+  onSearchChange?: (query: string) => void
   placeholder?: string
   searchPlaceholder?: string
   emptyMessage?: string
@@ -59,6 +60,7 @@ export function TouchCombobox({
   options,
   value,
   onSelect,
+  onSearchChange,
   placeholder = "Auswählen...",
   searchPlaceholder = "Suchen...",
   emptyMessage = "Keine Ergebnisse gefunden.",
@@ -92,6 +94,7 @@ export function TouchCombobox({
           <CommandInput
             placeholder={searchPlaceholder}
             className="h-12 text-base"
+            onValueChange={onSearchChange}
           />
           <CommandList>
             <CommandEmpty>{emptyMessage}</CommandEmpty>

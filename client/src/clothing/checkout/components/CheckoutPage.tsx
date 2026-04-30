@@ -216,6 +216,7 @@ function StepItemScanner({ state, onAddItem }: StepItemScannerProps) {
               options={searchOptions}
               value={null}
               onSelect={handleSearchSelect}
+              onSearchChange={(q) => void handleSearchChange(q)}
               placeholder="Kleidungsstück suchen..."
               searchPlaceholder="Typ, Größe oder Barcode..."
               emptyMessage={
