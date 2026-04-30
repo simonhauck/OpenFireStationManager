@@ -6,6 +6,7 @@ import io.github.simonhauck.openfirestationmanager.clothing.item.CreateOrUpdateC
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocationControllerCalls
 import io.github.simonhauck.openfirestationmanager.clothing.location.CreateClothingLocationRequest
+import io.github.simonhauck.openfirestationmanager.clothing.location.LocationType
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.clothing.type.CreateOrUpdateClothingTypeRequest
 import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveClothingTypeControllerCalls
@@ -57,8 +58,8 @@ class ClothingOverviewControllerIT : IntegrationTest() {
     @Test
     fun `getDashboardLocationSummaries should return type and size summaries for dashboard locations only`() {
         val type = createType()
-        val dashboardLocation = createLocation(shouldBeShownOnDashboard = true)
-        val hiddenLocation = createLocation(shouldBeShownOnDashboard = false)
+        val dashboardLocation = createLocation(type = LocationType.POOL)
+        val hiddenLocation = createLocation(type = LocationType.OTHER)
 
         itemCalls.createItem(
             CreateOrUpdateClothingItemRequest(
@@ -107,7 +108,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
 
     private fun createLocation(
         name: String = "Location-${System.nanoTime()}",
-        shouldBeShownOnDashboard: Boolean = false,
+        type: LocationType = LocationType.OTHER,
     ): ClothingLocation {
         return locationCalls
             .createLocation(
@@ -115,7 +116,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
                     name = name,
                     comment = "",
                     onlyVisibleForKleiderwart = false,
-                    shouldBeShownOnDashboard = shouldBeShownOnDashboard,
+                    type = type,
                 ),
                 authCookie = validCookieHeader,
             )

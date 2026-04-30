@@ -5,6 +5,7 @@ import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLoc
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocationControllerCalls
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocationRepository
 import io.github.simonhauck.openfirestationmanager.clothing.location.CreateClothingLocationRequest
+import io.github.simonhauck.openfirestationmanager.clothing.location.LocationType
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.clothing.type.CreateOrUpdateClothingTypeRequest
 import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveClothingTypeControllerCalls
@@ -190,7 +191,7 @@ class ClothingItemControllerIT : IntegrationTest() {
                     name = name,
                     comment = "",
                     onlyVisibleForKleiderwart = false,
-                    shouldBeShownOnDashboard = false,
+                    type = LocationType.POOL,
                 ),
                 authCookie = validCookieHeader,
             )

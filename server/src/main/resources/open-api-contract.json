@@ -969,16 +969,12 @@
           "onlyVisibleForKleiderwart": {
             "type": "boolean"
           },
-          "shouldBeShownOnDashboard": {
-            "type": "boolean"
+          "type": {
+            "type": "string",
+            "enum": ["POOL", "WAESCHE", "PERSONAL", "OTHER"]
           }
         },
-        "required": [
-          "comment",
-          "name",
-          "onlyVisibleForKleiderwart",
-          "shouldBeShownOnDashboard"
-        ]
+        "required": ["comment", "name", "onlyVisibleForKleiderwart", "type"]
       },
       "AggregateReferenceClothingLocationLong": {
         "type": "object",
@@ -1001,8 +997,9 @@
           "onlyVisibleForKleiderwart": {
             "type": "boolean"
           },
-          "shouldBeShownOnDashboard": {
-            "type": "boolean"
+          "type": {
+            "type": "string",
+            "enum": ["POOL", "WAESCHE", "PERSONAL", "OTHER"]
           },
           "id": {
             "type": "integer",
@@ -1022,7 +1019,7 @@
           "metaData",
           "name",
           "onlyVisibleForKleiderwart",
-          "shouldBeShownOnDashboard"
+          "type"
         ]
       },
       "BatchCreateClothingLocationsRequest": {

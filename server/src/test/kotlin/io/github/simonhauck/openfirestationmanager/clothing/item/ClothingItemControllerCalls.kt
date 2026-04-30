@@ -58,6 +58,16 @@ class ClothingItemControllerCalls(private val testRestTemplate: TestRestTemplate
         )
     }
 
+    fun createBatchItems(
+        request: BatchCreateClothingItemsRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<Array<ClothingItem>> {
+        return testRestTemplate.postForEntity<Array<ClothingItem>>(
+            "/api/clothing/items/batch",
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
     fun createItemExpectingError(
         request: CreateOrUpdateClothingItemRequest,
         authCookie: String? = null,

@@ -1,6 +1,7 @@
 package io.github.simonhauck.openfirestationmanager.clothing.location
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.clothing.overview.ClothingOverviewControllerCalls
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus
 class ClothingLocationControllerIT : IntegrationTest() {
 
     @Autowired private lateinit var calls: ClothingLocationControllerCalls
+    @Autowired private lateinit var overviewCalls: ClothingOverviewControllerCalls
 
     @Test
     fun `should create and read clothing locations`() {
@@ -20,7 +22,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                     name = uniqueName,
                     comment = "Main storage",
                     onlyVisibleForKleiderwart = true,
-                    shouldBeShownOnDashboard = false,
+                    type = LocationType.POOL,
                 ),
                 authCookie = validCookieHeader,
             )
@@ -31,13 +33,14 @@ class ClothingLocationControllerIT : IntegrationTest() {
         assertThat(created.name).isEqualTo(uniqueName)
         assertThat(created.comment).isEqualTo("Main storage")
         assertThat(created.onlyVisibleForKleiderwart).isTrue()
-        assertThat(created.shouldBeShownOnDashboard).isFalse()
+        assertThat(created.type).isEqualTo(LocationType.POOL)
 
         val byIdResponse = calls.getLocationById(created.id, authCookie = validCookieHeader)
 
         assertThat(byIdResponse.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(byIdResponse.body?.id).isEqualTo(created.id)
         assertThat(byIdResponse.body?.name).isEqualTo(uniqueName)
+        assertThat(byIdResponse.body?.type).isEqualTo(LocationType.POOL)
 
         val allResponse = calls.getAllLocations(authCookie = validCookieHeader)
 
@@ -56,13 +59,13 @@ class ClothingLocationControllerIT : IntegrationTest() {
                             name = "BatchLoc-A-$suffix",
                             comment = "First",
                             onlyVisibleForKleiderwart = false,
-                            shouldBeShownOnDashboard = true,
+                            type = LocationType.POOL,
                         ),
                         CreateClothingLocationRequest(
                             name = "BatchLoc-B-$suffix",
                             comment = "Second",
                             onlyVisibleForKleiderwart = true,
-                            shouldBeShownOnDashboard = false,
+                            type = LocationType.PERSONAL,
                         ),
                     )
             )
@@ -86,7 +89,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                         name = "Original-${System.nanoTime()}",
                         comment = "Old comment",
                         onlyVisibleForKleiderwart = false,
-                        shouldBeShownOnDashboard = false,
+                        type = LocationType.OTHER,
                     ),
                     authCookie = validCookieHeader,
                 )
@@ -100,7 +103,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                     name = updatedName,
                     comment = "New comment",
                     onlyVisibleForKleiderwart = true,
-                    shouldBeShownOnDashboard = true,
+                    type = LocationType.WAESCHE,
                 ),
                 authCookie = validCookieHeader,
             )
@@ -111,7 +114,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
         assertThat(updated.name).isEqualTo(updatedName)
         assertThat(updated.comment).isEqualTo("New comment")
         assertThat(updated.onlyVisibleForKleiderwart).isTrue()
-        assertThat(updated.shouldBeShownOnDashboard).isTrue()
+        assertThat(updated.type).isEqualTo(LocationType.WAESCHE)
     }
 
     @Test
@@ -123,7 +126,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                         name = "ToDelete-${System.nanoTime()}",
                         comment = "",
                         onlyVisibleForKleiderwart = false,
-                        shouldBeShownOnDashboard = false,
+                        type = LocationType.OTHER,
                     ),
                     authCookie = validCookieHeader,
                 )
@@ -132,5 +135,71 @@ class ClothingLocationControllerIT : IntegrationTest() {
         val deleteResponse = calls.deleteLocation(created.id, authCookie = validCookieHeader)
 
         assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
+    fun `dashboard summary includes POOL and WAESCHE locations but not PERSONAL or OTHER`() {
+        val suffix = System.nanoTime()
+
+        // Create one of each type
+        val pool =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        "DashPool-$suffix",
+                        "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.POOL,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val waesche =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        "DashWaesche-$suffix",
+                        "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.WAESCHE,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val personal =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        "DashPersonal-$suffix",
+                        "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.PERSONAL,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val other =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        "DashOther-$suffix",
+                        "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.OTHER,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val dashboardResponse =
+            overviewCalls.getDashboardLocationSummaries(authCookie = validCookieHeader)
+
+        assertThat(dashboardResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val locationIds = dashboardResponse.body!!.map { it.locationId }
+        assertThat(locationIds).contains(pool.id, waesche.id)
+        assertThat(locationIds).doesNotContain(personal.id, other.id)
     }
 }

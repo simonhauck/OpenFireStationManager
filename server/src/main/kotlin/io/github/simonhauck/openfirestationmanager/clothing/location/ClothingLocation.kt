@@ -8,11 +8,18 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
+enum class LocationType {
+    POOL,
+    WAESCHE,
+    PERSONAL,
+    OTHER,
+}
+
 data class CreateClothingLocationRequest(
     @NotBlank @Size(max = 255) val name: String,
     @Size(max = 255) val comment: String,
     val onlyVisibleForKleiderwart: Boolean,
-    val shouldBeShownOnDashboard: Boolean,
+    val type: LocationType,
 )
 
 data class BatchCreateClothingLocationsRequest(val items: List<CreateClothingLocationRequest>)
@@ -22,7 +29,7 @@ data class ClothingLocation(
     val name: String,
     val comment: String,
     val onlyVisibleForKleiderwart: Boolean,
-    val shouldBeShownOnDashboard: Boolean,
+    val type: LocationType,
     @Id override val id: Long = 0,
     @Embedded.Nullable override val metaData: EntityMetaData = EntityMetaData(),
 ) : BaseEntity<ClothingLocation> {

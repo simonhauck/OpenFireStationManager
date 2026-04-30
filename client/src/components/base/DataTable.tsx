@@ -25,6 +25,7 @@ export type DataTableColumn<TRow> = {
   id: string
   header: string
   getValue: (row: TRow) => DataTableCellValue
+  renderCell?: (row: TRow) => ReactNode
 }
 
 export type DataTableActionColumnProps<TRow> = {
@@ -275,7 +276,9 @@ export default function DataTable<TRow>({
                       <TableCell
                         key={`${rowIndex}-${column.id}-${columnIndex}`}
                       >
-                        {renderCellValue(column.getValue(row))}
+                        {column.renderCell
+                          ? column.renderCell(row)
+                          : renderCellValue(column.getValue(row))}
                       </TableCell>
                     ),
                   )}

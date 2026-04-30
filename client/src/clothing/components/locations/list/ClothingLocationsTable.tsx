@@ -7,7 +7,15 @@ import type { DataTableColumn } from "#/components/base/DataTable"
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import { deleteClothingLocationMutation } from "#/clothing/service/clothingLocationsQueries"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
+import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
+
+const LOCATION_TYPE_LABELS: Record<ClothingLocation["type"], string> = {
+  POOL: "Pool",
+  WAESCHE: "Wäsche",
+  PERSONAL: "Persönlicher Standort",
+  OTHER: "Sonstiges",
+}
 
 interface ClothingLocationsTableProps {
   locations: ClothingLocation[]
@@ -33,6 +41,14 @@ export default function ClothingLocationsTable({
       getValue: (location: ClothingLocation) => location.name,
     },
     {
+      id: "type",
+      header: "Typ",
+      renderCell: (location: ClothingLocation) => (
+        <Badge variant="outline">{LOCATION_TYPE_LABELS[location.type]}</Badge>
+      ),
+      getValue: (location: ClothingLocation) => location.type,
+    },
+    {
       id: "comment",
       header: "Kommentar",
       getValue: (location: ClothingLocation) => location.comment || "-",
@@ -42,12 +58,6 @@ export default function ClothingLocationsTable({
       header: "Nur Kleiderwart",
       getValue: (location: ClothingLocation) =>
         location.onlyVisibleForKleiderwart ? "Ja" : "Nein",
-    },
-    {
-      id: "dashboard",
-      header: "Dashboard",
-      getValue: (location: ClothingLocation) =>
-        location.shouldBeShownOnDashboard ? "Ja" : "Nein",
     },
     {
       id: "createdAt",

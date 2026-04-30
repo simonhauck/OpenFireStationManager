@@ -4,6 +4,7 @@ import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItem
 import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemRepository
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocationRepository
+import io.github.simonhauck.openfirestationmanager.clothing.location.LocationType
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingTypeRepository
 import org.springframework.stereotype.Service
@@ -30,7 +31,7 @@ class ClothingOverviewService(
         val types = clothingTypeRepository.findAll()
 
         return clothingLocationRepository
-            .findAllByShouldBeShownOnDashboard(true)
+            .findAllByTypeIn(listOf(LocationType.POOL, LocationType.WAESCHE))
             .sortedBy { it.id }
             .map { location ->
                 ClothingLocationSummary(
