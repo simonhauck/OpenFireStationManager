@@ -13,13 +13,18 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
             ?: throw NotFoundException("Clothing location not found for id: $id")
     }
 
+    fun getDashboardLocations(): List<ClothingLocation> =
+        repository.findAllByTypeIn(listOf(LocationType.POOL, LocationType.WAESCHE)).sortedBy {
+            it.id
+        }
+
     fun createLocation(request: CreateClothingLocationRequest): ClothingLocation {
         val entity =
             ClothingLocation(
                 name = request.name,
                 comment = request.comment,
                 onlyVisibleForKleiderwart = request.onlyVisibleForKleiderwart,
-                shouldBeShownOnDashboard = request.shouldBeShownOnDashboard,
+                type = request.type,
             )
         return repository.save(entity)
     }
@@ -33,7 +38,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
                     name = req.name,
                     comment = req.comment,
                     onlyVisibleForKleiderwart = req.onlyVisibleForKleiderwart,
-                    shouldBeShownOnDashboard = req.shouldBeShownOnDashboard,
+                    type = req.type,
                 )
             }
         return repository.saveAll(entities)
@@ -46,7 +51,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
                 name = request.name,
                 comment = request.comment,
                 onlyVisibleForKleiderwart = request.onlyVisibleForKleiderwart,
-                shouldBeShownOnDashboard = request.shouldBeShownOnDashboard,
+                type = request.type,
             )
         )
     }

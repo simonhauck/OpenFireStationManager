@@ -10,6 +10,7 @@ type CreateClothingLocationRequest =
   components["schemas"]["CreateClothingLocationRequest"]
 type BatchCreateClothingLocationsRequest =
   components["schemas"]["BatchCreateClothingLocationsRequest"]
+type LocationType = CreateClothingLocationRequest["type"]
 
 type UpdateClothingLocationVariables = {
   id: number
@@ -153,4 +154,5 @@ export type {
   ClothingLocation,
   CreateClothingLocationRequest,
   BatchCreateClothingLocationsRequest,
+  LocationType,
 }

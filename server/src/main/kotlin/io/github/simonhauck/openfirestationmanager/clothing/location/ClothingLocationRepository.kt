@@ -10,7 +10,7 @@ interface ClothingLocationRepository : Repository<ClothingLocation, Long> {
 
     fun findAll(): List<ClothingLocation>
 
-    fun findAllByShouldBeShownOnDashboard(shouldBeShownOnDashboard: Boolean): List<ClothingLocation>
+    fun findAllByTypeIn(types: List<LocationType>): List<ClothingLocation>
 
     fun findById(id: Long): ClothingLocation?
 

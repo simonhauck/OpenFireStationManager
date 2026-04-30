@@ -8,6 +8,7 @@ import {
   updateClothingLocationMutation,
 } from "#/clothing/service/clothingLocationsQueries"
 import ErrorState from "#/components/base/ErrorState"
+import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
 import {
   Card,
@@ -19,6 +20,15 @@ import {
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
+
+type LocationType = "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+
+const LOCATION_TYPE_OPTIONS: { value: LocationType; label: string }[] = [
+  { value: "POOL", label: "Pool" },
+  { value: "WAESCHE", label: "Wäsche" },
+  { value: "PERSONAL", label: "Persönlicher Standort" },
+  { value: "OTHER", label: "Sonstiges" },
+]
 
 type ClothingLocationFormProps = {
   existingLocation?: ClothingLocation
@@ -37,8 +47,8 @@ export default function ClothingLocationForm({
   const [onlyVisibleForKleiderwart, setOnlyVisibleForKleiderwart] = useState(
     existingLocation?.onlyVisibleForKleiderwart ?? false,
   )
-  const [shouldBeShownOnDashboard, setShouldBeShownOnDashboard] = useState(
-    existingLocation?.shouldBeShownOnDashboard ?? false,
+  const [type, setType] = useState<LocationType | "">(
+    existingLocation?.type ?? "",
   )
 
   const {
@@ -64,11 +74,13 @@ export default function ClothingLocationForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (!type) return
+
     const body = {
       name,
       comment,
       onlyVisibleForKleiderwart,
-      shouldBeShownOnDashboard,
+      type,
     }
 
     if (isEditing) {
@@ -98,6 +110,29 @@ export default function ClothingLocationForm({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Typ</Label>
+              <div className="flex flex-col gap-2">
+                {LOCATION_TYPE_OPTIONS.map((option) => (
+                  <div key={option.value} className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      id={`type-${option.value}`}
+                      name="type"
+                      value={option.value}
+                      checked={type === option.value}
+                      onChange={() => setType(option.value)}
+                      required
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor={`type-${option.value}`}>
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="name">Bezeichnung</Label>
               <Input
@@ -130,28 +165,15 @@ export default function ClothingLocationForm({
               </Label>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="shouldBeShownOnDashboard"
-                checked={shouldBeShownOnDashboard}
-                onCheckedChange={(checked) =>
-                  setShouldBeShownOnDashboard(checked === true)
-                }
-              />
-              <Label htmlFor="shouldBeShownOnDashboard">
-                Auf Dashboard anzeigen
-              </Label>
-            </div>
-
-            {error && (
+            <RenderIf when={!!error}>
               <ErrorState message="Der Standort konnte nicht gespeichert werden." />
-            )}
+            </RenderIf>
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
                 <Link to="/clothing-management/locations">Abbrechen</Link>
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending || !type}>
                 {isPending ? "Wird gespeichert..." : "Speichern"}
               </Button>
             </div>

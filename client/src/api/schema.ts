@@ -354,7 +354,8 @@ export interface components {
       name: string
       comment: string
       onlyVisibleForKleiderwart: boolean
-      shouldBeShownOnDashboard: boolean
+      /** @enum {string} */
+      type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
     }
     AggregateReferenceClothingLocationLong: {
       /** Format: int64 */
@@ -364,7 +365,8 @@ export interface components {
       name: string
       comment: string
       onlyVisibleForKleiderwart: boolean
-      shouldBeShownOnDashboard: boolean
+      /** @enum {string} */
+      type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]

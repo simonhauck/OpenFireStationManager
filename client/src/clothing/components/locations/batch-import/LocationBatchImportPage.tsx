@@ -5,6 +5,7 @@ import { useState } from "react"
 import type {
   ClothingLocation,
   CreateClothingLocationRequest,
+  LocationType,
 } from "#/clothing/service/clothingLocationsQueries"
 import { batchCreateClothingLocationsMutation } from "#/clothing/service/clothingLocationsQueries"
 import DataTable from "#/components/base/DataTable"
@@ -20,7 +21,21 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "#/components/ui/select"
 import { Textarea } from "#/components/ui/textarea"
+
+const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
+  POOL: "Pool",
+  WAESCHE: "Wäsche",
+  PERSONAL: "Persönlicher Standort",
+  OTHER: "Sonstiges",
+}
 
 interface ParsedRow {
   name: string
@@ -69,6 +84,11 @@ const previewColumns: DataTableColumn<CreateClothingLocationRequest>[] = [
     header: "Kommentar",
     getValue: (item) => item.comment || "—",
   },
+  {
+    id: "type",
+    header: "Typ",
+    getValue: (item) => LOCATION_TYPE_LABELS[item.type],
+  },
 ]
 
 const resultColumns: DataTableColumn<ClothingLocation>[] = [
@@ -87,6 +107,11 @@ const resultColumns: DataTableColumn<ClothingLocation>[] = [
     header: "Kommentar",
     getValue: (location) => location.comment || "—",
   },
+  {
+    id: "type",
+    header: "Typ",
+    getValue: (location) => LOCATION_TYPE_LABELS[location.type],
+  },
 ]
 
 export default function LocationBatchImportPage() {
@@ -101,6 +126,7 @@ function LocationBatchImportPageContent() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [csvInput, setCsvInput] = useState("")
+  const [locationType, setLocationType] = useState<LocationType>("POOL")
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [preview, setPreview] = useState<
     CreateClothingLocationRequest[] | null
@@ -126,7 +152,7 @@ function LocationBatchImportPageContent() {
       name: row.name,
       comment: row.comment,
       onlyVisibleForKleiderwart: false,
-      shouldBeShownOnDashboard: false,
+      type: locationType,
     }))
 
     setPreview(requests)
@@ -155,6 +181,7 @@ function LocationBatchImportPageContent() {
           <CardDescription>
             Importiere mehrere Standorte auf einmal. Gib die Daten im CSV-Format
             ein: <code>Bezeichnung,Kommentar</code>. Der Kommentar ist optional.
+            Alle importierten Standorte erhalten den ausgewählten Typ.
           </CardDescription>
         </CardHeader>
 
@@ -162,6 +189,8 @@ function LocationBatchImportPageContent() {
           <RenderIf when={createdLocations === null}>
             <CsvInputSection
               value={csvInput}
+              locationType={locationType}
+              onLocationTypeChange={setLocationType}
               onChange={(val) => {
                 setCsvInput(val)
                 setPreview(null)
@@ -212,6 +241,8 @@ function LocationBatchImportPageContent() {
 
 interface CsvInputSectionProps {
   value: string
+  locationType: LocationType
+  onLocationTypeChange: (type: LocationType) => void
   onChange: (value: string) => void
   onPreview: () => void
   disabled: boolean
@@ -219,12 +250,35 @@ interface CsvInputSectionProps {
 
 function CsvInputSection({
   value,
+  locationType,
+  onLocationTypeChange,
   onChange,
   onPreview,
   disabled,
 }: CsvInputSectionProps) {
   return (
     <>
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium">Standorttyp</p>
+        <Select
+          value={locationType}
+          onValueChange={(v) => onLocationTypeChange(v as LocationType)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(LOCATION_TYPE_LABELS) as LocationType[]).map(
+              (type) => (
+                <SelectItem key={type} value={type}>
+                  {LOCATION_TYPE_LABELS[type]}
+                </SelectItem>
+              ),
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="space-y-1.5">
         <p className="text-sm font-medium">CSV-Daten eingeben</p>
         <p className="text-sm italic">Beispiel: Schrank A,Hauptgebaeude EG</p>
