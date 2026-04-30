@@ -1,5 +1,8 @@
+import { Link } from "@tanstack/react-router"
+
 import type { ClothingLocationSizeSummary } from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
+import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
@@ -11,6 +14,11 @@ export default function PoolKlamottenPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <TouchButton asChild>
+          <Link to="/checkout">Klamotten Ausgabe</Link>
+        </TouchButton>
+      </div>
       <PoolKlamottenOverviewCard
         overview={overview}
         isLoading={isLoading}
