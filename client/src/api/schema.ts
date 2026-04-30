@@ -156,6 +156,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/checkouts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Perform a two-phase checkout */
+    post: operations["checkout"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/admin/users": {
     parameters: {
       query?: never
@@ -436,6 +453,36 @@ export interface components {
     BatchCreateClothingItemsRequest: {
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
     }
+    CheckoutRequest: {
+      /** Format: int64 */
+      targetLocationId: number
+      /** Format: int64 */
+      returnLocationId?: number
+      takeItemIds: number[]
+      returnItemIds: number[]
+      acknowledgedItemIds: number[]
+    }
+    CheckoutHttpResponse: {
+      status: string
+    }
+    Discrepancy: {
+      /** Format: int64 */
+      itemId: number
+      /** Format: int64 */
+      claimedLocationId: number
+      /** Format: int64 */
+      actualLocationId?: number
+    }
+    NeedsConfirmation: {
+      status: "NeedsConfirmation"
+    } & (Omit<components["schemas"]["CheckoutHttpResponse"], "status"> & {
+      discrepancies: components["schemas"]["Discrepancy"][]
+    })
+    Ok: {
+      status: "Ok"
+    } & (Omit<components["schemas"]["CheckoutHttpResponse"], "status"> & {
+      batchId: string
+    })
     CreateUserRequest: {
       username: string
       password: string
@@ -749,6 +796,32 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingItem"][]
+        }
+      }
+    }
+  }
+  checkout: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CheckoutRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*":
+            | components["schemas"]["NeedsConfirmation"]
+            | components["schemas"]["Ok"]
         }
       }
     }

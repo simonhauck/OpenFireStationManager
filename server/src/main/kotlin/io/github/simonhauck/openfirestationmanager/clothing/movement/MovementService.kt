@@ -1,7 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.clothing.movement
 
 import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItem
-import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
 import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.stereotype.Service
 
@@ -13,15 +12,14 @@ class MovementService(private val repository: ClothingMovementRepository) {
         fromLocationId: Long?,
         toLocationId: Long?,
         reason: MovementReason,
+        // TODO 01.05.26 - Simon.Hauck check if this is really required
         batchId: String? = null,
     ): ClothingMovement {
         val movement =
             ClothingMovement(
                 itemId = AggregateReference.to(item.id),
-                fromLocationId =
-                    fromLocationId?.let { AggregateReference.to<ClothingLocation, Long>(it) },
-                toLocationId =
-                    toLocationId?.let { AggregateReference.to<ClothingLocation, Long>(it) },
+                fromLocationId = fromLocationId?.let { AggregateReference.to(it) },
+                toLocationId = toLocationId?.let { AggregateReference.to(it) },
                 reason = reason,
                 batchId = batchId,
             )

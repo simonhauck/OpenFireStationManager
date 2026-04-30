@@ -318,6 +318,42 @@
         }
       }
     },
+    "/api/clothing/checkouts": {
+      "post": {
+        "tags": ["checkout-controller"],
+        "summary": "Perform a two-phase checkout",
+        "operationId": "checkout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NeedsConfirmation"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Ok"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/users": {
       "get": {
         "tags": ["admin-user-controller"],
@@ -1179,6 +1215,110 @@
           }
         },
         "required": ["items"]
+      },
+      "CheckoutRequest": {
+        "type": "object",
+        "properties": {
+          "targetLocationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "returnLocationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "takeItemIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "returnItemIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "acknowledgedItemIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "required": [
+          "acknowledgedItemIds",
+          "returnItemIds",
+          "takeItemIds",
+          "targetLocationId"
+        ]
+      },
+      "CheckoutHttpResponse": {
+        "discriminator": {
+          "propertyName": "status"
+        },
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": ["status"]
+      },
+      "Discrepancy": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "claimedLocationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "actualLocationId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": ["claimedLocationId", "itemId"]
+      },
+      "NeedsConfirmation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CheckoutHttpResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "discrepancies": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Discrepancy"
+                }
+              }
+            }
+          }
+        ],
+        "required": ["discrepancies"]
+      },
+      "Ok": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CheckoutHttpResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "batchId": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "required": ["batchId"]
       },
       "CreateUserRequest": {
         "type": "object",
