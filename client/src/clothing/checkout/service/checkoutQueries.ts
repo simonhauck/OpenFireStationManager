@@ -47,10 +47,6 @@ export const checkoutMutation = () =>
       const { data, error } = await client.POST("/api/clothing/checkouts", {
         body,
       })
-      return ensureData(
-        data,
-        error,
-        "POST /api/clothing/checkouts",
-      )
+      return ensureData(data, error, "POST /api/clothing/checkouts")
     },
   })
