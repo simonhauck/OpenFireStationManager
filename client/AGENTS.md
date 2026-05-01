@@ -27,16 +27,30 @@ All commands below are run from the `client/` directory.
 
 ## Commands
 
-| Purpose                        | Command              |
-| ------------------------------ | -------------------- |
-| Start dev server               | `npm run dev`        |
-| Production build               | `npm run build`      |
-| Preview production build       | `npm run preview`    |
-| Run tests                      | `npm run test`       |
-| Lint                           | `npm run lint`       |
-| Format check                   | `npm run format`     |
-| Format + lint auto-fix         | `npm run check`      |
-| Generate frontend API bindings | `npm run prepareEnv` |
+| Purpose                        | Command               |
+| ------------------------------ | --------------------- |
+| Start dev server               | `npm run dev`         |
+| Production build               | `npm run build`       |
+| Preview production build       | `npm run preview`     |
+| Run unit tests                 | `npm run test`        |
+| Run Playwright tests           | `npm run test:e2e`    |
+| Run Playwright tests (UI mode) | `npm run test:e2e:ui` |
+| Lint                           | `npm run lint`        |
+| Format check                   | `npm run format`      |
+| Format + lint auto-fix         | `npm run check`       |
+| Generate frontend API bindings | `npm run prepareEnv`  |
+
+---
+
+## Testing Strategy
+
+Frontend testing is done **primarily with Playwright** (end-to-end / integration tests).
+
+- Write Playwright tests for all user-facing features and flows.
+- Prefer Playwright tests over unit tests for UI behaviour; unit tests are reserved for pure
+  utility functions and logic that is hard to exercise through the browser.
+- Playwright tests live under `e2e/` (or wherever the project's Playwright config points).
+- Run Playwright tests with `npm run test:e2e` (or `npm run test:e2e:ui` for interactive UI mode).
 
 ---
 
