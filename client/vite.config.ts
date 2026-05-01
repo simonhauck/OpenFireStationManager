@@ -1,6 +1,6 @@
 import { defineConfig } from "vite"
+import { fileURLToPath } from "node:url"
 import { devtools } from "@tanstack/devtools-vite"
-import tsconfigPaths from "vite-tsconfig-paths"
 
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 
@@ -9,6 +9,14 @@ import tailwindcss from "@tailwindcss/vite"
 import { VitePWA } from "vite-plugin-pwa"
 
 const config = defineConfig({
+  resolve: {
+    alias: [
+      {
+        find: /^#\//,
+        replacement: fileURLToPath(new URL("./src/", import.meta.url)),
+      },
+    ],
+  },
   server: {
     proxy: {
       "/api": {
@@ -23,7 +31,6 @@ const config = defineConfig({
   },
   plugins: [
     devtools(),
-    tsconfigPaths({ projects: ["./tsconfig.json"] }),
     tailwindcss(),
     tanstackRouter({ target: "react", autoCodeSplitting: true }),
     viteReact(),
