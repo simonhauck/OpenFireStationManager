@@ -67,9 +67,7 @@ test.describe("Checkout", () => {
     await checkoutPage.clickWeiter()
 
     // ── Step 3: Return selection — locker is empty, just continue ─────────────
-    await expect(
-      page.getByText("Schritt 3: Rückgabe wählen"),
-    ).toBeVisible()
+    await expect(page.getByText("Schritt 3: Rückgabe wählen")).toBeVisible()
     await checkoutPage.confirmReturns()
 
     // Step 4 (Wäsche-Ziel) is skipped when no returns are selected; we land

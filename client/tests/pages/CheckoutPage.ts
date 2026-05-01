@@ -20,7 +20,9 @@ export class CheckoutPage {
 
   /** Types a barcode into the barcode input and presses Enter to confirm. */
   async scanBarcode(barcode: string) {
-    const input = this.page.getByPlaceholder("Barcode eingeben / Scanner verwenden...")
+    const input = this.page.getByPlaceholder(
+      "Barcode eingeben / Scanner verwenden...",
+    )
     await input.fill(barcode)
     await input.press("Enter")
   }

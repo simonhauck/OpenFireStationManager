@@ -81,11 +81,11 @@ Specs live under `tests/specs/` and follow the naming convention `<feature>.spec
 UUID-suffixed usernames (so parallel runs and shared databases never collide), logs each one
 in via the browser, and saves the resulting session cookies:
 
-| Persona | Roles | Auth file |
-| ------------ | ----------- | --------------------------------- |
-| `admin` | `ADMIN` | `playwright/.auth/admin.json` |
+| Persona       | Roles         | Auth file                           |
+| ------------- | ------------- | ----------------------------------- |
+| `admin`       | `ADMIN`       | `playwright/.auth/admin.json`       |
 | `kleiderwart` | `KLEIDERWART` | `playwright/.auth/kleiderwart.json` |
-| `user` | `USER` | `playwright/.auth/user.json` |
+| `user`        | `USER`        | `playwright/.auth/user.json`        |
 
 Activate a persona in a spec with `test.use`:
 
@@ -124,7 +124,9 @@ depends on — never to perform the action being tested.
 ```ts
 // ✅ correct — flow used as precondition, spec tests the real behaviour
 test.beforeAll(async ({ browser }) => {
-  const page = await browser.newPage({ storageState: "playwright/.auth/kleiderwart.json" })
+  const page = await browser.newPage({
+    storageState: "playwright/.auth/kleiderwart.json",
+  })
   typeName = await createClothingType(page, `Typ-${randomUUID().slice(0, 8)}`)
   await page.close()
 })
