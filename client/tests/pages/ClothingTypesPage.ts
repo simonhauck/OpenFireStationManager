@@ -33,7 +33,7 @@ export class ClothingTypesPage {
 
   async clickEditForType(name: string) {
     await this.page
-      .getByRole("button", { name: `Kleidungstyp ${name} bearbeiten` })
+      .getByRole("link", { name: `Kleidungstyp ${name} bearbeiten` })
       .click()
   }
 

@@ -29,9 +29,7 @@ export class ClothingLocationsPage {
     await this.page.getByRole("menuitem", { name: "Massenimport" }).click()
   }
 
-  async selectType(
-    type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER",
-  ) {
+  async selectType(type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER") {
     await this.page.locator(`#type-${type}`).click()
   }
 
@@ -49,7 +47,7 @@ export class ClothingLocationsPage {
 
   async clickEditForLocation(name: string) {
     await this.page
-      .getByRole("button", { name: `Standort ${name} bearbeiten` })
+      .getByRole("link", { name: `Standort ${name} bearbeiten` })
       .click()
   }
 

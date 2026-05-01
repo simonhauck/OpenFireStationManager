@@ -1,6 +1,6 @@
 import { chromium, request } from "@playwright/test"
-import { randomUUID } from "crypto"
-import path from "path"
+import { randomUUID } from "node:crypto"
+import path from "node:path"
 
 const BASE_URL = "http://localhost:8080"
 const CLIENT_URL = "http://localhost:3000"

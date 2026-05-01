@@ -12,9 +12,9 @@ test.describe("Pool Klamotten Dashboard", () => {
     await expect(poolPage.loadingIndicator()).not.toBeVisible()
     // No error state
     await expect(poolPage.errorState()).not.toBeVisible()
-    // Page title visible
+    // Page action button is visible
     await expect(
-      page.getByRole("heading", { name: /Pool Klamotten/i }),
+      page.getByRole("link", { name: "Klamotten Ausgabe" }),
     ).toBeVisible()
   })
 })

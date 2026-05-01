@@ -49,7 +49,7 @@ export class ClothingItemsPage {
 
   async clickEditForItem(id: string | number) {
     await this.page
-      .getByRole("button", {
+      .getByRole("link", {
         name: `Kleidungsstueck ${id} bearbeiten`,
       })
       .click()

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { randomUUID } from "crypto"
+import { randomUUID } from "node:crypto"
 import { UserManagementPage } from "../pages/UserManagementPage"
 
 test.use({ storageState: "playwright/.auth/admin.json" })
@@ -16,7 +16,8 @@ test.describe("User Management", () => {
     await userPage.fillFirstName("Max")
     await userPage.fillLastName("Mustermann")
     await userPage.fillPassword("testpassword")
-    await userPage.submitForm()
+    await userPage.fillConfirmPassword("testpassword")
+    await userPage.submitCreate()
 
     await expect(page).toHaveURL(/\/user-management$/)
     await expect(userPage.userRow(username)).toBeVisible()
@@ -32,14 +33,15 @@ test.describe("User Management", () => {
     await userPage.fillFirstName("Hans")
     await userPage.fillLastName("Alt")
     await userPage.fillPassword("testpassword")
-    await userPage.submitForm()
+    await userPage.fillConfirmPassword("testpassword")
+    await userPage.submitCreate()
     await expect(page).toHaveURL(/\/user-management$/)
 
     // Edit user
     await userPage.clickEditForUser(username)
     await userPage.fillFirstName("Hans")
     await userPage.fillLastName("Neu")
-    await userPage.submitForm()
+    await userPage.submitEdit()
 
     await expect(page).toHaveURL(/\/user-management$/)
     await expect(userPage.userRow(username)).toBeVisible()
