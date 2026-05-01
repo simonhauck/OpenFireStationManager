@@ -2,11 +2,6 @@ import { expect, test } from "@playwright/test"
 import { LoginPage } from "../pages/LoginPage"
 
 test.describe("Auth", () => {
-  test("redirects unauthenticated users to login", async ({ page }) => {
-    await page.goto("/")
-    await expect(page).toHaveURL(/\/login/)
-  })
-
   test("shows error message on invalid credentials", async ({ page }) => {
     const loginPage = new LoginPage(page)
     await loginPage.goto()

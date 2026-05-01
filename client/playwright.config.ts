@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "../gradlew server:bootRun",
+      command: "cd .. && ./gradlew server:bootRun",
       env: {
         SPRING_PROFILES_ACTIVE: process.env.SPRING_PROFILES_ACTIVE ?? "test",
         DB_URL: process.env.DB_URL ?? "jdbc:postgresql://localhost:5432/ofsm",
