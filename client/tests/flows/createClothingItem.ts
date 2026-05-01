@@ -5,6 +5,8 @@ export interface CreateItemOptions {
   typeName: string
   size: string
   barcode?: string
+  /** Name of the location to assign the item to. Must already exist. */
+  locationName?: string
 }
 
 /**
@@ -20,6 +22,9 @@ export async function createClothingItem(
   await itemsPage.fillSize(options.size)
   if (options.barcode) {
     await itemsPage.fillBarcode(options.barcode)
+  }
+  if (options.locationName) {
+    await itemsPage.selectLocation(options.locationName)
   }
   await itemsPage.submitForm()
   await page.waitForURL("**/clothing-management/items")
