@@ -27,18 +27,18 @@ All commands below are run from the `client/` directory.
 
 ## Commands
 
-| Purpose                        | Command              |
-| ------------------------------ | -------------------- |
-| Start dev server               | `npm run dev`        |
-| Production build               | `npm run build`      |
-| Preview production build       | `npm run preview`    |
-| Run unit tests                 | `npm run test`       |
-| Run Playwright tests           | `npm run test:e2e`   |
-| Run Playwright tests (UI mode) | `npm run test:e2e:ui`|
-| Lint                           | `npm run lint`       |
-| Format check                   | `npm run format`     |
-| Format + lint auto-fix         | `npm run check`      |
-| Generate frontend API bindings | `npm run prepareEnv` |
+| Purpose                        | Command               |
+| ------------------------------ | --------------------- |
+| Start dev server               | `npm run dev`         |
+| Production build               | `npm run build`       |
+| Preview production build       | `npm run preview`     |
+| Run unit tests                 | `npm run test`        |
+| Run Playwright tests           | `npm run test:e2e`    |
+| Run Playwright tests (UI mode) | `npm run test:e2e:ui` |
+| Lint                           | `npm run lint`        |
+| Format check                   | `npm run format`      |
+| Format + lint auto-fix         | `npm run check`       |
+| Generate frontend API bindings | `npm run prepareEnv`  |
 
 ---
 
