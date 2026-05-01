@@ -1,6 +1,8 @@
 package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemControllerCalls
+import io.github.simonhauck.openfirestationmanager.clothing.item.CreateOrUpdateClothingItemRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus
 class ClothingTypeControllerIT : IntegrationTest() {
 
     @Autowired private lateinit var calls: ProtectiveClothingTypeControllerCalls
+    @Autowired private lateinit var itemCalls: ClothingItemControllerCalls
 
     @Test
     fun `createType should create a new protective clothing type when authenticated`() {
@@ -88,5 +91,39 @@ class ClothingTypeControllerIT : IntegrationTest() {
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body?.map { it.name })
             .contains("Einsatzjacke", "Einsatzhose", "TH-Jacke", "Brandhandschuhe", typeName)
+    }
+
+    @Test
+    fun `deleteType should return 409 when clothing items reference the type`() {
+        val type =
+            calls
+                .createType(
+                    CreateOrUpdateClothingTypeRequest(name = "ReferencedType-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
+            authCookie = validCookieHeader,
+        )
+
+        val deleteResponse = calls.deleteTypeExpectingError(type.id, authCookie = validCookieHeader)
+
+        assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.CONFLICT)
+        assertThat(deleteResponse.body?.detail)
+            .isEqualTo(
+                "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind."
+            )
+    }
+
+    @Test
+    fun `deleteType should return 404 when type does not exist`() {
+        val nonExistentId = Long.MAX_VALUE
+
+        val deleteResponse =
+            calls.deleteTypeExpectingError(nonExistentId, authCookie = validCookieHeader)
+
+        assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 }
