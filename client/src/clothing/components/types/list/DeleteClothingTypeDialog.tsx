@@ -68,8 +68,8 @@ export default function DeleteClothingTypeDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Kleidungstyp löschen</AlertDialogTitle>
           <AlertDialogDescription>
-            Möchten Sie den Kleidungstyp &bdquo;{type.name}&ldquo; wirklich
-            löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+            Möchten Sie den Kleidungstyp „{type.name}" wirklich löschen? Diese
+            Aktion kann nicht rückgängig gemacht werden.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
