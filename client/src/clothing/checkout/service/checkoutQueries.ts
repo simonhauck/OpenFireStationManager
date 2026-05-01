@@ -5,9 +5,20 @@ import type { components } from "#/api/schema"
 
 export type ResolvedClothingItem = components["schemas"]["ResolvedClothingItem"]
 export type CheckoutRequest = components["schemas"]["CheckoutRequest"]
+
+/**
+ * Runtime-accurate discriminated union for the checkout response.
+ *
+ * The generated schema uses capitalised status literals ("Ok", "NeedsConfirmation")
+ * but the server actually sends lowercase snake_case values at runtime.
+ * This type reflects what the wire actually carries.
+ */
 export type CheckoutHttpResponse =
-  | components["schemas"]["Ok"]
-  | components["schemas"]["NeedsConfirmation"]
+  | { status: "ok"; batchId: string }
+  | {
+      status: "needs_confirmation"
+      discrepancies: components["schemas"]["Discrepancy"][]
+    }
 
 const ensureData = <T>(
   data: T | undefined,
@@ -48,7 +59,7 @@ export const checkoutMutation = () =>
         body,
       })
       return ensureData(
-        data as CheckoutHttpResponse | undefined,
+        data as unknown as CheckoutHttpResponse | undefined,
         error,
         "POST /api/clothing/checkouts",
       )

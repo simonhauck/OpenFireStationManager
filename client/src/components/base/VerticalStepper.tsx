@@ -14,6 +14,8 @@ export interface VerticalStepperProps {
   /** 1-based index of the currently active step */
   currentStep: number
   className?: string
+  /** Called when a completed step is clicked; receives the 1-based step number */
+  onStepClick?: (stepNumber: number) => void
 }
 
 /**
@@ -27,6 +29,7 @@ export function VerticalStepper({
   steps,
   currentStep,
   className,
+  onStepClick,
 }: VerticalStepperProps) {
   return (
     <ol className={cn("flex flex-col", className)} aria-label="Wizard steps">
@@ -40,12 +43,20 @@ export function VerticalStepper({
               : "upcoming"
 
         const isLast = index === steps.length - 1
+        const isClickable = status === "completed" && !!onStepClick
 
         return (
           <li key={stepNumber} className="flex items-stretch gap-4">
             {/* Left column: circle + connector line */}
             <div className="flex flex-col items-center">
-              <StepCircle status={status} stepNumber={stepNumber} />
+              <StepCircle
+                status={status}
+                stepNumber={stepNumber}
+                isClickable={isClickable}
+                onClick={
+                  isClickable ? () => onStepClick(stepNumber) : undefined
+                }
+              />
               <RenderIf when={!isLast}>
                 <div
                   className={cn(
@@ -57,7 +68,14 @@ export function VerticalStepper({
             </div>
 
             {/* Right column: label + description */}
-            <div className={cn("pb-6", isLast && "pb-0")}>
+            <div
+              className={cn(
+                "pb-6",
+                isLast && "pb-0",
+                isClickable && "cursor-pointer",
+              )}
+              onClick={isClickable ? () => onStepClick(stepNumber) : undefined}
+            >
               <p
                 className={cn(
                   "text-sm font-semibold leading-none",
@@ -93,12 +111,29 @@ export function VerticalStepper({
 interface StepCircleProps {
   status: StepStatus
   stepNumber: number
+  isClickable?: boolean
+  onClick?: () => void
 }
 
-function StepCircle({ status, stepNumber }: StepCircleProps) {
+function StepCircle({
+  status,
+  stepNumber,
+  isClickable,
+  onClick,
+}: StepCircleProps) {
   return (
     <div
       aria-current={status === "active" ? "step" : undefined}
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={
+        isClickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") onClick?.()
+            }
+          : undefined
+      }
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold",
         status === "completed" &&
@@ -106,6 +141,7 @@ function StepCircle({ status, stepNumber }: StepCircleProps) {
         status === "active" && "border-primary bg-background text-primary",
         status === "upcoming" &&
           "border-border bg-background text-muted-foreground",
+        isClickable && "cursor-pointer hover:opacity-80",
       )}
     >
       <RenderIf when={status === "completed"}>
