@@ -48,7 +48,7 @@ export const checkoutMutation = () =>
         body,
       })
       return ensureData(
-        data as CheckoutHttpResponse | undefined,
+        data,
         error,
         "POST /api/clothing/checkouts",
       )
