@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useEffect, useRef, useState } from "react"
 import { Trash2Icon } from "lucide-react"
@@ -57,6 +58,7 @@ const CHECKOUT_STEPS: Step[] = [
 ]
 
 export default function CheckoutPage() {
+  const navigate = useNavigate()
   const {
     state,
     selectTarget,
@@ -74,70 +76,84 @@ export default function CheckoutPage() {
   } = useCheckoutWizard()
 
   return (
-    <div className="space-y-6 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Klamotten Ausgabe</h1>
-        <TouchButton variant="outline" onClick={reset}>
-          Abbrechen
-        </TouchButton>
-      </div>
-
-      <div className="flex gap-8">
-        {/* Step indicator */}
-        <aside className="hidden shrink-0 sm:block">
-          <VerticalStepper
-            steps={CHECKOUT_STEPS}
-            currentStep={state.step}
-            onStepClick={(n) => goToStep(n as CheckoutStep)}
-          />
-        </aside>
-
-        {/* Step content */}
-        <div className="min-w-0 flex-1 space-y-4">
-          {/* Back button — shown on all steps except 1 and 6 */}
-          <RenderIf when={state.step > 1 && state.step < 6}>
-            <div>
-              <TouchButton variant="ghost" onClick={goBack}>
-                ← Zurück
-              </TouchButton>
+    <div className="p-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-2xl">Klamotten Ausgabe</CardTitle>
+          <TouchButton
+            variant="outline"
+            onClick={() => {
+              navigate({ to: "/pool-klamotten" })
+            }}
+          >
+            Abbrechen
+          </TouchButton>
+        </CardHeader>
+        <div className="flex items-stretch">
+          {/* Stepper sidebar — hidden on mobile */}
+          <aside className="hidden shrink-0 sm:block">
+            <div className="px-6 pb-6">
+              <VerticalStepper
+                steps={CHECKOUT_STEPS}
+                currentStep={state.step}
+                onStepClick={(n) => {
+                  if (state.step === 6) return
+                  goToStep(n as CheckoutStep)
+                }}
+              />
             </div>
-          </RenderIf>
+          </aside>
 
-          <RenderIf when={state.step === 1}>
-            <StepTargetPicker onSelect={selectTarget} />
-          </RenderIf>
+          {/* Step content */}
+          <div className="min-w-0 flex-1 space-y-4 px-6 pb-6">
+            <RenderIf when={state.step === 1}>
+              <StepTargetPicker onSelect={selectTarget} />
+            </RenderIf>
 
-          <RenderIf when={state.step === 2}>
-            <StepItemScanner
-              state={state}
-              onAddItem={addItem}
-              onRemoveItem={removeItem}
-              onNext={advanceToReturns}
-            />
-          </RenderIf>
+            <RenderIf when={state.step === 2}>
+              <StepItemScanner
+                state={state}
+                onAddItem={addItem}
+                onRemoveItem={removeItem}
+                onBack={goBack}
+                onNext={advanceToReturns}
+              />
+            </RenderIf>
 
-          <RenderIf when={state.step === 3}>
-            <StepReturnToggles
-              state={state}
-              onSetReturnItemIds={setReturnItemIds}
-              onToggleReturnItem={toggleReturnItem}
-              onConfirm={confirmReturns}
-            />
-          </RenderIf>
+            <RenderIf when={state.step === 3}>
+              <StepReturnToggles
+                state={state}
+                onSetReturnItemIds={setReturnItemIds}
+                onToggleReturnItem={toggleReturnItem}
+                onBack={goBack}
+                onConfirm={confirmReturns}
+              />
+            </RenderIf>
 
-          <RenderIf when={state.step === 4}>
-            <StepWashLocationPicker onSelect={selectWashLocation} />
-          </RenderIf>
+            <RenderIf when={state.step === 4}>
+              <StepWashLocationPicker onSelect={selectWashLocation} />
+            </RenderIf>
 
-          <RenderIf when={state.step === 5}>
-            <StepReview state={state} onSubmitOk={submitOk} onReset={reset} />
-          </RenderIf>
+            <RenderIf when={state.step === 5}>
+              <StepReview
+                state={state}
+                onSubmitOk={submitOk}
+                onBack={goBack}
+                onReset={reset}
+              />
+            </RenderIf>
 
-          <RenderIf when={state.step === 6}>
-            <StepSuccess onReset={reset} />
-          </RenderIf>
+            <RenderIf when={state.step === 6}>
+              <StepSuccess
+                onReset={reset}
+                onNavigateToOverview={() =>
+                  void navigate({ to: "/pool-klamotten" })
+                }
+              />
+            </RenderIf>
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }
@@ -150,7 +166,7 @@ interface StepTargetPickerProps {
 
 function StepTargetPicker({ onSelect }: StepTargetPickerProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
-  const [search, setSearch] = useState("")
+  const [search] = useState("")
 
   const personalLocations = (allLocations ?? []).filter(
     (l) => l.type === "PERSONAL",
@@ -193,6 +209,7 @@ interface StepItemScannerProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onAddItem: (item: ResolvedClothingItem, isDiscrepant?: boolean) => void
   onRemoveItem: (itemId: number) => void
+  onBack: () => void
   onNext: () => void
 }
 
@@ -205,6 +222,7 @@ function StepItemScanner({
   state,
   onAddItem,
   onRemoveItem,
+  onBack,
   onNext,
 }: StepItemScannerProps) {
   const barcodeInputRef = useRef<HTMLInputElement>(null)
@@ -343,7 +361,7 @@ function StepItemScanner({
                         when={state.discrepantItemIds.has(item.clothingItem.id)}
                       >
                         <Badge variant="outline" className="text-amber-600">
-                          Abweichend
+                          Nicht in Pool
                         </Badge>
                       </RenderIf>
                       <TouchButton
@@ -363,7 +381,10 @@ function StepItemScanner({
           </RenderIf>
 
           {/* Weiter button */}
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end gap-3 pt-2">
+            <TouchButton variant="outline" onClick={onBack}>
+              ← Zurück
+            </TouchButton>
             <TouchButton
               disabled={state.takeItems.length === 0}
               onClick={onNext}
@@ -425,6 +446,7 @@ interface StepReturnTogglesProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onSetReturnItemIds: (ids: Set<number>) => void
   onToggleReturnItem: (itemId: number) => void
+  onBack: () => void
   onConfirm: () => void
 }
 
@@ -432,6 +454,7 @@ function StepReturnToggles({
   state,
   onSetReturnItemIds,
   onToggleReturnItem,
+  onBack,
   onConfirm,
 }: StepReturnTogglesProps) {
   const { data: allItems } = useQuery(getAllClothingItemsQuery())
@@ -501,7 +524,10 @@ function StepReturnToggles({
           </div>
         </RenderIf>
 
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end gap-3 pt-2">
+          <TouchButton variant="outline" onClick={onBack}>
+            ← Zurück
+          </TouchButton>
           <TouchButton onClick={onConfirm}>Weiter →</TouchButton>
         </div>
       </CardContent>
@@ -562,6 +588,7 @@ function StepWashLocationPicker({ onSelect }: StepWashLocationPickerProps) {
 interface StepReviewProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onSubmitOk: () => void
+  onBack: () => void
   onReset: () => void
 }
 
@@ -569,7 +596,7 @@ interface DiscrepancyPending {
   itemIds: number[]
 }
 
-function StepReview({ state, onSubmitOk, onReset }: StepReviewProps) {
+function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   const { data: allItems } = useQuery(getAllClothingItemsQuery())
   const { data: allTypes } = useQuery(getAllClothingTypesQuery())
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
@@ -652,7 +679,7 @@ function StepReview({ state, onSubmitOk, onReset }: StepReviewProps) {
                       when={state.discrepantItemIds.has(item.clothingItem.id)}
                     >
                       <Badge variant="outline" className="text-amber-600">
-                        Abweichend
+                        Nicht in Pool
                       </Badge>
                     </RenderIf>
                   </div>
@@ -690,7 +717,14 @@ function StepReview({ state, onSubmitOk, onReset }: StepReviewProps) {
             </RenderIf>
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end gap-3 pt-2">
+            <TouchButton
+              variant="outline"
+              onClick={onBack}
+              disabled={checkout.isPending}
+            >
+              ← Zurück
+            </TouchButton>
             <TouchButton
               disabled={checkout.isPending}
               onClick={() => void handleSubmit()}
@@ -743,25 +777,44 @@ function StepReview({ state, onSubmitOk, onReset }: StepReviewProps) {
 
 // ─── Step 6: Success ──────────────────────────────────────────────────────────
 
+const SUCCESS_REDIRECT_SECONDS = 15
+
 interface StepSuccessProps {
   onReset: () => void
+  onNavigateToOverview: () => void
 }
 
-function StepSuccess({ onReset }: StepSuccessProps) {
+function StepSuccess({ onReset, onNavigateToOverview }: StepSuccessProps) {
+  const [secondsLeft, setSecondsLeft] = useState(SUCCESS_REDIRECT_SECONDS)
+
+  useEffect(() => {
+    if (secondsLeft <= 0) {
+      onNavigateToOverview()
+      return
+    }
+    const id = setTimeout(() => setSecondsLeft((s) => s - 1), 1000)
+    return () => clearTimeout(id)
+  }, [secondsLeft, onNavigateToOverview])
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Vorgang abgeschlossen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm">
+    <div className="space-y-4">
+      <div>
+        <p className="text-lg font-semibold">Vorgang abgeschlossen</p>
+        <p className="text-muted-foreground text-sm">
           Die Ausgabe wurde erfolgreich abgeschlossen. Alle Kleidungsstücke
           wurden korrekt verbucht.
         </p>
-        <div className="flex justify-end">
-          <TouchButton onClick={onReset}>Neuen Vorgang starten</TouchButton>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <p className="text-muted-foreground text-sm">
+        Weiterleitung zur Übersicht in {secondsLeft} Sekunde
+        {secondsLeft !== 1 ? "n" : ""}…
+      </p>
+      <div className="flex gap-3">
+        <TouchButton onClick={onReset}>Neuen Vorgang starten</TouchButton>
+        <TouchButton variant="outline" onClick={onNavigateToOverview}>
+          Zur Übersicht
+        </TouchButton>
+      </div>
+    </div>
   )
 }
