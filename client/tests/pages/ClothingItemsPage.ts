@@ -43,6 +43,11 @@ export class ClothingItemsPage {
     await this.page.locator("#barcode").fill(barcode)
   }
 
+  async selectLocation(locationName: string) {
+    await this.page.locator("#location").click()
+    await this.page.getByRole("option", { name: locationName }).click()
+  }
+
   async submitForm() {
     await this.page.getByRole("button", { name: "Speichern" }).click()
   }
