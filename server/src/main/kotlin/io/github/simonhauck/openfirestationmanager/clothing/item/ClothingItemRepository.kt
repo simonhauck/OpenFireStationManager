@@ -20,6 +20,8 @@ interface ClothingItemRepository : Repository<ClothingItem, Long> {
 
     fun findAllByTypeId(typeId: AggregateReference<ClothingType, Long>): List<ClothingItem>
 
+    fun countAllByTypeId(typeId: AggregateReference<ClothingType, Long>): Long
+
     fun findById(id: Long): ClothingItem?
 
     fun findByBarcode(barcode: String): ClothingItem?

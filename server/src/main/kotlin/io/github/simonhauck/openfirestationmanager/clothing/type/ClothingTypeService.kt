@@ -28,8 +28,8 @@ class ClothingTypeService(
 
     fun deleteType(id: Long) {
         findOrThrow(id)
-        val referencingItems = clothingItemRepository.findAllByTypeId(AggregateReference.to(id))
-        if (referencingItems.isNotEmpty()) {
+        val referencingItems = clothingItemRepository.countAllByTypeId(AggregateReference.to(id))
+        if (referencingItems >= 1) {
             throw ConflictException(
                 "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind."
             )
