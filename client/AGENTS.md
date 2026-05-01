@@ -49,8 +49,103 @@ Frontend testing is done **primarily with Playwright** (end-to-end / integration
 - Write Playwright tests for all user-facing features and flows.
 - Prefer Playwright tests over unit tests for UI behaviour; unit tests are reserved for pure
   utility functions and logic that is hard to exercise through the browser.
-- Playwright tests live under `e2e/` (or wherever the project's Playwright config points).
+- Playwright tests live under `tests/` and are configured via `playwright.config.ts`.
 - Run Playwright tests with `npm run test:e2e` (or `npm run test:e2e:ui` for interactive UI mode).
+
+### Infrastructure
+
+Playwright starts both the backend and the Vite dev server via `webServer` in
+`playwright.config.ts`. Both use `reuseExistingServer: true`, so if you already have them
+running locally Playwright will not start a second copy.
+
+The backend is started with `SPRING_PROFILES_ACTIVE=test`, which enables the
+`POST /api/test/users` endpoint used by global setup to create test personas. This endpoint
+does **not** exist in the production profile.
+
+### Folder structure
+
+```text
+tests/
+├── global-setup.ts     ← creates personas, saves auth state to playwright/.auth/
+├── pages/              ← page objects (one per route/feature)
+└── flows/              ← reusable multi-step sequences used as test preconditions
+playwright.config.ts
+playwright/.auth/       ← gitignored session state files written by global-setup
+```
+
+Specs live under `tests/specs/` and follow the naming convention `<feature>.spec.ts`.
+
+### Authentication
+
+`global-setup.ts` runs once before the test suite. It creates three test personas with
+UUID-suffixed usernames (so parallel runs and shared databases never collide), logs each one
+in via the browser, and saves the resulting session cookies:
+
+| Persona | Roles | Auth file |
+| ------------ | ----------- | --------------------------------- |
+| `admin` | `ADMIN` | `playwright/.auth/admin.json` |
+| `kleiderwart` | `KLEIDERWART` | `playwright/.auth/kleiderwart.json` |
+| `user` | `USER` | `playwright/.auth/user.json` |
+
+Activate a persona in a spec with `test.use`:
+
+```ts
+test.use({ storageState: "playwright/.auth/kleiderwart.json" })
+```
+
+### Page Object pattern
+
+Every route gets a page object in `tests/pages/`. A page object owns:
+
+- Navigation helpers (`goto()`, `gotoNew()`, etc.)
+- Locator methods that return a `Locator` for a specific element (for assertions in tests)
+- Action methods that interact with the page (`fillName()`, `submitForm()`, etc.)
+
+Page objects do **not** contain assertions. Keep `expect(...)` calls in the spec files.
+
+```ts
+// ✅ correct — page object returns a locator, spec asserts
+await expect(typesPage.typeRow(name)).toBeVisible()
+
+// ❌ avoid — assertion inside page object hides intent from the test
+await typesPage.assertTypeVisible(name)
+```
+
+### Flow helpers
+
+Reusable multi-step sequences that set up preconditions live in `tests/flows/`. A flow
+composes one or more page objects to perform a complete sub-task (e.g. create a clothing
+type) and leaves the page in a known state (typically the list page after a successful
+create).
+
+Use flows inside `test.beforeAll` or at the start of a test to establish the data a test
+depends on — never to perform the action being tested.
+
+```ts
+// ✅ correct — flow used as precondition, spec tests the real behaviour
+test.beforeAll(async ({ browser }) => {
+  const page = await browser.newPage({ storageState: "playwright/.auth/kleiderwart.json" })
+  typeName = await createClothingType(page, `Typ-${randomUUID().slice(0, 8)}`)
+  await page.close()
+})
+
+test("creates an item of that type", async ({ page }) => {
+  // ... uses typeName as a precondition, not the thing under test
+})
+```
+
+### Data isolation
+
+Tests share a database with manual testing and with each other. To stay safe:
+
+- Use `randomUUID().slice(0, 8)` suffixes for all names and barcodes created in tests.
+- Never rely on a clean database; never delete data after a test.
+- Never hardcode IDs; look up the ID from the rendered UI if needed.
+
+### Scope
+
+Focus on **main user flows** — happy-path end-to-end coverage of each feature. Do not test
+every invariant or validation edge case through Playwright; those belong in unit tests.
 
 ---
 
