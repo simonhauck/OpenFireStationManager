@@ -101,12 +101,11 @@ export const deleteClothingTypeMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationKey: [...queryKeys.clothingTypes(), "delete"] as const,
     mutationFn: async (id: number): Promise<void> => {
-      const { response } = await client.DELETE("/api/clothing/types/{id}", {
+      const { error } = await client.DELETE("/api/clothing/types/{id}", {
         params: { path: { id } },
       })
-      if (!response.ok) {
-        const body: unknown = await response.json()
-        throw body
+      if (error) {
+        throw error
       }
     },
     onSuccess: async (_, id) => {
