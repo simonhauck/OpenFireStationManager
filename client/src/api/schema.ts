@@ -86,6 +86,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/relocation": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Relocate clothing items to a target location */
+    post: operations["relocate"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/locations": {
     parameters: {
       query?: never
@@ -401,6 +418,27 @@ export interface components {
       metaData: components["schemas"]["EntityMetaData"]
       idAsReference: components["schemas"]["AggregateReferenceClothingTypeLong"]
     }
+    RelocationRequest: {
+      /** Format: int64 */
+      targetLocationId: number
+      itemIds: number[]
+    }
+    RelocationResponse: {
+      batchId: string
+    }
+    ProblemDetail: {
+      /** Format: uri */
+      type?: string
+      title?: string
+      /** Format: int32 */
+      status?: number
+      detail?: string
+      /** Format: uri */
+      instance?: string
+      properties?: {
+        [key: string]: unknown
+      }
+    }
     CreateClothingLocationRequest: {
       name: string
       comment: string
@@ -660,6 +698,48 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+    }
+  }
+  relocate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RelocationRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["RelocationResponse"]
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Forbidden — KLEIDERWART role required */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
         }
       }
     }
