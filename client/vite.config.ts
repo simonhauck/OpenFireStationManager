@@ -39,7 +39,7 @@ const config = defineConfig({
       // Use the existing public/manifest.json instead of auto-generating one
       manifest: false,
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,ico,png,svg,woff2}"],
       },
     }),
   ],
