@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
 
 import type { ClothingLocationSizeSummary } from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
@@ -8,13 +9,24 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
+import { meQuery } from "#/api/auth.queries"
 
 export default function PoolKlamottenPage() {
   const { data: overview, isLoading, isError } = useClothingOverview()
+  const { data: authData } = useQuery(meQuery())
+
+  const isKleiderwart =
+    authData?.user?.roles.includes("KLEIDERWART") === true ||
+    authData?.user?.roles.includes("ADMIN") === true
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-3">
+        <RenderIf when={isKleiderwart}>
+          <TouchButton asChild variant="outline">
+            <Link to="/pool-klamotten/relocation">Umlagerung starten</Link>
+          </TouchButton>
+        </RenderIf>
         <TouchButton asChild>
           <Link to="/checkout">Klamotten Ausgabe</Link>
         </TouchButton>
