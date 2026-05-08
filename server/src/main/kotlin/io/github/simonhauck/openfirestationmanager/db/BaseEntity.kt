@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.db
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -25,6 +26,7 @@ interface BaseEntity<T : Any> {
 
     fun copyWithMetaData(metaData: EntityMetaData): BaseEntity<T>
 
+    @JsonIgnore
     fun getIdAsReference(): AggregateReference<T, Long> {
         return AggregateReference.to(id)
     }

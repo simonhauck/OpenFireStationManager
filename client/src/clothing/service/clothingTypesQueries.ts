@@ -97,6 +97,27 @@ export const updateClothingTypeMutation = (queryClient: QueryClient) =>
     },
   })
 
+export const deleteClothingTypeMutation = (queryClient: QueryClient) =>
+  mutationOptions({
+    mutationKey: [...queryKeys.clothingTypes(), "delete"] as const,
+    mutationFn: async (id: number): Promise<void> => {
+      const { error } = await client.DELETE("/api/clothing/types/{id}", {
+        params: { path: { id } },
+      })
+      if (error) {
+        throw error
+      }
+    },
+    onSuccess: async (_, id) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.clothingTypes() }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingType(id),
+        }),
+      ])
+    },
+  })
+
 export function useClothingTypes() {
   return useQuery(getAllClothingTypesQuery())
 }
