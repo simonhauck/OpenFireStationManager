@@ -921,15 +921,6 @@
         },
         "required": ["newPassword"]
       },
-      "AggregateReferenceUserAccountLong": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "EntityMetaData": {
         "type": "object",
         "properties": {
@@ -983,16 +974,12 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
-          },
-          "idAsReference": {
-            "$ref": "#/components/schemas/AggregateReferenceUserAccountLong"
           }
         },
         "required": [
           "enabled",
           "firstName",
           "id",
-          "idAsReference",
           "lastName",
           "metaData",
           "roles",
@@ -1052,15 +1039,6 @@
         },
         "required": ["name"]
       },
-      "AggregateReferenceClothingTypeLong": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "ClothingType": {
         "type": "object",
         "properties": {
@@ -1073,12 +1051,9 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
-          },
-          "idAsReference": {
-            "$ref": "#/components/schemas/AggregateReferenceClothingTypeLong"
           }
         },
-        "required": ["id", "idAsReference", "metaData", "name"]
+        "required": ["id", "metaData", "name"]
       },
       "CreateClothingLocationRequest": {
         "type": "object",
@@ -1103,15 +1078,6 @@
         },
         "required": ["comment", "name", "onlyVisibleForKleiderwart", "type"]
       },
-      "AggregateReferenceClothingLocationLong": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "ClothingLocation": {
         "type": "object",
         "properties": {
@@ -1134,15 +1100,11 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
-          },
-          "idAsReference": {
-            "$ref": "#/components/schemas/AggregateReferenceClothingLocationLong"
           }
         },
         "required": [
           "comment",
           "id",
-          "idAsReference",
           "metaData",
           "name",
           "onlyVisibleForKleiderwart",
@@ -1185,15 +1147,6 @@
         },
         "required": ["size", "typeId"]
       },
-      "AggregateReferenceClothingItemLong": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "ClothingItem": {
         "type": "object",
         "properties": {
@@ -1217,12 +1170,9 @@
           },
           "metaData": {
             "$ref": "#/components/schemas/EntityMetaData"
-          },
-          "idAsReference": {
-            "$ref": "#/components/schemas/AggregateReferenceClothingItemLong"
           }
         },
-        "required": ["id", "idAsReference", "metaData", "size", "typeId"]
+        "required": ["id", "metaData", "size", "typeId"]
       },
       "BatchCreateClothingItemsRequest": {
         "type": "object",

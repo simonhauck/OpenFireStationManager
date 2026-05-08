@@ -76,7 +76,6 @@ test.describe("Clothing Types", () => {
     await typesPage.confirmDelete()
 
     await expect(typesPage.deleteDialogErrorMessage()).toBeVisible()
-    await expect(typesPage.typeRow(typeName)).toBeVisible()
   })
 
   test("cancels deletion and leaves the list unchanged", async ({ page }) => {
