@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.jib)
     alias(libs.plugins.testLoggerPlugin)
     id("io.github.simonhauck.frontend-route-mapping")
+    id("org.graalvm.buildtools.native") version "1.1.0"
 }
 
 group = "io.github.simonhauck"
@@ -51,6 +52,8 @@ dependencies {
     testImplementation(libs.assertjCore)
     testRuntimeOnly(libs.junitPlatformLauncher)
 }
+
+
 
 kotlin {
     compilerOptions {
