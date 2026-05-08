@@ -521,6 +521,19 @@ export interface components {
       location?: components["schemas"]["ClothingLocation"]
       clothingType: components["schemas"]["ClothingType"]
     }
+    ProblemDetail: {
+      /** Format: uri */
+      type?: string
+      title?: string
+      /** Format: int32 */
+      status?: number
+      detail?: string
+      /** Format: uri */
+      instance?: string
+      properties?: {
+        [key: string]: unknown
+      }
+    }
   }
   responses: never
   parameters: never
@@ -911,6 +924,24 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Conflict – type still referenced by clothing items */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
       }
     }
   }

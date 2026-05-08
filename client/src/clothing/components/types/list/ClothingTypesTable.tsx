@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router"
-import { Pencil } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 
 import type { ClothingType } from "#/clothing/model/clothingType"
+import DeleteClothingTypeDialog from "#/clothing/components/types/list/DeleteClothingTypeDialog"
 import FormattedDate from "#/components/base/FormattedDate"
 import { Button } from "#/components/ui/button"
 import {
@@ -53,6 +54,16 @@ export default function ClothingTypesTable({ types }: ClothingTypesTableProps) {
                       <Pencil className="size-4" />
                     </Link>
                   </Button>
+                  <DeleteClothingTypeDialog type={type}>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      aria-label={`Kleidungstyp ${type.name} löschen`}
+                      title="Kleidungstyp löschen"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </DeleteClothingTypeDialog>
                 </div>
               </TableCell>
             </TableRow>
