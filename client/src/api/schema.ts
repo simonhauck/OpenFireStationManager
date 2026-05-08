@@ -353,10 +353,6 @@ export interface components {
     ChangePasswordRequest: {
       newPassword: string
     }
-    AggregateReferenceUserAccountLong: {
-      /** Format: int64 */
-      id?: number
-    }
     EntityMetaData: {
       /** Format: date-time */
       createdAt: string
@@ -374,7 +370,6 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceUserAccountLong"]
     }
     InitialAdminSetupRequest: {
       username: string
@@ -390,16 +385,11 @@ export interface components {
     CreateOrUpdateClothingTypeRequest: {
       name: string
     }
-    AggregateReferenceClothingTypeLong: {
-      /** Format: int64 */
-      id?: number
-    }
     ClothingType: {
       name: string
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceClothingTypeLong"]
     }
     CreateClothingLocationRequest: {
       name: string
@@ -407,10 +397,6 @@ export interface components {
       onlyVisibleForKleiderwart: boolean
       /** @enum {string} */
       type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
-    }
-    AggregateReferenceClothingLocationLong: {
-      /** Format: int64 */
-      id?: number
     }
     ClothingLocation: {
       name: string
@@ -421,7 +407,6 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceClothingLocationLong"]
     }
     BatchCreateClothingLocationsRequest: {
       items: components["schemas"]["CreateClothingLocationRequest"][]
@@ -434,10 +419,6 @@ export interface components {
       /** Format: int64 */
       locationId?: number
     }
-    AggregateReferenceClothingItemLong: {
-      /** Format: int64 */
-      id?: number
-    }
     ClothingItem: {
       /** Format: int64 */
       typeId: number
@@ -448,7 +429,6 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceClothingItemLong"]
     }
     BatchCreateClothingItemsRequest: {
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
