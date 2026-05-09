@@ -1,11 +1,6 @@
 provider "neon" {
 }
 
-# import {
-#   id = "shy-silence-06063602"
-#   to = neon_project.open_fire_station_manager
-# }
-
 resource "neon_project" "open_fire_station_manager" {
   name       = "OpenFireStationmanager"
   pg_version = 18
@@ -19,6 +14,10 @@ resource "neon_project" "open_fire_station_manager" {
     database_name = "ofsm"
     role_name     = "postgres"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "neon_branch" "develop" {
@@ -30,4 +29,15 @@ resource "neon_branch" "develop" {
 resource "neon_endpoint" "develop_endpoint" {
   project_id = neon_project.open_fire_station_manager.id
   branch_id  = neon_branch.develop.id
+}
+
+resource "neon_branch" "local" {
+  project_id = neon_project.open_fire_station_manager.id
+  name       = "local"
+  parent_id = neon_project.open_fire_station_manager.default_branch_id
+}
+
+resource "neon_endpoint" "local_endpoint" {
+  project_id = neon_project.open_fire_station_manager.id
+  branch_id  = neon_branch.local.id
 }
