@@ -4,7 +4,7 @@ import io.github.simonhauck.openfirestationmanager.usermanagement.CreateUserRequ
 import io.github.simonhauck.openfirestationmanager.usermanagement.UserAccount
 import io.github.simonhauck.openfirestationmanager.usermanagement.UserService
 import jakarta.validation.Valid
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/test")
-@Profile("test")
+@ConditionalOnProperty(name = ["app.testing.enabled"], havingValue = "true")
 class TestUserController(private val userService: UserService) {
 
     @PostMapping("/users")
