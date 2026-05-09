@@ -1,4 +1,10 @@
-provider "neon" {}
+provider "neon" {
+}
+
+# import {
+#   id = "shy-silence-06063602"
+#   to = neon_project.open_fire_station_manager
+# }
 
 resource "neon_project" "open_fire_station_manager" {
   name       = "OpenFireStationmanager"
@@ -7,11 +13,11 @@ resource "neon_project" "open_fire_station_manager" {
   org_id     = "org-restless-king-43742972"
   # free accounts have maximum retention window of 6 hours (21600 seconds)
   history_retention_seconds = 21600
-  # Configure default branch settings (optional)
+
   branch {
     name          = "production"
     database_name = "ofsm"
-    role_name     = "ofsm_admin"
+    role_name     = "postgres"
   }
 }
 
