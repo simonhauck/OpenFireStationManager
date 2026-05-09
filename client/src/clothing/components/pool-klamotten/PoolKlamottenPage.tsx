@@ -8,13 +8,20 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
+import RoleGuard from "#/components/base/RoleGuard.tsx"
 
 export default function PoolKlamottenPage() {
   const { data: overview, isLoading, isError } = useClothingOverview()
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-3">
+        <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
+          <TouchButton asChild variant="outline">
+            <Link to="/pool-klamotten/relocation">Umlagerung starten</Link>
+          </TouchButton>
+        </RoleGuard>
+
         <TouchButton asChild>
           <Link to="/checkout">Klamotten Ausgabe</Link>
         </TouchButton>

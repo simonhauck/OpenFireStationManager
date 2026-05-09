@@ -14,6 +14,7 @@ enum class MovementReason {
     RETURN,
     MANUAL_CORRECTION,
     INITIAL_PLACEMENT,
+    RELOCATION,
 }
 
 @Table("clothing_movements")
