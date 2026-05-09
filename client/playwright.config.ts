@@ -21,8 +21,8 @@ export default defineConfig({
   webServer: [
     {
       command: "cd .. && ./gradlew server:bootRun",
-      env:{
-        SPRING_PROFILES_ACTIVE: "test"
+      env: {
+        SPRING_PROFILES_ACTIVE: "test",
       },
       url: "http://localhost:8080/api/public/auth/me",
       reuseExistingServer: true,
