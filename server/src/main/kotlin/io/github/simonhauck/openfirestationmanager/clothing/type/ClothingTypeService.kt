@@ -1,10 +1,16 @@
 package io.github.simonhauck.openfirestationmanager.clothing.type
 
+import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemRepository
+import io.github.simonhauck.openfirestationmanager.common.ConflictException
 import io.github.simonhauck.openfirestationmanager.common.NotFoundException
+import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.stereotype.Service
 
 @Service
-class ClothingTypeService(private val repository: ClothingTypeRepository) {
+class ClothingTypeService(
+    private val repository: ClothingTypeRepository,
+    private val clothingItemRepository: ClothingItemRepository,
+) {
 
     fun getAllTypes(): List<ClothingType> = repository.findAll().sortedBy { it.id }
 
@@ -22,6 +28,12 @@ class ClothingTypeService(private val repository: ClothingTypeRepository) {
 
     fun deleteType(id: Long) {
         findOrThrow(id)
+        val referencingItems = clothingItemRepository.countAllByTypeId(AggregateReference.to(id))
+        if (referencingItems >= 1) {
+            throw ConflictException(
+                "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind."
+            )
+        }
         repository.deleteById(id)
     }
 

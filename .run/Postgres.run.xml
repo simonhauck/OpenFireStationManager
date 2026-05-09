@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Postgres" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+  <configuration default="false" name="local.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
         <option name="services">
@@ -7,7 +7,7 @@
             <option value="postgres" />
           </list>
         </option>
-        <option name="sourceFilePath" value="local/docker-compose.yml" />
+        <option name="sourceFilePath" value="infrastructure/local/docker-compose.yml" />
       </settings>
     </deployment>
     <method v="2" />

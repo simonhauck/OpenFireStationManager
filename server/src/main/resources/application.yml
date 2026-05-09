@@ -2,10 +2,13 @@ spring:
   application:
     name: OpenFireStationManager
   datasource:
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/ofsm}
-
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ofsm?user=postgres&password=postgres}
+    hikari:
+      minimum-idle: 0
+      maximum-pool-size: 25
+      idle-timeout: 30000 # release idle connections after 30 s → pool drains to 0
+      connection-timeout: 30000 # wait up to 30 s for a connection (handles cold starts)
+      initialization-fail-timeout: -1 # don't fail on startup if DB is scaled to 0
 server:
   forward-headers-strategy: framework
   servlet:
@@ -21,10 +24,13 @@ app:
     key: ${REMEMBER_ME_KEY:change-me-in-prod}
     token-validity: ${REMEMBER_ME_TOKEN_VALIDITY:P30D}
     token-name: ${server.servlet.session.cookie.name}_REMEMBER_ME
-
 springdoc:
   swagger-ui:
     enabled: true
   api-docs:
     enabled: true
     path: /schema.json
+management:
+  health:
+    db:
+      enabled: false

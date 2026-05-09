@@ -370,10 +370,6 @@ export interface components {
     ChangePasswordRequest: {
       newPassword: string
     }
-    AggregateReferenceUserAccountLong: {
-      /** Format: int64 */
-      id?: number
-    }
     EntityMetaData: {
       /** Format: date-time */
       createdAt: string
@@ -391,7 +387,6 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceUserAccountLong"]
     }
     InitialAdminSetupRequest: {
       username: string
@@ -407,16 +402,11 @@ export interface components {
     CreateOrUpdateClothingTypeRequest: {
       name: string
     }
-    AggregateReferenceClothingTypeLong: {
-      /** Format: int64 */
-      id?: number
-    }
     ClothingType: {
       name: string
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceClothingTypeLong"]
     }
     RelocationRequest: {
       /** Format: int64 */
@@ -446,10 +436,6 @@ export interface components {
       /** @enum {string} */
       type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
     }
-    AggregateReferenceClothingLocationLong: {
-      /** Format: int64 */
-      id?: number
-    }
     ClothingLocation: {
       name: string
       comment: string
@@ -459,7 +445,6 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceClothingLocationLong"]
     }
     BatchCreateClothingLocationsRequest: {
       items: components["schemas"]["CreateClothingLocationRequest"][]
@@ -472,10 +457,6 @@ export interface components {
       /** Format: int64 */
       locationId?: number
     }
-    AggregateReferenceClothingItemLong: {
-      /** Format: int64 */
-      id?: number
-    }
     ClothingItem: {
       /** Format: int64 */
       typeId: number
@@ -486,7 +467,6 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-      idAsReference: components["schemas"]["AggregateReferenceClothingItemLong"]
     }
     BatchCreateClothingItemsRequest: {
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
@@ -558,6 +538,19 @@ export interface components {
       clothingItem: components["schemas"]["ClothingItem"]
       location?: components["schemas"]["ClothingLocation"]
       clothingType: components["schemas"]["ClothingType"]
+    }
+    ProblemDetail: {
+      /** Format: uri */
+      type?: string
+      title?: string
+      /** Format: int32 */
+      status?: number
+      detail?: string
+      /** Format: uri */
+      instance?: string
+      properties?: {
+        [key: string]: unknown
+      }
     }
   }
   responses: never
@@ -991,6 +984,24 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Conflict – type still referenced by clothing items */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
       }
     }
   }

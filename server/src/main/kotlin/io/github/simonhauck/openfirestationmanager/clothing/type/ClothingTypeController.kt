@@ -2,9 +2,14 @@ package io.github.simonhauck.openfirestationmanager.clothing.type
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -56,6 +61,19 @@ class ClothingTypeController(private val service: ClothingTypeService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     @Operation(summary = "Delete a protective clothing type")
+    @ApiResponses(
+        ApiResponse(responseCode = "204", description = "No Content"),
+        ApiResponse(
+            responseCode = "404",
+            description = "Not Found",
+            content = [Content(schema = Schema(implementation = ProblemDetail::class))],
+        ),
+        ApiResponse(
+            responseCode = "409",
+            description = "Conflict – type still referenced by clothing items",
+            content = [Content(schema = Schema(implementation = ProblemDetail::class))],
+        ),
+    )
     fun deleteType(
         @Parameter(description = "ID of the protective clothing type")
         @PathVariable
