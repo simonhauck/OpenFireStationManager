@@ -3,6 +3,9 @@ spring:
     name: OpenFireStationManager
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/ofsm?user=postgres&password=postgres}
+    hikari:
+      minimum-idle: 0
+      maximum-pool-size: 25
 
 server:
   forward-headers-strategy: framework
@@ -19,7 +22,6 @@ app:
     key: ${REMEMBER_ME_KEY:change-me-in-prod}
     token-validity: ${REMEMBER_ME_TOKEN_VALIDITY:P30D}
     token-name: ${server.servlet.session.cookie.name}_REMEMBER_ME
-
 springdoc:
   swagger-ui:
     enabled: true
