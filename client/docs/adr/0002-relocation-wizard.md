@@ -19,8 +19,9 @@ A new Umlagerung (relocation) wizard is added at `/pool-klamotten/relocation`.
 4. **Success** — items moved count, target name, countdown redirect to `/pool-klamotten`
 
 Target-first was chosen (rather than scan-first) because:
+
 - Knowing the destination before scanning avoids ambiguity and operator error
-- It mirrors the mental model: "I want to move items *to X*, now let me select what goes there"
+- It mirrors the mental model: "I want to move items _to X_, now let me select what goes there"
 - On a tablet, the combobox for location selection is the most deliberate action; making it first forces the operator to commit to a destination
 
 ### Shared ClothingItemScanner component
@@ -28,6 +29,7 @@ Target-first was chosen (rather than scan-first) because:
 The item-scanning interaction (barcode input auto-focused on mount, HID scanner fires Enter on scan, typeahead combobox fallback, silent duplicate guard, per-item remove button) is extracted into `clothing/components/shared/ClothingItemScanner`.
 
 Interface:
+
 - `items: ResolvedClothingItem[]` — the current list (parent owns state)
 - `onItemResolved: (item: ResolvedClothingItem) => void` — called for new non-duplicate items
 - `onRemoveItem: (itemId: number) => void` — called on remove button click
@@ -48,6 +50,7 @@ The route is role-guarded to `KLEIDERWART` via the existing `RoleGuard` componen
 ### State machine
 
 `useRelocationWizard` owns the wizard state. Steps are encoded as `1 | 2 | 3 | 4`. The reducer handles:
+
 - `SELECT_TARGET` → step 2
 - `ADD_ITEM` → appends item (no-op for duplicates)
 - `REMOVE_ITEM` → removes item by ID

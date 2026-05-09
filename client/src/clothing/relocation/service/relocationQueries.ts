@@ -4,13 +4,10 @@ import { client } from "#/api/client"
 import type { components } from "#/api/schema"
 
 export type RelocationRequest = components["schemas"]["RelocationRequest"]
-export type RelocationResponse = components["schemas"]["RelocationResponse"]
 
 export const relocationMutation = () =>
   mutationOptions({
-    mutationFn: async (
-      body: RelocationRequest,
-    ): Promise<RelocationResponse> => {
+    mutationFn: async (body: RelocationRequest): Promise<void> => {
       const { data, error } = await client.POST("/api/clothing/relocation", {
         body,
       })

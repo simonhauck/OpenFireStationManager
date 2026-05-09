@@ -1,9 +1,9 @@
 package io.github.simonhauck.openfirestationmanager.clothing.relocation
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
 import org.springframework.http.ProblemDetail
 import org.springframework.security.access.prepost.PreAuthorize
@@ -21,11 +21,7 @@ class RelocationController(private val service: RelocationService) {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     @Operation(summary = "Relocate clothing items to a target location")
-    @ApiResponse(
-        responseCode = "200",
-        description = "OK",
-        content = [Content(schema = Schema(implementation = RelocationResponse::class))],
-    )
+    @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(
         responseCode = "400",
         description = "Bad Request",
@@ -36,6 +32,7 @@ class RelocationController(private val service: RelocationService) {
         description = "Forbidden — KLEIDERWART role required",
         content = [Content(schema = Schema(implementation = ProblemDetail::class))],
     )
-    fun relocate(@Valid @RequestBody request: RelocationRequest): RelocationResponse =
+    fun relocate(@Valid @RequestBody request: RelocationRequest) {
         service.relocate(request)
+    }
 }

@@ -413,9 +413,6 @@ export interface components {
       targetLocationId: number
       itemIds: number[]
     }
-    RelocationResponse: {
-      batchId: string
-    }
     ProblemDetail: {
       /** Format: uri */
       type?: string
@@ -538,19 +535,6 @@ export interface components {
       clothingItem: components["schemas"]["ClothingItem"]
       location?: components["schemas"]["ClothingLocation"]
       clothingType: components["schemas"]["ClothingType"]
-    }
-    ProblemDetail: {
-      /** Format: uri */
-      type?: string
-      title?: string
-      /** Format: int32 */
-      status?: number
-      detail?: string
-      /** Format: uri */
-      instance?: string
-      properties?: {
-        [key: string]: unknown
-      }
     }
   }
   responses: never
@@ -713,9 +697,7 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          "*/*": components["schemas"]["RelocationResponse"]
-        }
+        content?: never
       }
       /** @description Bad Request */
       400: {

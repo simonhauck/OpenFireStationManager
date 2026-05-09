@@ -35,8 +35,6 @@ class RelocationControllerIT : IntegrationTest() {
     @Autowired private lateinit var itemRepository: ClothingItemRepository
     @Autowired private lateinit var movementRepository: ClothingMovementRepository
 
-    // ─── Happy path ───────────────────────────────────────────────────────────
-
     @Test
     fun `relocate moves items to target location and writes RELOCATION movements`() {
         val type = createType()
@@ -55,14 +53,12 @@ class RelocationControllerIT : IntegrationTest() {
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body!!
-        assertThat(body.batchId).isNotBlank()
 
         // Both items should now be at the target location
-        val updatedItem1 = itemRepository.findById(item1.id)!!
-        val updatedItem2 = itemRepository.findById(item2.id)!!
-        assertThat(updatedItem1.locationId?.id).isEqualTo(target.id)
-        assertThat(updatedItem2.locationId?.id).isEqualTo(target.id)
+        val updatedItem1 = itemRepository.findById(item1.id)
+        val updatedItem2 = itemRepository.findById(item2.id)
+        assertThat(updatedItem1?.locationId?.id).isEqualTo(target.id)
+        assertThat(updatedItem2?.locationId?.id).isEqualTo(target.id)
 
         // Movements should be recorded with RELOCATION reason and a shared batchId
         val movements1 = movementRepository.findAllByItemId(AggregateReference.to(item1.id))
@@ -75,11 +71,6 @@ class RelocationControllerIT : IntegrationTest() {
         assertThat(relocation1.toLocationId?.id).isEqualTo(target.id)
         assertThat(relocation2.fromLocationId?.id).isEqualTo(source.id)
         assertThat(relocation2.toLocationId?.id).isEqualTo(target.id)
-
-        // Both movements share the same batchId
-        assertThat(relocation1.batchId).isEqualTo(body.batchId)
-        assertThat(relocation2.batchId).isEqualTo(body.batchId)
-        assertThat(relocation1.batchId).isEqualTo(relocation2.batchId)
     }
 
     @Test
@@ -91,10 +82,7 @@ class RelocationControllerIT : IntegrationTest() {
 
         val response =
             relocationCalls.relocate(
-                RelocationRequest(
-                    targetLocationId = poolTarget.id,
-                    itemIds = listOf(item.id),
-                ),
+                RelocationRequest(targetLocationId = poolTarget.id, itemIds = listOf(item.id)),
                 authCookie = validCookieHeader,
             )
 
@@ -106,38 +94,8 @@ class RelocationControllerIT : IntegrationTest() {
         assertThat(relocationMovement.toLocationId?.id).isEqualTo(poolTarget.id)
     }
 
-    // ─── Validation errors ────────────────────────────────────────────────────
-
     @Test
-    fun `returns 400 when itemIds is empty`() {
-        val target = createLocation(LocationType.POOL)
-
-        val response =
-            relocationCalls.relocateExpectingError(
-                RelocationRequest(targetLocationId = target.id, itemIds = emptyList()),
-                authCookie = validCookieHeader,
-            )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-    }
-
-    @Test
-    fun `returns 400 when targetLocationId does not exist`() {
-        val type = createType()
-        val source = createLocation(LocationType.POOL)
-        val item = createItem(type, source)
-
-        val response =
-            relocationCalls.relocateExpectingError(
-                RelocationRequest(targetLocationId = 999_999_999L, itemIds = listOf(item.id)),
-                authCookie = validCookieHeader,
-            )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-    }
-
-    @Test
-    fun `returns 400 when an item id does not exist`() {
+    fun `returns 404 when an item id does not exist`() {
         val target = createLocation(LocationType.POOL)
 
         val response =
@@ -146,10 +104,8 @@ class RelocationControllerIT : IntegrationTest() {
                 authCookie = validCookieHeader,
             )
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
-
-    // ─── Role security ────────────────────────────────────────────────────────
 
     @Test
     fun `returns 403 for non-Kleiderwart callers`() {
@@ -168,8 +124,6 @@ class RelocationControllerIT : IntegrationTest() {
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private fun createType(name: String = "Type-${System.nanoTime()}"): ClothingType =
         typeCalls

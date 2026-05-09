@@ -17,9 +17,6 @@ import type { Step } from "#/components/base/VerticalStepper"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
-import type { components } from "#/api/schema"
-
-type ClothingLocation = components["schemas"]["ClothingLocation"]
 
 const RELOCATION_STEPS: Step[] = [
   { label: "Ziel wählen", description: "Ziel-Standort auswählen" },
@@ -53,8 +50,8 @@ export default function RelocationPage() {
           <CardTitle className="text-2xl">Umlagerung</CardTitle>
           <TouchButton
             variant="outline"
-            onClick={() => {
-              navigate({ to: "/pool-klamotten" })
+            onClick={async () => {
+              await navigate({ to: "/pool-klamotten" })
             }}
           >
             Abbrechen
@@ -198,7 +195,7 @@ function StepItemScanner({
 
 interface StepReviewProps {
   state: ReturnType<typeof useRelocationWizard>["state"]
-  onSubmitOk: (batchId: string) => void
+  onSubmitOk: () => void
   onBack: () => void
 }
 
@@ -214,11 +211,11 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
 
   async function handleSubmit() {
     try {
-      const response = await relocate.mutateAsync({
+      await relocate.mutateAsync({
         targetLocationId: state.targetLocationId!,
         itemIds: state.items.map((i) => i.clothingItem.id),
       })
-      onSubmitOk(response.batchId)
+      onSubmitOk()
     } catch {
       toast.error(
         "Fehler beim Abschließen der Umlagerung. Bitte erneut versuchen.",

@@ -11,11 +11,8 @@ import org.springframework.stereotype.Component
 @Component
 class RelocationControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
-    fun relocate(
-        request: RelocationRequest,
-        authCookie: String? = null,
-    ): ResponseEntity<RelocationResponse> {
-        return testRestTemplate.postForEntity<RelocationResponse>(
+    fun relocate(request: RelocationRequest, authCookie: String? = null): ResponseEntity<Unit> {
+        return testRestTemplate.postForEntity<Unit>(
             "/api/clothing/relocation",
             HttpEntity(request, headersWithCookie(authCookie)),
         )

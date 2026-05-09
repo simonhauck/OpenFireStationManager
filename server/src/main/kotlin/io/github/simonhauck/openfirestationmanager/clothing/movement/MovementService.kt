@@ -26,6 +26,10 @@ class MovementService(private val repository: ClothingMovementRepository) {
         return repository.save(movement)
     }
 
+    fun recordMovements(movements: List<ClothingMovement>): List<ClothingMovement> {
+        return repository.saveAll(movements)
+    }
+
     fun getMovementsForItem(itemId: Long): List<ClothingMovement> {
         return repository.findAllByItemId(AggregateReference.to(itemId))
     }

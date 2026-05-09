@@ -27,18 +27,6 @@ export interface ClothingItemScannerProps {
   renderItemBadge?: (item: ResolvedClothingItem) => ReactNode
 }
 
-/**
- * Shared barcode-scanner component used by both the Checkout wizard and the
- * Umlagerung wizard. Stateless with respect to the item list — the parent wizard
- * owns the list state and passes it in via `items`.
- *
- * Responsibilities:
- * - Barcode input (auto-focused on mount, HID scanner fires Enter on scan)
- * - Typeahead combobox fallback for manual lookup
- * - Silent duplicate detection (items already in `items` are ignored)
- * - Item list display with per-item remove buttons
- * - Render-prop slot (`renderItemBadge`) for workflow-specific annotations
- */
 export default function ClothingItemScanner({
   items,
   onItemResolved,

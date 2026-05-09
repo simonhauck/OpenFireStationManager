@@ -15,7 +15,7 @@ type Action =
   | { type: "ADD_ITEM"; item: ResolvedClothingItem }
   | { type: "REMOVE_ITEM"; itemId: number }
   | { type: "ADVANCE_TO_REVIEW" }
-  | { type: "SUBMIT_OK"; batchId: string }
+  | { type: "SUBMIT_OK" }
   | { type: "GO_BACK" }
   | { type: "RESET" }
 
@@ -45,7 +45,7 @@ function reducer(
       return { ...state, step: 3 }
 
     case "SUBMIT_OK":
-      return { ...state, step: 4, batchId: action.batchId }
+      return { ...state, step: 4 }
 
     case "GO_BACK": {
       if (state.step <= 1) return state
@@ -71,7 +71,7 @@ export interface UseRelocationWizardReturn {
   addItem: (item: ResolvedClothingItem) => void
   removeItem: (itemId: number) => void
   advanceToReview: () => void
-  submitOk: (batchId: string) => void
+  submitOk: () => void
   goBack: () => void
   reset: () => void
 }
@@ -87,7 +87,7 @@ export function useRelocationWizard(): UseRelocationWizardReturn {
       dispatch({ type: "ADD_ITEM", item }),
     removeItem: (itemId: number) => dispatch({ type: "REMOVE_ITEM", itemId }),
     advanceToReview: () => dispatch({ type: "ADVANCE_TO_REVIEW" }),
-    submitOk: (batchId: string) => dispatch({ type: "SUBMIT_OK", batchId }),
+    submitOk: () => dispatch({ type: "SUBMIT_OK" }),
     goBack: () => dispatch({ type: "GO_BACK" }),
     reset: () => dispatch({ type: "RESET" }),
   }
