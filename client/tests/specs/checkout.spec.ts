@@ -84,7 +84,7 @@ test.describe("Checkout", () => {
 
     // Navigate to pool overview
     await checkoutPage.navigateToOverviewButton().click()
-    await expect(page).toHaveURL(/\/pool-klamotten/)
+    await expect(page).toHaveURL(/\/pool-clothing/)
 
     // ── Verify item is no longer in the pool ─────────────────────────────────
     await expect(poolPage.loadingIndicator()).not.toBeVisible()

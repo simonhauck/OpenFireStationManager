@@ -83,7 +83,7 @@ export default function CheckoutPage() {
           <TouchButton
             variant="outline"
             onClick={() => {
-              navigate({ to: "/pool-klamotten" })
+              navigate({ to: "/pool-clothing" })
             }}
           >
             Abbrechen
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
               <StepSuccess
                 onReset={reset}
                 onNavigateToOverview={() =>
-                  void navigate({ to: "/pool-klamotten" })
+                  void navigate({ to: "/pool-clothing" })
                 }
               />
             </RenderIf>

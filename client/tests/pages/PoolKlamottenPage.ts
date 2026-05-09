@@ -4,7 +4,7 @@ export class PoolKlamottenPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/pool-klamotten")
+    await this.page.goto("/pool-clothing")
   }
 
   loadingIndicator() {

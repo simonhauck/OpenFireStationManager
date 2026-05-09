@@ -16,7 +16,7 @@ export default function PoolKlamottenPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-end">
         <TouchButton asChild>
-          <Link to="/checkout">Klamotten Ausgabe</Link>
+          <Link to="/pool-clothing/checkout">Klamotten Ausgabe</Link>
         </TouchButton>
       </div>
       <PoolKlamottenOverviewCard
