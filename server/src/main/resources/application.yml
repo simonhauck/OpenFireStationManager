@@ -6,7 +6,6 @@ spring:
     hikari:
       minimum-idle: 0
       maximum-pool-size: 25
-
 server:
   forward-headers-strategy: framework
   servlet:
@@ -28,3 +27,7 @@ springdoc:
   api-docs:
     enabled: true
     path: /schema.json
+management:
+  health:
+    db:
+      enabled: false
