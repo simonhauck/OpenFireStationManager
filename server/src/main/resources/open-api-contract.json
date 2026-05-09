@@ -156,6 +156,48 @@
         }
       }
     },
+    "/api/clothing/relocation": {
+      "post": {
+        "tags": ["relocation-controller"],
+        "summary": "Relocate clothing items to a target location",
+        "operationId": "relocate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — KLEIDERWART role required",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clothing/locations": {
       "get": {
         "tags": ["clothing-location-controller"],
@@ -1055,6 +1097,50 @@
         },
         "required": ["id", "metaData", "name"]
       },
+      "RelocationRequest": {
+        "type": "object",
+        "properties": {
+          "targetLocationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "required": ["itemIds", "targetLocationId"]
+      },
+      "ProblemDetail": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
       "CreateClothingLocationRequest": {
         "type": "object",
         "properties": {
@@ -1422,33 +1508,6 @@
           }
         },
         "required": ["clothingItem", "clothingType"]
-      },
-      "ProblemDetail": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "format": "uri"
-          },
-          "title": {
-            "type": "string"
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "detail": {
-            "type": "string"
-          },
-          "instance": {
-            "type": "string",
-            "format": "uri"
-          },
-          "properties": {
-            "type": "object",
-            "additionalProperties": {}
-          }
-        }
       }
     }
   }

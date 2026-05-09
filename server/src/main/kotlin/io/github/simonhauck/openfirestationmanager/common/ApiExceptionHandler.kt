@@ -3,6 +3,7 @@ package io.github.simonhauck.openfirestationmanager.common
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -61,5 +62,10 @@ class ApiExceptionHandler {
             HttpStatus.UNAUTHORIZED,
             "Invalid username or password",
         )
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handleAccessDeniedException(exception: AccessDeniedException): ProblemDetail {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Access denied")
     }
 }

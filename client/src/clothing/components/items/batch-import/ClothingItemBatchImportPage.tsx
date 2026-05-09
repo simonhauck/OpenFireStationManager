@@ -213,7 +213,7 @@ function TypeSelectionSection({
         </p>
       ) : (
         <RadioGroup
-          value={selectedTypeId !== null ? String(selectedTypeId) : undefined}
+          value={selectedTypeId !== null ? String(selectedTypeId) : ""}
           onValueChange={(val) => onSelect(Number(val))}
           className="grid grid-cols-2 gap-2 sm:grid-cols-3"
         >
