@@ -20,13 +20,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "cd .. && ./gradlew server:bootRun",
-      env: {
-        SPRING_PROFILES_ACTIVE: process.env.SPRING_PROFILES_ACTIVE ?? "test",
-        DB_URL: process.env.DB_URL ?? "jdbc:postgresql://localhost:5432/ofsm",
-        DB_USERNAME: process.env.DB_USERNAME ?? "postgres",
-        DB_PASSWORD: process.env.DB_PASSWORD ?? "postgres",
-      },
+      command: "cd .. && ./gradlew server:bootRun -Pspring.profiles.active=test",
       url: "http://localhost:8080/api/public/auth/me",
       reuseExistingServer: true,
       timeout: 120_000,
