@@ -1,4 +1,4 @@
-service:
+services:
   app:
     image: ghcr.io/simonhauck/open-fire-station-manager:latest
     restart: unless-stopped
