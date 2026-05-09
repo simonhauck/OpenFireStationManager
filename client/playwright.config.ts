@@ -20,7 +20,10 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "cd .. && ./gradlew server:bootRun -Pspring.profiles.active=test",
+      command: "cd .. && ./gradlew server:bootRun",
+      env:{
+        SPRING_PROFILES_ACTIVE: "test"
+      },
       url: "http://localhost:8080/api/public/auth/me",
       reuseExistingServer: true,
       timeout: 120_000,
