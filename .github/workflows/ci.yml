@@ -68,9 +68,6 @@ jobs:
         working-directory: client
         env:
           SPRING_PROFILES_ACTIVE: test
-          DB_URL: jdbc:postgresql://localhost:5432/ofsm
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
         run: npm run test:e2e
 
       - name: Upload Playwright report
