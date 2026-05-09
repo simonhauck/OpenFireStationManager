@@ -2,18 +2,13 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useEffect, useRef, useState } from "react"
-import { Trash2Icon } from "lucide-react"
 
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
 import type { CheckoutStep } from "#/clothing/checkout/useCheckoutWizard"
-import {
-  getItemByBarcode,
-  searchClothingItems,
-  checkoutMutation,
-} from "#/clothing/checkout/service/checkoutQueries"
+import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
 import type { ResolvedClothingItem } from "#/clothing/checkout/autoToggleReturnsByType"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import {
@@ -24,7 +19,7 @@ import type { ComboboxOption } from "#/clothing/checkout/components/TouchCompone
 import { VerticalStepper } from "#/components/base/VerticalStepper"
 import type { Step } from "#/components/base/VerticalStepper"
 import RenderIf from "#/components/base/RenderIf"
-import { Input } from "#/components/ui/input"
+import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import { Badge } from "#/components/ui/badge"
 import { Checkbox } from "#/components/ui/checkbox"
@@ -225,40 +220,15 @@ function StepItemScanner({
   onBack,
   onNext,
 }: StepItemScannerProps) {
-  const barcodeInputRef = useRef<HTMLInputElement>(null)
-  const [barcodeValue, setBarcodeValue] = useState("")
-  const [isScanning, setIsScanning] = useState(false)
   const [pendingConfirmation, setPendingConfirmation] =
     useState<PendingConfirmation | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<ResolvedClothingItem[]>([])
 
-  async function handleBarcodeSubmit(barcode: string) {
-    if (!barcode.trim()) return
-    setBarcodeValue("")
-    setIsScanning(true)
-    try {
-      const item = await getItemByBarcode(barcode.trim())
-      handleScannedItem(item)
-    } catch {
-      toast.error(`Barcode nicht gefunden: ${barcode}`)
-    } finally {
-      setIsScanning(false)
-      barcodeInputRef.current?.focus()
-    }
-  }
-
-  function handleScannedItem(item: ResolvedClothingItem) {
-    const alreadyInList = state.takeItems.some(
-      (i) => i.clothingItem.id === item.clothingItem.id,
-    )
-    if (alreadyInList) return // silent ignore
-
+  function handleItemResolved(item: ResolvedClothingItem) {
     const location = item.location
     const isAtPool = location?.type === "POOL"
 
     if (!isAtPool) {
-      // Not at a POOL — show confirmation dialog
+      // Not at a POOL — show checkout-specific discrepancy dialog
       setPendingConfirmation({
         item,
         actualLocationName: location?.name ?? "Unbekannt",
@@ -268,30 +238,6 @@ function StepItemScanner({
 
     onAddItem(item, false)
   }
-
-  async function handleSearchSelect(value: string) {
-    const found = searchResults.find((r) => String(r.clothingItem.id) === value)
-    if (found) handleScannedItem(found)
-  }
-
-  async function handleSearchChange(q: string) {
-    setSearchQuery(q)
-    if (q.length < 2) {
-      setSearchResults([])
-      return
-    }
-    try {
-      const results = await searchClothingItems(q)
-      setSearchResults(results)
-    } catch {
-      // silent — search is a backup, not critical
-    }
-  }
-
-  const searchOptions: ComboboxOption[] = searchResults.map((r) => ({
-    value: String(r.clothingItem.id),
-    label: `${r.clothingType.name} ${r.clothingItem.size}${r.clothingItem.barcode ? ` (${r.clothingItem.barcode})` : ""}`,
-  }))
 
   return (
     <>
@@ -304,81 +250,20 @@ function StepItemScanner({
             Scanne einen Barcode oder suche manuell nach einem Kleidungsstück.
           </p>
 
-          {/* Primary: barcode scanner input */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Barcode scannen</label>
-            <Input
-              ref={barcodeInputRef}
-              value={barcodeValue}
-              onChange={(e) => setBarcodeValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  void handleBarcodeSubmit(barcodeValue)
-                }
-              }}
-              placeholder="Barcode eingeben / Scanner verwenden..."
-              className="h-12 text-base"
-              disabled={isScanning}
-              autoFocus
-            />
-          </div>
-
-          {/* Backup: searchable combobox */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Oder manuell suchen</label>
-            <TouchCombobox
-              options={searchOptions}
-              value={null}
-              onSelect={handleSearchSelect}
-              onSearchChange={(q) => void handleSearchChange(q)}
-              placeholder="Kleidungsstück suchen..."
-              searchPlaceholder="Typ, Größe oder Barcode..."
-              emptyMessage={
-                searchQuery.length < 2
-                  ? "Mindestens 2 Zeichen eingeben..."
-                  : "Keine Ergebnisse."
-              }
-            />
-          </div>
-
-          {/* Item list */}
-          <RenderIf when={state.takeItems.length > 0}>
-            <div className="space-y-2">
-              <p className="text-sm font-medium">
-                Ausgewählte Kleidung ({state.takeItems.length})
-              </p>
-              <div className="space-y-2">
-                {state.takeItems.map((item) => (
-                  <div
-                    key={item.clothingItem.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
-                  >
-                    <span className="text-base">
-                      {item.clothingType.name} – {item.clothingItem.size}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <RenderIf
-                        when={state.discrepantItemIds.has(item.clothingItem.id)}
-                      >
-                        <Badge variant="outline" className="text-amber-600">
-                          Nicht in Pool
-                        </Badge>
-                      </RenderIf>
-                      <TouchButton
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`${item.clothingType.name} entfernen`}
-                        onClick={() => onRemoveItem(item.clothingItem.id)}
-                        className="text-destructive hover:text-destructive size-10 shrink-0"
-                      >
-                        <Trash2Icon className="size-4" />
-                      </TouchButton>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </RenderIf>
+          <ClothingItemScanner
+            items={state.takeItems}
+            onItemResolved={handleItemResolved}
+            onRemoveItem={onRemoveItem}
+            renderItemBadge={(item) => (
+              <RenderIf
+                when={state.discrepantItemIds.has(item.clothingItem.id)}
+              >
+                <Badge variant="outline" className="text-amber-600">
+                  Nicht in Pool
+                </Badge>
+              </RenderIf>
+            )}
+          />
 
           {/* Weiter button */}
           <div className="flex justify-end gap-3 pt-2">
