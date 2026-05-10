@@ -40,6 +40,8 @@ abstract class UpdateComposeImageTagTask : DefaultTask() {
     private fun loadVersion(): String {
         val properties = Properties()
         versionPropertyFile.get().asFile.inputStream().use(properties::load)
-        return properties.getProperty("version")
+        return requireNotNull(properties.getProperty("version")) {
+            "Missing 'version' property in ${versionPropertyFile.get().asFile.path}"
+        }
     }
 }

@@ -5,18 +5,25 @@ import org.gradle.api.Project
 
 class ReleaseComposePinningPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        val extension =
+            project.extensions.create(
+                "releaseComposePinning",
+                ReleaseComposePinningExtension::class.java,
+            )
+        extension.versionPropertyFilePath.convention("gradle.properties")
+        extension.composeFilePath.convention("infrastructure/ofsm-prod/compose.yml")
+        extension.imageName.convention("ghcr.io/simonhauck/open-fire-station-manager")
+
         val updateTaskProvider =
             project.tasks.register(
                 "updateProdComposeImage",
                 UpdateComposeImageTagTask::class.java,
             ) {
                 it.versionPropertyFile.set(
-                    project.layout.projectDirectory.file("gradle.properties")
+                    project.layout.projectDirectory.file(extension.versionPropertyFilePath)
                 )
-                it.composeFile.set(
-                    project.layout.projectDirectory.file("infrastructure/ofsm-prod/compose.yml")
-                )
-                it.imageName.set("ghcr.io/simonhauck/open-fire-station-manager")
+                it.composeFile.set(project.layout.projectDirectory.file(extension.composeFilePath))
+                it.imageName.set(extension.imageName)
             }
 
         project.pluginManager.withPlugin("io.github.simonhauck.release") {
