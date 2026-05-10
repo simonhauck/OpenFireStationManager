@@ -14,8 +14,6 @@ plugins {
 
 group = "io.github.simonhauck"
 
-version = "0.0.1-SNAPSHOT"
-
 description = "The server component to manage a firefighting station"
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
@@ -96,7 +94,9 @@ jib {
 
     to {
         image = "ghcr.io/simonhauck/open-fire-station-manager"
-        tags = setOfNotNull("$version", "latest").filterNot { it.isBlank() }.toSet()
+        val versionStr = version.toString()
+        val dynamicTag = if (versionStr.contains("SNAPSHOT")) "develop" else "stable"
+        tags = setOf(versionStr, "latest", dynamicTag)
         auth {
             username = System.getenv("DOCKER_USERNAME")
             password = System.getenv("DOCKER_PASSWORD")

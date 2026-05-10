@@ -61,7 +61,7 @@ testing, code style, API design, and database conventions.
   in `client/` and `server/`.
 - **Dependency updates:** Managed by Renovate (see `renovate.json`) with auto-merge enabled and
   a 14-day minimum release age. npm updates are enabled (including grouped `@tanstack/**` updates).
-- **No CI is configured yet.** Run lint, format checks, and tests locally before committing.
+- **CI workflows are configured in `.github/workflows/`.** Run lint, format checks, and tests locally before committing.
 - **No git hooks are installed.** Discipline is manual at this stage.
 
 ---

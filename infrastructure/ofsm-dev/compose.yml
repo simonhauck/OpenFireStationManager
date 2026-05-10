@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/simonhauck/open-fire-station-manager:latest
+    image: ghcr.io/simonhauck/open-fire-station-manager:develop
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: prod
