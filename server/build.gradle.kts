@@ -95,8 +95,8 @@ jib {
     to {
         image = "ghcr.io/simonhauck/open-fire-station-manager"
         val versionStr = version.toString()
-        val dynamicTag = if (versionStr.contains("SNAPSHOT")) "develop" else "stable"
-        tags = setOf(versionStr, "latest", dynamicTag)
+        val dynamicTag = if (versionStr.contains("SNAPSHOT")) "develop" else "latest"
+        tags = setOf(versionStr, dynamicTag)
         auth {
             username = System.getenv("DOCKER_USERNAME")
             password = System.getenv("DOCKER_PASSWORD")
