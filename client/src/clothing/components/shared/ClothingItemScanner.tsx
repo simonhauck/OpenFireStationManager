@@ -39,8 +39,9 @@ export default function ClothingItemScanner({
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<ResolvedClothingItem[]>([])
 
-  // Global barcode capture — no input field needs focus
+  // Global barcode capture
   const bufferRef = useRef("")
+
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Keep a stable ref to items so the keydown handler always sees the latest list
   const itemsRef = useRef(items)
@@ -94,7 +95,6 @@ export default function ClothingItemScanner({
       window.removeEventListener("keydown", handleKeyDown)
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function processBarcode(barcode: string) {
