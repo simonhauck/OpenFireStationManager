@@ -26,7 +26,7 @@ const MENU_ITEMS: MenuItem[] = [
   { label: "Über uns", href: "/about" },
   {
     label: "Pool Klamotten",
-    href: "/pool-klamotten",
+    href: "/pool-clothing",
     allowedRoles: ["USER"],
   },
   {

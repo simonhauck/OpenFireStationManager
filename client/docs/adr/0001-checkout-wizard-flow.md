@@ -5,7 +5,7 @@
 
 ## Context
 
-The `/checkout` route is a guided wizard for firefighters on a touch tablet. The naive ordering — pick target → pick returns → pick takes — forces the user to remember what they're returning before deciding what they're taking. In practice the trigger for a return is usually the take itself: "I'm taking a clean jacket, so I should return my dirty one." Ordering the take step first lets the wizard help the user with the return step.
+The `/pool-clothing/checkout` route is a guided wizard for firefighters on a touch tablet. The naive ordering — pick target → pick returns → pick takes — forces the user to remember what they're returning before deciding what they're taking. In practice the trigger for a return is usually the take itself: "I'm taking a clean jacket, so I should return my dirty one." Ordering the take step first lets the wizard help the user with the return step.
 
 ## Decision
 
@@ -18,7 +18,7 @@ Wizard steps in fixed order:
 5. **Review** — single screen showing all returns and takes with their target locations. Single "Confirm" button submits to the API.
 6. **Submit** — calls phase 1 of `POST /api/clothing/checkouts`. If the response is `needs_confirmation`, a discrepancy dialog overlays the Review screen; on acknowledgement the client calls phase 2 with `acknowledgedWarnings`.
 
-The wizard is a single TanStack Router route (`/checkout`) with internal step state. No sub-routes, no search-param-driven steps. Browser back exits the wizard; this is intentional for a transactional flow.
+The wizard is a single TanStack Router route (`/pool-clothing/checkout`) with internal step state. No sub-routes, no search-param-driven steps. Browser back exits the wizard; this is intentional for a transactional flow.
 
 ## Consequences
 
@@ -29,8 +29,8 @@ The wizard is a single TanStack Router route (`/checkout`) with internal step st
 
 ## Alternatives rejected
 
-- **Sub-routes per step.** TanStack Router file-based routes per step (`/checkout/target`, `/checkout/take`, ...). Browser back navigates between steps; deep-linking to a step is possible. Rejected: deep-linking to step 3 is meaningless without state from steps 1–2; back-button mid-wizard is a footgun on a tablet.
-- **Search params for step state** (`/checkout?step=3`). Middle ground; rejected as added complexity for no user benefit on a non-deep-linkable flow.
+- **Sub-routes per step.** TanStack Router file-based routes per step (`/pool-clothing/checkout/target`, `/pool-clothing/checkout/take`, ...). Browser back navigates between steps; deep-linking to a step is possible. Rejected: deep-linking to step 3 is meaningless without state from steps 1–2; back-button mid-wizard is a footgun on a tablet.
+- **Search params for step state** (`/pool-clothing/checkout?step=3`). Middle ground; rejected as added complexity for no user benefit on a non-deep-linkable flow.
 - **Returns before takes** (the original plan ordering). Forces the user to predict what they'll need to return without knowing what they're taking; defeats auto-toggle by type-match.
 - **Auto-toggle returns by type + size.** Misses the exchange-for-different-size case, which is one of the main reasons users return clothing. Type-only catches both same-size and exchange cases.
 - **Quantity-matched auto-toggle (toggle N existing items when taking N of that type).** Requires a heuristic to pick which existing items; the user has to disagree with the heuristic when it's wrong. Loose toggle-all is simpler and the user adjusts on the same screen.

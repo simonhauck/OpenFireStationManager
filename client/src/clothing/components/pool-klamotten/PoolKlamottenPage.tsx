@@ -23,7 +23,7 @@ export default function PoolKlamottenPage() {
         </RoleGuard>
 
         <TouchButton asChild>
-          <Link to="/checkout">Klamotten Ausgabe</Link>
+          <Link to="/pool-clothing/checkout">Klamotten Ausgabe</Link>
         </TouchButton>
       </div>
       <PoolKlamottenOverviewCard

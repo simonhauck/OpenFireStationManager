@@ -4,7 +4,7 @@ export class CheckoutPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/checkout")
+    await this.page.goto("/pool-clothing/checkout")
   }
 
   // ─── Step 1: Spind wählen ───────────────────────────────────────────────────
