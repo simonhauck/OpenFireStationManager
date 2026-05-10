@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { ReactNode } from "react"
 import { toast } from "sonner"
 import { Trash2Icon } from "lucide-react"
@@ -14,7 +14,6 @@ import {
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import RenderIf from "#/components/base/RenderIf"
-import { Input } from "#/components/ui/input"
 
 export interface ClothingItemScannerProps {
   /** Current list of items already in the batch. Used for duplicate detection. */
@@ -27,35 +26,94 @@ export interface ClothingItemScannerProps {
   renderItemBadge?: (item: ResolvedClothingItem) => ReactNode
 }
 
+/** Barcode scanners typically send all chars within this window (ms). */
+const SCANNER_TIMEOUT_MS = 50
+
 export default function ClothingItemScanner({
   items,
   onItemResolved,
   onRemoveItem,
   renderItemBadge,
 }: ClothingItemScannerProps) {
-  const barcodeInputRef = useRef<HTMLInputElement>(null)
-  const [barcodeValue, setBarcodeValue] = useState("")
   const [isScanning, setIsScanning] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<ResolvedClothingItem[]>([])
 
-  async function handleBarcodeSubmit(barcode: string) {
-    if (!barcode.trim()) return
-    setBarcodeValue("")
+  // Global barcode capture — no input field needs focus
+  const bufferRef = useRef("")
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Keep a stable ref to items so the keydown handler always sees the latest list
+  const itemsRef = useRef(items)
+  useEffect(() => {
+    itemsRef.current = items
+  }, [items])
+  const isScanningRef = useRef(false)
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Ignore when the user is typing inside an actual input / textarea / combobox
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return
+      }
+
+      if (e.key === "Enter") {
+        const barcode = bufferRef.current.trim()
+        bufferRef.current = ""
+        if (timerRef.current) {
+          clearTimeout(timerRef.current)
+          timerRef.current = null
+        }
+        if (barcode) {
+          void processBarcode(barcode)
+        }
+        return
+      }
+
+      // Accumulate printable characters
+      if (e.key.length === 1) {
+        bufferRef.current += e.key
+
+        // Auto-flush after a short idle period (handles scanners that don't send Enter)
+        if (timerRef.current) clearTimeout(timerRef.current)
+        timerRef.current = setTimeout(() => {
+          const barcode = bufferRef.current.trim()
+          bufferRef.current = ""
+          timerRef.current = null
+          if (barcode) void processBarcode(barcode)
+        }, SCANNER_TIMEOUT_MS)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function processBarcode(barcode: string) {
+    if (isScanningRef.current) return
+    isScanningRef.current = true
     setIsScanning(true)
     try {
-      const item = await getItemByBarcode(barcode.trim())
+      const item = await getItemByBarcode(barcode)
       handleResolved(item)
     } catch {
-      toast.error(`Barcode nicht gefunden: ${barcode}`)
+      toast.error(`Unbekannter Barcode: ${barcode}`)
     } finally {
+      isScanningRef.current = false
       setIsScanning(false)
-      barcodeInputRef.current?.focus()
     }
   }
 
   function handleResolved(item: ResolvedClothingItem) {
-    const alreadyInList = items.some(
+    const alreadyInList = itemsRef.current.some(
       (i) => i.clothingItem.id === item.clothingItem.id,
     )
     if (alreadyInList) return // silent duplicate ignore
@@ -89,23 +147,16 @@ export default function ClothingItemScanner({
 
   return (
     <div className="space-y-4">
-      {/* Primary: barcode scanner input */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Barcode scannen</label>
-        <Input
-          ref={barcodeInputRef}
-          value={barcodeValue}
-          onChange={(e) => setBarcodeValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              void handleBarcodeSubmit(barcodeValue)
-            }
-          }}
-          placeholder="Barcode eingeben / Scanner verwenden..."
-          className="h-12 text-base"
-          disabled={isScanning}
-          autoFocus
+      {/* Scanner status indicator */}
+      <div className="flex items-center gap-2 rounded-lg border p-3 text-sm">
+        <span
+          className={`size-2 shrink-0 rounded-full ${isScanning ? "animate-pulse bg-yellow-500" : "bg-green-500"}`}
         />
+        <span className="text-muted-foreground">
+          {isScanning
+            ? "Barcode wird verarbeitet…"
+            : "Scanner bereit – einfach scannen"}
+        </span>
       </div>
 
       {/* Backup: searchable combobox */}
