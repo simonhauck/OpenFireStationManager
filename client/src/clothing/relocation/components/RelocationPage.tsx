@@ -51,7 +51,7 @@ export default function RelocationPage() {
           <TouchButton
             variant="outline"
             onClick={async () => {
-              await navigate({ to: "/pool-klamotten" })
+              await navigate({ to: "/pool-clothing" })
             }}
           >
             Abbrechen
@@ -96,7 +96,7 @@ export default function RelocationPage() {
                 state={state}
                 onReset={reset}
                 onNavigateToOverview={() =>
-                  void navigate({ to: "/pool-klamotten" })
+                  void navigate({ to: "/pool-clothing" })
                 }
               />
             </RenderIf>
