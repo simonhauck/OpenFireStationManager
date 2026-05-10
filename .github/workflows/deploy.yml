@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Target deployment environment
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target deployment environment
+        required: true
+        type: choice
+        options:
+          - develop
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+    steps:
+      - name: Trigger deployment webhook
+        run: |
+          if [ -z "${{ secrets.DEPLOY_WEBHOOK_URL }}" ]; then
+            echo "DEPLOY_WEBHOOK_URL is not configured for the ${{ inputs.environment }} environment." >&2
+            exit 1
+          fi
+          curl --fail --show-error --silent -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}"

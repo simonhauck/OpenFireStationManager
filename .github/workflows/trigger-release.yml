@@ -15,9 +15,7 @@ on:
 
 jobs:
   run-tests:
-    permissions:
-      contents: read
-    uses: ./.github/workflows/run-tests.yml
+    uses: ./.github/workflows/ci.yml
 
   trigger-release:
     needs: run-tests
