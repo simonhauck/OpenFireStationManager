@@ -4,7 +4,7 @@ export class RelocationPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/pool-klamotten/relocation")
+    await this.page.goto("/pool-clothing/relocation")
   }
 
   // ─── Step 1: Ziel wählen ────────────────────────────────────────────────────
