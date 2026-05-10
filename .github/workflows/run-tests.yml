@@ -6,6 +6,8 @@ on:
 jobs:
   server-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -18,6 +20,8 @@ jobs:
 
   e2e-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     services:
       postgres:
         image: postgres:18
