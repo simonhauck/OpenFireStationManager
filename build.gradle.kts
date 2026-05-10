@@ -12,7 +12,6 @@ release {
         listOf(file("gradle.properties"), file("infrastructure/ofsm-prod/compose.yml"))
     )
     postReleaseCommitAddFiles.set(listOf(file("gradle.properties")))
-    disablePush.set(false)
 }
 
 spotless {
