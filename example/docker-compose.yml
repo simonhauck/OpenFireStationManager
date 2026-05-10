@@ -3,11 +3,8 @@ services:
     image: ghcr.io/simonhauck/open-fire-station-manager:latest
     restart: unless-stopped
     environment:
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_URL: jdbc:postgresql://db:5432/ofsm
+      DB_URL: jdbc:postgresql://db:5432/ofsm?user=postgres&password=postgres
       SPRING_PROFILES_ACTIVE: prod
-      JWT_SIGNING_SECRET: SOME_32_CHARACTERS_LONG_KEY_HERE
     ports:
       - "13841:8080"
 
