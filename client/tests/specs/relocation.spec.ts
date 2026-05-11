@@ -105,7 +105,7 @@ test.describe("Umlagerung (Relocation)", () => {
 
     // Navigate to pool overview
     await relocationPage.navigateToOverviewButton().click()
-    await expect(page).toHaveURL(/\/pool-klamotten/)
+    await expect(page).toHaveURL(/\/pool-clothing/)
     await expect(poolPage.loadingIndicator()).not.toBeVisible()
   })
 })

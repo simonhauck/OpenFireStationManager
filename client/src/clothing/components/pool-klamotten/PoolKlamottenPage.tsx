@@ -18,7 +18,7 @@ export default function PoolKlamottenPage() {
       <div className="flex items-center justify-end gap-3">
         <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
           <TouchButton asChild variant="outline">
-            <Link to="/pool-klamotten/relocation">Umlagerung starten</Link>
+            <Link to="/pool-clothing/relocation">Umlagerung starten</Link>
           </TouchButton>
         </RoleGuard>
 
