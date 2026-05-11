@@ -17,28 +17,12 @@ type UpdateClothingLocationVariables = {
   body: CreateClothingLocationRequest
 }
 
-const ensureData = <T>(
-  data: T | undefined,
-  error: unknown,
-  requestName: string,
-): T => {
-  if (error) {
-    throw error
-  }
-
-  if (data === undefined) {
-    throw new Error(`${requestName} returned no data`)
-  }
-
-  return data
-}
-
 export const getAllClothingLocationsQuery = () =>
   queryOptions({
     queryKey: queryKeys.clothingLocations(),
     queryFn: async (): Promise<ClothingLocation[]> => {
-      const { data, error } = await client.GET("/api/clothing/locations")
-      return ensureData(data, error, "GET /api/clothing/locations")
+      const { data } = await client.GET("/api/clothing/locations")
+      return data!
     },
   })
 
@@ -46,10 +30,10 @@ export const getClothingLocationByIdQuery = (id: number) =>
   queryOptions({
     queryKey: queryKeys.clothingLocation(id),
     queryFn: async (): Promise<ClothingLocation> => {
-      const { data, error } = await client.GET("/api/clothing/locations/{id}", {
+      const { data } = await client.GET("/api/clothing/locations/{id}", {
         params: { path: { id } },
       })
-      return ensureData(data, error, "GET /api/clothing/locations/{id}")
+      return data!
     },
   })
 
@@ -59,10 +43,8 @@ export const createClothingLocationMutation = (queryClient: QueryClient) =>
     mutationFn: async (
       body: CreateClothingLocationRequest,
     ): Promise<ClothingLocation> => {
-      const { data, error } = await client.POST("/api/clothing/locations", {
-        body,
-      })
-      return ensureData(data, error, "POST /api/clothing/locations")
+      const { data } = await client.POST("/api/clothing/locations", { body })
+      return data!
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -79,11 +61,10 @@ export const batchCreateClothingLocationsMutation = (
     mutationFn: async (
       body: BatchCreateClothingLocationsRequest,
     ): Promise<ClothingLocation[]> => {
-      const { data, error } = await client.POST(
-        "/api/clothing/locations/batch",
-        { body },
-      )
-      return ensureData(data, error, "POST /api/clothing/locations/batch")
+      const { data } = await client.POST("/api/clothing/locations/batch", {
+        body,
+      })
+      return data!
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -98,14 +79,11 @@ export const updateClothingLocationMutation = (queryClient: QueryClient) =>
     mutationFn: async (
       variables: UpdateClothingLocationVariables,
     ): Promise<ClothingLocation> => {
-      const { data, error } = await client.PATCH(
-        "/api/clothing/locations/{id}",
-        {
-          params: { path: { id: variables.id } },
-          body: variables.body,
-        },
-      )
-      return ensureData(data, error, "PATCH /api/clothing/locations/{id}")
+      const { data } = await client.PATCH("/api/clothing/locations/{id}", {
+        params: { path: { id: variables.id } },
+        body: variables.body,
+      })
+      return data!
     },
     onSuccess: async (_, variables) => {
       await Promise.all([

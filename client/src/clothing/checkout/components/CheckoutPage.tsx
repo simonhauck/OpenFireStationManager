@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useEffect, useRef, useState } from "react"
@@ -488,7 +488,8 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   const [discrepancyPending, setDiscrepancyPending] =
     useState<DiscrepancyPending | null>(null)
 
-  const checkout = useMutation(checkoutMutation())
+  const queryClient = useQueryClient()
+  const checkout = useMutation(checkoutMutation(queryClient))
 
   const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
