@@ -8,7 +8,6 @@ import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 
 import { cn } from "#/lib/utils"
 import { Button } from "#/components/ui/button"
-import type { ButtonProps } from "#/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -22,9 +21,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "#/components/ui/popover"
-
-// Re-export ButtonProps so callers can type-check without importing from ui/button
-export type { ButtonProps }
 
 /**
  * A Button with a minimum height of 48px (Material touch target).
@@ -89,7 +85,7 @@ export function TouchCombobox({
           <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
         <Command>
           <CommandInput
             placeholder={searchPlaceholder}
