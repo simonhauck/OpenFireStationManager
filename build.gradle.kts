@@ -14,6 +14,8 @@ release {
         listOf(file("gradle.properties"), file("infrastructure/ofsm-prod/compose.yml"))
     )
     postReleaseCommitAddFiles.set(listOf(file("gradle.properties")))
+    gitName = "Release Bot"
+    gitEmail = "no-reply@github.com"
 }
 
 spotless {
