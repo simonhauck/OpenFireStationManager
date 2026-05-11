@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 import { useState } from "react"
 
-import type { components } from "#/api/schema"
 import type { ClothingType } from "#/clothing/model/clothingType"
 import { deleteClothingTypeMutation } from "#/clothing/service/clothingTypesQueries"
 import RenderIf from "#/components/base/RenderIf"
@@ -17,8 +16,6 @@ import {
   AlertDialogTrigger,
 } from "#/components/ui/alert-dialog"
 import { Button } from "#/components/ui/button"
-
-type ProblemDetail = components["schemas"]["ProblemDetail"]
 
 interface DeleteClothingTypeDialogProps {
   type: ClothingType
@@ -49,10 +46,10 @@ export default function DeleteClothingTypeDialog({
     deleteType(type.id, {
       onSuccess: () => setIsOpen(false),
       onError: (error) => {
-        const problemDetail = error as ProblemDetail
         setErrorMessage(
-          problemDetail.detail ??
-            "Der Kleidungstyp konnte nicht gelöscht werden.",
+          error instanceof Error
+            ? error.message
+            : "Der Kleidungstyp konnte nicht gelöscht werden.",
         )
       },
     })

@@ -14,28 +14,12 @@ type UpdateClothingTypeVariables = {
   body: CreateOrUpdateClothingTypeRequest
 }
 
-const ensureData = <T>(
-  data: T | undefined,
-  error: unknown,
-  requestName: string,
-): T => {
-  if (error) {
-    throw error
-  }
-
-  if (data === undefined) {
-    throw new Error(`${requestName} returned no data`)
-  }
-
-  return data
-}
-
 export const getAllClothingTypesQuery = () =>
   queryOptions({
     queryKey: queryKeys.clothingTypes(),
     queryFn: async (): Promise<ClothingType[]> => {
-      const { data, error } = await client.GET("/api/clothing/types")
-      return ensureData(data, error, "GET /api/clothing/types")
+      const { data } = await client.GET("/api/clothing/types")
+      return data!
     },
   })
 
@@ -43,13 +27,10 @@ export const getClothingTypeByIdQuery = (id: number) =>
   queryOptions({
     queryKey: queryKeys.clothingType(id),
     queryFn: async (): Promise<ClothingType> => {
-      const { data, error } = await client.GET("/api/clothing/types/{id}", {
-        params: {
-          path: { id },
-        },
+      const { data } = await client.GET("/api/clothing/types/{id}", {
+        params: { path: { id } },
       })
-
-      return ensureData(data, error, "GET /api/clothing/types/{id}")
+      return data!
     },
   })
 
@@ -59,11 +40,8 @@ export const createClothingTypeMutation = (queryClient: QueryClient) =>
     mutationFn: async (
       body: CreateOrUpdateClothingTypeRequest,
     ): Promise<ClothingType> => {
-      const { data, error } = await client.POST("/api/clothing/types", {
-        body,
-      })
-
-      return ensureData(data, error, "POST /api/clothing/types")
+      const { data } = await client.POST("/api/clothing/types", { body })
+      return data!
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -78,14 +56,11 @@ export const updateClothingTypeMutation = (queryClient: QueryClient) =>
     mutationFn: async (
       variables: UpdateClothingTypeVariables,
     ): Promise<ClothingType> => {
-      const { data, error } = await client.PATCH("/api/clothing/types/{id}", {
-        params: {
-          path: { id: variables.id },
-        },
+      const { data } = await client.PATCH("/api/clothing/types/{id}", {
+        params: { path: { id: variables.id } },
         body: variables.body,
       })
-
-      return ensureData(data, error, "PATCH /api/clothing/types/{id}")
+      return data!
     },
     onSuccess: async (_, variables) => {
       await Promise.all([
@@ -101,12 +76,9 @@ export const deleteClothingTypeMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationKey: [...queryKeys.clothingTypes(), "delete"] as const,
     mutationFn: async (id: number): Promise<void> => {
-      const { error } = await client.DELETE("/api/clothing/types/{id}", {
+      await client.DELETE("/api/clothing/types/{id}", {
         params: { path: { id } },
       })
-      if (error) {
-        throw error
-      }
     },
     onSuccess: async (_, id) => {
       await Promise.all([

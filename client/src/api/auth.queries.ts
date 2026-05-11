@@ -7,24 +7,12 @@ import type { components } from "#/api/schema"
 type AuthStateResponse = components["schemas"]["AuthStateResponse"]
 type LoginRequest = components["schemas"]["LoginRequest"]
 
-const ensureData = <T>(data: T | undefined, error: unknown): T => {
-  if (error) {
-    throw error
-  }
-
-  if (data === undefined) {
-    throw new Error("GET /api/public/auth/me returned no data")
-  }
-
-  return data
-}
-
 export const meQuery = () =>
   queryOptions({
     queryKey: queryKeys.me(),
     queryFn: async (): Promise<AuthStateResponse> => {
-      const { data, error } = await client.GET("/api/public/auth/me")
-      return ensureData(data, error)
+      const { data } = await client.GET("/api/public/auth/me")
+      return data!
     },
   })
 
@@ -42,10 +30,7 @@ export const logoutMutation = (queryClient: QueryClient) =>
 export const loginMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationFn: async (body: LoginRequest): Promise<void> => {
-      const fetchResponse = await client.POST("/api/public/auth/login", {
-        body,
-      })
-      if (!fetchResponse.response.ok) throw new Error("Login failed")
+      await client.POST("/api/public/auth/login", { body })
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.me() })
