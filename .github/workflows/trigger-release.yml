@@ -1,0 +1,40 @@
+name: Trigger Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: Release type
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  run-tests:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+
+  trigger-release:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          # PAT is required so commits/tags pushed by the release task can trigger follow-up workflows.
+          token: ${{ secrets.RELEASE_PAT_TOKEN }}
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+
+      - name: Trigger release
+        run: ./gradlew release -PreleaseType=${{ inputs.release-type }} --no-daemon

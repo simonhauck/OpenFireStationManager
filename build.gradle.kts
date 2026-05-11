@@ -1,6 +1,20 @@
-plugins { alias(libs.plugins.spotless) }
+plugins {
+    alias(libs.plugins.spotless)
+    id("io.github.simonhauck.release") version "1.5.1"
+    id("io.github.simonhauck.release-compose-pinning")
+}
 
 repositories { mavenCentral() }
+
+allprojects { group = "io.github.simonhauck" }
+
+release {
+    versionPropertyFile.set(layout.projectDirectory.file("gradle.properties"))
+    releaseCommitAddFiles.set(
+        listOf(file("gradle.properties"), file("infrastructure/ofsm-prod/compose.yml"))
+    )
+    postReleaseCommitAddFiles.set(listOf(file("gradle.properties")))
+}
 
 spotless {
     kotlinGradle {
