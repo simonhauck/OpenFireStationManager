@@ -23,7 +23,7 @@ resource "neon_project" "open_fire_station_manager" {
 resource "neon_branch" "develop" {
   project_id = neon_project.open_fire_station_manager.id
   name       = "develop"
-  parent_id = neon_project.open_fire_station_manager.default_branch_id
+  parent_id  = neon_project.open_fire_station_manager.default_branch_id
 }
 
 resource "neon_endpoint" "develop_endpoint" {
@@ -34,7 +34,7 @@ resource "neon_endpoint" "develop_endpoint" {
 resource "neon_branch" "local" {
   project_id = neon_project.open_fire_station_manager.id
   name       = "local"
-  parent_id = neon_project.open_fire_station_manager.default_branch_id
+  parent_id  = neon_project.open_fire_station_manager.default_branch_id
 }
 
 resource "neon_endpoint" "local_endpoint" {

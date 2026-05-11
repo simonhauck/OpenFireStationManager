@@ -6,6 +6,10 @@ plugins {
 
 repositories { mavenCentral() }
 
+allprojects {
+    group = "io.github.simonhauck"
+}
+
 release {
     versionPropertyFile.set(layout.projectDirectory.file("gradle.properties"))
     releaseCommitAddFiles.set(

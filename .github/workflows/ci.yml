@@ -22,7 +22,8 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Check Terraform formatting
-        run: terraform fmt -check -recursive infrastructure/terraform
+        working-directory: infrastructure/terraform
+        run: terraform fmt -check -recursive .
 
       - name: Run backend checks
         run: ./gradlew check
@@ -33,11 +34,11 @@ jobs:
 
       - name: Lint client
         working-directory: client
-        run: npm run lint
+        run: npm run lint:check
 
       - name: Check client formatting
         working-directory: client
-        run: npm run format
+        run: npm run format:check
 
   e2e:
     runs-on: ubuntu-latest
