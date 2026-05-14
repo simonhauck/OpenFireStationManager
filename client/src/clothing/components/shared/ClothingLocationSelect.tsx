@@ -1,16 +1,12 @@
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
-import { Label } from "#/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "#/components/ui/select"
+import ClearableSelect from "#/components/base/ClearableSelect"
+import type { components } from "#/api/schema"
+
+type ClothingLocation = components["schemas"]["ClothingLocation"]
 
 type ClothingLocationSelectProps = {
   selectedLocationId: number | undefined
-  onLocationChange: (id: number) => void
+  onLocationChange: (id: number | undefined) => void
 }
 
 export default function ClothingLocationSelect({
@@ -19,26 +15,22 @@ export default function ClothingLocationSelect({
 }: ClothingLocationSelectProps) {
   const { data: clothingLocations } = useClothingLocations()
 
-  const locations = clothingLocations ?? []
+  const locations: ClothingLocation[] = clothingLocations ?? []
+  const selectedLocation: ClothingLocation | undefined = locations.find(
+    (l) => l.id === selectedLocationId,
+  )
 
   return (
-    <div className="space-y-1.5">
-      <Label htmlFor="location">Standort (optional)</Label>
-      <Select
-        value={String(selectedLocationId)}
-        onValueChange={(val) => onLocationChange(Number(val))}
-      >
-        <SelectTrigger id="location">
-          <SelectValue placeholder="Kein Standort" />
-        </SelectTrigger>
-        <SelectContent>
-          {locations.map((location) => (
-            <SelectItem key={location.id} value={String(location.id)}>
-              {location.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <ClearableSelect<ClothingLocation>
+      id="location"
+      label="Standort (optional)"
+      noItemSelectedLabel="--- Kein Standort / Unbekannt ---"
+      canClear={true}
+      options={locations}
+      selectedValue={selectedLocation}
+      onValueChange={(location) => onLocationChange(location?.id)}
+      toDisplayString={(location) => location.name}
+      toKey={(location) => String(location.id)}
+    />
   )
 }

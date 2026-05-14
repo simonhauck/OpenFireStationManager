@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { randomUUID } from "node:crypto"
 import { createClothingType } from "../flows/createClothingType"
+import { createClothingLocation } from "../flows/createClothingLocation"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
@@ -77,5 +78,52 @@ test.describe("Clothing Items", () => {
     await itemsPage.confirmDelete()
 
     await expect(itemsPage.itemRow(barcode)).not.toBeVisible()
+  })
+
+  test("can clear a selected location back to no location", async ({
+    page,
+  }) => {
+    const barcode = `BC-${randomUUID().slice(0, 8)}`
+    const locationName = `Loc-${randomUUID().slice(0, 8)}`
+    const itemsPage = new ClothingItemsPage(page)
+
+    // Create a location to assign
+    await createClothingLocation(page, { type: "POOL", name: locationName })
+
+    // Create an item with the location
+    await itemsPage.gotoNew()
+    await itemsPage.selectType(typeName)
+    await itemsPage.fillSize("M")
+    await itemsPage.fillBarcode(barcode)
+    await itemsPage.selectLocation(locationName)
+    await itemsPage.submitForm()
+    await expect(page).toHaveURL(/\/clothing-management\/items$/)
+
+    // Edit the item and clear the location
+    const row = itemsPage.itemRow(barcode)
+    const idCell = row.getByRole("cell").first()
+    const id = await idCell.textContent()
+
+    await itemsPage.clickEditForItem(id!.trim())
+
+    // The clear button should be visible because a location is selected
+    await expect(
+      page.getByRole("button", { name: "Auswahl zurücksetzen" }),
+    ).toBeVisible()
+
+    await itemsPage.clearLocation()
+
+    // After clearing, the placeholder "Kein Standort" should be shown
+    await expect(page.getByText("Kein Standort")).toBeVisible()
+
+    // Clear button should be gone
+    await expect(
+      page.getByRole("button", { name: "Auswahl zurücksetzen" }),
+    ).not.toBeVisible()
+
+    // Submit and verify save succeeds (navigates back to list)
+    await itemsPage.submitForm()
+    await expect(page).toHaveURL(/\/clothing-management\/items$/)
+    await expect(itemsPage.itemRow(barcode)).toBeVisible()
   })
 })
