@@ -11,25 +11,22 @@ jobs:
       contents: read
     uses: ./.github/workflows/ci.yml
 
-  publish-release:
+  publish-docker-release:
     needs: run-tests
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish-docker-image.yml
+    secrets: inherit
+
+  publish-github-release:
+    needs: publish-docker-release
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       contents: write
-      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Setup build environment
-        uses: ./.github/actions/setup-build-env
-
-      - name: Publish stable Docker image
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ./gradlew :server:jib --no-daemon
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
@@ -38,7 +35,7 @@ jobs:
           make_latest: true
 
   deploy-production:
-    needs: publish-release
+    needs: publish-docker-release
     permissions:
       contents: read
     uses: ./.github/workflows/deploy.yml
