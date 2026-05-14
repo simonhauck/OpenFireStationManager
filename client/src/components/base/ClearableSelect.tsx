@@ -49,10 +49,7 @@ export default function ClearableSelect<T>({
       <Label htmlFor={id}>{label}</Label>
       <div className="flex items-center gap-1">
         <div className="flex-1">
-          <Select
-            value={selectedKey ?? ""}
-            onValueChange={handleValueChange}
-          >
+          <Select value={selectedKey ?? ""} onValueChange={handleValueChange}>
             <SelectTrigger id={id}>
               <SelectValue placeholder={noItemSelectedLabel} />
             </SelectTrigger>

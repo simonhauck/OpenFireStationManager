@@ -16,7 +16,9 @@ export default function ClothingLocationSelect({
   const { data: clothingLocations } = useClothingLocations()
 
   const locations: ClothingLocation[] = clothingLocations ?? []
-  const selectedLocation: ClothingLocation | undefined = locations.find((l) => l.id === selectedLocationId)
+  const selectedLocation: ClothingLocation | undefined = locations.find(
+    (l) => l.id === selectedLocationId,
+  )
 
   return (
     <ClearableSelect<ClothingLocation>

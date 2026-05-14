@@ -8,6 +8,7 @@ import type {
   LocationType,
 } from "#/clothing/service/clothingLocationsQueries"
 import { batchCreateClothingLocationsMutation } from "#/clothing/service/clothingLocationsQueries"
+import ClearableSelect from "#/components/base/ClearableSelect"
 import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
@@ -21,13 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "#/components/ui/select"
 import { Textarea } from "#/components/ui/textarea"
 
 const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
@@ -258,26 +252,18 @@ function CsvInputSection({
 }: CsvInputSectionProps) {
   return (
     <>
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium">Standorttyp</p>
-        <Select
-          value={locationType}
-          onValueChange={(v) => onLocationTypeChange(v as LocationType)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(LOCATION_TYPE_LABELS) as LocationType[]).map(
-              (type) => (
-                <SelectItem key={type} value={type}>
-                  {LOCATION_TYPE_LABELS[type]}
-                </SelectItem>
-              ),
-            )}
-          </SelectContent>
-        </Select>
-      </div>
+      <ClearableSelect<LocationType>
+        id="location-type"
+        label="Standorttyp"
+        noItemSelectedLabel="Typ auswählen"
+        canClear={false}
+        options={Object.keys(LOCATION_TYPE_LABELS) as LocationType[]}
+        selectedValue={locationType}
+        onValueChange={(v) => {
+          if (v) onLocationTypeChange(v)
+        }}
+        toDisplayString={(type) => LOCATION_TYPE_LABELS[type]}
+      />
 
       <div className="space-y-1.5">
         <p className="text-sm font-medium">CSV-Daten eingeben</p>
