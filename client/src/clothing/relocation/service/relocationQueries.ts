@@ -13,8 +13,6 @@ export const relocationMutation = (queryClient: QueryClient) =>
       await client.POST("/api/clothing/relocation", { body })
     },
     onSuccess: async () => {
-      // Invalidating clothingItems() covers item details, the location-based
-      // overview and the type-size summary in one call.
       await queryClient.invalidateQueries({
         queryKey: queryKeys.clothingItems(),
       })

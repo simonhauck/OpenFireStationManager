@@ -68,8 +68,6 @@ export const updateClothingTypeMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingType(variables.id),
         }),
-        // The type-size summary displays type names, so it must be refreshed
-        // whenever a type is renamed.
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingTypeSizeSummary(),
         }),
@@ -91,7 +89,6 @@ export const deleteClothingTypeMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingType(id),
         }),
-        // Remove deleted type from the type-size summary.
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingTypeSizeSummary(),
         }),

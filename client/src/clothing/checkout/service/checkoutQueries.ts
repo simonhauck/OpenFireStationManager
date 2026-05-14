@@ -53,8 +53,6 @@ export const checkoutMutation = (queryClient: QueryClient) =>
       return data as unknown as CheckoutHttpResponse
     },
     onSuccess: async () => {
-      // clothingItems() is the prefix for all item-derived views (overview,
-      // summary), so a single invalidation covers everything.
       await queryClient.invalidateQueries({
         queryKey: queryKeys.clothingItems(),
       })

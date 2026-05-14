@@ -93,8 +93,6 @@ export const updateClothingLocationMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingLocation(variables.id),
         }),
-        // The location dashboard overview displays location names, so it must
-        // be refreshed whenever a location is renamed.
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingOverview(),
         }),
@@ -118,7 +116,6 @@ export const deleteClothingLocationMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingLocation(id),
         }),
-        // Remove deleted location from the dashboard overview.
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingOverview(),
         }),
