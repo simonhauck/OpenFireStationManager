@@ -11,28 +11,16 @@ jobs:
       contents: read
     uses: ./.github/workflows/ci.yml
 
-  publish-snapshot:
+  publish-docker-snapshot:
     needs: run-tests
-    runs-on: ubuntu-latest
-    environment: develop
     permissions:
       contents: read
       packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup build environment
-        uses: ./.github/actions/setup-build-env
-
-      - name: Publish Docker image
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ./gradlew :server:jib --no-daemon
+    uses: ./.github/workflows/publish-docker-image.yml
+    secrets: inherit
 
   deploy-develop:
-    needs: publish-snapshot
+    needs: publish-docker-snapshot
     permissions:
       contents: read
     uses: ./.github/workflows/deploy.yml
