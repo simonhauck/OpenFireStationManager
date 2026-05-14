@@ -48,6 +48,12 @@ export class ClothingItemsPage {
     await this.page.getByRole("option", { name: locationName }).click()
   }
 
+  async clearLocation() {
+    await this.page
+      .getByRole("button", { name: "Auswahl zurücksetzen" })
+      .click()
+  }
+
   async submitForm() {
     await this.page.getByRole("button", { name: "Speichern" }).click()
   }
