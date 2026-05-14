@@ -1,6 +1,8 @@
 import { mutationOptions } from "@tanstack/react-query"
+import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
+import { queryKeys } from "#/api/queryKeys"
 import type { components } from "#/api/schema"
 
 export type ResolvedClothingItem = components["schemas"]["ResolvedClothingItem"]
@@ -20,48 +22,42 @@ export type CheckoutHttpResponse =
       discrepancies: components["schemas"]["Discrepancy"][]
     }
 
-const ensureData = <T>(
-  data: T | undefined,
-  error: unknown,
-  requestName: string,
-): T => {
-  if (error) throw error
-  if (data === undefined) throw new Error(`${requestName} returned no data`)
-  return data
-}
-
 export async function searchClothingItems(
   q: string,
   limit = 50,
 ): Promise<ResolvedClothingItem[]> {
-  const { data, error } = await client.GET("/api/clothing/items/search", {
+  const { data } = await client.GET("/api/clothing/items/search", {
     params: { query: { q, limit } },
   })
-  return ensureData(data, error, "GET /api/clothing/items/search")
+  return data!
 }
 
 export async function getItemByBarcode(
   barcode: string,
 ): Promise<ResolvedClothingItem> {
-  const { data, error } = await client.GET(
+  const { data } = await client.GET(
     "/api/clothing/items/by-barcode/{barcode}",
-    { params: { path: { barcode } } },
+    {
+      params: { path: { barcode } },
+    },
   )
-  return ensureData(data, error, "GET /api/clothing/items/by-barcode/{barcode}")
+  return data!
 }
 
-export const checkoutMutation = () =>
+export const checkoutMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationFn: async (
       body: CheckoutRequest,
     ): Promise<CheckoutHttpResponse> => {
-      const { data, error } = await client.POST("/api/clothing/checkouts", {
-        body,
-      })
-      return ensureData(
-        data as unknown as CheckoutHttpResponse | undefined,
-        error,
-        "POST /api/clothing/checkouts",
-      )
+      const { data } = await client.POST("/api/clothing/checkouts", { body })
+      return data as unknown as CheckoutHttpResponse
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.clothingItems() }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingOverview(),
+        }),
+      ])
     },
   })

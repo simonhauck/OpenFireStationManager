@@ -1,19 +1,16 @@
-name: Publish
+name: publish-docker-image.yml
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
   workflow_dispatch:
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
-    secrets: inherit
-
-  publish:
-    needs: ci
+  build-docker:
     runs-on: ubuntu-latest
+    environment: develop
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -25,13 +22,12 @@ jobs:
         working-directory: client
         run: npm ci
 
-      - name: Build client
+      - name: Build frontend
         working-directory: client
         run: npm run build
 
       - name: Publish Docker image
-        shell: bash
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ./gradlew server:jib
+        run: ./gradlew :server:jib --no-daemon
