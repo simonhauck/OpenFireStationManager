@@ -179,9 +179,8 @@ function LocationBatchImportPageContent() {
         <CardHeader>
           <CardTitle>Massenimport von Standorten</CardTitle>
           <CardDescription>
-            Importiere mehrere Standorte auf einmal. Gib die Daten im CSV-Format
-            ein: <code>Bezeichnung,Kommentar</code>. Der Kommentar ist optional.
-            Alle importierten Standorte erhalten den ausgewählten Typ.
+            Importiere mehrere Standorte auf einmal. Alle importierten Standorte
+            erhalten den ausgewählten Typ.
           </CardDescription>
         </CardHeader>
 
@@ -281,6 +280,10 @@ function CsvInputSection({
 
       <div className="space-y-1.5">
         <p className="text-sm font-medium">CSV-Daten eingeben</p>
+        <p className="text-sm text-muted-foreground">
+          Gib die Daten im CSV-Format ein: <code>Bezeichnung,Kommentar</code>.
+          Der Kommentar ist optional.
+        </p>
         <p className="text-sm italic">Beispiel: Schrank A,Hauptgebaeude EG</p>
         <Textarea
           placeholder={"Schrank A,Hauptgebaeude EG\nRegal B\nSpind 3,Umkleide"}

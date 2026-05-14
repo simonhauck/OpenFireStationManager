@@ -130,8 +130,7 @@ function ClothingItemBatchImportPageContent() {
           <CardTitle>Massenimport von Kleidungsstuecken</CardTitle>
           <CardDescription>
             Importiere mehrere Kleidungsstuecke auf einmal. Waehle zuerst einen
-            Kleidungstyp, dann gib die Daten im CSV-Format ein:{" "}
-            <code>Groesse,Barcode</code>. Der Barcode ist optional.
+            Kleidungstyp, dann gib die CSV-Daten ein.
           </CardDescription>
         </CardHeader>
 
@@ -246,7 +245,11 @@ function CsvInputSection({
     <>
       <div className="space-y-1.5">
         <p className="text-sm font-medium">Schritt 2: CSV-Daten eingeben</p>
-        <p className="text-sm italic">Example: L,ExampleBarcode1</p>
+        <p className="text-sm text-muted-foreground">
+          Gib die Daten im CSV-Format ein: <code>Groesse,Barcode</code>. Der
+          Barcode ist optional.
+        </p>
+        <p className="text-sm italic">Beispiel: L,ExampleBarcode1</p>
         <Textarea
           placeholder={"L,BARCODE001\nM\nXL,BARCODE003"}
           rows={8}
