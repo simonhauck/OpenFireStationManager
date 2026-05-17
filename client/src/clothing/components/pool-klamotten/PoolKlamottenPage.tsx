@@ -1,6 +1,10 @@
 import { Link } from "@tanstack/react-router"
 
-import type { ClothingLocationSizeSummary } from "#/clothing/service/clothingOverviewQueries"
+import type {
+  ClothingLocationSizeSummary,
+  SizeGroupSummary,
+  SizeSummary,
+} from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
 import ErrorState from "#/components/base/ErrorState"
@@ -89,7 +93,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
     (locationTotal, typeSummary) =>
       locationTotal +
       typeSummary.sizeGroupSummary.reduce(
-        (typeTotal, sizeSummary) => typeTotal + sizeSummary.count,
+        (typeTotal, sizeGroupSummary) => typeTotal + sizeGroupSummary.totalCount,
         0,
       ),
     0,
@@ -120,7 +124,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
 
       <CardContent className="space-y-4">
         <RenderIf when={typeSummaries.length > 0}>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3">
             {typeSummaries.map((typeSummary) => (
               <Card
                 key={`${summary.locationId}-${typeSummary.typeId}`}
@@ -134,27 +138,23 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
                     <span className="text-muted-foreground text-xs uppercase tracking-wide">
                       Summe{" "}
                       {typeSummary.sizeGroupSummary.reduce(
-                        (sum, entry) => sum + entry.count,
+                        (sum, entry) => sum + entry.totalCount,
                         0,
                       )}
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex min-h-16 flex-wrap gap-2">
-                    {[...typeSummary.sizeGroupSummary]
-                      .sort((a, b) => a.size.localeCompare(b.size, "de"))
-                      .map(({ size, count }) => (
-                        <Badge
-                          key={`${summary.locationId}-${typeSummary.typeId}-${size}`}
-                          variant="outline"
-                          className="gap-2 px-3 py-1.5 text-base"
-                        >
-                          <span>{size}:</span>
-                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                            {count}
-                          </span>
-                        </Badge>
+                  <div className="space-y-3">
+                    {typeSummary.sizeGroupSummary
+                      .toSorted((a, b) => a.name.localeCompare(b.name, "de"))
+                      .map((sizeGroupSummary) => (
+                        <SizeGroupSection
+                          key={`${summary.locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}`}
+                          locationId={summary.locationId}
+                          typeId={typeSummary.typeId}
+                          sizeGroupSummary={sizeGroupSummary}
+                        />
                       ))}
 
                     <RenderIf when={typeSummary.sizeGroupSummary.length === 0}>
@@ -178,3 +178,61 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
     </Card>
   )
 }
+
+interface SizeGroupSectionProps {
+  locationId: ClothingLocationSizeSummary["locationId"]
+  typeId: number
+  sizeGroupSummary: SizeGroupSummary
+}
+
+function SizeGroupSection({
+  locationId,
+  typeId,
+  sizeGroupSummary,
+}: SizeGroupSectionProps) {
+  const sizeSummaries = [...sizeGroupSummary.sizes].sort((a, b) =>
+    a.size.localeCompare(b.size, "de"),
+  )
+
+  return (
+    <div className="space-y-2 rounded-md border p-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-medium">{sizeGroupSummary.name}</span>
+        <span className="text-muted-foreground text-xs uppercase tracking-wide">
+          Summe {sizeGroupSummary.totalCount}
+        </span>
+      </div>
+
+      <div className="flex min-h-10 flex-wrap gap-2">
+        {sizeSummaries.map((sizeSummary) => (
+          <SizeSummaryBadge
+            key={`${locationId}-${typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
+            sizeSummary={sizeSummary}
+          />
+        ))}
+
+        <RenderIf when={sizeSummaries.length === 0}>
+          <span className="text-muted-foreground text-sm">
+            Keine Groessen in dieser Gruppe vorhanden.
+          </span>
+        </RenderIf>
+      </div>
+    </div>
+  )
+}
+
+interface SizeSummaryBadgeProps {
+  sizeSummary: SizeSummary
+}
+
+function SizeSummaryBadge({ sizeSummary }: SizeSummaryBadgeProps) {
+  return (
+    <Badge variant="outline" className="gap-2 px-3 py-1.5 text-base">
+      <span>{sizeSummary.size}:</span>
+      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+        {sizeSummary.count}
+      </span>
+    </Badge>
+  )
+}
+
