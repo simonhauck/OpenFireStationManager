@@ -3,7 +3,7 @@ kotlin = "2.3.10"
 springBoot = "4.0.6"
 springDependencyManagement = "1.1.7"
 springdoc = "3.0.2"
-kotlinLogging = "8.0.01"
+kotlinLogging = "8.0.02"
 testcontainers = "1.21.4"
 
 [libraries]
