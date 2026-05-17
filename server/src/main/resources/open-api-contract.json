@@ -1453,14 +1453,37 @@
           "typeName": {
             "type": "string"
           },
-          "sizeCounts": {
+          "sizeGroupSummary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SizeGroupSummary"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": ["sizeGroupSummary", "totalCount", "typeId", "typeName"]
+      },
+      "SizeGroupSummary": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "sizes": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SizeSummary"
             }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
-        "required": ["sizeCounts", "typeId", "typeName"]
+        "required": ["name", "sizes", "totalCount"]
       },
       "SizeSummary": {
         "type": "object",
@@ -1490,9 +1513,13 @@
             "items": {
               "$ref": "#/components/schemas/ClothingTypeSummary"
             }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
-        "required": ["locationId", "locationName", "types"]
+        "required": ["locationId", "locationName", "totalCount", "types"]
       },
       "ResolvedClothingItem": {
         "type": "object",

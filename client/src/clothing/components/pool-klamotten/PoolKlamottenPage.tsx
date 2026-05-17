@@ -1,13 +1,17 @@
 import { Link } from "@tanstack/react-router"
 
-import type { ClothingLocationSizeSummary } from "#/clothing/service/clothingOverviewQueries"
+import type {
+  ClothingLocationSizeSummary,
+  ClothingTypeSizeSummary,
+} from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
 import ErrorState from "#/components/base/ErrorState"
+import LabelWithCount from "#/components/base/LabelWithCount"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
+import { Card, CardContent, CardHeader } from "#/components/ui/card"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
 
 export default function PoolKlamottenPage() {
@@ -86,12 +90,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
   )
 
   const totalCount = typeSummaries.reduce(
-    (locationTotal, typeSummary) =>
-      locationTotal +
-      typeSummary.sizeCounts.reduce(
-        (typeTotal, sizeSummary) => typeTotal + sizeSummary.count,
-        0,
-      ),
+    (locationTotal, typeSummary) => locationTotal + typeSummary.totalCount,
     0,
   )
 
@@ -120,51 +119,13 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
 
       <CardContent className="space-y-4">
         <RenderIf when={typeSummaries.length > 0}>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {typeSummaries.map((typeSummary) => (
-              <Card
+              <TypeAvailabilityPanel
                 key={`${summary.locationId}-${typeSummary.typeId}`}
-                className="h-full"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <CardTitle className="text-base">
-                      {typeSummary.typeName}
-                    </CardTitle>
-                    <span className="text-muted-foreground text-xs uppercase tracking-wide">
-                      Summe{" "}
-                      {typeSummary.sizeCounts.reduce(
-                        (sum, entry) => sum + entry.count,
-                        0,
-                      )}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex min-h-16 flex-wrap gap-2">
-                    {[...typeSummary.sizeCounts]
-                      .sort((a, b) => a.size.localeCompare(b.size, "de"))
-                      .map(({ size, count }) => (
-                        <Badge
-                          key={`${summary.locationId}-${typeSummary.typeId}-${size}`}
-                          variant="outline"
-                          className="gap-2 px-3 py-1.5 text-base"
-                        >
-                          <span>{size}:</span>
-                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                            {count}
-                          </span>
-                        </Badge>
-                      ))}
-
-                    <RenderIf when={typeSummary.sizeCounts.length === 0}>
-                      <span className="text-muted-foreground text-sm">
-                        Keine Kleidungsstuecke vorhanden.
-                      </span>
-                    </RenderIf>
-                  </div>
-                </CardContent>
-              </Card>
+                locationId={summary.locationId}
+                typeSummary={typeSummary}
+              />
             ))}
           </div>
         </RenderIf>
@@ -176,5 +137,88 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
         </RenderIf>
       </CardContent>
     </Card>
+  )
+}
+
+interface TypeAvailabilityPanelProps {
+  locationId: ClothingLocationSizeSummary["locationId"]
+  typeSummary: ClothingTypeSizeSummary
+}
+
+function TypeAvailabilityPanel({
+  locationId,
+  typeSummary,
+}: TypeAvailabilityPanelProps) {
+  const sizeGroups = [...typeSummary.sizeGroupSummary].map(
+    (sizeGroupSummary) => ({
+      ...sizeGroupSummary,
+      sizes: [...sizeGroupSummary.sizes].sort((a, b) =>
+        a.size.localeCompare(b.size, "de"),
+      ),
+    }),
+  )
+
+  const groupNameColumnWidthCh = sizeGroups.reduce(
+    (maxLength, sizeGroup) => Math.max(maxLength, sizeGroup.name.length),
+    0,
+  )
+
+  return (
+    <div className="overflow-hidden rounded-md border">
+      <div className="bg-muted/40 border-b px-3 py-2">
+        <p className="text-base font-semibold">
+          <LabelWithCount
+            label={typeSummary.typeName}
+            count={typeSummary.totalCount}
+            format="braces"
+          />
+        </p>
+      </div>
+
+      <div className="p-3">
+        <RenderIf
+          when={sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
+        >
+          <div className="divide-y">
+            {sizeGroups.map((sizeGroupSummary) => (
+              <div
+                key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}`}
+                className="flex items-center gap-2 py-2 first:pt-0 last:pb-0"
+              >
+                <span
+                  className="text-muted-foreground shrink-0 text-xs font-medium uppercase tracking-wide"
+                  style={{ width: `${groupNameColumnWidthCh}ch` }}
+                >
+                  {sizeGroupSummary.name}
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {sizeGroupSummary.sizes.map((sizeSummary) => (
+                    <Badge
+                      key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
+                      variant="outline"
+                      className="gap-2 px-3 py-1.5 text-base"
+                    >
+                      <LabelWithCount
+                        label={sizeSummary.size}
+                        count={sizeSummary.count}
+                        format="colon"
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </RenderIf>
+
+        <RenderIf
+          when={!sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
+        >
+          <span className="text-muted-foreground text-sm">
+            Keine Kleidungsstuecke vorhanden.
+          </span>
+        </RenderIf>
+      </div>
+    </div>
   )
 }
