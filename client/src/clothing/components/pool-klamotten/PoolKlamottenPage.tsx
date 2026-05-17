@@ -158,6 +158,11 @@ function TypeAvailabilityPanel({
     }),
   )
 
+  const groupNameColumnWidthCh = sizeGroups.reduce(
+    (maxLength, sizeGroup) => Math.max(maxLength, sizeGroup.name.length),
+    0,
+  )
+
   return (
     <div className="overflow-hidden rounded-md border">
       <div className="bg-muted/40 border-b px-3 py-2">
@@ -174,25 +179,33 @@ function TypeAvailabilityPanel({
         <RenderIf
           when={sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
         >
-          <div className="space-y-2">
+          <div className="divide-y">
             {sizeGroups.map((sizeGroupSummary) => (
               <div
                 key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}`}
-                className="flex flex-wrap gap-1"
+                className="flex items-center gap-2 py-2 first:pt-0 last:pb-0"
               >
-                {sizeGroupSummary.sizes.map((sizeSummary) => (
-                  <Badge
-                    key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
-                    variant="outline"
-                    className="gap-2 px-3 py-1.5 text-base"
-                  >
-                    <LabelWithCount
-                      label={sizeSummary.size}
-                      count={sizeSummary.count}
-                      format="colon"
-                    />
-                  </Badge>
-                ))}
+                <span
+                  className="text-muted-foreground shrink-0 text-xs font-medium uppercase tracking-wide"
+                  style={{ width: `${groupNameColumnWidthCh}ch` }}
+                >
+                  {sizeGroupSummary.name}
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {sizeGroupSummary.sizes.map((sizeSummary) => (
+                    <Badge
+                      key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
+                      variant="outline"
+                      className="gap-2 px-3 py-1.5 text-base"
+                    >
+                      <LabelWithCount
+                        label={sizeSummary.size}
+                        count={sizeSummary.count}
+                        format="colon"
+                      />
+                    </Badge>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

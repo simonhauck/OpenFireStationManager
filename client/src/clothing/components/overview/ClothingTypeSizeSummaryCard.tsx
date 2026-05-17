@@ -84,10 +84,7 @@ function renderClothingTypeSummary(
   return clothingTypeSummary.sizeGroupSummary.map((sizeGroup, index) => (
     <TableRow key={`${clothingTypeSummary.typeId}-${sizeGroup.name}`}>
       <RenderIf when={index === 0}>
-        <TableCell
-          rowSpan={clothingTypeSummary.sizeGroupSummary.length}
-          className="font-medium"
-        >
+        <TableCell rowSpan={clothingTypeSummary.sizeGroupSummary.length}>
           <LabelWithCount
             label={clothingTypeSummary.typeName}
             count={clothingTypeSummary.totalCount}
@@ -106,7 +103,7 @@ function renderClothingTypeSummary(
       <TableCell>
         <div className="flex flex-wrap gap-1">
           {sizeGroup.sizes.map((sizeSummary) => (
-            <Badge key={sizeSummary.size} variant="outline">
+            <Badge key={sizeSummary.size} variant="outline" className="text-sm">
               <LabelWithCount
                 label={sizeSummary.size}
                 count={sizeSummary.count}
