@@ -518,7 +518,11 @@ export interface components {
       /** Format: int64 */
       typeId: number
       typeName: string
-      sizeCounts: components["schemas"]["SizeSummary"][]
+      sizeGroupSummary: components["schemas"]["SizeGroupSummary"][]
+    }
+    SizeGroupSummary: {
+      name: string
+      sizes: components["schemas"]["SizeSummary"][]
     }
     SizeSummary: {
       size: string

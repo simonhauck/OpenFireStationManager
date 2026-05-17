@@ -88,7 +88,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
   const totalCount = typeSummaries.reduce(
     (locationTotal, typeSummary) =>
       locationTotal +
-      typeSummary.sizeCounts.reduce(
+      typeSummary.sizeGroupSummary.reduce(
         (typeTotal, sizeSummary) => typeTotal + sizeSummary.count,
         0,
       ),
@@ -133,7 +133,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
                     </CardTitle>
                     <span className="text-muted-foreground text-xs uppercase tracking-wide">
                       Summe{" "}
-                      {typeSummary.sizeCounts.reduce(
+                      {typeSummary.sizeGroupSummary.reduce(
                         (sum, entry) => sum + entry.count,
                         0,
                       )}
@@ -142,7 +142,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="flex min-h-16 flex-wrap gap-2">
-                    {[...typeSummary.sizeCounts]
+                    {[...typeSummary.sizeGroupSummary]
                       .sort((a, b) => a.size.localeCompare(b.size, "de"))
                       .map(({ size, count }) => (
                         <Badge
@@ -157,7 +157,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
                         </Badge>
                       ))}
 
-                    <RenderIf when={typeSummary.sizeCounts.length === 0}>
+                    <RenderIf when={typeSummary.sizeGroupSummary.length === 0}>
                       <span className="text-muted-foreground text-sm">
                         Keine Kleidungsstuecke vorhanden.
                       </span>

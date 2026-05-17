@@ -7,7 +7,7 @@ data class SizeGroupSummary(val name: String, val sizes: List<SizeSummary>)
 data class ClothingTypeSummary(
     val typeId: Long,
     val typeName: String,
-    val sizeCounts: List<SizeGroupSummary>,
+    val sizeGroupSummary: List<SizeGroupSummary>,
 )
 
 data class ClothingLocationSummary(

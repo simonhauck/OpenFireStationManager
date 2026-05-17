@@ -43,7 +43,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
             ClothingTypeSummary(
                 typeId = type.id,
                 typeName = summaryTypeName,
-                sizeCounts =
+                sizeGroupSummary =
                     listOf(
                         SizeGroupSummary(
                             name = "XXXL",
@@ -85,7 +85,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
                 ClothingTypeSummary(
                     typeId = type.id,
                     typeName = type.name,
-                    sizeCounts =
+                    sizeGroupSummary =
                         listOf(
                             SizeGroupSummary(
                                 name = "M",
