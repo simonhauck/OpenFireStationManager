@@ -1,10 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { createBatchClothingItemsMutation } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import type { ClothingType } from "#/clothing/model/clothingType"
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
+import DataTable from "#/components/base/DataTable"
+import type { DataTableColumn } from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
@@ -18,16 +22,7 @@ import {
 } from "#/components/ui/card"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "#/components/ui/table"
 import { Textarea } from "#/components/ui/textarea"
-import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
 
 interface ParsedRow {
   size: string
@@ -65,6 +60,47 @@ function parseCsv(csv: string): ParseResult {
   return { rows, errors }
 }
 
+const previewColumns: DataTableColumn<CreateOrUpdateClothingItemRequest>[] = [
+  {
+    id: "typeId",
+    header: "Typ-ID",
+    getValue: (item) => item.typeId,
+  },
+  {
+    id: "size",
+    header: "Groesse",
+    getValue: (item) => item.size,
+  },
+  {
+    id: "barcode",
+    header: "Barcode",
+    getValue: (item) => item.barcode || "—",
+  },
+]
+
+const resultColumns: DataTableColumn<ClothingItem>[] = [
+  {
+    id: "id",
+    header: "ID",
+    getValue: (item) => item.id,
+  },
+  {
+    id: "typeId",
+    header: "Typ-ID",
+    getValue: (item) => item.typeId,
+  },
+  {
+    id: "size",
+    header: "Groesse",
+    getValue: (item) => item.size,
+  },
+  {
+    id: "barcode",
+    header: "Barcode",
+    getValue: (item) => item.barcode || "—",
+  },
+]
+
 export default function ClothingItemBatchImportPage() {
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
@@ -82,17 +118,14 @@ function ClothingItemBatchImportPageContent() {
   const [preview, setPreview] = useState<
     CreateOrUpdateClothingItemRequest[] | null
   >(null)
+  const [createdItems, setCreatedItems] = useState<ClothingItem[] | null>(null)
+  const [mutationError, setMutationError] = useState<Error | null>(null)
 
   const { data: clothingTypes } = useClothingTypes()
 
-  const {
-    mutate: createBatch,
-    isPending,
-    error: mutationError,
-    data: createdItems,
-  } = useMutation(createBatchClothingItemsMutation(queryClient))
-
-  const typeIdToName = new Map((clothingTypes ?? []).map((t) => [t.id, t.name]))
+  const { mutateAsync: createBatch, isPending } = useMutation(
+    createBatchClothingItemsMutation(queryClient),
+  )
 
   function handlePreview() {
     if (selectedTypeId === null) return
@@ -112,15 +145,19 @@ function ClothingItemBatchImportPageContent() {
     setPreview(requests)
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!preview || preview.length === 0) return
 
-    createBatch(preview, {
-      onSuccess: () => {
-        setCsvInput("")
-        setPreview(null)
-      },
-    })
+    setMutationError(null)
+
+    try {
+      const results = await createBatch(preview)
+      setCreatedItems(results)
+      setCsvInput("")
+      setPreview(null)
+    } catch (err) {
+      setMutationError(err instanceof Error ? err : new Error(String(err)))
+    }
   }
 
   return (
@@ -130,60 +167,57 @@ function ClothingItemBatchImportPageContent() {
           <CardTitle>Massenimport von Kleidungsstuecken</CardTitle>
           <CardDescription>
             Importiere mehrere Kleidungsstuecke auf einmal. Waehle zuerst einen
-            Kleidungstyp, dann gib die Daten im CSV-Format ein:{" "}
-            <code>Groesse,Barcode</code>. Der Barcode ist optional.
+            Kleidungstyp, dann gib die CSV-Daten ein.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <TypeSelectionSection
-            clothingTypes={clothingTypes ?? []}
-            selectedTypeId={selectedTypeId}
-            onSelect={(id) => {
-              setSelectedTypeId(id)
-              setPreview(null)
-              setParseErrors([])
-            }}
-          />
-
-          <RenderIf when={selectedTypeId !== null}>
-            <CsvInputSection
-              value={csvInput}
-              onChange={(val) => {
-                setCsvInput(val)
+          <RenderIf when={createdItems === null}>
+            <TypeSelectionSection
+              clothingTypes={clothingTypes ?? []}
+              selectedTypeId={selectedTypeId}
+              onSelect={(id) => {
+                setSelectedTypeId(id)
                 setPreview(null)
                 setParseErrors([])
               }}
-              onPreview={handlePreview}
-              disabled={!csvInput.trim()}
             />
+
+            <RenderIf when={selectedTypeId !== null}>
+              <CsvInputSection
+                value={csvInput}
+                onChange={(val) => {
+                  setCsvInput(val)
+                  setPreview(null)
+                  setParseErrors([])
+                }}
+                onPreview={handlePreview}
+                disabled={!csvInput.trim()}
+              />
+            </RenderIf>
+
+            <RenderIf when={parseErrors.length > 0}>
+              <ErrorState
+                message={`Fehler in der Eingabe:\n${parseErrors.join("\n")}`}
+              />
+            </RenderIf>
+
+            <RenderIf when={preview !== null && preview.length > 0}>
+              <BatchPreviewSection
+                items={preview ?? []}
+                isPending={isPending}
+                hasError={mutationError !== null}
+                onSubmit={() => void handleSubmit()}
+                onCancel={() =>
+                  void navigate({ to: "/clothing-management/items" })
+                }
+              />
+            </RenderIf>
           </RenderIf>
 
-          <RenderIf when={parseErrors.length > 0}>
-            <ErrorState
-              message={`Fehler in der Eingabe:\n${parseErrors.join("\n")}`}
-            />
-          </RenderIf>
-
-          <RenderIf
-            when={preview !== null && preview.length > 0 && !createdItems}
-          >
-            <BatchPreviewSection
-              items={preview ?? []}
-              typeIdToName={typeIdToName}
-              isPending={isPending}
-              hasError={mutationError !== null}
-              onSubmit={handleSubmit}
-              onCancel={() =>
-                void navigate({ to: "/clothing-management/items" })
-              }
-            />
-          </RenderIf>
-
-          <RenderIf when={createdItems !== undefined}>
+          <RenderIf when={createdItems !== null}>
             <ImportSuccessResult
               items={createdItems ?? []}
-              typeIdToName={typeIdToName}
               onDone={() => void navigate({ to: "/clothing-management/items" })}
             />
           </RenderIf>
@@ -207,11 +241,12 @@ function TypeSelectionSection({
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium">Schritt 1: Kleidungstyp auswaehlen</p>
-      {clothingTypes.length === 0 ? (
+      <RenderIf when={clothingTypes.length === 0}>
         <p className="text-sm text-muted-foreground">
           Keine Kleidungstypen vorhanden.
         </p>
-      ) : (
+      </RenderIf>
+      <RenderIf when={clothingTypes.length > 0}>
         <RadioGroup
           value={selectedTypeId !== null ? String(selectedTypeId) : ""}
           onValueChange={(val) => onSelect(Number(val))}
@@ -224,7 +259,7 @@ function TypeSelectionSection({
             </div>
           ))}
         </RadioGroup>
-      )}
+      </RenderIf>
     </div>
   )
 }
@@ -246,7 +281,20 @@ function CsvInputSection({
     <>
       <div className="space-y-1.5">
         <p className="text-sm font-medium">Schritt 2: CSV-Daten eingeben</p>
-        <p className="text-sm italic">Example: L,ExampleBarcode1</p>
+        <p className="text-sm text-muted-foreground">
+          Gib die weiteren Parameter im CSV-Format ein. Werte mit{" "}
+          <code>
+            <sup>*</sup>
+          </code>{" "}
+          sind Pflichtfelder.
+          <br></br>
+          Format:{" "}
+          <code>
+            Groesse<sup>*</sup>,Barcode
+          </code>
+          <br></br>
+        </p>
+        <p className="text-sm italic">Beispiel: L,ExampleBarcode1</p>
         <Textarea
           placeholder={"L,BARCODE001\nM\nXL,BARCODE003"}
           rows={8}
@@ -271,7 +319,6 @@ function CsvInputSection({
 
 interface BatchPreviewSectionProps {
   items: CreateOrUpdateClothingItemRequest[]
-  typeIdToName: Map<number, string>
   isPending: boolean
   hasError: boolean
   onSubmit: () => void
@@ -280,7 +327,6 @@ interface BatchPreviewSectionProps {
 
 function BatchPreviewSection({
   items,
-  typeIdToName,
   isPending,
   hasError,
   onSubmit,
@@ -289,11 +335,16 @@ function BatchPreviewSection({
   return (
     <>
       <p className="text-sm font-medium">Vorschau ({items.length} Eintraege)</p>
-      <PreviewTable items={items} typeIdToName={typeIdToName} />
+      <DataTable
+        columns={previewColumns}
+        rows={items}
+        showSearch={false}
+        emptyMessage="Keine Eintraege vorhanden."
+      />
 
-      {hasError && (
+      <RenderIf when={hasError}>
         <ErrorState message="Die Kleidungsstuecke konnten nicht erstellt werden." />
-      )}
+      </RenderIf>
 
       <div className="flex flex-wrap justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>
@@ -307,74 +358,23 @@ function BatchPreviewSection({
   )
 }
 
-interface PreviewTableProps {
-  items: CreateOrUpdateClothingItemRequest[]
-  typeIdToName: Map<number, string>
-}
-
-function PreviewTable({ items, typeIdToName }: PreviewTableProps) {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Typ</TableHead>
-          <TableHead>Groesse</TableHead>
-          <TableHead>Barcode</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {items.map((item, idx) => (
-          <TableRow key={idx}>
-            <TableCell>
-              {typeIdToName.get(item.typeId) ?? String(item.typeId)}
-            </TableCell>
-            <TableCell>{item.size}</TableCell>
-            <TableCell>{item.barcode ?? "—"}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-}
-
 interface ImportSuccessResultProps {
   items: ClothingItem[]
-  typeIdToName: Map<number, string>
   onDone: () => void
 }
 
-function ImportSuccessResult({
-  items,
-  typeIdToName,
-  onDone,
-}: ImportSuccessResultProps) {
+function ImportSuccessResult({ items, onDone }: ImportSuccessResultProps) {
   return (
     <div className="space-y-4">
       <p className="text-sm font-medium text-green-600">
         {items.length} Kleidungsstueck(e) erfolgreich erstellt.
       </p>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Typ</TableHead>
-            <TableHead>Groesse</TableHead>
-            <TableHead>Barcode</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {items.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>{item.id}</TableCell>
-              <TableCell>
-                {typeIdToName.get(Number(item.typeId)) ?? String(item.typeId)}
-              </TableCell>
-              <TableCell>{item.size}</TableCell>
-              <TableCell>{item.barcode ?? "—"}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable
+        columns={resultColumns}
+        rows={items}
+        showSearch={false}
+        emptyMessage="Keine Kleidungsstuecke erstellt."
+      />
       <div className="flex justify-end">
         <Button type="button" onClick={onDone}>
           Zur Uebersicht
