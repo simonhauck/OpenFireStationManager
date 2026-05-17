@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router"
 import type {
   ClothingLocationSizeSummary,
   ClothingTypeSizeSummary,
-  SizeGroupSummary,
 } from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
@@ -13,14 +12,6 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
 import { Card, CardContent, CardHeader } from "#/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "#/components/ui/table"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
 
 export default function PoolKlamottenPage() {
@@ -128,20 +119,14 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
 
       <CardContent className="space-y-4">
         <RenderIf when={typeSummaries.length > 0}>
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs">Kleidungstyp</TableHead>
-                  <TableHead>Verfuegbarkeit</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {typeSummaries.flatMap((typeSummary) =>
-                  renderLocationTypeSummary(summary.locationId, typeSummary),
-                )}
-              </TableBody>
-            </Table>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {typeSummaries.map((typeSummary) => (
+              <TypeAvailabilityPanel
+                key={`${summary.locationId}-${typeSummary.typeId}`}
+                locationId={summary.locationId}
+                typeSummary={typeSummary}
+              />
+            ))}
           </div>
         </RenderIf>
 
@@ -155,69 +140,72 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
   )
 }
 
-interface RenderableSizeGroupSummary {
-  name: string
-  totalCount: number
-  sizes: SizeGroupSummary["sizes"]
+interface TypeAvailabilityPanelProps {
+  locationId: ClothingLocationSizeSummary["locationId"]
+  typeSummary: ClothingTypeSizeSummary
 }
 
-function renderLocationTypeSummary(
-  locationId: ClothingLocationSizeSummary["locationId"],
-  typeSummary: ClothingTypeSizeSummary,
-) {
-  const sizeGroupSummaries: RenderableSizeGroupSummary[] =
-    typeSummary.sizeGroupSummary.length > 0
-      ? typeSummary.sizeGroupSummary
-      : [{ name: "-", totalCount: 0, sizes: [] }]
+function TypeAvailabilityPanel({
+  locationId,
+  typeSummary,
+}: TypeAvailabilityPanelProps) {
+  const sizeGroups = [...typeSummary.sizeGroupSummary].map(
+    (sizeGroupSummary) => ({
+      ...sizeGroupSummary,
+      sizes: [...sizeGroupSummary.sizes].sort((a, b) =>
+        a.size.localeCompare(b.size, "de"),
+      ),
+    }),
+  )
 
-  return sizeGroupSummaries.map((sizeGroupSummary, index) => {
-    const sortedSizes = [...sizeGroupSummary.sizes].sort((a, b) =>
-      a.size.localeCompare(b.size, "de"),
-    )
+  return (
+    <div className="overflow-hidden rounded-md border">
+      <div className="bg-muted/40 border-b px-3 py-2">
+        <p className="text-base font-semibold">
+          <LabelWithCount
+            label={typeSummary.typeName}
+            count={typeSummary.totalCount}
+            format="braces"
+          />
+        </p>
+      </div>
 
-    return (
-      <TableRow
-        key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${index}`}
-      >
-        <RenderIf when={index === 0}>
-          <TableCell
-            rowSpan={sizeGroupSummaries.length}
-            className="text-sm font-medium"
-          >
-            <LabelWithCount
-              label={typeSummary.typeName}
-              count={typeSummary.totalCount}
-              format="braces"
-            />
-          </TableCell>
+      <div className="p-3">
+        <RenderIf
+          when={sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
+        >
+          <div className="space-y-2">
+            {sizeGroups.map((sizeGroupSummary) => (
+              <div
+                key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}`}
+                className="flex flex-wrap gap-1"
+              >
+                {sizeGroupSummary.sizes.map((sizeSummary) => (
+                  <Badge
+                    key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
+                    variant="outline"
+                    className="gap-2 px-3 py-1.5 text-base"
+                  >
+                    <LabelWithCount
+                      label={sizeSummary.size}
+                      count={sizeSummary.count}
+                      format="colon"
+                    />
+                  </Badge>
+                ))}
+              </div>
+            ))}
+          </div>
         </RenderIf>
 
-        <TableCell>
-          <RenderIf when={sortedSizes.length > 0}>
-            <div className="flex flex-wrap gap-1">
-              {sortedSizes.map((sizeSummary) => (
-                <Badge
-                  key={sizeSummary.size}
-                  variant="outline"
-                  className="gap-2 px-3 py-1.5 text-base"
-                >
-                  <LabelWithCount
-                    label={sizeSummary.size}
-                    count={sizeSummary.count}
-                    format="colon"
-                  />
-                </Badge>
-              ))}
-            </div>
-          </RenderIf>
-
-          <RenderIf when={sortedSizes.length === 0}>
-            <span className="text-muted-foreground text-sm">
-              Keine Kleidungsstuecke vorhanden.
-            </span>
-          </RenderIf>
-        </TableCell>
-      </TableRow>
-    )
-  })
+        <RenderIf
+          when={!sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
+        >
+          <span className="text-muted-foreground text-sm">
+            Keine Kleidungsstuecke vorhanden.
+          </span>
+        </RenderIf>
+      </div>
+    </div>
+  )
 }
