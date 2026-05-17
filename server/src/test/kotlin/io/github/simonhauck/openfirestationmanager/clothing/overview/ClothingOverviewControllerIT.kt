@@ -13,7 +13,6 @@ import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveCloth
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.http.HttpStatus
 
 class ClothingOverviewControllerIT : IntegrationTest() {
@@ -31,15 +30,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
         val summaryTypeName = "Summary-Type-${System.nanoTime()}"
         val type = createType(summaryTypeName)
         itemCalls.createItem(
-            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
-            authCookie = validCookieHeader,
-        )
-        itemCalls.createItem(
-            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "M"),
-            authCookie = validCookieHeader,
-        )
-        itemCalls.createItem(
-            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "L"),
+            CreateOrUpdateClothingItemRequest(typeId = type.id, size = "3XL-2"),
             authCookie = validCookieHeader,
         )
 
@@ -48,40 +39,32 @@ class ClothingOverviewControllerIT : IntegrationTest() {
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 
         val summaryForType = response.body?.firstOrNull { it.typeId == type.id }
-        assertThat(summaryForType).isNotNull
-        assertThat(summaryForType?.typeName).isEqualTo(summaryTypeName)
-        assertThat(summaryForType?.sizeCounts)
-            .contains(SizeSummary("M", 2))
-            .contains(SizeSummary("L", 1))
+        val expected =
+            ClothingTypeSummary(
+                typeId = type.id,
+                typeName = summaryTypeName,
+                sizeGroupSummary =
+                    listOf(
+                        SizeGroupSummary(
+                            name = "3XL",
+                            sizes = listOf(SizeSummary(size = "3XL-2", count = 1)),
+                        )
+                    ),
+            )
+        assertThat(summaryForType).isEqualTo(expected)
     }
 
     @Test
     fun `getDashboardLocationSummaries should return type and size summaries for dashboard locations only`() {
         val type = createType()
-        val dashboardLocation = createLocation(type = LocationType.POOL)
+        val poolLocation = createLocation(type = LocationType.POOL)
         val hiddenLocation = createLocation(type = LocationType.OTHER)
 
         itemCalls.createItem(
             CreateOrUpdateClothingItemRequest(
                 typeId = type.id,
                 size = "M",
-                locationId = AggregateReference.to(dashboardLocation.id),
-            ),
-            authCookie = validCookieHeader,
-        )
-        itemCalls.createItem(
-            CreateOrUpdateClothingItemRequest(
-                typeId = type.id,
-                size = "M",
-                locationId = AggregateReference.to(dashboardLocation.id),
-            ),
-            authCookie = validCookieHeader,
-        )
-        itemCalls.createItem(
-            CreateOrUpdateClothingItemRequest(
-                typeId = type.id,
-                size = "L",
-                locationId = AggregateReference.to(dashboardLocation.id),
+                locationId = poolLocation.getIdAsReference(),
             ),
             authCookie = validCookieHeader,
         )
@@ -91,19 +74,26 @@ class ClothingOverviewControllerIT : IntegrationTest() {
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 
         val locationIds = response.body?.map { it.locationId } ?: emptyList()
-        assertThat(locationIds).contains(dashboardLocation.id)
+        assertThat(locationIds).contains(poolLocation.id)
         assertThat(locationIds).doesNotContain(hiddenLocation.id)
 
-        val summaryForLocation =
-            response.body?.firstOrNull { it.locationId == dashboardLocation.id }
-        assertThat(summaryForLocation).isNotNull
-        assertThat(summaryForLocation?.locationName).isEqualTo(dashboardLocation.name)
-        val typeSummary = summaryForLocation?.types?.firstOrNull { it.typeId == type.id }
-        assertThat(typeSummary).isNotNull
-        assertThat(typeSummary?.typeName).isEqualTo(type.name)
-        assertThat(typeSummary?.sizeCounts)
-            .contains(SizeSummary("M", 2))
-            .contains(SizeSummary("L", 1))
+        val summaryForLocation = response.body?.firstOrNull { it.locationId == poolLocation.id }
+        assertThat(summaryForLocation?.locationId).isEqualTo(poolLocation.id)
+
+        assertThat(summaryForLocation?.types)
+            .contains(
+                ClothingTypeSummary(
+                    typeId = type.id,
+                    typeName = type.name,
+                    sizeGroupSummary =
+                        listOf(
+                            SizeGroupSummary(
+                                name = "M",
+                                sizes = listOf(SizeSummary(size = "M", count = 1)),
+                            )
+                        ),
+                )
+            )
     }
 
     private fun createLocation(

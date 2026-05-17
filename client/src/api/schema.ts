@@ -518,7 +518,15 @@ export interface components {
       /** Format: int64 */
       typeId: number
       typeName: string
-      sizeCounts: components["schemas"]["SizeSummary"][]
+      sizeGroupSummary: components["schemas"]["SizeGroupSummary"][]
+      /** Format: int32 */
+      totalCount: number
+    }
+    SizeGroupSummary: {
+      name: string
+      sizes: components["schemas"]["SizeSummary"][]
+      /** Format: int32 */
+      totalCount: number
     }
     SizeSummary: {
       size: string
@@ -530,6 +538,8 @@ export interface components {
       locationId: number
       locationName: string
       types: components["schemas"]["ClothingTypeSummary"][]
+      /** Format: int32 */
+      totalCount: number
     }
     ResolvedClothingItem: {
       clothingItem: components["schemas"]["ClothingItem"]
