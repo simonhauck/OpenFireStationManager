@@ -4,16 +4,16 @@ class SizeGroupAggregator {
 
     private val predefinedGroups =
         listOf(
-            PredefinedSizeGroup("XXXS", 0, "3XS"),
-            PredefinedSizeGroup("XXS", 1, "2XS"),
+            PredefinedSizeGroup("3XS", 0, "XXXS"),
+            PredefinedSizeGroup("2XS", 1, "XXS"),
             PredefinedSizeGroup("XS", 2),
             PredefinedSizeGroup("S", 3),
             PredefinedSizeGroup("M", 4),
             PredefinedSizeGroup("L", 5),
             PredefinedSizeGroup("XL", 6),
-            PredefinedSizeGroup("XXL", 7, "2XL"),
-            PredefinedSizeGroup("XXXL", 8, "3XL"),
-            PredefinedSizeGroup("XXXXL", 9, "4XL"),
+            PredefinedSizeGroup("2XL", 7, "XXL"),
+            PredefinedSizeGroup("3XL", 8, "XXXL"),
+            PredefinedSizeGroup("4XL", 9, "XXXL"),
         )
 
     fun group(sizes: List<String>): List<SizeGroupSummary> {

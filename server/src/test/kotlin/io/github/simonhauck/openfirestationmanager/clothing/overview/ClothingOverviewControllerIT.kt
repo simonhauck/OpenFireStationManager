@@ -46,7 +46,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
                 sizeGroupSummary =
                     listOf(
                         SizeGroupSummary(
-                            name = "XXXL",
+                            name = "3XL",
                             sizes = listOf(SizeSummary(size = "3XL-2", count = 1)),
                         )
                     ),

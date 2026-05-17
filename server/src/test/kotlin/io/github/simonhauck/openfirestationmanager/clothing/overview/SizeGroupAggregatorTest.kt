@@ -52,7 +52,7 @@ internal class SizeGroupAggregatorTest {
                     ),
                 ),
                 SizeGroupSummary(
-                    "XXL",
+                    "2XL",
                     listOf(
                         SizeSummary("2XL-0", 22),
                         SizeSummary("2XL-1", 23),
@@ -61,7 +61,7 @@ internal class SizeGroupAggregatorTest {
                     ),
                 ),
                 SizeGroupSummary(
-                    "XXXL",
+                    "3XL",
                     listOf(
                         SizeSummary("3XL", 29),
                         SizeSummary("3XL-0", 26),
