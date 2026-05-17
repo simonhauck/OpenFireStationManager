@@ -53,11 +53,8 @@ export const checkoutMutation = (queryClient: QueryClient) =>
       return data as unknown as CheckoutHttpResponse
     },
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: queryKeys.clothingItems() }),
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.clothingOverview(),
-        }),
-      ])
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.clothingItems(),
+      })
     },
   })

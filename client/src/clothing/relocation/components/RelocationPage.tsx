@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useEffect, useState } from "react"
@@ -201,7 +201,8 @@ interface StepReviewProps {
 
 function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
-  const relocate = useMutation(relocationMutation())
+  const queryClient = useQueryClient()
+  const relocate = useMutation(relocationMutation(queryClient))
 
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
   const targetLocationName =

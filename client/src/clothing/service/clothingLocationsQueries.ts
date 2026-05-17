@@ -93,6 +93,9 @@ export const updateClothingLocationMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingLocation(variables.id),
         }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingOverview(),
+        }),
       ])
     },
   })
@@ -112,6 +115,9 @@ export const deleteClothingLocationMutation = (queryClient: QueryClient) =>
         }),
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingLocation(id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingOverview(),
         }),
       ])
     },

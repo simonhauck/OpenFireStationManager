@@ -68,6 +68,9 @@ export const updateClothingTypeMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingType(variables.id),
         }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingTypeSizeSummary(),
+        }),
       ])
     },
   })
@@ -85,6 +88,9 @@ export const deleteClothingTypeMutation = (queryClient: QueryClient) =>
         queryClient.invalidateQueries({ queryKey: queryKeys.clothingTypes() }),
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingType(id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingTypeSizeSummary(),
         }),
       ])
     },
