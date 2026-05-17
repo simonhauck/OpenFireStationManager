@@ -2,16 +2,25 @@ import { Link } from "@tanstack/react-router"
 
 import type {
   ClothingLocationSizeSummary,
+  ClothingTypeSizeSummary,
   SizeGroupSummary,
-  SizeSummary,
 } from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
 import ErrorState from "#/components/base/ErrorState"
+import LabelWithCount from "#/components/base/LabelWithCount"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
+import { Card, CardContent, CardHeader } from "#/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "#/components/ui/table"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
 
 export default function PoolKlamottenPage() {
@@ -90,12 +99,7 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
   )
 
   const totalCount = typeSummaries.reduce(
-    (locationTotal, typeSummary) =>
-      locationTotal +
-      typeSummary.sizeGroupSummary.reduce(
-        (typeTotal, sizeGroupSummary) => typeTotal + sizeGroupSummary.totalCount,
-        0,
-      ),
+    (locationTotal, typeSummary) => locationTotal + typeSummary.totalCount,
     0,
   )
 
@@ -124,48 +128,20 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
 
       <CardContent className="space-y-4">
         <RenderIf when={typeSummaries.length > 0}>
-          <div className="grid grid-cols-1 gap-3">
-            {typeSummaries.map((typeSummary) => (
-              <Card
-                key={`${summary.locationId}-${typeSummary.typeId}`}
-                className="h-full"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <CardTitle className="text-base">
-                      {typeSummary.typeName}
-                    </CardTitle>
-                    <span className="text-muted-foreground text-xs uppercase tracking-wide">
-                      Summe{" "}
-                      {typeSummary.sizeGroupSummary.reduce(
-                        (sum, entry) => sum + entry.totalCount,
-                        0,
-                      )}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {typeSummary.sizeGroupSummary
-                      .toSorted((a, b) => a.name.localeCompare(b.name, "de"))
-                      .map((sizeGroupSummary) => (
-                        <SizeGroupSection
-                          key={`${summary.locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}`}
-                          locationId={summary.locationId}
-                          typeId={typeSummary.typeId}
-                          sizeGroupSummary={sizeGroupSummary}
-                        />
-                      ))}
-
-                    <RenderIf when={typeSummary.sizeGroupSummary.length === 0}>
-                      <span className="text-muted-foreground text-sm">
-                        Keine Kleidungsstuecke vorhanden.
-                      </span>
-                    </RenderIf>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="overflow-x-auto rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Kleidungstyp</TableHead>
+                  <TableHead>Verfuegbarkeit</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {typeSummaries.flatMap((typeSummary) =>
+                  renderLocationTypeSummary(summary.locationId, typeSummary),
+                )}
+              </TableBody>
+            </Table>
           </div>
         </RenderIf>
 
@@ -179,60 +155,69 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
   )
 }
 
-interface SizeGroupSectionProps {
-  locationId: ClothingLocationSizeSummary["locationId"]
-  typeId: number
-  sizeGroupSummary: SizeGroupSummary
+interface RenderableSizeGroupSummary {
+  name: string
+  totalCount: number
+  sizes: SizeGroupSummary["sizes"]
 }
 
-function SizeGroupSection({
-  locationId,
-  typeId,
-  sizeGroupSummary,
-}: SizeGroupSectionProps) {
-  const sizeSummaries = [...sizeGroupSummary.sizes].sort((a, b) =>
-    a.size.localeCompare(b.size, "de"),
-  )
+function renderLocationTypeSummary(
+  locationId: ClothingLocationSizeSummary["locationId"],
+  typeSummary: ClothingTypeSizeSummary,
+) {
+  const sizeGroupSummaries: RenderableSizeGroupSummary[] =
+    typeSummary.sizeGroupSummary.length > 0
+      ? typeSummary.sizeGroupSummary
+      : [{ name: "-", totalCount: 0, sizes: [] }]
 
-  return (
-    <div className="space-y-2 rounded-md border p-3">
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-medium">{sizeGroupSummary.name}</span>
-        <span className="text-muted-foreground text-xs uppercase tracking-wide">
-          Summe {sizeGroupSummary.totalCount}
-        </span>
-      </div>
+  return sizeGroupSummaries.map((sizeGroupSummary, index) => {
+    const sortedSizes = [...sizeGroupSummary.sizes].sort((a, b) =>
+      a.size.localeCompare(b.size, "de"),
+    )
 
-      <div className="flex min-h-10 flex-wrap gap-2">
-        {sizeSummaries.map((sizeSummary) => (
-          <SizeSummaryBadge
-            key={`${locationId}-${typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
-            sizeSummary={sizeSummary}
-          />
-        ))}
-
-        <RenderIf when={sizeSummaries.length === 0}>
-          <span className="text-muted-foreground text-sm">
-            Keine Groessen in dieser Gruppe vorhanden.
-          </span>
+    return (
+      <TableRow
+        key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${index}`}
+      >
+        <RenderIf when={index === 0}>
+          <TableCell
+            rowSpan={sizeGroupSummaries.length}
+            className="text-sm font-medium"
+          >
+            <LabelWithCount
+              label={typeSummary.typeName}
+              count={typeSummary.totalCount}
+              format="braces"
+            />
+          </TableCell>
         </RenderIf>
-      </div>
-    </div>
-  )
-}
 
-interface SizeSummaryBadgeProps {
-  sizeSummary: SizeSummary
-}
+        <TableCell>
+          <RenderIf when={sortedSizes.length > 0}>
+            <div className="flex flex-wrap gap-1">
+              {sortedSizes.map((sizeSummary) => (
+                <Badge
+                  key={sizeSummary.size}
+                  variant="outline"
+                  className="gap-2 px-3 py-1.5 text-base"
+                >
+                  <LabelWithCount
+                    label={sizeSummary.size}
+                    count={sizeSummary.count}
+                    format="colon"
+                  />
+                </Badge>
+              ))}
+            </div>
+          </RenderIf>
 
-function SizeSummaryBadge({ sizeSummary }: SizeSummaryBadgeProps) {
-  return (
-    <Badge variant="outline" className="gap-2 px-3 py-1.5 text-base">
-      <span>{sizeSummary.size}:</span>
-      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-        {sizeSummary.count}
-      </span>
-    </Badge>
-  )
+          <RenderIf when={sortedSizes.length === 0}>
+            <span className="text-muted-foreground text-sm">
+              Keine Kleidungsstuecke vorhanden.
+            </span>
+          </RenderIf>
+        </TableCell>
+      </TableRow>
+    )
+  })
 }
-
