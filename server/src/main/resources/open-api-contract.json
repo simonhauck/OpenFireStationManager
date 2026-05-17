@@ -1,43 +1,41 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "OpenAPI definition",
-    "version": "v0"
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "OpenAPI definition",
+    "version" : "v0"
   },
-  "paths": {
-    "/api/admin/users/{id}/password": {
-      "put": {
-        "tags": ["admin-user-controller"],
-        "operationId": "changePassword",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+  "paths" : {
+    "/api/admin/users/{id}/password" : {
+      "put" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "changePassword",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangePasswordRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserAccount"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -45,27 +43,27 @@
         }
       }
     },
-    "/api/public/setup/initial-admin": {
-      "post": {
-        "tags": ["initial-setup-controller"],
-        "operationId": "initializeAdmin",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitialAdminSetupRequest"
+    "/api/public/setup/initial-admin" : {
+      "post" : {
+        "tags" : [ "initial-setup-controller" ],
+        "operationId" : "initializeAdmin",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/InitialAdminSetupRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserAccount"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
                 }
               }
             }
@@ -73,54 +71,54 @@
         }
       }
     },
-    "/api/public/auth/logout": {
-      "post": {
-        "tags": ["auth-controller"],
-        "operationId": "logout",
-        "responses": {
-          "204": {
-            "description": "No Content",
-            "content": {}
+    "/api/public/auth/logout" : {
+      "post" : {
+        "tags" : [ "auth-controller" ],
+        "operationId" : "logout",
+        "responses" : {
+          "204" : {
+            "description" : "No Content",
+            "content" : { }
           }
         }
       }
     },
-    "/api/public/auth/login": {
-      "post": {
-        "tags": ["auth-controller"],
-        "operationId": "login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
+    "/api/public/auth/login" : {
+      "post" : {
+        "tags" : [ "auth-controller" ],
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : { }
           }
         }
       }
     },
-    "/api/clothing/types": {
-      "get": {
-        "tags": ["clothing-type-controller"],
-        "summary": "List all protective clothing types",
-        "operationId": "getAllTypes",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingType"
+    "/api/clothing/types" : {
+      "get" : {
+        "tags" : [ "clothing-type-controller" ],
+        "summary" : "List all protective clothing types",
+        "operationId" : "getAllTypes",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingType"
                   }
                 }
               }
@@ -128,27 +126,27 @@
           }
         }
       },
-      "post": {
-        "tags": ["clothing-type-controller"],
-        "summary": "Create a new protective clothing type",
-        "operationId": "createType",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOrUpdateClothingTypeRequest"
+      "post" : {
+        "tags" : [ "clothing-type-controller" ],
+        "summary" : "Create a new protective clothing type",
+        "operationId" : "createType",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateOrUpdateClothingTypeRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingType"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingType"
                 }
               }
             }
@@ -156,41 +154,41 @@
         }
       }
     },
-    "/api/clothing/relocation": {
-      "post": {
-        "tags": ["relocation-controller"],
-        "summary": "Relocate clothing items to a target location",
-        "operationId": "relocate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RelocationRequest"
+    "/api/clothing/relocation" : {
+      "post" : {
+        "tags" : [ "relocation-controller" ],
+        "summary" : "Relocate clothing items to a target location",
+        "operationId" : "relocate",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelocationRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK"
+        "responses" : {
+          "200" : {
+            "description" : "OK"
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
                 }
               }
             }
           },
-          "403": {
-            "description": "Forbidden — KLEIDERWART role required",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
+          "403" : {
+            "description" : "Forbidden — KLEIDERWART role required",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
                 }
               }
             }
@@ -198,20 +196,20 @@
         }
       }
     },
-    "/api/clothing/locations": {
-      "get": {
-        "tags": ["clothing-location-controller"],
-        "summary": "List all clothing locations",
-        "operationId": "getAllLocations",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingLocation"
+    "/api/clothing/locations" : {
+      "get" : {
+        "tags" : [ "clothing-location-controller" ],
+        "summary" : "List all clothing locations",
+        "operationId" : "getAllLocations",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingLocation"
                   }
                 }
               }
@@ -219,27 +217,27 @@
           }
         }
       },
-      "post": {
-        "tags": ["clothing-location-controller"],
-        "summary": "Create a new clothing location",
-        "operationId": "createLocation",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateClothingLocationRequest"
+      "post" : {
+        "tags" : [ "clothing-location-controller" ],
+        "summary" : "Create a new clothing location",
+        "operationId" : "createLocation",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateClothingLocationRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingLocation"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingLocation"
                 }
               }
             }
@@ -247,111 +245,30 @@
         }
       }
     },
-    "/api/clothing/locations/batch": {
-      "post": {
-        "tags": ["clothing-location-controller"],
-        "summary": "Create multiple clothing locations in a single request",
-        "operationId": "createBatchLocations",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchCreateClothingLocationsRequest"
+    "/api/clothing/locations/batch" : {
+      "post" : {
+        "tags" : [ "clothing-location-controller" ],
+        "summary" : "Create multiple clothing locations in a single request",
+        "operationId" : "createBatchLocations",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BatchCreateClothingLocationsRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingLocation"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clothing/items": {
-      "get": {
-        "tags": ["clothing-item-controller"],
-        "summary": "List all clothing items",
-        "operationId": "getAllItems",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingItem"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Create a new clothing item",
-        "operationId": "createItem",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingItem"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clothing/items/batch": {
-      "post": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Create multiple clothing items in a single request",
-        "operationId": "createBatchItems",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchCreateClothingItemsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingItem"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingLocation"
                   }
                 }
               }
@@ -360,55 +277,20 @@
         }
       }
     },
-    "/api/clothing/checkouts": {
-      "post": {
-        "tags": ["checkout-controller"],
-        "summary": "Perform a two-phase checkout",
-        "operationId": "checkout",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckoutRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/NeedsConfirmation"
-                    },
-                    {
-                      "$ref": "#/components/schemas/Ok"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/users": {
-      "get": {
-        "tags": ["admin-user-controller"],
-        "operationId": "getAllUsers",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserAccount"
+    "/api/clothing/items" : {
+      "get" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "List all clothing items",
+        "operationId" : "getAllItems",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingItem"
                   }
                 }
               }
@@ -416,26 +298,27 @@
           }
         }
       },
-      "post": {
-        "tags": ["admin-user-controller"],
-        "operationId": "createUser",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserRequest"
+      "post" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Create a new clothing item",
+        "operationId" : "createItem",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateOrUpdateClothingItemRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserAccount"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingItem"
                 }
               }
             }
@@ -443,411 +326,30 @@
         }
       }
     },
-    "/api/clothing/types/{id}": {
-      "get": {
-        "tags": ["clothing-type-controller"],
-        "summary": "Get a protective clothing type by ID",
-        "operationId": "getTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the protective clothing type",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingType"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["clothing-type-controller"],
-        "summary": "Delete a protective clothing type",
-        "operationId": "deleteType",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the protective clothing type",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
-                }
+    "/api/clothing/items/batch" : {
+      "post" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Create multiple clothing items in a single request",
+        "operationId" : "createBatchItems",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BatchCreateClothingItemsRequest"
               }
             }
           },
-          "409": {
-            "description": "Conflict – type still referenced by clothing items",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": ["clothing-type-controller"],
-        "summary": "Update a protective clothing type",
-        "operationId": "updateType",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the protective clothing type",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOrUpdateClothingTypeRequest"
-              }
-            }
-          },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingType"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clothing/locations/{id}": {
-      "get": {
-        "tags": ["clothing-location-controller"],
-        "summary": "Get a clothing location by ID",
-        "operationId": "getLocationById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing location",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingLocation"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["clothing-location-controller"],
-        "summary": "Delete a clothing location",
-        "operationId": "deleteLocation",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing location",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        }
-      },
-      "patch": {
-        "tags": ["clothing-location-controller"],
-        "summary": "Update a clothing location",
-        "operationId": "updateLocation",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing location",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateClothingLocationRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingLocation"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clothing/items/{id}": {
-      "get": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Get a clothing item by ID",
-        "operationId": "getItemById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing item",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingItem"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Delete a clothing item",
-        "operationId": "deleteItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing item",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        }
-      },
-      "patch": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Update a clothing item",
-        "operationId": "updateItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing item",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClothingItem"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/users/{id}": {
-      "get": {
-        "tags": ["admin-user-controller"],
-        "operationId": "getUserById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserAccount"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": ["admin-user-controller"],
-        "operationId": "updateUser",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserAccount"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/public/auth/me": {
-      "get": {
-        "tags": ["auth-controller"],
-        "operationId": "me",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthStateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clothing/overview/summary/type": {
-      "get": {
-        "tags": ["clothing-overview-controller"],
-        "summary": "List clothing item counts by type and size",
-        "operationId": "getSummariesByType",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingTypeSummary"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingItem"
                   }
                 }
               }
@@ -856,62 +358,469 @@
         }
       }
     },
-    "/api/clothing/overview/dashboard/location": {
-      "get": {
-        "tags": ["clothing-overview-controller"],
-        "summary": "Get clothing availability overview for dashboard locations",
-        "operationId": "getDashboardLocationSummaries",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClothingLocationSummary"
-                  }
-                }
+    "/api/clothing/checkouts" : {
+      "post" : {
+        "tags" : [ "checkout-controller" ],
+        "summary" : "Perform a two-phase checkout",
+        "operationId" : "checkout",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CheckoutRequest"
               }
-            }
-          }
-        }
-      }
-    },
-    "/api/clothing/items/search": {
-      "get": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Search clothing items by type name, size, or barcode",
-        "operationId": "searchItems",
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 50
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/NeedsConfirmation"
+                  }, {
+                    "$ref" : "#/components/schemas/Ok"
+                  } ]
+                }
+              }
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ResolvedClothingItem"
+        }
+      }
+    },
+    "/api/admin/users" : {
+      "get" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "getAllUsers",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserAccount"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "createUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateUserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/types/{id}" : {
+      "get" : {
+        "tags" : [ "clothing-type-controller" ],
+        "summary" : "Get a protective clothing type by ID",
+        "operationId" : "getTypeById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the protective clothing type",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingType"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "clothing-type-controller" ],
+        "summary" : "Delete a protective clothing type",
+        "operationId" : "deleteType",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the protective clothing type",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict – type still referenced by clothing items",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "clothing-type-controller" ],
+        "summary" : "Update a protective clothing type",
+        "operationId" : "updateType",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the protective clothing type",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateOrUpdateClothingTypeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingType"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/locations/{id}" : {
+      "get" : {
+        "tags" : [ "clothing-location-controller" ],
+        "summary" : "Get a clothing location by ID",
+        "operationId" : "getLocationById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the clothing location",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "clothing-location-controller" ],
+        "summary" : "Delete a clothing location",
+        "operationId" : "deleteLocation",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the clothing location",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "clothing-location-controller" ],
+        "summary" : "Update a clothing location",
+        "operationId" : "updateLocation",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the clothing location",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateClothingLocationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/items/{id}" : {
+      "get" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Get a clothing item by ID",
+        "operationId" : "getItemById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the clothing item",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Delete a clothing item",
+        "operationId" : "deleteItem",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the clothing item",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Update a clothing item",
+        "operationId" : "updateItem",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "ID of the clothing item",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateOrUpdateClothingItemRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClothingItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}" : {
+      "get" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "getUserById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "admin-user-controller" ],
+        "operationId" : "updateUser",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/auth/me" : {
+      "get" : {
+        "tags" : [ "auth-controller" ],
+        "operationId" : "me",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthStateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/overview/summary/type" : {
+      "get" : {
+        "tags" : [ "clothing-overview-controller" ],
+        "summary" : "List clothing item counts by type and size",
+        "operationId" : "getSummariesByType",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingTypeSummary"
                   }
                 }
               }
@@ -920,28 +829,87 @@
         }
       }
     },
-    "/api/clothing/items/by-barcode/{barcode}": {
-      "get": {
-        "tags": ["clothing-item-controller"],
-        "summary": "Look up a clothing item by barcode",
-        "operationId": "getItemByBarcode",
-        "parameters": [
-          {
-            "name": "barcode",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
+    "/api/clothing/overview/dashboard/location" : {
+      "get" : {
+        "tags" : [ "clothing-overview-controller" ],
+        "summary" : "Get clothing availability overview for dashboard locations",
+        "operationId" : "getDashboardLocationSummaries",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClothingLocationSummary"
+                  }
+                }
+              }
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResolvedClothingItem"
+        }
+      }
+    },
+    "/api/clothing/items/search" : {
+      "get" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Search clothing items by type name, size, or barcode",
+        "operationId" : "searchItems",
+        "parameters" : [ {
+          "name" : "q",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 50
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ResolvedClothingItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/items/by-barcode/{barcode}" : {
+      "get" : {
+        "tags" : [ "clothing-item-controller" ],
+        "summary" : "Look up a clothing item by barcode",
+        "operationId" : "getItemByBarcode",
+        "parameters" : [ {
+          "name" : "barcode",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResolvedClothingItem"
                 }
               }
             }
@@ -950,579 +918,560 @@
       }
     }
   },
-  "components": {
-    "schemas": {
-      "ChangePasswordRequest": {
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "type": "string",
-            "maxLength": 32,
-            "minLength": 4
+  "components" : {
+    "schemas" : {
+      "ChangePasswordRequest" : {
+        "type" : "object",
+        "properties" : {
+          "newPassword" : {
+            "type" : "string",
+            "maxLength" : 32,
+            "minLength" : 4
           }
         },
-        "required": ["newPassword"]
+        "required" : [ "newPassword" ]
       },
-      "EntityMetaData": {
-        "type": "object",
-        "properties": {
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
+      "EntityMetaData" : {
+        "type" : "object",
+        "properties" : {
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
           },
-          "createdBy": {
-            "type": "string"
+          "createdBy" : {
+            "type" : "string"
           },
-          "lastModifiedAt": {
-            "type": "string",
-            "format": "date-time"
+          "lastModifiedAt" : {
+            "type" : "string",
+            "format" : "date-time"
           },
-          "lastModifiedBy": {
-            "type": "string"
+          "lastModifiedBy" : {
+            "type" : "string"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "lastModifiedAt",
-          "lastModifiedBy"
-        ]
+        "required" : [ "createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy" ]
       },
-      "UserAccount": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string"
+      "UserAccount" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string"
           },
-          "firstName": {
-            "type": "string"
+          "firstName" : {
+            "type" : "string"
           },
-          "lastName": {
-            "type": "string"
+          "lastName" : {
+            "type" : "string"
           },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": ["USER", "ADMIN", "KLEIDERWART"]
+          "roles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "USER", "ADMIN", "KLEIDERWART" ]
             }
           },
-          "enabled": {
-            "type": "boolean"
+          "enabled" : {
+            "type" : "boolean"
           },
-          "id": {
-            "type": "integer",
-            "format": "int64"
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "metaData": {
-            "$ref": "#/components/schemas/EntityMetaData"
+          "metaData" : {
+            "$ref" : "#/components/schemas/EntityMetaData"
           }
         },
-        "required": [
-          "enabled",
-          "firstName",
-          "id",
-          "lastName",
-          "metaData",
-          "roles",
-          "username"
-        ]
+        "required" : [ "enabled", "firstName", "id", "lastName", "metaData", "roles", "username" ]
       },
-      "InitialAdminSetupRequest": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string",
-            "minLength": 1
+      "InitialAdminSetupRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "minLength" : 1
           },
-          "password": {
-            "type": "string",
-            "maxLength": 32,
-            "minLength": 4
+          "password" : {
+            "type" : "string",
+            "maxLength" : 32,
+            "minLength" : 4
           },
-          "firstName": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
           },
-          "lastName": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
           }
         },
-        "required": ["firstName", "lastName", "password", "username"]
+        "required" : [ "firstName", "lastName", "password", "username" ]
       },
-      "LoginRequest": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string",
-            "minLength": 1
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "minLength" : 1
           },
-          "password": {
-            "type": "string",
-            "minLength": 1
+          "password" : {
+            "type" : "string",
+            "minLength" : 1
           },
-          "rememberMe": {
-            "type": "boolean"
+          "rememberMe" : {
+            "type" : "boolean"
           }
         },
-        "required": ["password", "rememberMe", "username"]
+        "required" : [ "password", "rememberMe", "username" ]
       },
-      "CreateOrUpdateClothingTypeRequest": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
+      "CreateOrUpdateClothingTypeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 255,
+            "minLength" : 0
           }
         },
-        "required": ["name"]
+        "required" : [ "name" ]
       },
-      "ClothingType": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+      "ClothingType" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
           },
-          "id": {
-            "type": "integer",
-            "format": "int64"
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "metaData": {
-            "$ref": "#/components/schemas/EntityMetaData"
+          "metaData" : {
+            "$ref" : "#/components/schemas/EntityMetaData"
           }
         },
-        "required": ["id", "metaData", "name"]
+        "required" : [ "id", "metaData", "name" ]
       },
-      "RelocationRequest": {
-        "type": "object",
-        "properties": {
-          "targetLocationId": {
-            "type": "integer",
-            "format": "int64"
+      "RelocationRequest" : {
+        "type" : "object",
+        "properties" : {
+          "targetLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "itemIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int64"
+          "itemIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
             }
           }
         },
-        "required": ["itemIds", "targetLocationId"]
+        "required" : [ "itemIds", "targetLocationId" ]
       },
-      "ProblemDetail": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "format": "uri"
+      "ProblemDetail" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "format" : "uri"
           },
-          "title": {
-            "type": "string"
+          "title" : {
+            "type" : "string"
           },
-          "status": {
-            "type": "integer",
-            "format": "int32"
+          "status" : {
+            "type" : "integer",
+            "format" : "int32"
           },
-          "detail": {
-            "type": "string"
+          "detail" : {
+            "type" : "string"
           },
-          "instance": {
-            "type": "string",
-            "format": "uri"
+          "instance" : {
+            "type" : "string",
+            "format" : "uri"
           },
-          "properties": {
-            "type": "object",
-            "additionalProperties": {}
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : { }
           }
         }
       },
-      "CreateClothingLocationRequest": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
+      "CreateClothingLocationRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 255,
+            "minLength" : 0
           },
-          "comment": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
+          "comment" : {
+            "type" : "string",
+            "maxLength" : 255,
+            "minLength" : 0
           },
-          "onlyVisibleForKleiderwart": {
-            "type": "boolean"
+          "onlyVisibleForKleiderwart" : {
+            "type" : "boolean"
           },
-          "type": {
-            "type": "string",
-            "enum": ["POOL", "WAESCHE", "PERSONAL", "OTHER"]
+          "type" : {
+            "type" : "string",
+            "enum" : [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
           }
         },
-        "required": ["comment", "name", "onlyVisibleForKleiderwart", "type"]
+        "required" : [ "comment", "name", "onlyVisibleForKleiderwart", "type" ]
       },
-      "ClothingLocation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+      "ClothingLocation" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
           },
-          "comment": {
-            "type": "string"
+          "comment" : {
+            "type" : "string"
           },
-          "onlyVisibleForKleiderwart": {
-            "type": "boolean"
+          "onlyVisibleForKleiderwart" : {
+            "type" : "boolean"
           },
-          "type": {
-            "type": "string",
-            "enum": ["POOL", "WAESCHE", "PERSONAL", "OTHER"]
+          "type" : {
+            "type" : "string",
+            "enum" : [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
           },
-          "id": {
-            "type": "integer",
-            "format": "int64"
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "metaData": {
-            "$ref": "#/components/schemas/EntityMetaData"
+          "metaData" : {
+            "$ref" : "#/components/schemas/EntityMetaData"
           }
         },
-        "required": [
-          "comment",
-          "id",
-          "metaData",
-          "name",
-          "onlyVisibleForKleiderwart",
-          "type"
-        ]
+        "required" : [ "comment", "id", "metaData", "name", "onlyVisibleForKleiderwart", "type" ]
       },
-      "BatchCreateClothingLocationsRequest": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateClothingLocationRequest"
+      "BatchCreateClothingLocationsRequest" : {
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CreateClothingLocationRequest"
             }
           }
         },
-        "required": ["items"]
+        "required" : [ "items" ]
       },
-      "CreateOrUpdateClothingItemRequest": {
-        "type": "object",
-        "properties": {
-          "typeId": {
-            "type": "integer",
-            "format": "int64"
+      "CreateOrUpdateClothingItemRequest" : {
+        "type" : "object",
+        "properties" : {
+          "typeId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "size": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
+          "size" : {
+            "type" : "string",
+            "maxLength" : 255,
+            "minLength" : 0
           },
-          "barcode": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
+          "barcode" : {
+            "type" : "string",
+            "maxLength" : 255,
+            "minLength" : 0
           },
-          "locationId": {
-            "type": "integer",
-            "format": "int64"
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         },
-        "required": ["size", "typeId"]
+        "required" : [ "size", "typeId" ]
       },
-      "ClothingItem": {
-        "type": "object",
-        "properties": {
-          "typeId": {
-            "type": "integer",
-            "format": "int64"
+      "ClothingItem" : {
+        "type" : "object",
+        "properties" : {
+          "typeId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "size": {
-            "type": "string"
+          "size" : {
+            "type" : "string"
           },
-          "barcode": {
-            "type": "string"
+          "barcode" : {
+            "type" : "string"
           },
-          "locationId": {
-            "type": "integer",
-            "format": "int64"
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "id": {
-            "type": "integer",
-            "format": "int64"
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "metaData": {
-            "$ref": "#/components/schemas/EntityMetaData"
+          "metaData" : {
+            "$ref" : "#/components/schemas/EntityMetaData"
           }
         },
-        "required": ["id", "metaData", "size", "typeId"]
+        "required" : [ "id", "metaData", "size", "typeId" ]
       },
-      "BatchCreateClothingItemsRequest": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
+      "BatchCreateClothingItemsRequest" : {
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CreateOrUpdateClothingItemRequest"
             }
           }
         },
-        "required": ["items"]
+        "required" : [ "items" ]
       },
-      "CheckoutRequest": {
-        "type": "object",
-        "properties": {
-          "targetLocationId": {
-            "type": "integer",
-            "format": "int64"
+      "CheckoutRequest" : {
+        "type" : "object",
+        "properties" : {
+          "targetLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "returnLocationId": {
-            "type": "integer",
-            "format": "int64"
+          "returnLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "takeItemIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int64"
+          "takeItemIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
             }
           },
-          "returnItemIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int64"
+          "returnItemIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
             }
           },
-          "acknowledgedItemIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int64"
+          "acknowledgedItemIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
             }
           }
         },
-        "required": [
-          "acknowledgedItemIds",
-          "returnItemIds",
-          "takeItemIds",
-          "targetLocationId"
-        ]
+        "required" : [ "acknowledgedItemIds", "returnItemIds", "takeItemIds", "targetLocationId" ]
       },
-      "CheckoutHttpResponse": {
-        "discriminator": {
-          "propertyName": "status"
+      "CheckoutHttpResponse" : {
+        "discriminator" : {
+          "propertyName" : "status"
         },
-        "properties": {
-          "status": {
-            "type": "string"
+        "properties" : {
+          "status" : {
+            "type" : "string"
           }
         },
-        "required": ["status"]
+        "required" : [ "status" ]
       },
-      "Discrepancy": {
-        "type": "object",
-        "properties": {
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
+      "Discrepancy" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "claimedLocationId": {
-            "type": "integer",
-            "format": "int64"
+          "claimedLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "actualLocationId": {
-            "type": "integer",
-            "format": "int64"
+          "actualLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         },
-        "required": ["claimedLocationId", "itemId"]
+        "required" : [ "claimedLocationId", "itemId" ]
       },
-      "NeedsConfirmation": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CheckoutHttpResponse"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "discrepancies": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Discrepancy"
-                }
+      "NeedsConfirmation" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/CheckoutHttpResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "discrepancies" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/Discrepancy"
               }
             }
           }
-        ],
-        "required": ["discrepancies"]
+        } ],
+        "required" : [ "discrepancies" ]
       },
-      "Ok": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CheckoutHttpResponse"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "batchId": {
-                "type": "string"
-              }
+      "Ok" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/CheckoutHttpResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "batchId" : {
+              "type" : "string"
             }
           }
-        ],
-        "required": ["batchId"]
+        } ],
+        "required" : [ "batchId" ]
       },
-      "CreateUserRequest": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string",
-            "minLength": 1
+      "CreateUserRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "minLength" : 1
           },
-          "password": {
-            "type": "string",
-            "maxLength": 32,
-            "minLength": 4
+          "password" : {
+            "type" : "string",
+            "maxLength" : 32,
+            "minLength" : 4
           },
-          "firstName": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
           },
-          "lastName": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
           },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": ["USER", "ADMIN", "KLEIDERWART"]
+          "roles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "USER", "ADMIN", "KLEIDERWART" ]
             }
           }
         },
-        "required": ["firstName", "lastName", "password", "roles", "username"]
+        "required" : [ "firstName", "lastName", "password", "roles", "username" ]
       },
-      "UpdateUserRequest": {
-        "type": "object",
-        "properties": {
-          "firstName": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
+      "UpdateUserRequest" : {
+        "type" : "object",
+        "properties" : {
+          "firstName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
           },
-          "lastName": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
+          "lastName" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
           },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": ["USER", "ADMIN", "KLEIDERWART"]
+          "roles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "USER", "ADMIN", "KLEIDERWART" ]
             }
           }
         },
-        "required": ["firstName", "lastName", "roles"]
+        "required" : [ "firstName", "lastName", "roles" ]
       },
-      "AuthStateResponse": {
-        "type": "object",
-        "properties": {
-          "authenticated": {
-            "type": "boolean"
+      "AuthStateResponse" : {
+        "type" : "object",
+        "properties" : {
+          "authenticated" : {
+            "type" : "boolean"
           },
-          "user": {
-            "$ref": "#/components/schemas/UserAccount"
+          "user" : {
+            "$ref" : "#/components/schemas/UserAccount"
           }
         },
-        "required": ["authenticated"]
+        "required" : [ "authenticated" ]
       },
-      "ClothingTypeSummary": {
-        "type": "object",
-        "properties": {
-          "typeId": {
-            "type": "integer",
-            "format": "int64"
+      "ClothingTypeSummary" : {
+        "type" : "object",
+        "properties" : {
+          "typeId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "typeName": {
-            "type": "string"
+          "typeName" : {
+            "type" : "string"
           },
-          "sizeGroupSummary": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SizeGroupSummary"
+          "sizeGroupSummary" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SizeGroupSummary"
             }
+          },
+          "totalCount" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         },
-        "required": ["sizeGroupSummary", "typeId", "typeName"]
+        "required" : [ "sizeGroupSummary", "totalCount", "typeId", "typeName" ]
       },
-      "SizeGroupSummary": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+      "SizeGroupSummary" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
           },
-          "sizes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SizeSummary"
+          "sizes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SizeSummary"
             }
+          },
+          "totalCount" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         },
-        "required": ["name", "sizes"]
+        "required" : [ "name", "sizes", "totalCount" ]
       },
-      "SizeSummary": {
-        "type": "object",
-        "properties": {
-          "size": {
-            "type": "string"
+      "SizeSummary" : {
+        "type" : "object",
+        "properties" : {
+          "size" : {
+            "type" : "string"
           },
-          "count": {
-            "type": "integer",
-            "format": "int32"
+          "count" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         },
-        "required": ["count", "size"]
+        "required" : [ "count", "size" ]
       },
-      "ClothingLocationSummary": {
-        "type": "object",
-        "properties": {
-          "locationId": {
-            "type": "integer",
-            "format": "int64"
+      "ClothingLocationSummary" : {
+        "type" : "object",
+        "properties" : {
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
           },
-          "locationName": {
-            "type": "string"
+          "locationName" : {
+            "type" : "string"
           },
-          "types": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClothingTypeSummary"
+          "types" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ClothingTypeSummary"
             }
+          },
+          "totalCount" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         },
-        "required": ["locationId", "locationName", "types"]
+        "required" : [ "locationId", "locationName", "totalCount", "types" ]
       },
-      "ResolvedClothingItem": {
-        "type": "object",
-        "properties": {
-          "clothingItem": {
-            "$ref": "#/components/schemas/ClothingItem"
+      "ResolvedClothingItem" : {
+        "type" : "object",
+        "properties" : {
+          "clothingItem" : {
+            "$ref" : "#/components/schemas/ClothingItem"
           },
-          "location": {
-            "$ref": "#/components/schemas/ClothingLocation"
+          "location" : {
+            "$ref" : "#/components/schemas/ClothingLocation"
           },
-          "clothingType": {
-            "$ref": "#/components/schemas/ClothingType"
+          "clothingType" : {
+            "$ref" : "#/components/schemas/ClothingType"
           }
         },
-        "required": ["clothingItem", "clothingType"]
+        "required" : [ "clothingItem", "clothingType" ]
       }
     }
   }

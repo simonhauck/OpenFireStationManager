@@ -13,6 +13,7 @@ class SizeGroupAggregator {
             PredefinedSizeGroup("XL", 6),
             PredefinedSizeGroup("XXL", 7, "2XL"),
             PredefinedSizeGroup("XXXL", 8, "3XL"),
+            PredefinedSizeGroup("XXXXL", 9, "4XL"),
         )
 
     fun group(sizes: List<String>): List<SizeGroupSummary> {
