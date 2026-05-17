@@ -8,7 +8,6 @@ import io.github.simonhauck.openfirestationmanager.clothing.location.LocationTyp
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingTypeRepository
 import org.springframework.stereotype.Service
-import kotlin.collections.sorted
 
 @Service
 class ClothingOverviewService(
@@ -24,7 +23,7 @@ class ClothingOverviewService(
 
         return types.map { type ->
             val relevantItems = clothingItemRepository.findAllByTypeId(type.getIdAsReference())
-            val summary = summarizeBySize2(relevantItems)
+            val summary = summarizeBySize(relevantItems)
             ClothingTypeSummary(type.id, type.name, summary)
         }
     }
@@ -58,16 +57,7 @@ class ClothingOverviewService(
         return ClothingTypeSummary(type.id, type.name, sizeSummaries)
     }
 
-    private fun summarizeBySize2(relevantItems: List<ClothingItem>): List<SizeGroupSummary> {
-        return relevantItems.map { it.size }
-            .let { sizeGroupAggregator.group(it) }
-
-    }
-
-    private fun summarizeBySize(relevantItems: List<ClothingItem>): List<SizeSummary> {
-        return relevantItems
-            .groupBy { item -> item.size }
-            .mapValues { (_, items) -> items.count() }
-            .map { (size, count) -> SizeSummary(size, count) }
+    private fun summarizeBySize(relevantItems: List<ClothingItem>): List<SizeGroupSummary> {
+        return relevantItems.map { it.size }.let { sizeGroupAggregator.group(it) }
     }
 }

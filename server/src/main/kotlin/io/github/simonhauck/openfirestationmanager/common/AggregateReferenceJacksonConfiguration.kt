@@ -35,8 +35,7 @@ private object AggregateReferenceSerializer : ValueSerializer<AggregateReference
         generator: tools.jackson.core.JsonGenerator,
         ctxt: SerializationContext,
     ) {
-        val id = value.id
-        when (id) {
+        when (val id = value.id) {
             is Int -> generator.writeNumber(id)
             is Long -> generator.writeNumber(id)
             is Short -> generator.writeNumber(id.toInt())
