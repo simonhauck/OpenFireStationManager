@@ -36,3 +36,7 @@ Picker UI scales by cardinality:
 - **Many items (>100 PERSONAL locations, >1000 clothing items):** searchable Combobox with typeahead, primary input on tablet. For items the barcode scanner is the primary input and the Combobox is the backup.
 
 Touch optimisation is mandatory throughout; this flow is the primary tablet UX.
+
+### Page Section
+
+The full-page layout wrapper used on each route. Renders a `bg-muted` surface (rounded, full-height) that visually separates the page from the plain app background. Contains a header row (title, optional subtitle, optional action buttons) and a body area for page content. Inner `Card` components sit on top of the muted surface and are visually distinct from it. Accepts `buttonPosition: "right" | "center"` to control action-button alignment. Used on both tablet and desktop routes; callers are responsible for passing appropriately sized button components (`TouchButton` on tablet routes, shadcn `Button` on desktop routes).
