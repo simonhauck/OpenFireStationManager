@@ -13,12 +13,14 @@ test.describe("Checkout", () => {
   let typeName: string
   let barcode: string
   let personalLocationName: string
+  let poolLocationName: string
 
   test.beforeAll(async ({ browser }) => {
     const suffix = randomUUID().slice(0, 8)
     typeName = `Typ-Checkout-${suffix}`
     barcode = `BC-CO-${suffix}`
     personalLocationName = `Spind-${suffix}`
+    poolLocationName = `Pool-${suffix}`
 
     // Setup requires KLEIDERWART role — use a dedicated page for preconditions.
     const page = await browser.newPage({
@@ -29,7 +31,6 @@ test.describe("Checkout", () => {
     await createClothingType(page, typeName)
 
     // 2. Create a POOL location so the item lives there initially
-    const poolLocationName = `Pool-${suffix}`
     await createClothingLocation(page, { type: "POOL", name: poolLocationName })
 
     // 3. Create the clothing item and place it in the pool location so it
@@ -87,8 +88,13 @@ test.describe("Checkout", () => {
     await expect(page).toHaveURL(/\/pool-clothing/)
 
     // ── Verify item is no longer in the pool ─────────────────────────────────
-    await expect(poolPage.loadingIndicator()).not.toBeVisible()
-    // The item was the only item of this type/size; the type badge must be gone.
-    await expect(page.getByText(typeName)).not.toBeVisible()
+    // Scope to the specific pool location's PageSubSection to avoid false
+    // matches from other pool locations accumulated in the shared database.
+    // toHaveCount(0) retries until the invalidated overview refetch completes.
+    const poolLocationSection = poolPage.locationSection(poolLocationName)
+    await expect(poolLocationSection).toBeVisible({ timeout: 10000 })
+    await expect(
+      poolLocationSection.getByText(typeName, { exact: true }),
+    ).toHaveCount(0, { timeout: 10000 })
   })
 })

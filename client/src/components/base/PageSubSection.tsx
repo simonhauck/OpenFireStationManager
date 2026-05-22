@@ -14,7 +14,7 @@ export default function PageSubSection({
   children,
 }: PageSubSectionProps) {
   return (
-    <div className="border-border [&:not(:first-child)]:border-t [&:not(:first-child)]:pt-6 pb-6 last:pb-0">
+    <div data-testid={`section-${title}`} className="border-border [&:not(:first-child)]:border-t [&:not(:first-child)]:pt-6 pb-6 last:pb-0">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3 mb-4">
         <div>

@@ -5,15 +5,9 @@ import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import CreateWithImportButton from "#/components/base/CreateWithImportButton"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
 
 export default function ClothingItemsPage() {
   const {
@@ -41,43 +35,33 @@ export default function ClothingItemsPage() {
 
   return (
     <RoleGuard allowedRoles={["KLEIDERWART"]}>
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <CardTitle>Klamottenmanagement</CardTitle>
-              <CardDescription>
-                Alle vorhandenen Kleidungsstuecke
-              </CardDescription>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <CreateWithImportButton
-                label="Neues Kleidungsstueck"
-                createTo="/clothing-management/items/new"
-                importTo="/clothing-management/items/batch"
-              />
-            </div>
-          </div>
-        </CardHeader>
+      <PageSection
+        title="Kleidungsstücke"
+        subtitle="Alle vorhandenen Kleidungsstücke"
+        buttons={
+          <CreateWithImportButton
+            label="Neues Kleidungsstück"
+            createTo="/clothing-management/items/new"
+            importTo="/clothing-management/items/batch"
+          />
+        }
+      >
+        <RenderIf when={isLoading}>
+          <LoadingIndicator label="Kleidungsstücke werden geladen..." />
+        </RenderIf>
 
-        <CardContent className="space-y-4">
-          <RenderIf when={isLoading}>
-            <LoadingIndicator label="Kleidungsstuecke werden geladen..." />
-          </RenderIf>
+        <RenderIf when={isError}>
+          <ErrorState message="Kleidungsstücke konnten nicht geladen werden." />
+        </RenderIf>
 
-          <RenderIf when={isError}>
-            <ErrorState message="Kleidungsstuecke konnten nicht geladen werden." />
-          </RenderIf>
-
-          <RenderIf when={canRenderTable}>
-            <ClothingItemsTable
-              items={clothingItems ?? []}
-              types={clothingTypes!}
-              locations={clothingLocations!}
-            />
-          </RenderIf>
-        </CardContent>
-      </Card>
+        <RenderIf when={canRenderTable}>
+          <ClothingItemsTable
+            items={clothingItems ?? []}
+            types={clothingTypes!}
+            locations={clothingLocations!}
+          />
+        </RenderIf>
+      </PageSection>
     </RoleGuard>
   )
 }

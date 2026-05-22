@@ -8,15 +8,10 @@ import {
   updateClothingLocationMutation,
 } from "#/clothing/service/clothingLocationsQueries"
 import ErrorState from "#/components/base/ErrorState"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
+import { Card, CardContent } from "#/components/ui/card"
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
@@ -69,7 +64,7 @@ export default function ClothingLocationForm({
   const title = isEditing ? "Standort bearbeiten" : "Standort erstellen"
   const description = isEditing
     ? "Bearbeiten Sie die Daten des Standorts."
-    : "Erfassen Sie die Daten fuer einen neuen Standort."
+    : "Erfassen Sie die Daten für einen neuen Standort."
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -102,13 +97,9 @@ export default function ClothingLocationForm({
   }
 
   return (
-    <main className="page-wrap px-4 py-12">
+    <PageSection title={title} subtitle={description}>
       <Card className="mx-auto w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label>Typ</Label>
@@ -161,7 +152,7 @@ export default function ClothingLocationForm({
                 }
               />
               <Label htmlFor="onlyVisibleForKleiderwart">
-                Nur sichtbar fuer Kleiderwart
+                Nur sichtbar für Kleiderwart
               </Label>
             </div>
 
@@ -180,6 +171,6 @@ export default function ClothingLocationForm({
           </form>
         </CardContent>
       </Card>
-    </main>
+    </PageSection>
   )
 }

@@ -10,15 +10,10 @@ import {
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import ClothingLocationSelect from "#/clothing/components/shared/ClothingLocationSelect"
 import ErrorState from "#/components/base/ErrorState"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
+import { Card, CardContent } from "#/components/ui/card"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
@@ -63,15 +58,15 @@ export default function ClothingItemForm({
   const error = createError ?? updateError
 
   const title = isEditing
-    ? "Kleidungsstueck bearbeiten"
-    : "Kleidungsstueck erstellen"
+    ? "Kleidungsstück bearbeiten"
+    : "Kleidungsstück erstellen"
   const description = isEditing
-    ? "Bearbeiten Sie die Daten des Kleidungsstuecks."
-    : "Erfassen Sie die Daten fuer ein neues Kleidungsstueck."
+    ? "Bearbeiten Sie die Daten des Kleidungsstücks."
+    : "Erfassen Sie die Daten für ein neues Kleidungsstück."
   const submitLabel = "Speichern"
   const pendingLabel = "Wird gespeichert..."
   const errorMessage = error
-    ? "Das Kleidungsstueck konnte nicht gespeichert werden."
+    ? "Das Kleidungsstück konnte nicht gespeichert werden."
     : null
 
   function handleSubmit(e: React.FormEvent) {
@@ -110,18 +105,14 @@ export default function ClothingItemForm({
   const types = clothingTypes ?? []
 
   return (
-    <main className="page-wrap px-4 py-12">
+    <PageSection title={title} subtitle={description}>
       <Card className="mx-auto w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label>Kleidungstyp</Label>
               <RenderIf when={types.length === 0}>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Keine Kleidungstypen vorhanden.
                 </p>
               </RenderIf>
@@ -145,7 +136,7 @@ export default function ClothingItemForm({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="size">Groesse</Label>
+              <Label htmlFor="size">Größe</Label>
               <Input
                 id="size"
                 required
@@ -183,6 +174,6 @@ export default function ClothingItemForm({
           </form>
         </CardContent>
       </Card>
-    </main>
+    </PageSection>
   )
 }

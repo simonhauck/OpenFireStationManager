@@ -12,16 +12,11 @@ import ClearableSelect from "#/components/base/ClearableSelect"
 import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
 import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
+import { Card, CardContent } from "#/components/ui/card"
 import { Textarea } from "#/components/ui/textarea"
 
 const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
@@ -168,17 +163,12 @@ function LocationBatchImportPageContent() {
   }
 
   return (
-    <main className="page-wrap space-y-6 px-4 py-12">
+    <PageSection
+      title="Massenimport von Standorten"
+      subtitle="Erstelle mehrere Standorte in einem Schritt. Die Daten werden im CSV-Format angegeben."
+    >
       <Card className="mx-auto w-full max-w-3xl">
-        <CardHeader>
-          <CardTitle>Massenimport von Standorten</CardTitle>
-          <CardDescription>
-            Erstelle mehrere Standorte in einem Schritt. Die Daten werden im
-            CSV-Format angegeben
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <RenderIf when={createdLocations === null}>
             <CsvInputSection
               value={csvInput}
@@ -228,7 +218,7 @@ function LocationBatchImportPageContent() {
           </RenderIf>
         </CardContent>
       </Card>
-    </main>
+    </PageSection>
   )
 }
 
@@ -266,8 +256,8 @@ function CsvInputSection({
 
       <div className="space-y-1.5">
         <p className="text-sm font-medium">CSV-Daten eingeben</p>
-        <p className="text-sm text-muted-foreground">
-          Gib die weiteren Parameter im CSV-Format ein.Werte mit{" "}
+        <p className="text-muted-foreground text-sm">
+          Gib die weiteren Parameter im CSV-Format ein. Werte mit{" "}
           <code>
             <sup>*</sup>
           </code>{" "}
@@ -278,7 +268,7 @@ function CsvInputSection({
           </code>
           <br></br>
         </p>
-        <p className="text-sm italic">Beispiel: Schrank A,Hauptgebaeude EG</p>
+        <p className="text-sm italic">Beispiel: Schrank A,Hauptgebäude EG</p>
         <Textarea
           placeholder={"Schrank A,Hauptgebaeude EG\nRegal B\nSpind 3,Umkleide"}
           rows={8}
@@ -318,12 +308,12 @@ function BatchPreviewSection({
 }: BatchPreviewSectionProps) {
   return (
     <>
-      <p className="text-sm font-medium">Vorschau ({items.length} Eintraege)</p>
+      <p className="text-sm font-medium">Vorschau ({items.length} Einträge)</p>
       <DataTable
         columns={previewColumns}
         rows={items}
         showSearch={false}
-        emptyMessage="Keine Eintraege vorhanden."
+        emptyMessage="Keine Einträge vorhanden."
       />
 
       <RenderIf when={hasError}>
@@ -361,7 +351,7 @@ function ImportSuccessResult({ locations, onDone }: ImportSuccessResultProps) {
       />
       <div className="flex justify-end">
         <Button type="button" onClick={onDone}>
-          Zur Uebersicht
+          Zur Übersicht
         </Button>
       </div>
     </div>

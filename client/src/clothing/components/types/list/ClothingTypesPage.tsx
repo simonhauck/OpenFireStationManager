@@ -2,18 +2,12 @@ import { Link } from "@tanstack/react-router"
 
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
 import ClothingTypesTable from "#/clothing/components/types/list/ClothingTypesTable"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
 
 export default function ClothingTypesPage() {
   return (
@@ -28,34 +22,26 @@ function ClothingTypesPageContent() {
   const canRenderTable = clothingTypes !== undefined
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <CardTitle>Klamottenmanagement</CardTitle>
-            <CardDescription>Kleidungstypen</CardDescription>
-          </div>
-          <Button asChild>
-            <Link to="/clothing-management/types/new">
-              Kleidungstyp erstellen
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
+    <PageSection
+      title="Kleidungstypen"
+      subtitle="Alle vorhandenen Kleidungstypen"
+      buttons={
+        <Button asChild>
+          <Link to="/clothing-management/types/new">Kleidungstyp erstellen</Link>
+        </Button>
+      }
+    >
+      <RenderIf when={isLoading}>
+        <LoadingIndicator label="Kleidungstypen werden geladen..." />
+      </RenderIf>
 
-      <CardContent className="space-y-4">
-        <RenderIf when={isLoading}>
-          <LoadingIndicator label="Kleidungstypen werden geladen..." />
-        </RenderIf>
+      <RenderIf when={isError}>
+        <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
+      </RenderIf>
 
-        <RenderIf when={isError}>
-          <ErrorState message="Kleidungstypen konnten nicht geladen werden." />
-        </RenderIf>
-
-        <RenderIf when={canRenderTable}>
-          <ClothingTypesTable types={clothingTypes!} />
-        </RenderIf>
-      </CardContent>
-    </Card>
+      <RenderIf when={canRenderTable}>
+        <ClothingTypesTable types={clothingTypes!} />
+      </RenderIf>
+    </PageSection>
   )
 }
