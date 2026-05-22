@@ -10,6 +10,7 @@ import ErrorState from "#/components/base/ErrorState"
 import LabelWithCount from "#/components/base/LabelWithCount"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
+import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
@@ -73,14 +74,12 @@ function PoolKlamottenOverviewCard({
       </RenderIf>
 
       <RenderIf when={overviewData.length > 0}>
-        <div className="divide-border divide-y">
+        <div>
           {overviewData.map((locationSummary) => (
-            <div
+            <LocationSizeSummaryTable
               key={locationSummary.locationId}
-              className="py-6 first:pt-0 last:pb-0"
-            >
-              <LocationSizeSummaryTable summary={locationSummary} />
-            </div>
+              summary={locationSummary}
+            />
           ))}
         </div>
       </RenderIf>
@@ -103,46 +102,38 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
   )
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            {summary.locationName}
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Verfuegbare Pool-Kleidung am Standort
-          </p>
-        </div>
+    <PageSubSection
+      title={summary.locationName}
+      subtitle="Verfügbare Pool-Kleidung am Standort"
+      right={
         <div className="text-right">
           <p className="text-muted-foreground text-xs uppercase tracking-wide">
             Gesamt
           </p>
-          <p className="text-emerald-600 dark:text-emerald-400 text-3xl font-bold">
+          <p className="text-emerald-600 dark:text-emerald-400 text-2xl font-bold">
             {totalCount}
           </p>
         </div>
-      </div>
+      }
+    >
+      <RenderIf when={typeSummaries.length > 0}>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          {typeSummaries.map((typeSummary) => (
+            <TypeAvailabilityPanel
+              key={`${summary.locationId}-${typeSummary.typeId}`}
+              locationId={summary.locationId}
+              typeSummary={typeSummary}
+            />
+          ))}
+        </div>
+      </RenderIf>
 
-      <div>
-        <RenderIf when={typeSummaries.length > 0}>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {typeSummaries.map((typeSummary) => (
-              <TypeAvailabilityPanel
-                key={`${summary.locationId}-${typeSummary.typeId}`}
-                locationId={summary.locationId}
-                typeSummary={typeSummary}
-              />
-            ))}
-          </div>
-        </RenderIf>
-
-        <RenderIf when={typeSummaries.length === 0}>
-          <p className="text-muted-foreground text-sm">
-            Keine Kleidungstypen vorhanden.
-          </p>
-        </RenderIf>
-      </div>
-    </div>
+      <RenderIf when={typeSummaries.length === 0}>
+        <p className="text-muted-foreground text-sm">
+          Keine Kleidungstypen vorhanden.
+        </p>
+      </RenderIf>
+    </PageSubSection>
   )
 }
 
