@@ -154,14 +154,15 @@ function ChangePasswordPageContent() {
 
               <div className="flex flex-wrap justify-end gap-2 pt-2">
                 <Button type="button" variant="outline" asChild>
-                  <Link
-                    to="/user-management/$userId/edit"
-                    params={{ userId }}
-                  >
+                  <Link to="/user-management/$userId/edit" params={{ userId }}>
                     Abbrechen
                   </Link>
                 </Button>
-                <Button type="submit" variant="destructive" disabled={isPending}>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={isPending}
+                >
                   {isPending ? "Wird gespeichert..." : "Passwort ändern"}
                 </Button>
               </div>
