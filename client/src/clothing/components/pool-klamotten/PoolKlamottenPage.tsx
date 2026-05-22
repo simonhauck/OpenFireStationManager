@@ -75,7 +75,10 @@ function PoolKlamottenOverviewCard({
       <RenderIf when={overviewData.length > 0}>
         <div className="divide-border divide-y">
           {overviewData.map((locationSummary) => (
-            <div key={locationSummary.locationId} className="py-6 first:pt-0 last:pb-0">
+            <div
+              key={locationSummary.locationId}
+              className="py-6 first:pt-0 last:pb-0"
+            >
               <LocationSizeSummaryTable summary={locationSummary} />
             </div>
           ))}
