@@ -14,6 +14,7 @@ import {
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import { VerticalStepper } from "#/components/base/VerticalStepper"
 import type { Step } from "#/components/base/VerticalStepper"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
@@ -44,66 +45,65 @@ export default function RelocationPage() {
   } = useRelocationWizard()
 
   return (
-    <div className="p-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl">Umlagerung</CardTitle>
-          <TouchButton
-            variant="outline"
-            onClick={async () => {
-              await navigate({ to: "/pool-clothing" })
-            }}
-          >
-            Abbrechen
-          </TouchButton>
-        </CardHeader>
-        <div className="flex items-stretch">
-          {/* Stepper sidebar — hidden on mobile */}
-          <aside className="hidden shrink-0 sm:block">
-            <div className="px-6 pb-6">
-              <VerticalStepper
-                steps={RELOCATION_STEPS}
-                currentStep={state.step}
-                onStepClick={() => {
-                  /* wizard is linear — no jump navigation */
-                }}
-              />
-            </div>
-          </aside>
-
-          {/* Step content */}
-          <div className="min-w-0 flex-1 space-y-4 px-6 pb-6">
-            <RenderIf when={state.step === 1}>
-              <StepTargetPicker onSelect={selectTarget} />
-            </RenderIf>
-
-            <RenderIf when={state.step === 2}>
-              <StepItemScanner
-                state={state}
-                onAddItem={addItem}
-                onRemoveItem={removeItem}
-                onBack={goBack}
-                onNext={advanceToReview}
-              />
-            </RenderIf>
-
-            <RenderIf when={state.step === 3}>
-              <StepReview state={state} onSubmitOk={submitOk} onBack={goBack} />
-            </RenderIf>
-
-            <RenderIf when={state.step === 4}>
-              <StepSuccess
-                state={state}
-                onReset={reset}
-                onNavigateToOverview={() =>
-                  void navigate({ to: "/pool-clothing" })
-                }
-              />
-            </RenderIf>
+    <PageSection
+      title="Umlagerung"
+      buttons={
+        <TouchButton
+          variant="outline"
+          onClick={async () => {
+            await navigate({ to: "/pool-clothing" })
+          }}
+        >
+          Abbrechen
+        </TouchButton>
+      }
+    >
+      <div className="flex items-stretch">
+        {/* Stepper sidebar — hidden on mobile */}
+        <aside className="hidden shrink-0 sm:block">
+          <div className="pr-6 pb-2">
+            <VerticalStepper
+              steps={RELOCATION_STEPS}
+              currentStep={state.step}
+              onStepClick={() => {
+                /* wizard is linear — no jump navigation */
+              }}
+            />
           </div>
+        </aside>
+
+        {/* Step content */}
+        <div className="min-w-0 flex-1 space-y-4">
+          <RenderIf when={state.step === 1}>
+            <StepTargetPicker onSelect={selectTarget} />
+          </RenderIf>
+
+          <RenderIf when={state.step === 2}>
+            <StepItemScanner
+              state={state}
+              onAddItem={addItem}
+              onRemoveItem={removeItem}
+              onBack={goBack}
+              onNext={advanceToReview}
+            />
+          </RenderIf>
+
+          <RenderIf when={state.step === 3}>
+            <StepReview state={state} onSubmitOk={submitOk} onBack={goBack} />
+          </RenderIf>
+
+          <RenderIf when={state.step === 4}>
+            <StepSuccess
+              state={state}
+              onReset={reset}
+              onNavigateToOverview={() =>
+                void navigate({ to: "/pool-clothing" })
+              }
+            />
+          </RenderIf>
         </div>
-      </Card>
-    </div>
+      </div>
+    </PageSection>
   )
 }
 
