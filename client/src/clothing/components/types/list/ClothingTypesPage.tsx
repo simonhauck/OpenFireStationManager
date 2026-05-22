@@ -27,7 +27,9 @@ function ClothingTypesPageContent() {
       subtitle="Alle vorhandenen Kleidungstypen"
       buttons={
         <Button asChild>
-          <Link to="/clothing-management/types/new">Kleidungstyp erstellen</Link>
+          <Link to="/clothing-management/types/new">
+            Kleidungstyp erstellen
+          </Link>
         </Button>
       }
     >

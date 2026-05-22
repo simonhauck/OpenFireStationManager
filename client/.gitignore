@@ -16,5 +16,6 @@ src/routeTree.gen.ts
 
 # Playwright
 playwright/.auth/
+playwright/.backup/
 playwright-report/
 test-results/

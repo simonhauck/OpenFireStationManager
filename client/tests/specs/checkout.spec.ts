@@ -88,13 +88,12 @@ test.describe("Checkout", () => {
     await expect(page).toHaveURL(/\/pool-clothing/)
 
     // ── Verify item is no longer in the pool ─────────────────────────────────
-    // Scope to the specific pool location's PageSubSection to avoid false
-    // matches from other pool locations accumulated in the shared database.
-    // toHaveCount(0) retries until the invalidated overview refetch completes.
-    const poolLocationSection = poolPage.locationSection(poolLocationName)
-    await expect(poolLocationSection).toBeVisible({ timeout: 10000 })
-    await expect(
-      poolLocationSection.getByText(typeName, { exact: true }),
-    ).toHaveCount(0, { timeout: 10000 })
+    // The pool overview retains zero-count type panels, so we assert the count
+    // dropped to 0 rather than the panel disappearing entirely.
+    // Scope to the specific pool location section (via data-testid) to avoid
+    // false matches from other pool locations in the shared database.
+    const typePanelHeader = poolPage.typePanel(poolLocationName, typeName)
+    await expect(typePanelHeader).toBeVisible({ timeout: 10000 })
+    await expect(typePanelHeader.getByText("(0)")).toBeVisible({ timeout: 10000 })
   })
 })

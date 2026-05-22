@@ -92,9 +92,9 @@ interface LocationSizeSummaryTableProps {
 }
 
 function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
-  const typeSummaries = [...summary.types]
-    // .filter((t) => t.totalCount > 0)
-    .sort((a, b) => a.typeName.localeCompare(b.typeName, "de"))
+  const typeSummaries = [...summary.types].sort((a, b) =>
+    a.typeName.localeCompare(b.typeName, "de"),
+  )
 
   const totalCount = typeSummaries.reduce(
     (locationTotal, typeSummary) => locationTotal + typeSummary.totalCount,
