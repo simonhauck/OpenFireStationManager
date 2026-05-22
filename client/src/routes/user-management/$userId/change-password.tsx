@@ -5,6 +5,7 @@ import { useState } from "react"
 import { changePasswordMutation, getUserByIdQuery } from "#/api/users.queries"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
+import PageSection from "#/components/base/PageSection"
 import RoleGuard from "#/components/base/RoleGuard"
 import {
   AlertDialog,
@@ -17,13 +18,7 @@ import {
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
 import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
+import { Card, CardContent } from "#/components/ui/card"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 
@@ -109,70 +104,72 @@ function ChangePasswordPageContent() {
 
   return (
     <>
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Passwort ändern</CardTitle>
-          <CardDescription>
-            Setzen Sie ein neues Passwort für den Nutzer{" "}
-            <span className="font-medium">{user.username}</span>.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="username">Benutzername</Label>
-              <Input id="username" value={user.username} disabled readOnly />
-            </div>
+      <PageSection
+        title="Passwort ändern"
+        subtitle={`Neues Passwort für ${user.username} festlegen.`}
+      >
+        <Card className="mx-auto w-full max-w-2xl">
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="username">Benutzername</Label>
+                <Input id="username" value={user.username} disabled readOnly />
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="new-password">Neues Passwort</Label>
-              <Input
-                id="new-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={newPassword}
-                onChange={(e) => {
-                  setNewPassword(e.target.value)
-                  setPasswordError(null)
-                }}
-              />
-            </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="new-password">Neues Passwort</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value)
+                    setPasswordError(null)
+                  }}
+                />
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="confirm-password">Passwort bestätigen</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value)
-                  setPasswordError(null)
-                }}
-              />
-            </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="confirm-password">Passwort bestätigen</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value)
+                    setPasswordError(null)
+                  }}
+                />
+              </div>
 
-            {passwordError && <ErrorState message={passwordError} />}
+              {passwordError && <ErrorState message={passwordError} />}
 
-            {error && (
-              <ErrorState message="Das Passwort konnte nicht geändert werden." />
-            )}
+              {error && (
+                <ErrorState message="Das Passwort konnte nicht geändert werden." />
+              )}
 
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/user-management/$userId/edit" params={{ userId }}>
-                  Abbrechen
-                </Link>
-              </Button>
-              <Button type="submit" variant="destructive" disabled={isPending}>
-                {isPending ? "Wird gespeichert..." : "Passwort ändern"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="flex flex-wrap justify-end gap-2 pt-2">
+                <Button type="button" variant="outline" asChild>
+                  <Link to="/user-management/$userId/edit" params={{ userId }}>
+                    Abbrechen
+                  </Link>
+                </Button>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={isPending}
+                >
+                  {isPending ? "Wird gespeichert..." : "Passwort ändern"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </PageSection>
 
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <AlertDialogContent>

@@ -21,6 +21,7 @@ import type { Step } from "#/components/base/VerticalStepper"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
+import PageSection from "#/components/base/PageSection"
 import { Badge } from "#/components/ui/badge"
 import { Checkbox } from "#/components/ui/checkbox"
 import {
@@ -71,85 +72,84 @@ export default function CheckoutPage() {
   } = useCheckoutWizard()
 
   return (
-    <div className="p-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl">Klamotten Ausgabe</CardTitle>
-          <TouchButton
-            variant="outline"
-            onClick={() => {
-              navigate({ to: "/pool-clothing" })
-            }}
-          >
-            Abbrechen
-          </TouchButton>
-        </CardHeader>
-        <div className="flex items-stretch">
-          {/* Stepper sidebar — hidden on mobile */}
-          <aside className="hidden shrink-0 sm:block">
-            <div className="px-6 pb-6">
-              <VerticalStepper
-                steps={CHECKOUT_STEPS}
-                currentStep={state.step}
-                onStepClick={(n) => {
-                  if (state.step === 6) return
-                  goToStep(n as CheckoutStep)
-                }}
-              />
-            </div>
-          </aside>
-
-          {/* Step content */}
-          <div className="min-w-0 flex-1 space-y-4 px-6 pb-6">
-            <RenderIf when={state.step === 1}>
-              <StepTargetPicker onSelect={selectTarget} />
-            </RenderIf>
-
-            <RenderIf when={state.step === 2}>
-              <StepItemScanner
-                state={state}
-                onAddItem={addItem}
-                onRemoveItem={removeItem}
-                onBack={goBack}
-                onNext={advanceToReturns}
-              />
-            </RenderIf>
-
-            <RenderIf when={state.step === 3}>
-              <StepReturnToggles
-                state={state}
-                onSetReturnItemIds={setReturnItemIds}
-                onToggleReturnItem={toggleReturnItem}
-                onBack={goBack}
-                onConfirm={confirmReturns}
-              />
-            </RenderIf>
-
-            <RenderIf when={state.step === 4}>
-              <StepWashLocationPicker onSelect={selectWashLocation} />
-            </RenderIf>
-
-            <RenderIf when={state.step === 5}>
-              <StepReview
-                state={state}
-                onSubmitOk={submitOk}
-                onBack={goBack}
-                onReset={reset}
-              />
-            </RenderIf>
-
-            <RenderIf when={state.step === 6}>
-              <StepSuccess
-                onReset={reset}
-                onNavigateToOverview={() =>
-                  void navigate({ to: "/pool-clothing" })
-                }
-              />
-            </RenderIf>
+    <PageSection
+      title="Klamotten Ausgabe"
+      buttons={
+        <TouchButton
+          variant="outline"
+          onClick={async () => {
+            await navigate({ to: "/pool-clothing" })
+          }}
+        >
+          Abbrechen
+        </TouchButton>
+      }
+    >
+      <div className="flex items-stretch">
+        {/* Stepper sidebar — hidden on mobile */}
+        <aside className="hidden shrink-0 sm:block">
+          <div className="pr-6 pb-2">
+            <VerticalStepper
+              steps={CHECKOUT_STEPS}
+              currentStep={state.step}
+              onStepClick={(n) => {
+                if (state.step === 6) return
+                goToStep(n as CheckoutStep)
+              }}
+            />
           </div>
+        </aside>
+
+        {/* Step content */}
+        <div className="min-w-0 flex-1 space-y-4">
+          <RenderIf when={state.step === 1}>
+            <StepTargetPicker onSelect={selectTarget} />
+          </RenderIf>
+
+          <RenderIf when={state.step === 2}>
+            <StepItemScanner
+              state={state}
+              onAddItem={addItem}
+              onRemoveItem={removeItem}
+              onBack={goBack}
+              onNext={advanceToReturns}
+            />
+          </RenderIf>
+
+          <RenderIf when={state.step === 3}>
+            <StepReturnToggles
+              state={state}
+              onSetReturnItemIds={setReturnItemIds}
+              onToggleReturnItem={toggleReturnItem}
+              onBack={goBack}
+              onConfirm={confirmReturns}
+            />
+          </RenderIf>
+
+          <RenderIf when={state.step === 4}>
+            <StepWashLocationPicker onSelect={selectWashLocation} />
+          </RenderIf>
+
+          <RenderIf when={state.step === 5}>
+            <StepReview
+              state={state}
+              onSubmitOk={submitOk}
+              onBack={goBack}
+              onReset={reset}
+            />
+          </RenderIf>
+
+          <RenderIf when={state.step === 6}>
+            <StepSuccess
+              onReset={reset}
+              onNavigateToOverview={() =>
+                void navigate({ to: "/pool-clothing" })
+              }
+            />
+          </RenderIf>
         </div>
-      </Card>
-    </div>
+      </div>
+    </PageSection>
   )
 }
 

@@ -13,12 +13,14 @@ test.describe("Checkout", () => {
   let typeName: string
   let barcode: string
   let personalLocationName: string
+  let poolLocationName: string
 
   test.beforeAll(async ({ browser }) => {
     const suffix = randomUUID().slice(0, 8)
     typeName = `Typ-Checkout-${suffix}`
     barcode = `BC-CO-${suffix}`
     personalLocationName = `Spind-${suffix}`
+    poolLocationName = `Pool-${suffix}`
 
     // Setup requires KLEIDERWART role — use a dedicated page for preconditions.
     const page = await browser.newPage({
@@ -29,7 +31,6 @@ test.describe("Checkout", () => {
     await createClothingType(page, typeName)
 
     // 2. Create a POOL location so the item lives there initially
-    const poolLocationName = `Pool-${suffix}`
     await createClothingLocation(page, { type: "POOL", name: poolLocationName })
 
     // 3. Create the clothing item and place it in the pool location so it
@@ -87,8 +88,14 @@ test.describe("Checkout", () => {
     await expect(page).toHaveURL(/\/pool-clothing/)
 
     // ── Verify item is no longer in the pool ─────────────────────────────────
-    await expect(poolPage.loadingIndicator()).not.toBeVisible()
-    // The item was the only item of this type/size; the type badge must be gone.
-    await expect(page.getByText(typeName)).not.toBeVisible()
+    // The pool overview retains zero-count type panels, so we assert the count
+    // dropped to 0 rather than the panel disappearing entirely.
+    // Scope to the specific pool location section (via data-testid) to avoid
+    // false matches from other pool locations in the shared database.
+    const typePanelHeader = poolPage.typePanel(poolLocationName, typeName)
+    await expect(typePanelHeader).toBeVisible({ timeout: 10000 })
+    await expect(typePanelHeader.getByText("(0)")).toBeVisible({
+      timeout: 10000,
+    })
   })
 })

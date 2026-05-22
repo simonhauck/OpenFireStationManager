@@ -10,16 +10,11 @@ import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/sh
 import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
+import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
 import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
+import { Card, CardContent } from "#/components/ui/card"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
 import { Textarea } from "#/components/ui/textarea"
@@ -50,7 +45,7 @@ function parseCsv(csv: string): ParseResult {
     const [size, barcode] = parts
 
     if (!size) {
-      errors.push(`Zeile ${i + 1}: Groesse darf nicht leer sein.`)
+      errors.push(`Zeile ${i + 1}: Größe darf nicht leer sein.`)
       continue
     }
 
@@ -68,7 +63,7 @@ const previewColumns: DataTableColumn<CreateOrUpdateClothingItemRequest>[] = [
   },
   {
     id: "size",
-    header: "Groesse",
+    header: "Größe",
     getValue: (item) => item.size,
   },
   {
@@ -91,7 +86,7 @@ const resultColumns: DataTableColumn<ClothingItem>[] = [
   },
   {
     id: "size",
-    header: "Groesse",
+    header: "Größe",
     getValue: (item) => item.size,
   },
   {
@@ -161,17 +156,12 @@ function ClothingItemBatchImportPageContent() {
   }
 
   return (
-    <main className="page-wrap space-y-6 px-4 py-12">
+    <PageSection
+      title="Massenimport von Kleidungsstücken"
+      subtitle="Importiere mehrere Kleidungsstücke auf einmal. Wähle zuerst einen Kleidungstyp, dann gib die CSV-Daten ein."
+    >
       <Card className="mx-auto w-full max-w-3xl">
-        <CardHeader>
-          <CardTitle>Massenimport von Kleidungsstuecken</CardTitle>
-          <CardDescription>
-            Importiere mehrere Kleidungsstuecke auf einmal. Waehle zuerst einen
-            Kleidungstyp, dann gib die CSV-Daten ein.
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <RenderIf when={createdItems === null}>
             <TypeSelectionSection
               clothingTypes={clothingTypes ?? []}
@@ -223,7 +213,7 @@ function ClothingItemBatchImportPageContent() {
           </RenderIf>
         </CardContent>
       </Card>
-    </main>
+    </PageSection>
   )
 }
 
@@ -240,9 +230,9 @@ function TypeSelectionSection({
 }: TypeSelectionSectionProps) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium">Schritt 1: Kleidungstyp auswaehlen</p>
+      <p className="text-sm font-medium">Schritt 1: Kleidungstyp auswählen</p>
       <RenderIf when={clothingTypes.length === 0}>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Keine Kleidungstypen vorhanden.
         </p>
       </RenderIf>
@@ -281,7 +271,7 @@ function CsvInputSection({
     <>
       <div className="space-y-1.5">
         <p className="text-sm font-medium">Schritt 2: CSV-Daten eingeben</p>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Gib die weiteren Parameter im CSV-Format ein. Werte mit{" "}
           <code>
             <sup>*</sup>
@@ -290,7 +280,7 @@ function CsvInputSection({
           <br></br>
           Format:{" "}
           <code>
-            Groesse<sup>*</sup>,Barcode
+            Größe<sup>*</sup>,Barcode
           </code>
           <br></br>
         </p>
@@ -334,16 +324,16 @@ function BatchPreviewSection({
 }: BatchPreviewSectionProps) {
   return (
     <>
-      <p className="text-sm font-medium">Vorschau ({items.length} Eintraege)</p>
+      <p className="text-sm font-medium">Vorschau ({items.length} Einträge)</p>
       <DataTable
         columns={previewColumns}
         rows={items}
         showSearch={false}
-        emptyMessage="Keine Eintraege vorhanden."
+        emptyMessage="Keine Einträge vorhanden."
       />
 
       <RenderIf when={hasError}>
-        <ErrorState message="Die Kleidungsstuecke konnten nicht erstellt werden." />
+        <ErrorState message="Die Kleidungsstücke konnten nicht erstellt werden." />
       </RenderIf>
 
       <div className="flex flex-wrap justify-end gap-2 pt-2">
@@ -367,17 +357,17 @@ function ImportSuccessResult({ items, onDone }: ImportSuccessResultProps) {
   return (
     <div className="space-y-4">
       <p className="text-sm font-medium text-green-600">
-        {items.length} Kleidungsstueck(e) erfolgreich erstellt.
+        {items.length} Kleidungsstück(e) erfolgreich erstellt.
       </p>
       <DataTable
         columns={resultColumns}
         rows={items}
         showSearch={false}
-        emptyMessage="Keine Kleidungsstuecke erstellt."
+        emptyMessage="Keine Kleidungsstücke erstellt."
       />
       <div className="flex justify-end">
         <Button type="button" onClick={onDone}>
-          Zur Uebersicht
+          Zur Übersicht
         </Button>
       </div>
     </div>

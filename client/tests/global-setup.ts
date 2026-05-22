@@ -1,6 +1,7 @@
 import { chromium, request } from "@playwright/test"
 import { randomUUID } from "node:crypto"
 import path from "node:path"
+import { backupDatabase } from "./db-backup.js"
 
 const BASE_URL = "http://localhost:8080"
 const CLIENT_URL = "http://localhost:3000"
@@ -51,6 +52,11 @@ async function loginAndSave(persona: Persona) {
 }
 
 export default async function globalSetup() {
+  // ── DB backup ─────────────────────────────────────────────────────────────
+  // Dump the current database state before any test data is written so that
+  // global-teardown can restore it afterwards, keeping the DB clean.
+  backupDatabase()
+
   const runId = randomUUID().slice(0, 8)
 
   const personas: Persona[] = [
