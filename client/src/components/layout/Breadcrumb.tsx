@@ -6,9 +6,9 @@ import { ChevronRight, Home } from "lucide-react"
 
 type AllPaths = keyof FileRoutesByPath
 
-type SplitPath<S extends string> = S extends `${infer Head}/${infer Tail}`
+type SplitPath<T extends string> = T extends `${infer Head}/${infer Tail}`
   ? Head | SplitPath<Tail>
-  : S
+  : T
 
 type AllRawSegments = SplitPath<AllPaths>
 
