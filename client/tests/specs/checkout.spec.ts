@@ -94,6 +94,8 @@ test.describe("Checkout", () => {
     // false matches from other pool locations in the shared database.
     const typePanelHeader = poolPage.typePanel(poolLocationName, typeName)
     await expect(typePanelHeader).toBeVisible({ timeout: 10000 })
-    await expect(typePanelHeader.getByText("(0)")).toBeVisible({ timeout: 10000 })
+    await expect(typePanelHeader.getByText("(0)")).toBeVisible({
+      timeout: 10000,
+    })
   })
 })

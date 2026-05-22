@@ -1,24 +1,10 @@
 import { chromium, request } from "@playwright/test"
 import { randomUUID } from "node:crypto"
-import { execSync } from "node:child_process"
 import path from "node:path"
-import fs from "node:fs"
-import { fileURLToPath } from "node:url"
+import { backupDatabase } from "./db-backup.js"
 
 const BASE_URL = "http://localhost:8080"
 const CLIENT_URL = "http://localhost:3000"
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const COMPOSE_FILE = path.resolve(
-  __dirname,
-  "../../infrastructure/local/docker-compose.yml",
-)
-const BACKUP_FILE = path.resolve(__dirname, "../playwright/.backup/db.dump")
-
-const DB_NAME = "ofsm"
-const DB_USER = "postgres"
-const DB_PASSWORD = "postgres"
 
 interface Persona {
   username: string
@@ -69,29 +55,7 @@ export default async function globalSetup() {
   // ── DB backup ─────────────────────────────────────────────────────────────
   // Dump the current database state before any test data is written so that
   // global-teardown can restore it afterwards, keeping the DB clean.
-  const containerId = execSync(
-    `docker compose -f "${COMPOSE_FILE}" ps -q postgres`,
-  )
-    .toString()
-    .trim()
-
-  if (!containerId) {
-    throw new Error(
-      "Postgres container is not running. Start it with:\n" +
-        `  docker compose -f ${COMPOSE_FILE} up -d`,
-    )
-  }
-
-  fs.mkdirSync(path.dirname(BACKUP_FILE), { recursive: true })
-
-  console.log("▶ Backing up database before test run…")
-  execSync(
-    `docker exec -e PGPASSWORD="${DB_PASSWORD}" "${containerId}" ` +
-      `pg_dump --no-owner --no-acl --clean --if-exists -U "${DB_USER}" -d "${DB_NAME}" ` +
-      `> "${BACKUP_FILE}"`,
-    { shell: "/bin/bash" },
-  )
-  console.log(`  Backup written to ${BACKUP_FILE}`)
+  backupDatabase()
 
   const runId = randomUUID().slice(0, 8)
 

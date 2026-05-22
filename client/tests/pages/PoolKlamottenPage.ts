@@ -36,6 +36,8 @@ export class PoolKlamottenPage {
    * the count after a checkout, e.g. `.getByText("(0)")`.
    */
   typePanel(locationName: string, typeName: string) {
-    return this.locationSection(locationName).locator("p", { hasText: typeName })
+    return this.locationSection(locationName).locator("p", {
+      hasText: typeName,
+    })
   }
 }
