@@ -363,7 +363,7 @@
     "/api/clothing/checkouts": {
       "post": {
         "tags": ["checkout-controller"],
-        "summary": "Perform a two-phase checkout",
+        "summary": "Perform a checkout",
         "operationId": "checkout",
         "requestBody": {
           "content": {
@@ -381,14 +381,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/NeedsConfirmation"
-                    },
-                    {
-                      "$ref": "#/components/schemas/Ok"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/CheckoutResponse"
                 }
               }
             }
@@ -1296,84 +1289,17 @@
               "type": "integer",
               "format": "int64"
             }
-          },
-          "acknowledgedItemIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int64"
-            }
           }
         },
-        "required": [
-          "acknowledgedItemIds",
-          "returnItemIds",
-          "takeItemIds",
-          "targetLocationId"
-        ]
+        "required": ["returnItemIds", "takeItemIds", "targetLocationId"]
       },
-      "CheckoutHttpResponse": {
-        "discriminator": {
-          "propertyName": "status"
-        },
+      "CheckoutResponse": {
+        "type": "object",
         "properties": {
-          "status": {
+          "batchId": {
             "type": "string"
           }
         },
-        "required": ["status"]
-      },
-      "Discrepancy": {
-        "type": "object",
-        "properties": {
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "claimedLocationId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "actualLocationId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "required": ["claimedLocationId", "itemId"]
-      },
-      "NeedsConfirmation": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CheckoutHttpResponse"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "discrepancies": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Discrepancy"
-                }
-              }
-            }
-          }
-        ],
-        "required": ["discrepancies"]
-      },
-      "Ok": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CheckoutHttpResponse"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "batchId": {
-                "type": "string"
-              }
-            }
-          }
-        ],
         "required": ["batchId"]
       },
       "CreateUserRequest": {

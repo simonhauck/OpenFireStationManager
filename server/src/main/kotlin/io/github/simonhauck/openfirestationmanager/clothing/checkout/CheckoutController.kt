@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController
 class CheckoutController(private val checkoutService: CheckoutService) {
 
     @PostMapping
-    @Operation(summary = "Perform a two-phase checkout")
+    @Operation(summary = "Perform a checkout")
     fun checkout(
         @Valid @RequestBody request: CheckoutRequest,
         authentication: Authentication,
-    ): CheckoutHttpResponse {
+    ): CheckoutResponse {
         val isKleiderwart = authentication.authorities.any { it.authority == "ROLE_KLEIDERWART" }
-        return checkoutService.checkout(request, isKleiderwart).toHttpResponse()
+        return checkoutService.checkout(request, isKleiderwart)
     }
 }

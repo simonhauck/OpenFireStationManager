@@ -7,20 +7,7 @@ import type { components } from "#/api/schema"
 
 export type ResolvedClothingItem = components["schemas"]["ResolvedClothingItem"]
 export type CheckoutRequest = components["schemas"]["CheckoutRequest"]
-
-/**
- * Runtime-accurate discriminated union for the checkout response.
- *
- * The generated schema uses capitalised status literals ("Ok", "NeedsConfirmation")
- * but the server actually sends lowercase snake_case values at runtime.
- * This type reflects what the wire actually carries.
- */
-export type CheckoutHttpResponse =
-  | { status: "ok"; batchId: string }
-  | {
-      status: "needs_confirmation"
-      discrepancies: components["schemas"]["Discrepancy"][]
-    }
+export type CheckoutResponse = components["schemas"]["CheckoutResponse"]
 
 export async function searchClothingItems(
   q: string,
@@ -46,11 +33,9 @@ export async function getItemByBarcode(
 
 export const checkoutMutation = (queryClient: QueryClient) =>
   mutationOptions({
-    mutationFn: async (
-      body: CheckoutRequest,
-    ): Promise<CheckoutHttpResponse> => {
+    mutationFn: async (body: CheckoutRequest): Promise<CheckoutResponse> => {
       const { data } = await client.POST("/api/clothing/checkouts", { body })
-      return data as unknown as CheckoutHttpResponse
+      return data!
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({

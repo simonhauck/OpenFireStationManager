@@ -14,8 +14,8 @@ class CheckoutControllerCalls(private val testRestTemplate: TestRestTemplate) {
     fun checkout(
         request: CheckoutRequest,
         authCookie: String? = null,
-    ): ResponseEntity<CheckoutHttpResponse> {
-        return testRestTemplate.postForEntity<CheckoutHttpResponse>(
+    ): ResponseEntity<CheckoutResponse> {
+        return testRestTemplate.postForEntity<CheckoutResponse>(
             "/api/clothing/checkouts",
             HttpEntity(request, headersWithCookie(authCookie)),
         )

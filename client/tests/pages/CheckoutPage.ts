@@ -32,6 +32,26 @@ export class CheckoutPage {
     await this.page.getByRole("button", { name: "Weiter →" }).click()
   }
 
+  // ─── Step 2: Discrepancy dialog ─────────────────────────────────────────────
+
+  discrepancyDialog() {
+    return this.page.getByRole("alertdialog")
+  }
+
+  async dismissDiscrepancyDialog() {
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Abbrechen" })
+      .click()
+  }
+
+  async confirmDiscrepancyDialog() {
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Trotzdem hinzufügen" })
+      .click()
+  }
+
   // ─── Step 3: Rückgabe wählen ────────────────────────────────────────────────
 
   /** Proceeds past the return step without selecting any returns. */

@@ -28,84 +28,16 @@ class CheckoutService(
         val takeItems = request.takeItemIds.map { getItemOrBadRequest(it) }
         val returnItems = request.returnItemIds.map { getItemOrBadRequest(it) }
 
-        val acknowledged = request.acknowledgedItemIds.toSet()
-
-        val discrepancies = mutableListOf<Discrepancy>()
-
-        // Takes: item must be at a POOL location.
-        // claimedLocationId = item's current cached locationId (the implied source)
-        // actualLocationId  = item's current cached locationId (same — this shows the server's
-        // view)
-        // If item is not at a POOL, the user needs to acknowledge this discrepancy.
-        for (item in takeItems) {
-            if (item.id in acknowledged) continue
-            val currentLocationId = item.locationId?.id
-            val currentLocation = currentLocationId?.let { locationRepository.findById(it) }
-            val isAtPool = currentLocation?.type == LocationType.POOL
-            if (!isAtPool) {
-                discrepancies.add(
-                    Discrepancy(
-                        itemId = item.id,
-                        claimedLocationId = currentLocationId ?: 0L,
-                        actualLocationId = currentLocationId,
-                    )
-                )
-            }
-        }
-
-        // Returns: item must be at targetLocationId (PERSONAL).
-        // claimedLocationId = targetLocationId (where user claims item currently resides)
-        // actualLocationId  = item's current cached locationId
+        // Returns: item must be at the target PERSONAL location. Frontend ensures that
         for (item in returnItems) {
-            if (item.id in acknowledged) continue
             val currentLocationId = item.locationId?.id
             val isAtTarget = currentLocationId == request.targetLocationId
             if (!isAtTarget) {
-                discrepancies.add(
-                    Discrepancy(
-                        itemId = item.id,
-                        claimedLocationId = request.targetLocationId,
-                        actualLocationId = currentLocationId,
-                    )
+                throw PublicApiException(
+                    HttpStatus.CONFLICT,
+                    "Item ${item.id} is not at the expected PERSONAL location",
                 )
             }
-        }
-
-        // Phase 2: check that acknowledged items haven't drifted further since phase 1.
-        // Items in acknowledgedItemIds that STILL have the same discrepancy are accepted.
-        // Items that now have a DIFFERENT discrepancy (moved again) are re-flagged.
-        for (item in takeItems) {
-            if (item.id !in acknowledged) continue
-            val currentLocationId = item.locationId?.id
-            val currentLocation = currentLocationId?.let { locationRepository.findById(it) }
-            val isAtPool = currentLocation?.type == LocationType.POOL
-            if (!isAtPool) {
-                // Still discrepant — accepted via acknowledgement, no new discrepancy added
-                // But if item moved to a completely different non-POOL location, re-flag it
-                // (For simplicity per ADR: acknowledged items are accepted as-is; only
-                // truly new discrepancies — items that moved to yet another spot — block phase 2.)
-                // Currently the re-flag logic is: we do nothing extra since we already skipped
-                // above.
-                // The ADR says: "If new discrepancies have appeared since phase 1, returns
-                // needs_confirmation."
-                // We implement this by: if acknowledged but now at POOL (moved back), also fine.
-                // The critical case: item acknowledged as at non-POOL, but now at DIFFERENT
-                // non-POOL.
-                // We accept it — acknowledgedItemIds covers "this item is discrepant, proceed
-                // anyway."
-            }
-        }
-        for (item in returnItems) {
-            if (item.id !in acknowledged) continue
-            val currentLocationId = item.locationId?.id
-            val isAtTarget = currentLocationId == request.targetLocationId
-            if (!isAtTarget) {
-                // Still discrepant — accepted
-            }
-        }
-
-        if (discrepancies.isNotEmpty()) {
-            return CheckoutResponse.NeedsConfirmation(discrepancies)
         }
 
         // Write all movements in one transaction with a shared batchId.
@@ -140,7 +72,7 @@ class CheckoutService(
             itemRepository.save(item.copy(locationId = newLocationRef))
         }
 
-        return CheckoutResponse.Ok(batchId)
+        return CheckoutResponse(batchId)
     }
 
     private fun validateRequest(request: CheckoutRequest, isKleiderwart: Boolean) {

@@ -22,7 +22,6 @@ import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import PageSection from "#/components/base/PageSection"
-import { Badge } from "#/components/ui/badge"
 import { Checkbox } from "#/components/ui/checkbox"
 import {
   AlertDialog,
@@ -34,6 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
+import { Badge } from "#/components/ui/badge"
 import type { components } from "#/api/schema"
 
 type ClothingLocation = components["schemas"]["ClothingLocation"]
@@ -202,7 +202,7 @@ function StepTargetPicker({ onSelect }: StepTargetPickerProps) {
 
 interface StepItemScannerProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
-  onAddItem: (item: ResolvedClothingItem, isDiscrepant?: boolean) => void
+  onAddItem: (item: ResolvedClothingItem) => void
   onRemoveItem: (itemId: number) => void
   onBack: () => void
   onNext: () => void
@@ -225,18 +225,25 @@ function StepItemScanner({
 
   function handleItemResolved(item: ResolvedClothingItem) {
     const location = item.location
-    const isAtPool = location?.type === "POOL"
+
+    // No location set — add silently without a discrepancy warning
+    if (!location) {
+      onAddItem(item)
+      return
+    }
+
+    const isAtPool = location.type === "POOL"
 
     if (!isAtPool) {
-      // Not at a POOL — show checkout-specific discrepancy dialog
+      // Known non-POOL location — show discrepancy dialog
       setPendingConfirmation({
         item,
-        actualLocationName: location?.name ?? "Unbekannt",
+        actualLocationName: location.name,
       })
       return
     }
 
-    onAddItem(item, false)
+    onAddItem(item)
   }
 
   return (
@@ -254,15 +261,11 @@ function StepItemScanner({
             items={state.takeItems}
             onItemResolved={handleItemResolved}
             onRemoveItem={onRemoveItem}
-            renderItemBadge={(item) => (
-              <RenderIf
-                when={state.discrepantItemIds.has(item.clothingItem.id)}
-              >
-                <Badge variant="outline" className="text-amber-600">
-                  Nicht in Pool
-                </Badge>
-              </RenderIf>
-            )}
+            renderItemBadge={(item) => {
+              const loc = item.location
+              if (!loc || loc.type === "POOL") return null
+              return <Badge variant="outline">{loc.name}</Badge>
+            }}
           />
 
           {/* Weiter button */}
@@ -310,7 +313,7 @@ function StepItemScanner({
             <AlertDialogAction
               onClick={() => {
                 if (pendingConfirmation) {
-                  onAddItem(pendingConfirmation.item, true)
+                  onAddItem(pendingConfirmation.item)
                   setPendingConfirmation(null)
                 }
               }}
@@ -477,16 +480,10 @@ interface StepReviewProps {
   onReset: () => void
 }
 
-interface DiscrepancyPending {
-  itemIds: number[]
-}
-
 function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   const { data: allItems } = useQuery(getAllClothingItemsQuery())
   const { data: allTypes } = useQuery(getAllClothingTypesQuery())
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
-  const [discrepancyPending, setDiscrepancyPending] =
-    useState<DiscrepancyPending | null>(null)
 
   const queryClient = useQueryClient()
   const checkout = useMutation(checkoutMutation(queryClient))
@@ -510,23 +507,16 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
       ? (locationMap.get(state.returnLocationId)?.name ?? "–")
       : "–"
 
-  async function handleSubmit(acknowledgedItemIds: number[] = []) {
+  async function handleSubmit() {
     const body = {
       targetLocationId: state.targetLocationId!,
       takeItemIds: state.takeItems.map((i) => i.clothingItem.id),
       returnItemIds: [...state.returnItemIds],
       returnLocationId: state.returnLocationId ?? undefined,
-      acknowledgedItemIds,
     }
     try {
-      const response = await checkout.mutateAsync(body)
-      if (response.status === "ok") {
-        onSubmitOk()
-      } else {
-        setDiscrepancyPending({
-          itemIds: response.discrepancies.map((d) => d.itemId),
-        })
-      }
+      await checkout.mutateAsync(body)
+      onSubmitOk()
     } catch {
       toast.error(
         "Fehler beim Abschließen des Vorgangs. Bitte erneut versuchen.",
@@ -535,129 +525,83 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Schritt 5: Überprüfen</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Take items */}
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">
-              Ausgabe ({state.takeItems.length})
+    <Card>
+      <CardHeader>
+        <CardTitle>Schritt 5: Überprüfen</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Take items */}
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">
+            Ausgabe ({state.takeItems.length})
+          </p>
+          <RenderIf when={state.takeItems.length === 0}>
+            <p className="text-muted-foreground text-sm italic">
+              Keine Kleidung ausgewählt.
             </p>
-            <RenderIf when={state.takeItems.length === 0}>
-              <p className="text-muted-foreground text-sm italic">
-                Keine Kleidung ausgewählt.
-              </p>
-            </RenderIf>
-            <RenderIf when={state.takeItems.length > 0}>
-              <div className="space-y-1">
-                {state.takeItems.map((item) => (
-                  <div
-                    key={item.clothingItem.id}
-                    className="flex items-center justify-between rounded border px-3 py-2"
-                  >
-                    <span>
-                      {item.clothingType.name} – {item.clothingItem.size}
-                    </span>
-                    <RenderIf
-                      when={state.discrepantItemIds.has(item.clothingItem.id)}
-                    >
-                      <Badge variant="outline" className="text-amber-600">
-                        Nicht in Pool
-                      </Badge>
-                    </RenderIf>
-                  </div>
-                ))}
-              </div>
-            </RenderIf>
-          </div>
+          </RenderIf>
+          <RenderIf when={state.takeItems.length > 0}>
+            <div className="space-y-1">
+              {state.takeItems.map((item) => (
+                <div
+                  key={item.clothingItem.id}
+                  className="flex items-center justify-between rounded border px-3 py-2"
+                >
+                  <span>
+                    {item.clothingType.name} – {item.clothingItem.size}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </RenderIf>
+        </div>
 
-          {/* Return items */}
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">
-              Rückgabe ({returnItems.length})
+        {/* Return items */}
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">
+            Rückgabe ({returnItems.length})
+          </p>
+          <RenderIf when={returnItems.length === 0}>
+            <p className="text-muted-foreground text-sm italic">
+              Keine Rückgabe.
             </p>
-            <RenderIf when={returnItems.length === 0}>
-              <p className="text-muted-foreground text-sm italic">
-                Keine Rückgabe.
-              </p>
-            </RenderIf>
-            <RenderIf when={returnItems.length > 0}>
-              <div className="space-y-1">
-                {returnItems.map((item) => (
-                  <div
-                    key={item.clothingItem.id}
-                    className="flex items-center justify-between rounded border px-3 py-2"
-                  >
-                    <span>
-                      {item.clothingType.name} – {item.clothingItem.size}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Wäsche-Ziel: <strong>{washLocationName}</strong>
-              </p>
-            </RenderIf>
-          </div>
+          </RenderIf>
+          <RenderIf when={returnItems.length > 0}>
+            <div className="space-y-1">
+              {returnItems.map((item) => (
+                <div
+                  key={item.clothingItem.id}
+                  className="flex items-center justify-between rounded border px-3 py-2"
+                >
+                  <span>
+                    {item.clothingType.name} – {item.clothingItem.size}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-muted-foreground text-sm">
+              Wäsche-Ziel: <strong>{washLocationName}</strong>
+            </p>
+          </RenderIf>
+        </div>
 
-          <div className="flex justify-end gap-3 pt-2">
-            <TouchButton
-              variant="outline"
-              onClick={onBack}
-              disabled={checkout.isPending}
-            >
-              ← Zurück
-            </TouchButton>
-            <TouchButton
-              disabled={checkout.isPending}
-              onClick={() => void handleSubmit()}
-            >
-              {checkout.isPending ? "Wird gesendet…" : "Bestätigen"}
-            </TouchButton>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Phase-2 discrepancy dialog */}
-      <AlertDialog
-        open={discrepancyPending !== null}
-        onOpenChange={(open) => {
-          if (!open) setDiscrepancyPending(null)
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Abweichungen bestätigen</AlertDialogTitle>
-            <AlertDialogDescription>
-              Das System hat Abweichungen festgestellt (
-              {discrepancyPending?.itemIds.length ?? 0} Artikel). Soll der
-              Vorgang trotzdem abgeschlossen werden?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => setDiscrepancyPending(null)}
-              className="min-h-12"
-            >
-              Abbrechen
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="min-h-12"
-              onClick={() => {
-                const ids = discrepancyPending?.itemIds ?? []
-                setDiscrepancyPending(null)
-                void handleSubmit(ids)
-              }}
-            >
-              Trotzdem bestätigen
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+        <div className="flex justify-end gap-3 pt-2">
+          <TouchButton
+            variant="outline"
+            onClick={onBack}
+            disabled={checkout.isPending}
+          >
+            ← Zurück
+          </TouchButton>
+          <TouchButton
+            disabled={checkout.isPending}
+            onClick={() => void handleSubmit()}
+          >
+            {checkout.isPending ? "Wird gesendet…" : "Bestätigen"}
+          </TouchButton>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 

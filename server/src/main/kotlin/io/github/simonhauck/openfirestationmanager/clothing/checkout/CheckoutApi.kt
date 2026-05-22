@@ -5,13 +5,6 @@ data class CheckoutRequest(
     val returnLocationId: Long? = null,
     val takeItemIds: List<Long> = emptyList(),
     val returnItemIds: List<Long> = emptyList(),
-    val acknowledgedItemIds: List<Long> = emptyList(),
 )
 
-sealed class CheckoutResponse {
-    data class Ok(val batchId: String) : CheckoutResponse()
-
-    data class NeedsConfirmation(val discrepancies: List<Discrepancy>) : CheckoutResponse()
-}
-
-data class Discrepancy(val itemId: Long, val claimedLocationId: Long, val actualLocationId: Long?)
+data class CheckoutResponse(val batchId: String)

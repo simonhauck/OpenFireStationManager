@@ -78,31 +78,6 @@ describe("useCheckoutWizard", () => {
     expect(result.current.state.takeItems).toHaveLength(1)
   })
 
-  it("tracks discrepant items when added with isDiscrepant=true", () => {
-    const { result } = renderHook(() => useCheckoutWizard())
-    const item = makeItem(5, 10)
-
-    act(() => {
-      result.current.selectTarget(42)
-      result.current.addItem(item, true)
-    })
-
-    expect(result.current.state.discrepantItemIds).toContain(5)
-    expect(result.current.state.takeItems).toHaveLength(1)
-  })
-
-  it("does not mark item as discrepant when isDiscrepant=false", () => {
-    const { result } = renderHook(() => useCheckoutWizard())
-    const item = makeItem(5, 10)
-
-    act(() => {
-      result.current.selectTarget(42)
-      result.current.addItem(item, false)
-    })
-
-    expect(result.current.state.discrepantItemIds.size).toBe(0)
-  })
-
   it("resets to initial state", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
@@ -256,20 +231,6 @@ describe("useCheckoutWizard", () => {
       result.current.removeItem(1)
     })
 
-    expect(result.current.state.takeItems).toHaveLength(0)
-  })
-
-  it("removing an item also clears its discrepant flag", () => {
-    const { result } = renderHook(() => useCheckoutWizard())
-    const item = makeItem(5, 10)
-
-    act(() => {
-      result.current.selectTarget(42)
-      result.current.addItem(item, true)
-      result.current.removeItem(5)
-    })
-
-    expect(result.current.state.discrepantItemIds.has(5)).toBe(false)
     expect(result.current.state.takeItems).toHaveLength(0)
   })
 })

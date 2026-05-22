@@ -99,3 +99,99 @@ test.describe("Checkout", () => {
     })
   })
 })
+
+test.describe("Checkout – discrepancy dialog", () => {
+  let typeName: string
+  let barcode: string
+  let personalLocationName: string
+  let nonPoolLocationName: string
+
+  test.beforeAll(async ({ browser }) => {
+    const suffix = randomUUID().slice(0, 8)
+    typeName = `Typ-Disc-${suffix}`
+    barcode = `BC-DC-${suffix}`
+    personalLocationName = `Spind-Disc-${suffix}`
+    nonPoolLocationName = `Waesche-Disc-${suffix}`
+
+    const page = await browser.newPage({
+      storageState: "playwright/.auth/kleiderwart.json",
+    })
+
+    await createClothingType(page, typeName)
+
+    // Item lives at a WAESCHE location — deliberately not a POOL location
+    await createClothingLocation(page, {
+      type: "WAESCHE",
+      name: nonPoolLocationName,
+    })
+    await createClothingItem(page, {
+      typeName,
+      size: "L",
+      barcode,
+      locationName: nonPoolLocationName,
+    })
+
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: personalLocationName,
+    })
+
+    await page.close()
+  })
+
+  test("shows discrepancy dialog when scanned item is not at a POOL location", async ({
+    page,
+  }) => {
+    const checkoutPage = new CheckoutPage(page)
+
+    await checkoutPage.goto()
+    await checkoutPage.selectPersonalLocation(personalLocationName)
+
+    await checkoutPage.scanBarcode(barcode)
+
+    // Dialog must appear and mention the actual location name
+    await expect(checkoutPage.discrepancyDialog()).toBeVisible()
+    await expect(checkoutPage.discrepancyDialog()).toContainText(
+      nonPoolLocationName,
+    )
+  })
+
+  test("discrepancy dialog – cancel does not add the item", async ({
+    page,
+  }) => {
+    const checkoutPage = new CheckoutPage(page)
+
+    await checkoutPage.goto()
+    await checkoutPage.selectPersonalLocation(personalLocationName)
+
+    await checkoutPage.scanBarcode(barcode)
+    await expect(checkoutPage.discrepancyDialog()).toBeVisible()
+
+    await checkoutPage.dismissDiscrepancyDialog()
+
+    // Dialog closed and item list remains empty
+    await expect(checkoutPage.discrepancyDialog()).not.toBeVisible()
+    await expect(checkoutPage.scannedItem(`${typeName} – L`)).not.toBeVisible()
+  })
+
+  test("discrepancy dialog – confirm adds the item to the list", async ({
+    page,
+  }) => {
+    const checkoutPage = new CheckoutPage(page)
+
+    await checkoutPage.goto()
+    await checkoutPage.selectPersonalLocation(personalLocationName)
+
+    await checkoutPage.scanBarcode(barcode)
+    await expect(checkoutPage.discrepancyDialog()).toBeVisible()
+
+    await checkoutPage.confirmDiscrepancyDialog()
+
+    // Dialog closed and item is now in the scanned list with the non-POOL location badge
+    await expect(checkoutPage.discrepancyDialog()).not.toBeVisible()
+    await expect(checkoutPage.scannedItem(`${typeName} – L`)).toBeVisible()
+    await expect(checkoutPage.scannedItem(`${typeName} – L`)).toContainText(
+      nonPoolLocationName,
+    )
+  })
+})
