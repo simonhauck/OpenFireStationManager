@@ -17,23 +17,33 @@ const DB_USER = "postgres"
 const DB_PASSWORD = "postgres"
 
 /**
- * Returns the docker network flag and DB host appropriate for the current OS.
+ * Returns the docker network flag and DB host appropriate for the current OS,
+ * or `null` if the platform is unsupported (backup/restore will be skipped).
  *
  * - Linux: `--network host` + `localhost` (host networking, no port mapping needed)
  * - macOS: no network flag + `host.docker.internal` (Docker Desktop magic hostname)
+ * - Windows: not supported, returns null
  */
-function networkArgs(): { flags: string; host: string } {
+function networkArgs(): { flags: string; host: string } | null {
   if (process.platform === "linux") {
     return { flags: "--network host", host: "localhost" }
   }
   if (process.platform === "darwin") {
     return { flags: "", host: "host.docker.internal" }
   }
-  console.log("DB backup is not supported on windows")
+  return null
 }
 
 export function backupDatabase(): void {
-  const { flags, host } = networkArgs()
+  const network = networkArgs()
+  if (!network) {
+    console.warn(
+      `⚠ DB backup is not supported on platform "${process.platform}" — skipping.`,
+    )
+    return
+  }
+
+  const { flags, host } = network
   fs.mkdirSync(path.dirname(BACKUP_FILE), { recursive: true })
 
   console.log("▶ Backing up database before test run…")
@@ -50,7 +60,15 @@ export function backupDatabase(): void {
 }
 
 export function restoreDatabase(): void {
-  const { flags, host } = networkArgs()
+  const network = networkArgs()
+  if (!network) {
+    console.warn(
+      `⚠ DB restore is not supported on platform "${process.platform}" — skipping.`,
+    )
+    return
+  }
+
+  const { flags, host } = network
   console.log("▶ Restoring database after test run…")
   execSync(
     `docker run --rm ${flags} -i ` +
