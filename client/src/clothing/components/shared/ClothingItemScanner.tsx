@@ -14,6 +14,7 @@ import {
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import RenderIf from "#/components/base/RenderIf"
+import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 
 type InputMode = "scanner" | "manual"
 
@@ -205,28 +206,26 @@ export default function ClothingItemScanner({
           </p>
           <div className="space-y-2">
             {items.map((item) => (
-              <div
+              <ClothingItemRow
                 key={item.clothingItem.id}
-                className="flex items-center justify-between rounded-lg border p-3"
-              >
-                <span className="text-base">
-                  {item.clothingType.name} – {item.clothingItem.size}
-                </span>
-                <div className="flex items-center gap-2">
-                  <RenderIf when={renderItemBadge !== undefined}>
-                    {renderItemBadge?.(item)}
-                  </RenderIf>
-                  <TouchButton
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`${item.clothingType.name} entfernen`}
-                    onClick={() => onRemoveItem(item.clothingItem.id)}
-                    className="text-destructive hover:text-destructive size-10 shrink-0"
-                  >
-                    <Trash2Icon className="size-4" />
-                  </TouchButton>
-                </div>
-              </div>
+                item={item}
+                trailing={
+                  <div className="flex items-center gap-2">
+                    <RenderIf when={renderItemBadge !== undefined}>
+                      {renderItemBadge?.(item)}
+                    </RenderIf>
+                    <TouchButton
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`${item.clothingType.name} entfernen`}
+                      onClick={() => onRemoveItem(item.clothingItem.id)}
+                      className="text-destructive hover:text-destructive size-10 shrink-0"
+                    >
+                      <Trash2Icon className="size-4" />
+                    </TouchButton>
+                  </div>
+                }
+              />
             ))}
           </div>
         </div>

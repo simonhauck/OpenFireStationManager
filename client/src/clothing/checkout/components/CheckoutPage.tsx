@@ -20,6 +20,7 @@ import { VerticalStepper } from "#/components/base/VerticalStepper"
 import type { Step } from "#/components/base/VerticalStepper"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
+import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import PageSection from "#/components/base/PageSection"
 import { Checkbox } from "#/components/ui/checkbox"
@@ -392,21 +393,20 @@ function StepReturnToggles({
             {lockerItems.map((item) => {
               const checked = state.returnItemIds.has(item.clothingItem.id)
               return (
-                <label
+                <ClothingItemRow
                   key={item.clothingItem.id}
-                  className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border p-3 hover:bg-muted/50"
-                >
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={() =>
-                      onToggleReturnItem(item.clothingItem.id)
-                    }
-                    className="size-5"
-                  />
-                  <span className="text-base">
-                    {item.clothingType.name} – {item.clothingItem.size}
-                  </span>
-                </label>
+                  item={item}
+                  asLabel
+                  leading={
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() =>
+                        onToggleReturnItem(item.clothingItem.id)
+                      }
+                      className="size-5"
+                    />
+                  }
+                />
               )
             })}
           </div>
@@ -543,16 +543,15 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
           <RenderIf when={state.takeItems.length > 0}>
             <div className="space-y-1">
               {state.takeItems.map((item) => (
-                <div
-                  key={item.clothingItem.id}
-                  className="flex items-center justify-between rounded border px-3 py-2"
-                >
-                  <span>
-                    {item.clothingType.name} – {item.clothingItem.size}
-                  </span>
-                </div>
+                <ClothingItemRow key={item.clothingItem.id} item={item} />
               ))}
             </div>
+            <p className="text-muted-foreground text-sm">
+              Ziel:{" "}
+              <strong>
+                {locationMap.get(state.targetLocationId!)?.name ?? "–"}
+              </strong>
+            </p>
           </RenderIf>
         </div>
 
@@ -569,18 +568,11 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
           <RenderIf when={returnItems.length > 0}>
             <div className="space-y-1">
               {returnItems.map((item) => (
-                <div
-                  key={item.clothingItem.id}
-                  className="flex items-center justify-between rounded border px-3 py-2"
-                >
-                  <span>
-                    {item.clothingType.name} – {item.clothingItem.size}
-                  </span>
-                </div>
+                <ClothingItemRow key={item.clothingItem.id} item={item} />
               ))}
             </div>
             <p className="text-muted-foreground text-sm">
-              Wäsche-Ziel: <strong>{washLocationName}</strong>
+              Ziel: <strong>{washLocationName}</strong>
             </p>
           </RenderIf>
         </div>
