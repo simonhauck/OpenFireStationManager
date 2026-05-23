@@ -41,8 +41,7 @@ export default function ClothingItemRow({
     </>
   )
 
-  const className =
-    "flex min-h-12 items-center gap-3 rounded-lg border p-3"
+  const className = "flex min-h-12 items-center gap-3 rounded-lg border p-3"
 
   if (asLabel) {
     return (
