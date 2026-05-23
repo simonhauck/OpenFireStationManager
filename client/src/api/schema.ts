@@ -182,7 +182,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Perform a two-phase checkout */
+    /** Perform a checkout */
     post: operations["checkout"]
     delete?: never
     options?: never
@@ -475,29 +475,10 @@ export interface components {
       returnLocationId?: number
       takeItemIds: number[]
       returnItemIds: number[]
-      acknowledgedItemIds: number[]
     }
-    CheckoutHttpResponse: {
-      status: string
-    }
-    Discrepancy: {
-      /** Format: int64 */
-      itemId: number
-      /** Format: int64 */
-      claimedLocationId: number
-      /** Format: int64 */
-      actualLocationId?: number
-    }
-    NeedsConfirmation: {
-      status: "NeedsConfirmation"
-    } & (Omit<components["schemas"]["CheckoutHttpResponse"], "status"> & {
-      discrepancies: components["schemas"]["Discrepancy"][]
-    })
-    Ok: {
-      status: "Ok"
-    } & (Omit<components["schemas"]["CheckoutHttpResponse"], "status"> & {
+    CheckoutResponse: {
       batchId: string
-    })
+    }
     CreateUserRequest: {
       username: string
       password: string
@@ -884,9 +865,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*":
-            | components["schemas"]["NeedsConfirmation"]
-            | components["schemas"]["Ok"]
+          "*/*": components["schemas"]["CheckoutResponse"]
         }
       }
     }

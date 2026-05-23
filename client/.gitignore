@@ -18,4 +18,5 @@ src/routeTree.gen.ts
 playwright/.auth/
 playwright/.backup/
 playwright-report/
+
 test-results/

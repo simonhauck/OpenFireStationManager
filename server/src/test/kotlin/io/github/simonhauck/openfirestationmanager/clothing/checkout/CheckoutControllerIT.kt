@@ -35,10 +35,10 @@ class CheckoutControllerIT : IntegrationTest() {
     @Autowired private lateinit var itemRepository: ClothingItemRepository
     @Autowired private lateinit var movementRepository: ClothingMovementRepository
 
-    // ─── Phase 1: happy path ──────────────────────────────────────────────────
+    // ─── Happy path ───────────────────────────────────────────────────────────
 
     @Test
-    fun `phase 1 - take item at POOL with no discrepancies writes movements and returns ok`() {
+    fun `take item at POOL writes movement and returns batchId`() {
         val type = createType()
         val pool = createLocation(LocationType.POOL)
         val personal = createLocation(LocationType.PERSONAL)
@@ -51,14 +51,12 @@ class CheckoutControllerIT : IntegrationTest() {
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body as CheckoutHttpResponse.Ok
+        val body = response.body!!
         assertThat(body.batchId).isNotBlank()
 
-        // Item should now be at the PERSONAL location
         val updatedItem = itemRepository.findById(item.id)!!
         assertThat(updatedItem.locationId?.id).isEqualTo(personal.id)
 
-        // Movement should be recorded
         val movements = movementRepository.findAllByItemId(AggregateReference.to(item.id))
         val checkout = movements.first { it.reason == MovementReason.CHECKOUT }
         assertThat(checkout.fromLocationId?.id).isEqualTo(pool.id)
@@ -67,7 +65,7 @@ class CheckoutControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `phase 1 - return item at PERSONAL with no discrepancies writes movements and returns ok`() {
+    fun `return item at PERSONAL writes movement and returns batchId`() {
         val type = createType()
         val personal = createLocation(LocationType.PERSONAL)
         val waesche = createLocation(LocationType.WAESCHE)
@@ -84,7 +82,7 @@ class CheckoutControllerIT : IntegrationTest() {
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body as CheckoutHttpResponse.Ok
+        val body = response.body!!
         assertThat(body.batchId).isNotBlank()
 
         val updatedItem = itemRepository.findById(item.id)!!
@@ -98,7 +96,7 @@ class CheckoutControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `phase 1 - mixed takes and returns share a single batchId`() {
+    fun `mixed takes and returns share a single batchId`() {
         val type = createType()
         val pool = createLocation(LocationType.POOL)
         val personal = createLocation(LocationType.PERSONAL)
@@ -118,7 +116,7 @@ class CheckoutControllerIT : IntegrationTest() {
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body as CheckoutHttpResponse.Ok
+        val body = response.body!!
 
         val takeMovements = movementRepository.findAllByItemId(AggregateReference.to(takeItem.id))
         val returnMovements =
@@ -131,32 +129,10 @@ class CheckoutControllerIT : IntegrationTest() {
         assertThat(returnMovement.batchId).isEqualTo(body.batchId)
     }
 
-    // ─── Phase 1: discrepancy detection ──────────────────────────────────────
+    // ─── Conflict (409) ───────────────────────────────────────────────────────
 
     @Test
-    fun `phase 1 - take item not at POOL returns needs_confirmation with discrepancy`() {
-        val type = createType()
-        val personal = createLocation(LocationType.PERSONAL)
-        val item = createItem(type, personal) // Not at a POOL
-
-        val response =
-            checkoutCalls.checkout(
-                CheckoutRequest(targetLocationId = personal.id, takeItemIds = listOf(item.id)),
-                authCookie = validCookieHeader,
-            )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body as CheckoutHttpResponse.NeedsConfirmation
-        assertThat(body.discrepancies).hasSize(1)
-        assertThat(body.discrepancies.first().itemId).isEqualTo(item.id)
-
-        // No movements should have been written
-        val movements = movementRepository.findAllByItemId(AggregateReference.to(item.id))
-        assertThat(movements.none { it.reason == MovementReason.CHECKOUT }).isTrue()
-    }
-
-    @Test
-    fun `phase 1 - return item not at targetLocation returns needs_confirmation`() {
+    fun `returns 409 when return item is not at the target PERSONAL location`() {
         val type = createType()
         val pool = createLocation(LocationType.POOL)
         val personal = createLocation(LocationType.PERSONAL)
@@ -164,7 +140,7 @@ class CheckoutControllerIT : IntegrationTest() {
         val item = createItem(type, pool) // Not at PERSONAL
 
         val response =
-            checkoutCalls.checkout(
+            checkoutCalls.checkoutExpectingError(
                 CheckoutRequest(
                     targetLocationId = personal.id,
                     returnLocationId = waesche.id,
@@ -173,41 +149,7 @@ class CheckoutControllerIT : IntegrationTest() {
                 authCookie = validCookieHeader,
             )
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body as CheckoutHttpResponse.NeedsConfirmation
-        assertThat(body.discrepancies).hasSize(1)
-        assertThat(body.discrepancies.first().itemId).isEqualTo(item.id)
-        assertThat(body.discrepancies.first().claimedLocationId).isEqualTo(personal.id)
-        assertThat(body.discrepancies.first().actualLocationId).isEqualTo(pool.id)
-    }
-
-    // ─── Phase 2: acknowledged discrepancies ─────────────────────────────────
-
-    @Test
-    fun `phase 2 - acknowledged discrepant take item writes movement with claimed source`() {
-        val type = createType()
-        val personal = createLocation(LocationType.PERSONAL)
-        val anotherPersonal = createLocation(LocationType.PERSONAL)
-        val item = createItem(type, personal) // Not at a POOL
-
-        val response =
-            checkoutCalls.checkout(
-                CheckoutRequest(
-                    targetLocationId = anotherPersonal.id,
-                    takeItemIds = listOf(item.id),
-                    acknowledgedItemIds = listOf(item.id),
-                ),
-                authCookie = validCookieHeader,
-            )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val body = response.body as CheckoutHttpResponse.Ok
-        assertThat(body.batchId).isNotBlank()
-
-        val movements = movementRepository.findAllByItemId(AggregateReference.to(item.id))
-        val checkout = movements.first { it.reason == MovementReason.CHECKOUT }
-        assertThat(checkout.fromLocationId?.id).isEqualTo(personal.id)
-        assertThat(checkout.toLocationId?.id).isEqualTo(anotherPersonal.id)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)
     }
 
     // ─── Hard 400 validation ──────────────────────────────────────────────────
@@ -304,8 +246,10 @@ class CheckoutControllerIT : IntegrationTest() {
         assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
 
+    // ─── Cache invariant ──────────────────────────────────────────────────────
+
     @Test
-    fun `cache invariant - item locationId is updated after checkout`() {
+    fun `item locationId is updated after checkout`() {
         val type = createType()
         val pool = createLocation(LocationType.POOL)
         val personal = createLocation(LocationType.PERSONAL)

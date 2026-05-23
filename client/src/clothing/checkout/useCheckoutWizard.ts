@@ -7,8 +7,6 @@ export interface CheckoutWizardState {
   step: CheckoutStep
   targetLocationId: number | null
   takeItems: ResolvedClothingItem[]
-  /** Item IDs that were added despite not being at a POOL (user confirmed discrepancy). */
-  discrepantItemIds: Set<number>
   /** Item IDs from the locker that the user wants to return. */
   returnItemIds: Set<number>
   /** WAESCHE location ID chosen for dirty returns (null = no returns or not yet chosen). */
@@ -17,7 +15,7 @@ export interface CheckoutWizardState {
 
 type Action =
   | { type: "SELECT_TARGET"; locationId: number }
-  | { type: "ADD_ITEM"; item: ResolvedClothingItem; isDiscrepant: boolean }
+  | { type: "ADD_ITEM"; item: ResolvedClothingItem }
   | { type: "REMOVE_ITEM"; itemId: number }
   | { type: "ADVANCE_TO_RETURNS" }
   | { type: "SET_RETURN_ITEM_IDS"; ids: Set<number> }
@@ -46,29 +44,19 @@ function reducer(
       )
       if (alreadyAdded) return state // silent no-op on duplicate
 
-      const newDiscrepantIds = new Set(state.discrepantItemIds)
-      if (action.isDiscrepant) {
-        newDiscrepantIds.add(action.item.clothingItem.id)
-      }
-
       return {
         ...state,
         takeItems: [...state.takeItems, action.item],
-        discrepantItemIds: newDiscrepantIds,
       }
     }
 
-    case "REMOVE_ITEM": {
-      const newDiscrepantIds = new Set(state.discrepantItemIds)
-      newDiscrepantIds.delete(action.itemId)
+    case "REMOVE_ITEM":
       return {
         ...state,
         takeItems: state.takeItems.filter(
           (i) => i.clothingItem.id !== action.itemId,
         ),
-        discrepantItemIds: newDiscrepantIds,
       }
-    }
 
     case "SET_RETURN_ITEM_IDS":
       return { ...state, returnItemIds: new Set(action.ids) }
@@ -118,7 +106,6 @@ const initialState: CheckoutWizardState = {
   step: 1,
   targetLocationId: null,
   takeItems: [],
-  discrepantItemIds: new Set(),
   returnItemIds: new Set(),
   returnLocationId: null,
 }
@@ -126,7 +113,7 @@ const initialState: CheckoutWizardState = {
 export interface UseCheckoutWizardReturn {
   state: CheckoutWizardState
   selectTarget: (locationId: number) => void
-  addItem: (item: ResolvedClothingItem, isDiscrepant?: boolean) => void
+  addItem: (item: ResolvedClothingItem) => void
   removeItem: (itemId: number) => void
   advanceToReturns: () => void
   setReturnItemIds: (ids: Set<number>) => void
@@ -146,8 +133,8 @@ export function useCheckoutWizard(): UseCheckoutWizardReturn {
     state,
     selectTarget: (locationId: number) =>
       dispatch({ type: "SELECT_TARGET", locationId }),
-    addItem: (item: ResolvedClothingItem, isDiscrepant = false) =>
-      dispatch({ type: "ADD_ITEM", item, isDiscrepant }),
+    addItem: (item: ResolvedClothingItem) =>
+      dispatch({ type: "ADD_ITEM", item }),
     removeItem: (itemId: number) => dispatch({ type: "REMOVE_ITEM", itemId }),
     advanceToReturns: () => dispatch({ type: "ADVANCE_TO_RETURNS" }),
     setReturnItemIds: (ids: Set<number>) =>

@@ -16,7 +16,7 @@ Wizard steps in fixed order:
 3. **Return step (always shown)** — lists every item currently at the chosen PERSONAL location with a per-item return toggle. Items are pre-toggled by **type match (strict, loose count)**: every existing item whose `ClothingType` equals the type of any item being taken is toggled on. Size is not considered (an exchange-for-a-different-size still triggers the auto-toggle). The user can freely adjust toggles.
 4. **Pick WAESCHE return target** — tile grid, single tap. Only shown if at least one item is toggled in step 3.
 5. **Review** — single screen showing all returns and takes with their target locations. Single "Confirm" button submits to the API.
-6. **Submit** — calls phase 1 of `POST /api/clothing/checkouts`. If the response is `needs_confirmation`, a discrepancy dialog overlays the Review screen; on acknowledgement the client calls phase 2 with `acknowledgedWarnings`.
+6. **Submit** — calls `POST /api/clothing/checkouts`. The server responds with `{ batchId }` on success, or `409 Conflict` if an item is not where the server expects it. If the server returns 409, a toast error is shown and the user remains on the review screen.
 
 The wizard is a single TanStack Router route (`/pool-clothing/checkout`) with internal step state. No sub-routes, no search-param-driven steps. Browser back exits the wizard; this is intentional for a transactional flow.
 

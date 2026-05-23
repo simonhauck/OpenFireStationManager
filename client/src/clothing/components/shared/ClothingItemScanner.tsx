@@ -14,6 +14,9 @@ import {
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import RenderIf from "#/components/base/RenderIf"
+import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
+
+type InputMode = "scanner" | "manual"
 
 export interface ClothingItemScannerProps {
   /** Current list of items already in the batch. Used for duplicate detection. */
@@ -35,6 +38,7 @@ export default function ClothingItemScanner({
   onRemoveItem,
   renderItemBadge,
 }: ClothingItemScannerProps) {
+  const [inputMode, setInputMode] = useState<InputMode>("scanner")
   const [isScanning, setIsScanning] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<ResolvedClothingItem[]>([])
@@ -148,20 +152,21 @@ export default function ClothingItemScanner({
   return (
     <div className="space-y-4">
       {/* Scanner status indicator */}
-      <div className="flex items-center gap-2 rounded-lg border p-3 text-sm">
-        <span
-          className={`size-2 shrink-0 rounded-full ${isScanning ? "animate-pulse bg-yellow-500" : "bg-green-500"}`}
-        />
-        <span className="text-muted-foreground">
-          {isScanning
-            ? "Barcode wird verarbeitet…"
-            : "Scanner bereit – einfach scannen"}
-        </span>
-      </div>
+      <RenderIf when={inputMode === "scanner"}>
+        <div className="flex items-center gap-2 rounded-lg border p-3 text-sm">
+          <span
+            className={`size-2 shrink-0 rounded-full ${isScanning ? "animate-pulse bg-yellow-500" : "bg-green-500"}`}
+          />
+          <span className="text-muted-foreground">
+            {isScanning
+              ? "Barcode wird verarbeitet…"
+              : "Scanner bereit – einfach scannen"}
+          </span>
+        </div>
+      </RenderIf>
 
-      {/* Backup: searchable combobox */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Oder manuell suchen</label>
+      {/* Manual search combobox */}
+      <RenderIf when={inputMode === "manual"}>
         <TouchCombobox
           options={searchOptions}
           value={null}
@@ -175,7 +180,23 @@ export default function ClothingItemScanner({
               : "Keine Ergebnisse."
           }
         />
-      </div>
+      </RenderIf>
+
+      {/* Mode switch link */}
+      <button
+        type="button"
+        onClick={() =>
+          setInputMode(inputMode === "scanner" ? "manual" : "scanner")
+        }
+        className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
+      >
+        <RenderIf when={inputMode === "scanner"}>
+          Stattdessen manuell suchen
+        </RenderIf>
+        <RenderIf when={inputMode === "manual"}>
+          Stattdessen Scanner verwenden
+        </RenderIf>
+      </button>
 
       {/* Item list */}
       <RenderIf when={items.length > 0}>
@@ -185,28 +206,26 @@ export default function ClothingItemScanner({
           </p>
           <div className="space-y-2">
             {items.map((item) => (
-              <div
+              <ClothingItemRow
                 key={item.clothingItem.id}
-                className="flex items-center justify-between rounded-lg border p-3"
-              >
-                <span className="text-base">
-                  {item.clothingType.name} – {item.clothingItem.size}
-                </span>
-                <div className="flex items-center gap-2">
-                  <RenderIf when={renderItemBadge !== undefined}>
-                    {renderItemBadge?.(item)}
-                  </RenderIf>
-                  <TouchButton
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`${item.clothingType.name} entfernen`}
-                    onClick={() => onRemoveItem(item.clothingItem.id)}
-                    className="text-destructive hover:text-destructive size-10 shrink-0"
-                  >
-                    <Trash2Icon className="size-4" />
-                  </TouchButton>
-                </div>
-              </div>
+                item={item}
+                trailing={
+                  <div className="flex items-center gap-2">
+                    <RenderIf when={renderItemBadge !== undefined}>
+                      {renderItemBadge?.(item)}
+                    </RenderIf>
+                    <TouchButton
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`${item.clothingType.name} entfernen`}
+                      onClick={() => onRemoveItem(item.clothingItem.id)}
+                      className="text-destructive hover:text-destructive size-10 shrink-0"
+                    >
+                      <Trash2Icon className="size-4" />
+                    </TouchButton>
+                  </div>
+                }
+              />
             ))}
           </div>
         </div>
