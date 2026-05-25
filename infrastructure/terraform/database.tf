@@ -51,7 +51,7 @@ locals {
   db_password = neon_project.open_fire_station_manager.database_password
   db_name     = neon_project.open_fire_station_manager.database_name
 
-  _jdbc = "jdbc:postgresql://"
+  _jdbc   = "jdbc:postgresql://"
   _params = "/${local.db_name}?user=${local.db_user}&password=${local.db_password}&sslmode=require&channelBinding=require"
 
   db_urls = {

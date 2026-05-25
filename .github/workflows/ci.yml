@@ -18,13 +18,6 @@ jobs:
       - name: Setup build environment
         uses: ./.github/actions/setup-build-env
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
-
-      - name: Check Terraform formatting
-        working-directory: infrastructure/terraform
-        run: terraform fmt -check -recursive .
-
       - name: Run backend checks
         run: ./gradlew check
 
@@ -86,3 +79,26 @@ jobs:
           name: playwright-report
           path: client/playwright-report/
           retention-days: 7
+
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: infrastructure/terraform
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive .
+
+      - name: Terraform Init (no backend)
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
