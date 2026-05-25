@@ -7,4 +7,4 @@ services:
       DB_URL: ${DB_URL}
       REMEMBER_ME_KEY: ${REMEMBER_ME_KEY}
     ports:
-      - "13842:8080"
+      - "${APP_PORT}:8080"
