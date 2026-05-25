@@ -41,3 +41,37 @@ resource "neon_endpoint" "local_endpoint" {
   project_id = neon_project.open_fire_station_manager.id
   branch_id  = neon_branch.local.id
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Outputs
+// ---------------------------------------------------------------------------------------------------------------------
+
+locals {
+  db_user     = neon_project.open_fire_station_manager.database_user
+  db_password = neon_project.open_fire_station_manager.database_password
+  db_name     = neon_project.open_fire_station_manager.database_name
+
+  _jdbc   = "jdbc:postgresql://"
+  _params = "/${local.db_name}?user=${local.db_user}&password=${local.db_password}&sslmode=require&channelBinding=require"
+
+  db_urls = {
+    production = {
+      direct = "${local._jdbc}${neon_project.open_fire_station_manager.database_host}${local._params}"
+      pooler = "${local._jdbc}${neon_project.open_fire_station_manager.database_host_pooler}${local._params}"
+    }
+    develop = {
+      direct = "${local._jdbc}${neon_endpoint.develop_endpoint.host}${local._params}"
+      pooler = "${local._jdbc}${neon_endpoint.develop_endpoint.id}-pooler.${neon_endpoint.develop_endpoint.proxy_host}${local._params}"
+    }
+    local = {
+      direct = "${local._jdbc}${neon_endpoint.local_endpoint.host}${local._params}"
+      pooler = "${local._jdbc}${neon_endpoint.local_endpoint.id}-pooler.${neon_endpoint.local_endpoint.proxy_host}${local._params}"
+    }
+  }
+}
+
+output "db_urls" {
+  description = "JDBC connection strings for all branches and connection types (direct / pooler)"
+  sensitive   = true
+  value       = local.db_urls
+}

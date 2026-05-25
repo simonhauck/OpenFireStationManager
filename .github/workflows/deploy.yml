@@ -18,8 +18,33 @@ on:
           - production
 
 jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: infrastructure/terraform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run: terraform init
+
+      - name: Terraform Apply
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run: terraform apply -auto-approve
+
   deploy:
     runs-on: ubuntu-latest
+    needs: terraform
     environment: ${{ inputs.environment }}
     permissions:
       contents: read

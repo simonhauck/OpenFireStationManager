@@ -2,6 +2,7 @@
   <configuration default="false" name="Format All" type="CompoundRunConfigurationType">
     <toRun name="spotlessApply" type="GradleRunConfiguration" />
     <toRun name="lint and format fix" type="js.build_tools.npm" />
+    <toRun name="Terraform Format" type="ShConfigurationType" />
     <method v="2" />
   </configuration>
 </component>
