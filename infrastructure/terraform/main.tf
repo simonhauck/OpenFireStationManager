@@ -21,12 +21,21 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 }
 
 provider "portainer" {
   endpoint = "https://portainer.simonhauck.de"
   api_key  = var.arm_portainer_api_token
+}
+
+provider "github" {
+  token = var.ofsm_github_token
+  owner = "simonhauck"
 }
 
 
