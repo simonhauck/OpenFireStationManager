@@ -1,0 +1,31 @@
+app:
+  otlp:
+    enabled: true
+
+management:
+  opentelemetry:
+    logging:
+      export:
+        otlp:
+          endpoint: ${OTLP_ENDPOINT:http://localhost:5080}/api/default/v1/logs
+          headers:
+            Authorization: "Basic ${OTLP_AUTH:YWRtaW5AdGVzdC5kZTpwYXNzd29yZDEyMzQ=}"
+  tracing:
+    export:
+      otlp:
+        endpoint: ${OTLP_ENDPOINT:http://localhost:5080}/api/default/v1/traces
+        headers:
+          Authorization: "Basic ${OTLP_AUTH:YWRtaW5AdGVzdC5kZTpwYXNzd29yZDEyMzQ=}"
+
+  otlp:
+    metrics:
+      export:
+        url: ${OTLP_ENDPOINT:http://localhost:5080}/api/default/v1/metrics
+        headers:
+          Authorization: "Basic ${OTLP_AUTH:YWRtaW5AdGVzdC5kZTpwYXNzd29yZDEyMzQ=}"
+
+logging:
+  structured:
+    format:
+      console: ecs
+

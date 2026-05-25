@@ -1,6 +1,9 @@
 spring:
   application:
     name: OpenFireStationManager
+  profiles:
+    group:
+      prod: otlp
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/ofsm?user=postgres&password=postgres}
     hikari:
@@ -24,6 +27,8 @@ app:
     key: ${REMEMBER_ME_KEY:change-me-in-prod}
     token-validity: ${REMEMBER_ME_TOKEN_VALIDITY:P30D}
     token-name: ${server.servlet.session.cookie.name}_REMEMBER_ME
+  otlp:
+    enabled: false
 springdoc:
   swagger-ui:
     enabled: true
@@ -34,3 +39,7 @@ management:
   health:
     db:
       enabled: false
+
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
