@@ -1,5 +1,5 @@
-variable "stack_name" {
-  description = "Name of the Portainer stack"
+variable "deployment_name" {
+  description = "Deployment name (e.g. 'dev', 'prod'). Stack will be named 'ofsm-{deployment_name}'"
   type        = string
 }
 

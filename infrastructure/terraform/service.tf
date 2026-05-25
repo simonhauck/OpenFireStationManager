@@ -9,25 +9,25 @@ resource "random_password" "remember_me_key" {
 module "ofsm_dev" {
   source = "./modules/deployment"
 
-  stack_name        = "ofsm-dev"
+  deployment_name   = "develop"
   endpoint_id       = local.portainer_endpoint_id
   compose_file_path = "infrastructure/ofsm-dev/compose.yml"
   git_branch        = "main"
   port              = 13433
 
-  db_url          = local.jdbc_urls["develop"]["pooler"]
+  db_url          = local.db_urls.develop.pooler
   remember_me_key = random_password.remember_me_key.result
 }
 
 module "ofsm_prod" {
   source = "./modules/deployment"
 
-  stack_name        = "ofsm-prod"
+  deployment_name   = "production"
   endpoint_id       = local.portainer_endpoint_id
   compose_file_path = "infrastructure/ofsm-prod/compose.yml"
   git_branch        = "main"
   port              = 13455
 
-  db_url          = local.jdbc_urls["production"]["direct"]
+  db_url          = local.db_urls.production.pooler
   remember_me_key = random_password.remember_me_key.result
 }

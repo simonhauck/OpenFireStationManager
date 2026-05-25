@@ -51,26 +51,21 @@ locals {
   db_password = neon_project.open_fire_station_manager.database_password
   db_name     = neon_project.open_fire_station_manager.database_name
 
-  # Builds a map of { direct, pooler } JDBC URLs given two hostnames
+  _jdbc = "jdbc:postgresql://"
+  _params = "/${local.db_name}?user=${local.db_user}&password=${local.db_password}&sslmode=require&channelBinding=require"
+
   db_urls = {
     production = {
-      direct = neon_project.open_fire_station_manager.database_host
-      pooler = neon_project.open_fire_station_manager.database_host_pooler
+      direct = "${local._jdbc}${neon_project.open_fire_station_manager.database_host}${local._params}"
+      pooler = "${local._jdbc}${neon_project.open_fire_station_manager.database_host_pooler}${local._params}"
     }
     develop = {
-      direct = neon_endpoint.develop_endpoint.host
-      pooler = "${neon_endpoint.develop_endpoint.id}-pooler.${neon_endpoint.develop_endpoint.proxy_host}"
+      direct = "${local._jdbc}${neon_endpoint.develop_endpoint.host}${local._params}"
+      pooler = "${local._jdbc}${neon_endpoint.develop_endpoint.id}-pooler.${neon_endpoint.develop_endpoint.proxy_host}${local._params}"
     }
     local = {
-      direct = neon_endpoint.local_endpoint.host
-      pooler = "${neon_endpoint.local_endpoint.id}-pooler.${neon_endpoint.local_endpoint.proxy_host}"
-    }
-  }
-
-  jdbc_urls = {
-    for branch, hosts in local.db_urls : branch => {
-      for type, host in hosts : type =>
-      "jdbc:postgresql://${host}/${local.db_name}?user=${local.db_user}&password=${local.db_password}&sslmode=require&channelBinding=require"
+      direct = "${local._jdbc}${neon_endpoint.local_endpoint.host}${local._params}"
+      pooler = "${local._jdbc}${neon_endpoint.local_endpoint.id}-pooler.${neon_endpoint.local_endpoint.proxy_host}${local._params}"
     }
   }
 }
@@ -78,5 +73,5 @@ locals {
 output "db_urls" {
   description = "JDBC connection strings for all branches and connection types (direct / pooler)"
   sensitive   = true
-  value       = local.jdbc_urls
+  value       = local.db_urls
 }

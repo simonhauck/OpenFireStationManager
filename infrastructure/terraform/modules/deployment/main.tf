@@ -1,9 +1,10 @@
 locals {
   repository_url = "https://github.com/simonhauck/OpenFireStationManager"
+  stack_name     = "ofsm-${var.deployment_name}"
 }
 
 resource "portainer_stack" "this" {
-  name            = var.stack_name
+  name            = local.stack_name
   deployment_type = "standalone"
   method          = "repository"
   endpoint_id     = var.endpoint_id
