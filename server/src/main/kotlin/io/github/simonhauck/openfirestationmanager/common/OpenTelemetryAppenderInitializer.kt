@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConditionalOnProperty(name = ["app.otlp.enabled"], havingValue = "true")
-class OpenTelemetryAppenderInitializer(private val openTelemetry: OpenTelemetry) : InitializingBean {
+class OpenTelemetryAppenderInitializer(private val openTelemetry: OpenTelemetry) :
+    InitializingBean {
 
     override fun afterPropertiesSet() {
-        val loggerContext = LoggerFactory.getILoggerFactory() as ch.qos.logback.classic.LoggerContext
+        val loggerContext =
+            LoggerFactory.getILoggerFactory() as ch.qos.logback.classic.LoggerContext
         val appender =
             OpenTelemetryAppender().apply {
                 name = "OpenTelemetry"
