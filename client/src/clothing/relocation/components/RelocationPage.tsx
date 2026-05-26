@@ -4,6 +4,10 @@ import { toast } from "sonner"
 import { useEffect, useState } from "react"
 
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import {
+  formatClothingLocationLabel,
+  formatClothingLocationLabelOrDefault,
+} from "#/clothing/components/shared/clothingLocationLabel"
 import { useRelocationWizard } from "#/clothing/relocation/useRelocationWizard"
 import { relocationMutation } from "#/clothing/relocation/service/relocationQueries"
 import type { ResolvedClothingItem } from "#/clothing/checkout/service/checkoutQueries"
@@ -118,7 +122,7 @@ function StepTargetPicker({ onSelect }: StepTargetPickerProps) {
 
   const options: ComboboxOption[] = (allLocations ?? []).map((l) => ({
     value: String(l.id),
-    label: `${l.name} (${l.type})`,
+    label: formatClothingLocationLabel(l, { showType: true }),
   }))
 
   return (
@@ -205,10 +209,13 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   const relocate = useMutation(relocationMutation(queryClient))
 
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
-  const targetLocationName =
+  const location =
     state.targetLocationId !== null
-      ? (locationMap.get(state.targetLocationId)?.name ?? "–")
-      : "–"
+      ? locationMap.get(state.targetLocationId)
+      : undefined
+  const targetLocationName = formatClothingLocationLabelOrDefault(location, {
+    showType: true,
+  })
 
   async function handleSubmit() {
     try {
@@ -299,10 +306,12 @@ function StepSuccess({
   const [secondsLeft, setSecondsLeft] = useState(SUCCESS_REDIRECT_SECONDS)
 
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
-  const targetLocationName =
+  const targetLocationName = formatClothingLocationLabelOrDefault(
     state.targetLocationId !== null
-      ? (locationMap.get(state.targetLocationId)?.name ?? "–")
-      : "–"
+      ? locationMap.get(state.targetLocationId)
+      : undefined,
+    { showType: true },
+  )
 
   useEffect(() => {
     if (secondsLeft <= 0) {

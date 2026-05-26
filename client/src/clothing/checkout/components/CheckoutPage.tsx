@@ -4,6 +4,10 @@ import { toast } from "sonner"
 import { useEffect, useRef, useState } from "react"
 
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import {
+  formatClothingLocationLabel,
+  formatClothingLocationLabelOrDefault,
+} from "#/clothing/components/shared/clothingLocationLabel"
 import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
@@ -170,7 +174,7 @@ function StepTargetPicker({ onSelect }: StepTargetPickerProps) {
 
   const options: ComboboxOption[] = personalLocations.map((l) => ({
     value: String(l.id),
-    label: l.name,
+    label: formatClothingLocationLabel(l),
   }))
 
   const filteredOptions = options.filter((o) =>
@@ -239,7 +243,7 @@ function StepItemScanner({
       // Known non-POOL location — show discrepancy dialog
       setPendingConfirmation({
         item,
-        actualLocationName: location.name,
+        actualLocationName: formatClothingLocationLabel(location),
       })
       return
     }
@@ -265,7 +269,11 @@ function StepItemScanner({
             renderItemBadge={(item) => {
               const loc = item.location
               if (!loc || loc.type === "POOL") return null
-              return <Badge variant="outline">{loc.name}</Badge>
+              return (
+                <Badge variant="outline">
+                  {formatClothingLocationLabel(loc)}
+                </Badge>
+              )
             }}
           />
 
@@ -461,7 +469,9 @@ function StepWashLocationPicker({ onSelect }: StepWashLocationPickerProps) {
                 className="h-auto min-h-16 flex-col gap-1 p-4 text-wrap"
                 onClick={() => onSelect(loc.id)}
               >
-                <span className="text-base font-medium">{loc.name}</span>
+                <span className="text-base font-medium">
+                  {formatClothingLocationLabel(loc)}
+                </span>
               </TouchButton>
             ))}
           </div>
@@ -490,6 +500,9 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
 
   const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
+  const targetLocationName = formatClothingLocationLabelOrDefault(
+    locationMap.get(state.targetLocationId!),
+  )
 
   // Resolved return items
   const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
@@ -502,10 +515,11 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
     },
   )
 
-  const washLocationName =
+  const location =
     state.returnLocationId !== null
-      ? (locationMap.get(state.returnLocationId)?.name ?? "–")
-      : "–"
+      ? locationMap.get(state.returnLocationId)
+      : undefined
+  const washLocationName = formatClothingLocationLabelOrDefault(location)
 
   async function handleSubmit() {
     const body = {
@@ -547,10 +561,7 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
               ))}
             </div>
             <p className="text-muted-foreground text-sm">
-              Ziel:{" "}
-              <strong>
-                {locationMap.get(state.targetLocationId!)?.name ?? "–"}
-              </strong>
+              Ziel: <strong>{targetLocationName}</strong>
             </p>
           </RenderIf>
         </div>
