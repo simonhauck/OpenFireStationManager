@@ -12,6 +12,15 @@ The dashboard view at `/pool-clothing` summarising clothing on `POOL` and `WAESC
 
 User-facing label for `ClothingLocation`.
 
+Location pickers (combobox dropdowns) display a formatted label built from the location's fields:
+
+- Name only: `Spind 5`
+- Name + comment: `Spind 5 – Müller, Hans`
+- Name + type: `Spind 5 (Persönlicher Standort)`
+- Name + comment + type: `Spind 5 – Müller, Hans (Persönlicher Standort)`
+
+The `comment` field is used to hold supplementary context (e.g. the assigned person's name). Whether the type is shown depends on the picker context — checkout hides the type (all options are PERSONAL), relocation shows it (any type may appear).
+
 ### Klamotten / Kleidung
 
 Informal vs. formal labels for clothing items. Both appear in the UI; "Klamotten" tends to be used in headings/navigation, "Kleidung" in form labels.

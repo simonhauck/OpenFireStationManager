@@ -6,7 +6,7 @@ Domain language for the Spring Boot / Kotlin backend.
 
 ### ClothingLocation
 
-A physical place where clothing items can be stored. Every `ClothingItem` has at most one `locationId` (nullable). Locations are categorised by their `type`:
+A physical place where clothing items can be stored. Every `ClothingItem` has at most one `locationId` (nullable). Locations have a `name` (required) and an optional `comment` for additional context (e.g. the assigned person's name). Locations are categorised by their `type`:
 
 - **POOL** — shared stock that firefighters can take items *from*. Shown on the dashboard.
 - **WAESCHE** — laundry. Items can be returned *to* it but never taken *from* it. Shown on the dashboard.
