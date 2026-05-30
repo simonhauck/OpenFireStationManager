@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="OpenFireStationManagerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <option name="ACTIVE_PROFILES" value="test" />
+    <option name="ACTIVE_PROFILES" value="test,prod" />
     <module name="openfirestationmanager.server.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.simonhauck.openfirestationmanager.OpenFireStationManagerApplication" />
     <extension name="coverage">

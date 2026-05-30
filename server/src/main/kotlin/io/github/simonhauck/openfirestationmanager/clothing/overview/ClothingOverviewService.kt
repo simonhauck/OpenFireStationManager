@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.clothing.overview
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItem
 import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemRepository
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
@@ -16,9 +17,15 @@ class ClothingOverviewService(
     private val clothingTypeRepository: ClothingTypeRepository,
 ) {
 
+    private val log = KotlinLogging.logger {}
     private val sizeGroupAggregator = SizeGroupAggregator()
 
     fun getSummariesByType(): List<ClothingTypeSummary> {
+        log.info { "Summarize by type service" }
+        log.atInfo {
+            message = "test log with payload"
+            payload = mapOf("key" to "value")
+        }
         val types = clothingTypeRepository.findAll().sortedBy { it.id }
 
         return types.map { type ->

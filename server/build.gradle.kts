@@ -38,6 +38,13 @@ dependencies {
 
     runtimeOnly(libs.postgresql)
 
+    // OpenTelemetry — logs, traces, OTLP export
+    implementation(libs.springBootStarterOpentelemetry)
+    implementation(libs.springBootStarterActuator)
+    implementation(libs.micrometerTracingBridgeOtel)
+    implementation(libs.opentelemetryExporterOtlp)
+    implementation(libs.opentelemetryLogbackAppender)
+
     testImplementation(libs.springBootStarterDataJdbcTest)
     testImplementation(libs.springBootStarterRestclient)
     testImplementation(libs.springSecurityTest)
