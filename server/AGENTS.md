@@ -186,8 +186,8 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   `CrudRepository`/`PagingAndSortingRepository` interfaces.
 - Repositories should expose only the concrete operations needed by the feature (for example `findByUsername`,
   `existsByUsername`, `save`, `count`) to keep behavior obvious.
-- Schema migrations should use Flyway or Liquibase (not yet configured; add when first migration
-  is needed).
+- Schema migrations use a **custom Kotlin migration runner** (not Flyway or Liquibase). Each migration is a `@Component` implementing the `DatabaseMigration` interface (`val id: String`, `fun execute(jdbcTemplate: JdbcTemplate)`). The runner fires automatically on startup, sorts migrations by `id`, and skips already-applied ones (tracked in the `schema_migrations` table).
+- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). The next available version number is **V017**.
 - The `compose.yml` spins up `postgres:latest` on a random host port; `application.yml` uses
   Docker Compose lifecycle `start_only` so the container persists across restarts.
 - Database credentials for local dev: `POSTGRES_USER=myuser`, `POSTGRES_PASSWORD=secret`,

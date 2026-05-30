@@ -22,13 +22,7 @@ class PrivacyPolicyService(private val repository: PrivacyPolicyRepository) {
             )
         }
 
-        if (file.size > MAX_FILE_SIZE_BYTES) {
-            throw PublicApiException(
-                status = HttpStatus.UNPROCESSABLE_ENTITY,
-                publicMessage = "File is too large. Maximum allowed size is 10 MB",
-            )
-        }
-
+        repository.deleteAll()
         val document =
             PrivacyPolicyDocument(
                 fileName = file.originalFilename ?: "privacy-policy",
@@ -37,24 +31,21 @@ class PrivacyPolicyService(private val repository: PrivacyPolicyRepository) {
                 uploadedAt = ZonedDateTime.now(ZoneOffset.UTC),
                 content = file.bytes,
             )
-        repository.save(document)
-        return document.toMetadata()
+        return repository.save(document).toMetadata()
     }
 
-    @Transactional fun delete() = repository.delete()
+    @Transactional fun delete() = repository.deleteAll()
 
-    fun getDocument(): PrivacyPolicyDocument? = repository.find()
+    fun getDocument(): PrivacyPolicyDocument? = repository.findAll().firstOrNull()
 
     fun getMetadata(): PrivacyPolicyMetadata =
-        repository.find()?.toMetadata()
+        repository.findAll().firstOrNull()?.toMetadata()
             ?: throw PublicApiException(
                 status = HttpStatus.NOT_FOUND,
                 publicMessage = "No privacy policy document has been uploaded",
             )
 
     companion object {
-        private const val MAX_FILE_SIZE_BYTES = 10L * 1024 * 1024
-
         val ACCEPTED_CONTENT_TYPES = setOf("application/pdf", "text/html", "text/plain")
     }
 }
