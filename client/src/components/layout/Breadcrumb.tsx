@@ -18,6 +18,7 @@ type StaticSegment = Exclude<AllRawSegments, "" | `$${string}`>
 
 const SEGMENT_LABELS: Record<StaticSegment, string> = {
   about: "Über uns",
+  admin: "Administration",
   batch: "Stapelverarbeitung",
   "change-password": "Passwort ändern",
   checkout: "Klamotten Ausgabe",
@@ -29,6 +30,7 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   new: "Neu",
   "pool-clothing": "Pool Klamotten",
   relocation: "Umlagerung",
+  settings: "Einstellungen",
   types: "Typen",
   "user-management": "Nutzer Management",
 }

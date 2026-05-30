@@ -39,6 +39,11 @@ const MENU_ITEMS: MenuItem[] = [
     href: "/user-management",
     allowedRoles: ["ADMIN"],
   },
+  {
+    label: "Admin Einstellungen",
+    href: "/admin/settings",
+    allowedRoles: ["ADMIN"],
+  },
 ]
 
 export default function Header() {
