@@ -51,3 +51,9 @@ A Kleiderwart-only batch operation that moves one or more clothing items to any 
 ### UserAccount
 
 A login. Roles: `USER`, `ADMIN`, `KLEIDERWART`. There is no separate "Firefighter" entity — every user is a potential firefighter. Note: tablets in the station may run a shared account, so the logged-in user is *not* a reliable identifier of who is physically performing an action.
+
+### Datenschutzerklärung (Privacy Policy)
+
+The legally required privacy policy document. At most one document exists at any time, stored as a single row in the `privacy_policy` table together with its binary `content`, `fileName`, `contentType`, `fileSize`, and `uploadedAt`. Managed by `PrivacyPolicyService` and persisted through the explicit JDBC `PrivacyPolicyRepository` (`find` / `save` / `delete`); uploading a new document atomically replaces the previous one.
+
+Admins manage it through ADMIN-only endpoints under `/api/admin/privacy-policy` (GET metadata, POST multipart upload, DELETE). Accepted MIME types are `application/pdf`, `text/html`, and `text/plain`; the maximum size is 10 MB. The document is served publicly — without authentication — at the top-level, bookmarkable URL `GET /privacy-policy` (deliberately outside the `/api/**` namespace), streamed with the stored `Content-Type` and `Content-Disposition: inline`. The stored `content_type` is the authoritative header value; the server never re-detects the MIME type at serve time. When no document is present, `/privacy-policy` returns 404.

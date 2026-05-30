@@ -51,3 +51,7 @@ The full-page layout wrapper used on each route. Renders a `bg-muted` surface (r
 ### Page Sub Section
 
 A named content group used inside a `Page Section` body. Renders a header row (`<h2>` title, optional subtitle, optional right slot for summary info or actions) separated from its content by a `border-b`. Multiple `Page Sub Section`s stacked inside a `Page Section` are divided by a `border-t` on all but the first. The right slot accepts any `ReactNode` — typically a stat display (e.g. total count) or a secondary action. Does not use a card surface; sits directly on the `Page Section`'s `bg-muted` body.
+
+### Admin Settings
+
+The `/admin/settings` route (ADMIN-only via `RoleGuard`, reached from the "Admin Einstellungen" nav item) hosts application-wide configuration. It renders a `Page Section` containing the `Datenschutzerklärung` sub-section: it shows the currently active privacy policy document's name and upload date (or a "no document uploaded yet" empty state), a file picker plus upload button, a delete action, and a "Vorschau" link to the public `/privacy-policy` URL. Data and mutations use TanStack Query (`privacyPolicyQuery`, `uploadPrivacyPolicyMutation`, `deletePrivacyPolicyMutation`); a 404 from the metadata endpoint is treated as the empty state rather than an error.
