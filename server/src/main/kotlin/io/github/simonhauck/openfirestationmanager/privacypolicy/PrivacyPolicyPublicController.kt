@@ -1,6 +1,7 @@
 package io.github.simonhauck.openfirestationmanager.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.common.NotFoundException
+import java.nio.charset.Charset
 import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -20,8 +21,14 @@ class PrivacyPolicyPublicController(private val service: PrivacyPolicyService) {
         val contentDisposition =
             ContentDisposition.inline().filename(document.fileName).build().toString()
 
+        val mediaType =
+            MediaType.parseMediaType(document.contentType).let { base ->
+                val charset = document.charset?.let { Charset.forName(it) }
+                if (charset != null) MediaType(base, charset) else base
+            }
+
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(document.contentType))
+            .contentType(mediaType)
             .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
             .body(document.content)
     }

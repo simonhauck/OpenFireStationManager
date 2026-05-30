@@ -79,7 +79,7 @@ export default function PrivacyPolicySection() {
         <Button asChild variant="outline" size="sm">
           <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">
             <ExternalLink className="size-4" />
-            Vorschau
+            Datenschutzerklärung aufrufen
           </a>
         </Button>
       }

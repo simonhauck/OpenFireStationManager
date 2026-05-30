@@ -20,6 +20,7 @@ data class PrivacyPolicyExists(val exists: Boolean)
 data class PrivacyPolicyDocument(
     val fileName: String,
     val contentType: String,
+    val charset: String?,
     val fileSize: Long,
     val uploadedAt: ZonedDateTime,
     val content: ByteArray,
@@ -36,4 +37,34 @@ data class PrivacyPolicyDocument(
             fileSize = fileSize,
             uploadedAt = uploadedAt,
         )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PrivacyPolicyDocument
+
+        if (fileSize != other.fileSize) return false
+        if (id != other.id) return false
+        if (fileName != other.fileName) return false
+        if (contentType != other.contentType) return false
+        if (charset != other.charset) return false
+        if (uploadedAt != other.uploadedAt) return false
+        if (!content.contentEquals(other.content)) return false
+        if (metaData != other.metaData) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = fileSize.hashCode()
+        result = 31 * result + id.hashCode()
+        result = 31 * result + fileName.hashCode()
+        result = 31 * result + contentType.hashCode()
+        result = 31 * result + (charset?.hashCode() ?: 0)
+        result = 31 * result + uploadedAt.hashCode()
+        result = 31 * result + content.contentHashCode()
+        result = 31 * result + metaData.hashCode()
+        return result
+    }
 }

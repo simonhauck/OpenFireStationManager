@@ -26,6 +26,7 @@ class PrivacyPolicyService(private val repository: PrivacyPolicyRepository) {
             PrivacyPolicyDocument(
                 fileName = file.originalFilename ?: "privacy-policy",
                 contentType = contentType,
+                charset = if (contentType.startsWith("text/")) "UTF-8" else null,
                 fileSize = file.size,
                 uploadedAt = ZonedDateTime.now(),
                 content = file.bytes,
