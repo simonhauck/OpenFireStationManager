@@ -23,6 +23,10 @@ const config = defineConfig({
         target: "http://localhost:8080",
         changeOrigin: true,
       },
+      "/privacy-policy": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
     },
   },
   build: {

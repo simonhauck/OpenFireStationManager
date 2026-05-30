@@ -27,15 +27,9 @@ An append-only record of an item moving from one location to another (or being a
 
 ### Checkout
 
-A user-facing action that produces one or more `ClothingMovement` rows in a single batch and atomic transaction: optionally returning items from a PERSONAL location to a WAESCHE location, then taking items from a POOL location to that PERSONAL location. The Checkout itself is not a persisted aggregate — it is the API operation that writes the movements.
+A user-facing action that produces one or more `ClothingMovement` rows in a single batch and atomic transaction: optionally returning items from a PERSONAL location to a WAESCHE location, then taking items from any location to that PERSONAL location. The Checkout itself is not a persisted aggregate — it is the API operation that writes the movements.
 
-The endpoint is strict about types: source must be POOL, target must be PERSONAL, return target (if present) must be WAESCHE. Any authenticated user may perform a Checkout. Operations that violate these type rules (e.g. Kleiderwart rebalancing POOL ↔ POOL) require purpose-built, role-restricted endpoints — they are not Checkouts.
-
-The endpoint is two-phase (see ADR-0002): phase 1 reports `Discrepancy` records when the user's claim disagrees with the system's recorded `locationId`; phase 2 accepts an `acknowledgedWarnings` list and writes the movements.
-
-### Discrepancy
-
-A disagreement between a user's claim during phase 1 of a Checkout and the system's recorded `locationId` for an item — e.g. the user claims to be taking item #123 from Pool A, but the system has it at Locker 3. Discrepancies are reported back to the user, who may acknowledge them; an acknowledged Discrepancy results in a single `CHECKOUT` (or `RETURN`) movement with `fromLocationId` equal to the claimed source. No compensating movement is inserted to explain the prior drift.
+The endpoint validates that the target must be PERSONAL and the return target (if present) must be WAESCHE. The source location type of taken items is **not** validated server-side — the source is inferred per item from its current `locationId` in the database. Any authenticated user may perform a Checkout. The endpoint is a single `POST /api/clothing/checkouts` with no two-phase protocol; discrepancy handling (warning the user when a scanned item is not at a POOL location) is a client-side UX concern only.
 
 ### Item lookup endpoints
 
@@ -47,6 +41,16 @@ Two purpose-built endpoints serve the Checkout flow's item picker:
 ### Umlagerung (Relocation)
 
 A Kleiderwart-only batch operation that moves one or more clothing items to any target location regardless of location type. Unlike Checkout, there is no discrepancy protocol — the source location is inferred per item from its current `locationId` in the database. All movements are written atomically in a single transaction sharing a `batchId` with `reason = RELOCATION`. Endpoint: `POST /api/clothing/relocation`. See ADR-0003.
+
+### Datenschutzerklärung (Privacy Policy Document)
+
+A single, admin-managed document served publicly at `/privacy-policy`. At most one document is active at any time. Stored as a binary blob in a dedicated `privacy_policy` table alongside metadata (`file_name`, `content_type`, `file_size`, `uploaded_at`). No join is required — all data lives in one row. Managed by `PrivacyPolicyService` and persisted through the explicit JDBC `PrivacyPolicyRepository` (`find` / `save` / `delete`); uploading a new document atomically replaces the previous one.
+
+Accepted formats: PDF (`application/pdf`), HTML (`text/html`), plain text (`text/plain`). Maximum file size: 10 MB. The `Content-Type` response header is derived from the stored `content_type` value; the server never re-detects the MIME type at serve time.
+
+When no document has been uploaded, the endpoint returns `404`. Uploading a new document deletes the existing row and inserts a new one (no version history). The document can also be explicitly deleted by an admin, which returns the endpoint to the `404` state.
+
+The upload/delete admin API lives under `/api/admin/privacy-policy` (ADMIN-only, GET metadata + POST multipart upload + DELETE). The public serving endpoint is `GET /privacy-policy` — a top-level route outside the `/api/**` namespace, accessible without authentication, streamed with the stored `Content-Type` and `Content-Disposition: inline`.
 
 ### UserAccount
 
