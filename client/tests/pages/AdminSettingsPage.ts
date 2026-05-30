@@ -16,7 +16,9 @@ export class AdminSettingsPage {
   }
 
   previewLink() {
-    return this.page.getByRole("link", { name: "Datenschutzerklärung aufrufen" })
+    return this.page.getByRole("link", {
+      name: "Datenschutzerklärung aufrufen",
+    })
   }
 
   currentDocument() {
