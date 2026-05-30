@@ -20,6 +20,25 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/admin/impressum": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the current Impressum */
+    get: operations["get"]
+    /** Create or update the Impressum */
+    put: operations["upsert"]
+    post?: never
+    /** Delete the Impressum */
+    delete: operations["delete"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/public/setup/initial-admin": {
     parameters: {
       query?: never
@@ -219,7 +238,7 @@ export interface paths {
     /** Upload a new privacy policy document, replacing any existing one */
     post: operations["upload"]
     /** Delete the active privacy policy document */
-    delete: operations["delete"]
+    delete: operations["delete_1"]
     options?: never
     head?: never
     patch?: never
@@ -306,6 +325,40 @@ export interface paths {
       cookie?: never
     }
     get: operations["getPrivacyPolicy"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/public/impressum": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the current Impressum */
+    get: operations["get_1"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/public/impressum/exists": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether an Impressum has been configured */
+    get: operations["exists"]
     put?: never
     post?: never
     delete?: never
@@ -406,7 +459,24 @@ export interface paths {
       cookie?: never
     }
     /** Check whether a privacy policy document has been uploaded */
-    get: operations["exists"]
+    get: operations["exists_1"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/admin/impressum/exists": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether an Impressum has been configured */
+    get: operations["exists_2"]
     put?: never
     post?: never
     delete?: never
@@ -439,6 +509,18 @@ export interface components {
       /** Format: int64 */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
+    }
+    ImpressumRequest: {
+      name: string
+      address: string
+      contactEmail: string
+      phone?: string
+    }
+    ImpressumResponse: {
+      name: string
+      address: string
+      contactEmail: string
+      phone?: string
     }
     InitialAdminSetupRequest: {
       username: string
@@ -551,6 +633,9 @@ export interface components {
       lastName: string
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
+    ImpressumExists: {
+      exists: boolean
+    }
     AuthStateResponse: {
       authenticated: boolean
       user?: components["schemas"]["UserAccount"]
@@ -622,6 +707,77 @@ export interface operations {
         content: {
           "*/*": components["schemas"]["UserAccount"]
         }
+      }
+    }
+  }
+  get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ImpressumResponse"]
+        }
+      }
+      /** @description No Impressum has been configured */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  upsert: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ImpressumRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ImpressumResponse"]
+        }
+      }
+    }
+  }
+  delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -1042,7 +1198,7 @@ export interface operations {
       }
     }
   }
-  delete: {
+  delete_1: {
     parameters: {
       query?: never
       header?: never
@@ -1359,6 +1515,46 @@ export interface operations {
       }
     }
   }
+  get_1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ImpressumResponse"]
+        }
+      }
+    }
+  }
+  exists: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ImpressumExists"]
+        }
+      }
+    }
+  }
   me: {
     parameters: {
       query?: never
@@ -1464,7 +1660,7 @@ export interface operations {
       }
     }
   }
-  exists: {
+  exists_1: {
     parameters: {
       query?: never
       header?: never
@@ -1480,6 +1676,26 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["PrivacyPolicyExists"]
+        }
+      }
+    }
+  }
+  exists_2: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ImpressumExists"]
         }
       }
     }

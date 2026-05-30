@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.privacypolicy
+package io.github.simonhauck.openfirestationmanager.legal.privacypolicy
 
 import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.resttestclient.exchange

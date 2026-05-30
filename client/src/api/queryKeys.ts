@@ -11,4 +11,5 @@ export const queryKeys = {
   clothingLocation: (id: number) => ["clothing", "locations", id] as const,
   me: () => ["auth", "me"] as const,
   privacyPolicy: () => ["admin", "privacy-policy"] as const,
+  impressum: () => ["legal", "impressum"] as const,
 }

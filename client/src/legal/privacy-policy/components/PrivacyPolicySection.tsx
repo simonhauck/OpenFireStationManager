@@ -7,7 +7,7 @@ import {
   deletePrivacyPolicyMutation,
   privacyPolicyQuery,
   uploadPrivacyPolicyMutation,
-} from "#/admin/service/queries/privacyPolicyQueries"
+} from "#/legal/privacy-policy/service/privacyPolicyQueries"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
 import FormattedDate from "#/components/base/FormattedDate"

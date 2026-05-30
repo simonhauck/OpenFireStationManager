@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.privacypolicy
+package io.github.simonhauck.openfirestationmanager.legal.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat

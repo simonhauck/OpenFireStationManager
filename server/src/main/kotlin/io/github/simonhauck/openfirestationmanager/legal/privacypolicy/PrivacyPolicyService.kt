@@ -1,4 +1,4 @@
-package io.github.simonhauck.openfirestationmanager.privacypolicy
+package io.github.simonhauck.openfirestationmanager.legal.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
 import java.time.ZonedDateTime
