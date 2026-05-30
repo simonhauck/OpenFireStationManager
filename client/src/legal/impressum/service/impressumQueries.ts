@@ -17,7 +17,9 @@ export const impressumAdminQuery = () =>
   queryOptions({
     queryKey: queryKeys.impressum(),
     queryFn: async (): Promise<ImpressumState> => {
-      const { data: existsData } = await client.GET("/api/admin/impressum/exists")
+      const { data: existsData } = await client.GET(
+        "/api/admin/impressum/exists",
+      )
       if (!existsData?.exists) {
         return { exists: false, impressum: null }
       }
@@ -30,7 +32,9 @@ export const impressumPublicQuery = () =>
   queryOptions({
     queryKey: [...queryKeys.impressum(), "public"] as const,
     queryFn: async (): Promise<ImpressumState> => {
-      const { data: existsData } = await client.GET("/api/public/impressum/exists")
+      const { data: existsData } = await client.GET(
+        "/api/public/impressum/exists",
+      )
       if (!existsData?.exists) {
         return { exists: false, impressum: null }
       }
@@ -41,8 +45,12 @@ export const impressumPublicQuery = () =>
 
 export const upsertImpressumMutation = (queryClient: QueryClient) =>
   mutationOptions({
-    mutationFn: async (request: ImpressumRequest): Promise<ImpressumResponse> => {
-      const { data } = await client.PUT("/api/admin/impressum", { body: request })
+    mutationFn: async (
+      request: ImpressumRequest,
+    ): Promise<ImpressumResponse> => {
+      const { data } = await client.PUT("/api/admin/impressum", {
+        body: request,
+      })
       return data!
     },
     onSuccess: async () => {

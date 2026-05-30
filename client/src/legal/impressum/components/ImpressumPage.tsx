@@ -20,7 +20,9 @@ export default function ImpressumPage() {
   return (
     <PageSection title="Impressum">
       <RenderIf when={data?.exists === false}>
-        <p className="text-sm text-muted-foreground">Kein Impressum vorhanden.</p>
+        <p className="text-sm text-muted-foreground">
+          Kein Impressum vorhanden.
+        </p>
       </RenderIf>
 
       <RenderIf when={data?.exists === true}>
@@ -29,7 +31,9 @@ export default function ImpressumPage() {
           <p className="whitespace-pre-line text-muted-foreground">
             {data?.impressum?.address}
           </p>
-          <p className="text-muted-foreground">{data?.impressum?.contactEmail}</p>
+          <p className="text-muted-foreground">
+            {data?.impressum?.contactEmail}
+          </p>
           <RenderIf when={!!data?.impressum?.phone}>
             <p className="text-muted-foreground">{data?.impressum?.phone}</p>
           </RenderIf>

@@ -43,8 +43,7 @@ class ImpressumAdminController(private val service: ImpressumService) {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Create or update the Impressum")
     @ApiResponses(ApiResponse(responseCode = "200", description = "OK"))
-    fun upsert(@RequestBody request: ImpressumRequest): ImpressumResponse =
-        service.upsert(request)
+    fun upsert(@RequestBody request: ImpressumRequest): ImpressumResponse = service.upsert(request)
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)

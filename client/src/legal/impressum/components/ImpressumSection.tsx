@@ -106,7 +106,9 @@ export default function ImpressumSection() {
                 <p className="whitespace-pre-line text-muted-foreground">
                   {impressum?.address}
                 </p>
-                <p className="text-muted-foreground">{impressum?.contactEmail}</p>
+                <p className="text-muted-foreground">
+                  {impressum?.contactEmail}
+                </p>
                 <RenderIf when={!!impressum?.phone}>
                   <p className="text-muted-foreground">{impressum?.phone}</p>
                 </RenderIf>
@@ -140,7 +142,11 @@ export default function ImpressumSection() {
           </RenderIf>
 
           <RenderIf when={data?.exists === false}>
-            <Button variant="outline" className="self-start" onClick={startEditing}>
+            <Button
+              variant="outline"
+              className="self-start"
+              onClick={startEditing}
+            >
               <Pencil className="size-4" />
               Impressum erstellen
             </Button>
@@ -196,7 +202,11 @@ export default function ImpressumSection() {
             >
               Speichern
             </Button>
-            <Button variant="outline" onClick={cancelEditing} disabled={isUpserting}>
+            <Button
+              variant="outline"
+              onClick={cancelEditing}
+              disabled={isUpserting}
+            >
               Abbrechen
             </Button>
           </div>
