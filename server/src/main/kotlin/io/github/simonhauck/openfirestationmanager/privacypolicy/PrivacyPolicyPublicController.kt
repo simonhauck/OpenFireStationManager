@@ -1,7 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.common.NotFoundException
-import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Hidden
 class PrivacyPolicyPublicController(private val service: PrivacyPolicyService) {
 
     @GetMapping("/privacy-policy")

@@ -34,12 +34,12 @@ class PrivacyPolicyService(private val repository: PrivacyPolicyRepository) {
         return repository.save(document).toMetadata()
     }
 
-    @Transactional fun delete() = repository.deleteAll()
+    fun delete() = repository.deleteAll()
 
     fun getDocument(): PrivacyPolicyDocument? = repository.findAll().firstOrNull()
 
     fun getMetadata(): PrivacyPolicyMetadata =
-        repository.findAll().firstOrNull()?.toMetadata()
+        getDocument()?.toMetadata()
             ?: throw PublicApiException(
                 status = HttpStatus.NOT_FOUND,
                 publicMessage = "No privacy policy document has been uploaded",
