@@ -69,13 +69,13 @@ export class ClothingItemsPage {
   async clickDeleteForItem(id: string | number) {
     await this.page
       .getByRole("button", {
-        name: `Kleidungsstueck ${id} loeschen`,
+        name: `Kleidungsstueck ${id} löschen`,
       })
       .click()
   }
 
   async confirmDelete() {
-    await this.page.getByRole("button", { name: "Loeschen" }).click()
+    await this.page.getByRole("button", { name: "Löschen" }).click()
   }
 
   itemRow(barcode: string) {

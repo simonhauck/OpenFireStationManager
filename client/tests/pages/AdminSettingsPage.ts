@@ -16,7 +16,7 @@ export class AdminSettingsPage {
   }
 
   previewLink() {
-    return this.page.getByRole("link", { name: "Vorschau" })
+    return this.page.getByRole("link", { name: "Datenschutzerklärung aufrufen" })
   }
 
   currentDocument() {
@@ -32,7 +32,7 @@ export class AdminSettingsPage {
   }
 
   confirmDeleteButton() {
-    return this.page.getByRole("button", { name: "Loeschen" })
+    return this.page.getByRole("button", { name: "Löschen" })
   }
 
   async selectFile(name: string, mimeType: string, contents: string) {

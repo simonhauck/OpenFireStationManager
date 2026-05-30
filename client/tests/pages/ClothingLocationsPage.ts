@@ -53,12 +53,12 @@ export class ClothingLocationsPage {
 
   async clickDeleteForLocation(name: string) {
     await this.page
-      .getByRole("button", { name: `Standort ${name} loeschen` })
+      .getByRole("button", { name: `Standort ${name} löschen` })
       .click()
   }
 
   async confirmDelete() {
-    await this.page.getByRole("button", { name: "Loeschen" }).click()
+    await this.page.getByRole("button", { name: "Löschen" }).click()
   }
 
   locationRow(name: string) {
