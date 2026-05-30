@@ -45,6 +45,7 @@ class SecurityConfiguration {
                 it.userDetailsService(userDetailsService)
             }
             .authorizeHttpRequests {
+                it.requestMatchers("/privacy-policy").permitAll()
                 it.requestMatchers("/api/public/**").permitAll()
                 it.requestMatchers("/api/**").authenticated()
                 it.anyRequest().permitAll()

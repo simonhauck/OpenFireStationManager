@@ -436,6 +436,88 @@
         }
       }
     },
+    "/api/admin/privacy-policy": {
+      "get": {
+        "tags": ["privacy-policy-admin-controller"],
+        "summary": "Get metadata of the active privacy policy document",
+        "operationId": "getMetadata",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyPolicyMetadata"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No privacy policy document has been uploaded",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["privacy-policy-admin-controller"],
+        "summary": "Upload a new privacy policy document, replacing any existing one",
+        "operationId": "upload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyPolicyMetadata"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unsupported file type or file too large",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["privacy-policy-admin-controller"],
+        "summary": "Delete the active privacy policy document",
+        "operationId": "delete",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/clothing/types/{id}": {
       "get": {
         "tags": ["clothing-type-controller"],
@@ -1333,6 +1415,26 @@
           }
         },
         "required": ["firstName", "lastName", "password", "roles", "username"]
+      },
+      "PrivacyPolicyMetadata": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["contentType", "fileName", "fileSize", "uploadedAt"]
       },
       "UpdateUserRequest": {
         "type": "object",
