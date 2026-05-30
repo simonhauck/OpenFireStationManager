@@ -25,11 +25,7 @@ export default function PrivacyPolicySection() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useQuery(privacyPolicyQuery())
+  const { data, isLoading, isError } = useQuery(privacyPolicyQuery())
 
   const metadata = data?.exists ? data.metadata : null
 

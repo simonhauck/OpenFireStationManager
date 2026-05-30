@@ -89,14 +89,14 @@ export default function ClothingLocationsTable({
 
           <DeleteDialogComponent
             onDelete={() => deleteLocation(location.id)}
-            headline="Standort loeschen"
-            bodyText={`Moechten Sie den Standort "${location.name}" wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
+            headline="Standort löschen"
+            bodyText={`Moechten Sie den Standort "${location.name}" wirklich löschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
           >
             <Button
               size="icon"
               variant="outline"
-              aria-label={`Standort ${location.name} loeschen`}
-              title="Loeschen"
+              aria-label={`Standort ${location.name} löschen`}
+              title="Löschen"
             >
               <Trash2 className="size-4" />
             </Button>

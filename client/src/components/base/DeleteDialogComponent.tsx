@@ -26,7 +26,7 @@ export default function DeleteDialogComponent({
   headline,
   bodyText,
   children,
-  confirmText = "Loeschen",
+  confirmText = "Löschen",
   cancelText = "Abbrechen",
 }: DeleteDialogComponentProps) {
   return (

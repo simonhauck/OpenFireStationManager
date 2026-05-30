@@ -96,14 +96,14 @@ export default function ClothingItemsTable({
 
             <DeleteDialogComponent
               onDelete={() => deleteItem(item.id)}
-              headline="Kleidungsstueck loeschen"
-              bodyText={`Moechten Sie das Kleidungsstueck mit der ID ${item.id} wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
+              headline="Kleidungsstueck löschen"
+              bodyText={`Moechten Sie das Kleidungsstueck mit der ID ${item.id} wirklich löschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
             >
               <Button
                 size="icon"
                 variant="outline"
-                aria-label={`Kleidungsstueck ${item.id} loeschen`}
-                title="Loeschen"
+                aria-label={`Kleidungsstueck ${item.id} löschen`}
+                title="Löschen"
               >
                 <Trash2 className="size-4" />
               </Button>
