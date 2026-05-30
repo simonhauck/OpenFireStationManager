@@ -1,7 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -28,7 +27,7 @@ class PrivacyPolicyService(private val repository: PrivacyPolicyRepository) {
                 fileName = file.originalFilename ?: "privacy-policy",
                 contentType = contentType,
                 fileSize = file.size,
-                uploadedAt = ZonedDateTime.now(ZoneOffset.UTC),
+                uploadedAt = ZonedDateTime.now(),
                 content = file.bytes,
             )
         return repository.save(document).toMetadata()

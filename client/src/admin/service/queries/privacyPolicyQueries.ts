@@ -7,24 +7,23 @@ import type { components } from "#/api/schema"
 
 export type PrivacyPolicyMetadata =
   components["schemas"]["PrivacyPolicyMetadata"]
-export type PrivacyPolicyExistsResponse =
-  components["schemas"]["PrivacyPolicyExists"]
 
-export const privacyPolicyExistsQuery = () =>
-  queryOptions({
-    queryKey: queryKeys.privacyPolicyExists(),
-    queryFn: async (): Promise<PrivacyPolicyExistsResponse> => {
-      const { data } = await client.GET("/api/admin/privacy-policy/exists")
-      return data!
-    },
-  })
+export type PrivacyPolicyState =
+  | { exists: false; metadata: null }
+  | { exists: true; metadata: PrivacyPolicyMetadata }
 
 export const privacyPolicyQuery = () =>
   queryOptions({
     queryKey: queryKeys.privacyPolicy(),
-    queryFn: async (): Promise<PrivacyPolicyMetadata> => {
-      const { data } = await client.GET("/api/admin/privacy-policy")
-      return data!
+    queryFn: async (): Promise<PrivacyPolicyState> => {
+      const { data: existsData } = await client.GET(
+        "/api/admin/privacy-policy/exists",
+      )
+      if (!existsData?.exists) {
+        return { exists: false, metadata: null }
+      }
+      const { data: metadata } = await client.GET("/api/admin/privacy-policy")
+      return { exists: true, metadata: metadata! }
     },
   })
 
