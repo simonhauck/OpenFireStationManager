@@ -35,6 +35,12 @@ class PrivacyPolicyAdminController(private val service: PrivacyPolicyService) {
     )
     fun getMetadata(): PrivacyPolicyMetadata = service.getMetadata()
 
+    @GetMapping("/exists")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Check whether a privacy policy document has been uploaded")
+    @ApiResponses(ApiResponse(responseCode = "200", description = "OK"))
+    fun exists(): PrivacyPolicyExists = service.exists()
+
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN')")

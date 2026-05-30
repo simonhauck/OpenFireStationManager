@@ -298,6 +298,22 @@ export interface paths {
     patch: operations["updateUser"]
     trace?: never
   }
+  "/privacy-policy": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["getPrivacyPolicy"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/public/auth/me": {
     parameters: {
       query?: never
@@ -374,6 +390,23 @@ export interface paths {
     }
     /** Look up a clothing item by barcode */
     get: operations["getItemByBarcode"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/admin/privacy-policy/exists": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether a privacy policy document has been uploaded */
+    get: operations["exists"]
     put?: never
     post?: never
     delete?: never
@@ -553,6 +586,9 @@ export interface components {
       clothingItem: components["schemas"]["ClothingItem"]
       location?: components["schemas"]["ClothingLocation"]
       clothingType: components["schemas"]["ClothingType"]
+    }
+    PrivacyPolicyExists: {
+      exists: boolean
     }
   }
   responses: never
@@ -1303,6 +1339,26 @@ export interface operations {
       }
     }
   }
+  getPrivacyPolicy: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": string
+        }
+      }
+    }
+  }
   me: {
     parameters: {
       query?: never
@@ -1404,6 +1460,26 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ResolvedClothingItem"]
+        }
+      }
+    }
+  }
+  exists: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["PrivacyPolicyExists"]
         }
       }
     }

@@ -14,6 +14,8 @@ data class PrivacyPolicyMetadata(
     val uploadedAt: ZonedDateTime,
 )
 
+data class PrivacyPolicyExists(val exists: Boolean)
+
 @Table("privacy_policy")
 data class PrivacyPolicyDocument(
     val fileName: String,

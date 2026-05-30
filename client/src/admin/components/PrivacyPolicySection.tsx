@@ -5,6 +5,7 @@ import { ExternalLink, Trash2, Upload } from "lucide-react"
 
 import {
   deletePrivacyPolicyMutation,
+  privacyPolicyExistsQuery,
   privacyPolicyQuery,
   uploadPrivacyPolicyMutation,
 } from "#/admin/service/queries/privacyPolicyQueries"
@@ -25,7 +26,20 @@ export default function PrivacyPolicySection() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const { data: metadata, isLoading, isError } = useQuery(privacyPolicyQuery())
+  const {
+    data: exists,
+    isLoading: isExistsLoading,
+    isError: isExistsError,
+  } = useQuery(privacyPolicyExistsQuery())
+
+  const {
+    data: metadata,
+    isLoading: isMetadataLoading,
+    isError: isMetadataError,
+  } = useQuery({ ...privacyPolicyQuery(), enabled: exists?.exists === true })
+
+  const isLoading = isExistsLoading || isMetadataLoading
+  const isError = isExistsError || isMetadataError
 
   const { mutate: uploadDocument, isPending: isUploading } = useMutation(
     uploadPrivacyPolicyMutation(queryClient),
@@ -101,7 +115,7 @@ export default function PrivacyPolicySection() {
                 <p className="font-medium">{metadata?.fileName}</p>
                 <p className="text-muted-foreground">
                   Hochgeladen am{" "}
-                  <RenderIf when={!!metadata}>
+                  <RenderIf when={exists?.exists === true}>
                     <FormattedDate value={metadata?.uploadedAt ?? ""} />
                   </RenderIf>
                 </p>
@@ -119,7 +133,7 @@ export default function PrivacyPolicySection() {
             </div>
           </RenderIf>
 
-          <RenderIf when={!metadata}>
+          <RenderIf when={exists?.exists === false}>
             <p
               data-testid="privacy-policy-empty"
               className="text-sm text-muted-foreground"

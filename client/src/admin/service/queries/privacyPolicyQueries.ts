@@ -7,29 +7,24 @@ import type { components } from "#/api/schema"
 
 export type PrivacyPolicyMetadata =
   components["schemas"]["PrivacyPolicyMetadata"]
+export type PrivacyPolicyExistsResponse =
+  components["schemas"]["PrivacyPolicyExists"]
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? ""
+export const privacyPolicyExistsQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.privacyPolicyExists(),
+    queryFn: async (): Promise<PrivacyPolicyExistsResponse> => {
+      const { data } = await client.GET("/api/admin/privacy-policy/exists")
+      return data!
+    },
+  })
 
 export const privacyPolicyQuery = () =>
   queryOptions({
     queryKey: queryKeys.privacyPolicy(),
-    queryFn: async (): Promise<PrivacyPolicyMetadata | null> => {
-      // A 404 means no document has been uploaded yet, which is a valid empty
-      // state rather than an error, so it is handled explicitly here instead of
-      // going through the typed client's throw-on-error middleware.
-      const response = await fetch(`${baseUrl}/api/admin/privacy-policy`, {
-        credentials: "include",
-      })
-
-      if (response.status === 404) {
-        return null
-      }
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`)
-      }
-
-      return (await response.json()) as PrivacyPolicyMetadata
+    queryFn: async (): Promise<PrivacyPolicyMetadata> => {
+      const { data } = await client.GET("/api/admin/privacy-policy")
+      return data!
     },
   })
 

@@ -45,6 +45,8 @@ class PrivacyPolicyService(private val repository: PrivacyPolicyRepository) {
                 publicMessage = "No privacy policy document has been uploaded",
             )
 
+    fun exists(): PrivacyPolicyExists = PrivacyPolicyExists(getDocument() != null)
+
     companion object {
         val ACCEPTED_CONTENT_TYPES = setOf("application/pdf", "text/html", "text/plain")
     }
