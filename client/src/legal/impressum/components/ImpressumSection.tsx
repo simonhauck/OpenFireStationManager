@@ -3,7 +3,10 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 
-import { deleteImpressumMutation, impressumAdminQuery } from "#/legal/impressum/service/impressumQueries"
+import {
+  deleteImpressumMutation,
+  impressumAdminQuery,
+} from "#/legal/impressum/service/impressumQueries"
 import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
@@ -60,7 +63,9 @@ export default function ImpressumSection() {
                 <p className="whitespace-pre-line text-muted-foreground">
                   {impressum?.address}
                 </p>
-                <p className="text-muted-foreground">{impressum?.contactEmail}</p>
+                <p className="text-muted-foreground">
+                  {impressum?.contactEmail}
+                </p>
                 <RenderIf when={!!impressum?.phone}>
                   <p className="text-muted-foreground">{impressum?.phone}</p>
                 </RenderIf>
