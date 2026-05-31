@@ -28,10 +28,5 @@ data class Impressum(
         copy(metaData = metaData)
 
     fun toDto(): ImpressumDto =
-        ImpressumDto(
-            name = name,
-            address = address,
-            contactEmail = contactEmail,
-            phone = phone,
-        )
+        ImpressumDto(name = name, address = address, contactEmail = contactEmail, phone = phone)
 }

@@ -3,12 +3,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 
-import {
-  deleteImpressumMutation,
-  impressumAdminQuery,
-  upsertImpressumMutation,
-} from "#/legal/impressum/service/impressumQueries"
-import type { ImpressumDto } from "#/legal/impressum/service/impressumQueries"
+import { deleteImpressumMutation, impressumAdminQuery } from "#/legal/impressum/service/impressumQueries"
 import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
@@ -25,24 +20,9 @@ export default function ImpressumSection() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const { mutate: upsert, isPending: isUpserting } = useMutation(
-    upsertImpressumMutation(queryClient),
-  )
   const { mutate: deleteImpressum, isPending: isDeleting } = useMutation(
     deleteImpressumMutation(queryClient),
   )
-
-  function handleSave(dto: ImpressumDto) {
-    upsert(dto, {
-      onSuccess: () => {
-        toast.success("Impressum wurde gespeichert.")
-        setIsDialogOpen(false)
-      },
-      onError: (error) => {
-        toast.error(error.message)
-      },
-    })
-  }
 
   function handleDelete() {
     deleteImpressum(undefined, {
@@ -134,8 +114,6 @@ export default function ImpressumSection() {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         initialValues={impressum}
-        onSave={handleSave}
-        isSaving={isUpserting}
       />
     </PageSubSection>
   )

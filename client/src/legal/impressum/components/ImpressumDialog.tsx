@@ -1,4 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+import { toast } from "sonner"
+
+import { upsertImpressumMutation } from "#/legal/impressum/service/impressumQueries"
 import type { ImpressumDto } from "#/legal/impressum/service/impressumQueries"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
@@ -17,23 +21,24 @@ type ImpressumDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialValues: ImpressumDto | null
-  onSave: (dto: ImpressumDto) => void
-  isSaving: boolean
 }
 
 export default function ImpressumDialog({
   open,
   onOpenChange,
   initialValues,
-  onSave,
-  isSaving,
 }: ImpressumDialogProps) {
+  const queryClient = useQueryClient()
   const [name, setName] = useState(initialValues?.name ?? "")
   const [address, setAddress] = useState(initialValues?.address ?? "")
   const [contactEmail, setContactEmail] = useState(
     initialValues?.contactEmail ?? "",
   )
   const [phone, setPhone] = useState(initialValues?.phone ?? "")
+
+  const { mutate: upsert, isPending: isSaving } = useMutation(
+    upsertImpressumMutation(queryClient),
+  )
 
   function handleOpenChange(nextOpen: boolean) {
     if (nextOpen) {
@@ -46,12 +51,23 @@ export default function ImpressumDialog({
   }
 
   function handleSave() {
-    onSave({
-      name,
-      address,
-      contactEmail,
-      phone: phone.trim() || null,
-    })
+    upsert(
+      {
+        name,
+        address,
+        contactEmail,
+        phone: phone.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Impressum wurde gespeichert.")
+          onOpenChange(false)
+        },
+        onError: (error) => {
+          toast.error(error.message)
+        },
+      },
+    )
   }
 
   return (

@@ -6,7 +6,6 @@ import { queryKeys } from "#/api/queryKeys"
 import type { components } from "#/api/schema"
 
 export type ImpressumDto = components["schemas"]["ImpressumDto"]
-export type ImpressumExists = components["schemas"]["ImpressumExists"]
 
 export type ImpressumState =
   | { exists: false; impressum: null }

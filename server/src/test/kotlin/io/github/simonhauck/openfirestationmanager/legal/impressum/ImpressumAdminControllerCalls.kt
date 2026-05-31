@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class ImpressumAdminControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
-    fun upsert(
-        request: ImpressumDto,
-        authCookie: String? = null,
-    ): ResponseEntity<ImpressumDto> {
+    fun upsert(request: ImpressumDto, authCookie: String? = null): ResponseEntity<ImpressumDto> {
         return testRestTemplate.exchange<ImpressumDto>(
             "/api/admin/impressum",
             HttpMethod.PUT,
