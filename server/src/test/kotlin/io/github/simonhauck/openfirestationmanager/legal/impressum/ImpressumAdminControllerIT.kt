@@ -13,7 +13,7 @@ class ImpressumAdminControllerIT : IntegrationTest() {
     @Test
     fun `upsert should create an impressum and return it`() {
         val request =
-            ImpressumRequest(
+            ImpressumDto(
                 name = "Feuerwehr Musterstadt",
                 address = "Musterstraße 1\n12345 Musterstadt",
                 contactEmail = "info@feuerwehr-musterstadt.de",
@@ -32,7 +32,7 @@ class ImpressumAdminControllerIT : IntegrationTest() {
     @Test
     fun `upsert should replace the existing impressum`() {
         calls.upsert(
-            ImpressumRequest(
+            ImpressumDto(
                 name = "Old Name",
                 address = "Old Address",
                 contactEmail = "old@example.com",
@@ -43,7 +43,7 @@ class ImpressumAdminControllerIT : IntegrationTest() {
 
         val updated =
             calls.upsert(
-                ImpressumRequest(
+                ImpressumDto(
                     name = "New Name",
                     address = "New Address",
                     contactEmail = "new@example.com",
@@ -58,7 +58,7 @@ class ImpressumAdminControllerIT : IntegrationTest() {
     @Test
     fun `delete should remove the impressum`() {
         calls.upsert(
-            ImpressumRequest(
+            ImpressumDto(
                 name = "Feuerwehr",
                 address = "Straße 1",
                 contactEmail = "mail@example.com",

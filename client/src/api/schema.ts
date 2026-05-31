@@ -510,13 +510,7 @@ export interface components {
       id: number
       metaData: components["schemas"]["EntityMetaData"]
     }
-    ImpressumRequest: {
-      name: string
-      address: string
-      contactEmail: string
-      phone?: string
-    }
-    ImpressumResponse: {
+    ImpressumDto: {
       name: string
       address: string
       contactEmail: string
@@ -725,7 +719,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ImpressumResponse"]
+          "*/*": components["schemas"]["ImpressumDto"]
         }
       }
       /** @description No Impressum has been configured */
@@ -748,7 +742,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ImpressumRequest"]
+        "application/json": components["schemas"]["ImpressumDto"]
       }
     }
     responses: {
@@ -758,7 +752,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ImpressumResponse"]
+          "*/*": components["schemas"]["ImpressumDto"]
         }
       }
     }
@@ -1530,7 +1524,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ImpressumResponse"]
+          "*/*": components["schemas"]["ImpressumDto"]
         }
       }
     }

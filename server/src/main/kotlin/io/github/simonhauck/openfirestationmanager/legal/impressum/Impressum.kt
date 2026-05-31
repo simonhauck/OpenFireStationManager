@@ -6,14 +6,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
-data class ImpressumRequest(
-    val name: String,
-    val address: String,
-    val contactEmail: String,
-    val phone: String?,
-)
-
-data class ImpressumResponse(
+data class ImpressumDto(
     val name: String,
     val address: String,
     val contactEmail: String,
@@ -34,8 +27,8 @@ data class Impressum(
     override fun copyWithMetaData(metaData: EntityMetaData): BaseEntity<Impressum> =
         copy(metaData = metaData)
 
-    fun toResponse(): ImpressumResponse =
-        ImpressumResponse(
+    fun toDto(): ImpressumDto =
+        ImpressumDto(
             name = name,
             address = address,
             contactEmail = contactEmail,

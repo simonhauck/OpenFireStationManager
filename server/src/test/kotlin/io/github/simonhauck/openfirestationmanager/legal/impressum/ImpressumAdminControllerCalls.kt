@@ -12,18 +12,18 @@ import org.springframework.stereotype.Component
 class ImpressumAdminControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
     fun upsert(
-        request: ImpressumRequest,
+        request: ImpressumDto,
         authCookie: String? = null,
-    ): ResponseEntity<ImpressumResponse> {
-        return testRestTemplate.exchange<ImpressumResponse>(
+    ): ResponseEntity<ImpressumDto> {
+        return testRestTemplate.exchange<ImpressumDto>(
             "/api/admin/impressum",
             HttpMethod.PUT,
             HttpEntity(request, headersWithCookie(authCookie)),
         )
     }
 
-    fun get(authCookie: String? = null): ResponseEntity<ImpressumResponse> {
-        return testRestTemplate.exchange<ImpressumResponse>(
+    fun get(authCookie: String? = null): ResponseEntity<ImpressumDto> {
+        return testRestTemplate.exchange<ImpressumDto>(
             "/api/admin/impressum",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),

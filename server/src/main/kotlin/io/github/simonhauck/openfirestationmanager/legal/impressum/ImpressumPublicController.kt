@@ -14,7 +14,7 @@ class ImpressumPublicController(private val service: ImpressumService) {
     @GetMapping
     @Operation(summary = "Get the current Impressum")
     @ApiResponses(ApiResponse(responseCode = "200", description = "OK"))
-    fun get(): ImpressumResponse? = service.getResponse()
+    fun get(): ImpressumDto? = service.getDto()
 
     @GetMapping("/exists")
     @Operation(summary = "Check whether an Impressum has been configured")

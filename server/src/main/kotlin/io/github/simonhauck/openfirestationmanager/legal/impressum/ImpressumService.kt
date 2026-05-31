@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 class ImpressumService(private val repository: ImpressumRepository) {
 
     @Transactional
-    fun upsert(request: ImpressumRequest): ImpressumResponse {
+    fun upsert(request: ImpressumDto): ImpressumDto {
         repository.deleteAll()
         val impressum =
             Impressum(
@@ -16,14 +16,14 @@ class ImpressumService(private val repository: ImpressumRepository) {
                 contactEmail = request.contactEmail,
                 phone = request.phone,
             )
-        return repository.save(impressum).toResponse()
+        return repository.save(impressum).toDto()
     }
 
     fun delete() = repository.deleteAll()
 
     fun find(): Impressum? = repository.findAll().firstOrNull()
 
-    fun getResponse(): ImpressumResponse? = find()?.toResponse()
+    fun getDto(): ImpressumDto? = find()?.toDto()
 
     fun exists(): ImpressumExists = ImpressumExists(find() != null)
 }

@@ -5,13 +5,12 @@ import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type { components } from "#/api/schema"
 
-export type ImpressumResponse = components["schemas"]["ImpressumResponse"]
-export type ImpressumRequest = components["schemas"]["ImpressumRequest"]
+export type ImpressumDto = components["schemas"]["ImpressumDto"]
 export type ImpressumExists = components["schemas"]["ImpressumExists"]
 
 export type ImpressumState =
   | { exists: false; impressum: null }
-  | { exists: true; impressum: ImpressumResponse }
+  | { exists: true; impressum: ImpressumDto }
 
 export const impressumAdminQuery = () =>
   queryOptions({
@@ -45,9 +44,7 @@ export const impressumPublicQuery = () =>
 
 export const upsertImpressumMutation = (queryClient: QueryClient) =>
   mutationOptions({
-    mutationFn: async (
-      request: ImpressumRequest,
-    ): Promise<ImpressumResponse> => {
+    mutationFn: async (request: ImpressumDto): Promise<ImpressumDto> => {
       const { data } = await client.PUT("/api/admin/impressum", {
         body: request,
       })

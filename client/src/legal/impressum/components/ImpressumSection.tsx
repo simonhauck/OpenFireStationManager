@@ -1,23 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 
 import {
   deleteImpressumMutation,
   impressumAdminQuery,
   upsertImpressumMutation,
 } from "#/legal/impressum/service/impressumQueries"
-import type { ImpressumRequest } from "#/legal/impressum/service/impressumQueries"
+import type { ImpressumDto } from "#/legal/impressum/service/impressumQueries"
+import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
-import { Textarea } from "#/components/ui/textarea"
 
 export default function ImpressumSection() {
   const queryClient = useQueryClient()
@@ -25,11 +23,7 @@ export default function ImpressumSection() {
 
   const impressum = data?.exists ? data.impressum : null
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [name, setName] = useState("")
-  const [address, setAddress] = useState("")
-  const [contactEmail, setContactEmail] = useState("")
-  const [phone, setPhone] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const { mutate: upsert, isPending: isUpserting } = useMutation(
     upsertImpressumMutation(queryClient),
@@ -38,30 +32,11 @@ export default function ImpressumSection() {
     deleteImpressumMutation(queryClient),
   )
 
-  function startEditing() {
-    setName(impressum?.name ?? "")
-    setAddress(impressum?.address ?? "")
-    setContactEmail(impressum?.contactEmail ?? "")
-    setPhone(impressum?.phone ?? "")
-    setIsEditing(true)
-  }
-
-  function cancelEditing() {
-    setIsEditing(false)
-  }
-
-  function handleSave() {
-    const request: ImpressumRequest = {
-      name,
-      address,
-      contactEmail,
-      phone: phone.trim() || null,
-    }
-
-    upsert(request, {
+  function handleSave(dto: ImpressumDto) {
+    upsert(dto, {
       onSuccess: () => {
         toast.success("Impressum wurde gespeichert.")
-        setIsEditing(false)
+        setIsDialogOpen(false)
       },
       onError: (error) => {
         toast.error(error.message)
@@ -73,7 +48,6 @@ export default function ImpressumSection() {
     deleteImpressum(undefined, {
       onSuccess: () => {
         toast.success("Impressum wurde gelöscht.")
-        setIsEditing(false)
       },
       onError: (error) => {
         toast.error(error.message)
@@ -94,7 +68,7 @@ export default function ImpressumSection() {
         <ErrorState message="Fehler beim Laden des Impressums." />
       </RenderIf>
 
-      <RenderIf when={!isLoading && !isError && !isEditing}>
+      <RenderIf when={!isLoading && !isError}>
         <div className="flex flex-col gap-4">
           <RenderIf when={!!impressum}>
             <div
@@ -106,15 +80,17 @@ export default function ImpressumSection() {
                 <p className="whitespace-pre-line text-muted-foreground">
                   {impressum?.address}
                 </p>
-                <p className="text-muted-foreground">
-                  {impressum?.contactEmail}
-                </p>
+                <p className="text-muted-foreground">{impressum?.contactEmail}</p>
                 <RenderIf when={!!impressum?.phone}>
                   <p className="text-muted-foreground">{impressum?.phone}</p>
                 </RenderIf>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={startEditing}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDialogOpen(true)}
+                >
                   <Pencil className="size-4" />
                   Bearbeiten
                 </Button>
@@ -145,73 +121,22 @@ export default function ImpressumSection() {
             <Button
               variant="outline"
               className="self-start"
-              onClick={startEditing}
+              onClick={() => setIsDialogOpen(true)}
             >
-              <Pencil className="size-4" />
+              <Plus className="size-4" />
               Impressum erstellen
             </Button>
           </RenderIf>
         </div>
       </RenderIf>
 
-      <RenderIf when={!isLoading && !isError && isEditing}>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-name">Name *</Label>
-            <Input
-              id="impressum-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="z. B. Freiwillige Feuerwehr Musterstadt"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-address">Adresse *</Label>
-            <Textarea
-              id="impressum-address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder={"Musterstraße 1\n12345 Musterstadt"}
-              rows={3}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-email">Kontakt-E-Mail *</Label>
-            <Input
-              id="impressum-email"
-              type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-              placeholder="info@feuerwehr-musterstadt.de"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-phone">Telefonnummer (optional)</Label>
-            <Input
-              id="impressum-phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+49 123 456789"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={handleSave}
-              disabled={!name || !address || !contactEmail || isUpserting}
-            >
-              Speichern
-            </Button>
-            <Button
-              variant="outline"
-              onClick={cancelEditing}
-              disabled={isUpserting}
-            >
-              Abbrechen
-            </Button>
-          </div>
-        </div>
-      </RenderIf>
+      <ImpressumDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        initialValues={impressum}
+        onSave={handleSave}
+        isSaving={isUpserting}
+      />
     </PageSubSection>
   )
 }
