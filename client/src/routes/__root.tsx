@@ -7,9 +7,11 @@ import { TanStackDevtools } from "@tanstack/react-devtools"
 import "../styles.css"
 import DefaultLayout from "#/components/layout/DefaultLayout"
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  component: RootComponent,
-})
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    component: RootComponent,
+  },
+)
 
 function RootComponent() {
   return (
