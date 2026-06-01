@@ -11,10 +11,10 @@ interface DefaultLayoutProps {
 
 export default function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col">
       <Header />
       <Breadcrumb />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1">
         <ErrorBoundary>
           <div className="min-h-full w-full p-2">{children}</div>
         </ErrorBoundary>

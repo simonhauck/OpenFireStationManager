@@ -38,6 +38,12 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 
 | Purpose                       | Command                                                                                |
 | ----------------------------- | -------------------------------------------------------------------------------------- |
+| Update API definition (schema) | `./update-api-definition.sh` (from repo root) |
+
+> **After any API change**, run `./update-api-definition.sh` from the repo root. It regenerates
+> the OpenAPI schema (`schema.json`) by running `HttpApiContractIT` with `UPDATE_SNAPSHOT=true`,
+> then applies Spotless formatting in a separate step to avoid a race condition.
+
 | Build (compile + test + JAR)  | `./gradlew build`                                                                      |
 | Run application               | `./gradlew bootRun`                                                                    |
 | Run all tests                 | `./gradlew test`                                                                       |

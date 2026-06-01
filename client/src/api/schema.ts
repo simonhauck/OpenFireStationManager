@@ -350,6 +350,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/public/privacy-policy/exists": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether a privacy policy document has been uploaded */
+    get: operations["existsPublic"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/public/impressum/exists": {
     parameters: {
       query?: never
@@ -1525,6 +1542,26 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ImpressumDto"]
+        }
+      }
+    }
+  }
+  existsPublic: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["PrivacyPolicyExists"]
         }
       }
     }
