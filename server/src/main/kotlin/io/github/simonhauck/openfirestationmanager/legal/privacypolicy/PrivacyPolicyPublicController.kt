@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -23,7 +22,10 @@ class PrivacyPolicyPublicController(private val service: PrivacyPolicyService) {
     @Operation(summary = "Serve the active privacy policy document")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "OK"),
-        ApiResponse(responseCode = "404", description = "No privacy policy document has been uploaded"),
+        ApiResponse(
+            responseCode = "404",
+            description = "No privacy policy document has been uploaded",
+        ),
     )
     fun serve(): ResponseEntity<ByteArray> {
         val document =
@@ -37,10 +39,7 @@ class PrivacyPolicyPublicController(private val service: PrivacyPolicyService) {
             else document.contentType
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, contentType)
-            .header(
-                HttpHeaders.CONTENT_DISPOSITION,
-                "inline; filename=\"${document.fileName}\"",
-            )
+            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"${document.fileName}\"")
             .body(document.content)
     }
 }

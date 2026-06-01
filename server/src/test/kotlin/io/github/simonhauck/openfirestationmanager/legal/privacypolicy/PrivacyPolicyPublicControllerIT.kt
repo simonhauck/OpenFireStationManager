@@ -1,11 +1,11 @@
 package io.github.simonhauck.openfirestationmanager.legal.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import java.nio.charset.StandardCharsets
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import java.nio.charset.StandardCharsets
 import org.springframework.http.MediaType
 
 class PrivacyPolicyPublicControllerIT : IntegrationTest() {

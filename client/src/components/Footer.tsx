@@ -20,7 +20,10 @@ export default function Footer() {
         <span>&copy; {year} Simon Hauck</span>
         <RenderIf when={impressumExists}>
           <span aria-hidden="true">·</span>
-          <Link to="/impressum" className="hover:text-(--sea-ink) transition-colors">
+          <Link
+            to="/impressum"
+            className="hover:text-(--sea-ink) transition-colors"
+          >
             Impressum
           </Link>
         </RenderIf>
