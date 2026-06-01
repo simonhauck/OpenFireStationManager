@@ -23,7 +23,6 @@ type MenuItem = {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { label: "Über uns", href: "/about" },
   {
     label: "Pool Klamotten",
     href: "/pool-clothing",
