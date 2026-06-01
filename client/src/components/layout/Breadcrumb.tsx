@@ -17,7 +17,6 @@ type StaticSegment = Exclude<AllRawSegments, "" | `$${string}`>
 // ─── Label map ────────────────────────────────────────────────────────────────
 
 const SEGMENT_LABELS: Record<StaticSegment, string> = {
-  about: "Über uns",
   admin: "Administration",
   batch: "Stapelverarbeitung",
   "change-password": "Passwort ändern",

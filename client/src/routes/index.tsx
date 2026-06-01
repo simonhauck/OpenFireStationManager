@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { Flame, ShieldCheck, Users, Building2 } from "lucide-react"
 
 import { Badge } from "#/components/ui/badge"
@@ -46,9 +46,6 @@ function App() {
           browserbasierten Plattform zu koordinieren.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <Button asChild size="lg">
-            <Link to="/about">Mehr erfahren</Link>
-          </Button>
           <Button asChild size="lg" variant="outline">
             <a
               href="https://github.com/simonhauck/OpenFireStationManager"
