@@ -995,6 +995,25 @@
         }
       }
     },
+    "/api/public/privacy-policy/exists": {
+      "get": {
+        "tags": ["privacy-policy-public-controller"],
+        "summary": "Check whether a privacy policy document has been uploaded",
+        "operationId": "existsPublic",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyPolicyExists"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/impressum/exists": {
       "get": {
         "tags": ["impressum-public-controller"],

@@ -27,6 +27,15 @@ export const privacyPolicyQuery = () =>
     },
   })
 
+export const privacyPolicyPublicQuery = () =>
+  queryOptions({
+    queryKey: [...queryKeys.privacyPolicy(), "public"] as const,
+    queryFn: async (): Promise<{ exists: boolean }> => {
+      const { data } = await client.GET("/api/public/privacy-policy/exists")
+      return { exists: data?.exists ?? false }
+    },
+  })
+
 export const uploadPrivacyPolicyMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationKey: [...queryKeys.privacyPolicy(), "upload"] as const,
