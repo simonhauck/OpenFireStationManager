@@ -45,6 +45,72 @@
         }
       }
     },
+    "/api/admin/impressum": {
+      "get": {
+        "tags": ["impressum-admin-controller"],
+        "summary": "Get the current Impressum",
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpressumDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No Impressum has been configured",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["impressum-admin-controller"],
+        "summary": "Create or update the Impressum",
+        "operationId": "upsert",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpressumDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpressumDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["impressum-admin-controller"],
+        "summary": "Delete the Impressum",
+        "operationId": "delete",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/public/setup/initial-admin": {
       "post": {
         "tags": ["initial-setup-controller"],
@@ -510,7 +576,7 @@
       "delete": {
         "tags": ["privacy-policy-admin-controller"],
         "summary": "Delete the active privacy policy document",
-        "operationId": "delete",
+        "operationId": "delete_1",
         "responses": {
           "204": {
             "description": "No Content"
@@ -910,6 +976,44 @@
         }
       }
     },
+    "/api/public/impressum": {
+      "get": {
+        "tags": ["impressum-public-controller"],
+        "summary": "Get the current Impressum",
+        "operationId": "get_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpressumDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/impressum/exists": {
+      "get": {
+        "tags": ["impressum-public-controller"],
+        "summary": "Check whether an Impressum has been configured",
+        "operationId": "exists",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpressumExists"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/auth/me": {
       "get": {
         "tags": ["auth-controller"],
@@ -1047,7 +1151,7 @@
       "get": {
         "tags": ["privacy-policy-admin-controller"],
         "summary": "Check whether a privacy policy document has been uploaded",
-        "operationId": "exists",
+        "operationId": "exists_1",
         "responses": {
           "200": {
             "description": "OK",
@@ -1055,6 +1159,25 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/PrivacyPolicyExists"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/impressum/exists": {
+      "get": {
+        "tags": ["impressum-admin-controller"],
+        "summary": "Check whether an Impressum has been configured",
+        "operationId": "exists_2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpressumExists"
                 }
               }
             }
@@ -1140,6 +1263,24 @@
           "roles",
           "username"
         ]
+      },
+      "ImpressumDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "contactEmail": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": ["address", "contactEmail", "name"]
       },
       "InitialAdminSetupRequest": {
         "type": "object",
@@ -1496,6 +1637,15 @@
           }
         },
         "required": ["firstName", "lastName", "roles"]
+      },
+      "ImpressumExists": {
+        "type": "object",
+        "properties": {
+          "exists": {
+            "type": "boolean"
+          }
+        },
+        "required": ["exists"]
       },
       "AuthStateResponse": {
         "type": "object",
