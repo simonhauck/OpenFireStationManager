@@ -16,6 +16,9 @@ import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   beforeLoad: async ({ context }) => {
     const data = await context.queryClient.ensureQueryData(meQuery())
     if (data.authenticated) {
@@ -28,6 +31,7 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { redirect: redirectTo } = Route.useSearch()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -45,7 +49,11 @@ function Login() {
       { username, password, rememberMe },
       {
         onSuccess: () => {
-          void navigate({ to: "/dashboard", replace: true })
+          if (redirectTo) {
+            void navigate({ to: redirectTo, replace: true })
+          } else {
+            void navigate({ to: "/dashboard", replace: true })
+          }
         },
       },
     )
