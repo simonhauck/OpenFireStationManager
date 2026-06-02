@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
-import { useEffect, useRef } from "react"
-import { useNavigate, useRouterState } from "@tanstack/react-router"
 
 import { meQuery } from "#/api/auth.queries"
 import type { components } from "#/api/schema"
@@ -19,29 +17,11 @@ export interface RoleGuardProps {
 
 export default function RoleGuard(props: RoleGuardProps) {
   const { data, isLoading, isError } = useQuery(meQuery())
-  const navigate = useNavigate()
-  const location = useRouterState({ select: (s) => s.location })
-
-  // Capture the href at mount time so the redirect target never changes even
-  // if the router state updates while this component is still mounted.
-  const mountHref = useRef(location.href)
 
   const hideChildOrDefault = props.hideChildComponent ?? false
   const errorOrDefault =
     props.forbiddenMessage ??
     "Du hast nicht die notwendigen Rechte diesen Bereich zu sehen"
-
-  const isAuthenticated = data?.authenticated === true
-
-  useEffect(() => {
-    if (!isLoading && !isError && !isAuthenticated && !hideChildOrDefault) {
-      void navigate({
-        to: "/login",
-        search: { redirect: mountHref.current },
-        replace: true,
-      })
-    }
-  }, [isLoading, isError, isAuthenticated, hideChildOrDefault, navigate])
 
   if (isLoading) {
     return showChildOrNothing(
@@ -58,13 +38,17 @@ export default function RoleGuard(props: RoleGuardProps) {
   }
 
   const userRoles = data?.user?.roles ?? []
+  const isAuthenticated = data?.authenticated === true
   const hasRequiredRole = props.allowedRoles.some((role) =>
     userRoles.includes(role),
   )
   const hasAdminRole = userRoles.includes("ADMIN")
 
   if (!isAuthenticated) {
-    return showChildOrNothing(hideChildOrDefault, null)
+    return showChildOrNothing(
+      hideChildOrDefault,
+      <ErrorState message={errorOrDefault} />,
+    )
   }
 
   if (!(hasRequiredRole || hasAdminRole)) {
