@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router"
 
 import CreateClothingLocationPage from "#/clothing/components/locations/create/CreateClothingLocationPage"
 
-export const Route = createFileRoute("/_authenticated/clothing-management/locations/new")({
+export const Route = createFileRoute(
+  "/_authenticated/clothing-management/locations/new",
+)({
   component: CreateClothingLocationRoute,
 })
 

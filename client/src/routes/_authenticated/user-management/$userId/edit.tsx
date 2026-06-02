@@ -15,7 +15,9 @@ import { Label } from "#/components/ui/label"
 import { ROLE_OPTIONS } from "#/users/roleMetadata"
 import type { UserRole } from "#/users/roleMetadata"
 
-export const Route = createFileRoute("/_authenticated/user-management/$userId/edit")({
+export const Route = createFileRoute(
+  "/_authenticated/user-management/$userId/edit",
+)({
   component: EditUserPage,
 })
 

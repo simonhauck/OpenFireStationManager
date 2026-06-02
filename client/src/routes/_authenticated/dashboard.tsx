@@ -3,7 +3,8 @@ import { Link, createFileRoute } from "@tanstack/react-router"
 import { Settings, ShieldCheck, Shirt, Users } from "lucide-react"
 
 import { meQuery } from "#/api/auth.queries"
-import type { components } from "#/api/schema"
+import { hasRequiredRole } from "#/api/auth.utils"
+import type { UserRole } from "#/api/auth.utils"
 import PageSection from "#/components/base/PageSection"
 import {
   Card,
@@ -15,8 +16,6 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 })
-
-type UserRole = components["schemas"]["UserAccount"]["roles"][number]
 
 type DashboardItem = {
   title: string
@@ -57,11 +56,6 @@ const DASHBOARD_ITEMS: DashboardItem[] = [
   },
 ]
 
-function hasAccess(userRoles: UserRole[], allowedRoles: UserRole[]): boolean {
-  if (userRoles.includes("ADMIN")) return true
-  return allowedRoles.some((role) => userRoles.includes(role))
-}
-
 export default function Dashboard() {
   const { data } = useQuery(meQuery())
 
@@ -69,7 +63,7 @@ export default function Dashboard() {
   const userName = data?.user?.firstName ?? data?.user?.username ?? ""
 
   const visibleItems = DASHBOARD_ITEMS.filter((item) =>
-    hasAccess(userRoles, item.allowedRoles),
+    hasRequiredRole(userRoles, item.allowedRoles),
   )
 
   const title = userName ? `Willkommen, ${userName}` : "Willkommen"

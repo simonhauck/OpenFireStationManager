@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router"
 import RoleGuard from "#/components/base/RoleGuard"
 import ClothingItemForm from "#/clothing/components/shared/ClothingItemForm.tsx"
 
-export const Route = createFileRoute("/_authenticated/clothing-management/items/new")({
+export const Route = createFileRoute(
+  "/_authenticated/clothing-management/items/new",
+)({
   component: CreateClothingItemRoute,
 })
 
