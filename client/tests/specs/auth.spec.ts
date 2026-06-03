@@ -21,3 +21,55 @@ test.describe("Auth", () => {
     await expect(page).not.toHaveURL(/\/login/)
   })
 })
+
+test.describe("Auth – redirect after login", () => {
+  // /pool-clothing/checkout is guarded by RoleGuard with allowedRoles=["USER"]
+  const protectedRoute = "/pool-clothing/checkout"
+
+  test("unauthenticated user visiting a protected route is redirected to login", async ({
+    page,
+  }) => {
+    await page.goto(protectedRoute)
+    await expect(page).toHaveURL(/\/login/)
+  })
+
+  test("login URL contains the original protected route as redirect param", async ({
+    page,
+  }) => {
+    await page.goto(protectedRoute)
+    await expect(page).toHaveURL(/redirect=/)
+    await expect(page).toHaveURL(/pool-clothing/)
+  })
+
+  test("after login the user is redirected back to the originally requested page", async ({
+    page,
+  }) => {
+    const username = process.env.E2E_USER_USERNAME!
+    const password = process.env.E2E_USER_PASSWORD!
+
+    await page.goto(protectedRoute)
+    await expect(page).toHaveURL(/\/login/)
+
+    const loginPage = new LoginPage(page)
+    await loginPage.login(username, password)
+
+    await expect(page).toHaveURL(/\/pool-clothing\/checkout/)
+  })
+
+  test("after redirect-login the login page is not in the history stack", async ({
+    page,
+  }) => {
+    const username = process.env.E2E_USER_USERNAME!
+    const password = process.env.E2E_USER_PASSWORD!
+
+    await page.goto(protectedRoute)
+    await expect(page).toHaveURL(/\/login/)
+
+    const loginPage = new LoginPage(page)
+    await loginPage.login(username, password)
+    await expect(page).toHaveURL(/\/pool-clothing\/checkout/)
+
+    await page.goBack()
+    await expect(page).not.toHaveURL(/\/login/)
+  })
+})

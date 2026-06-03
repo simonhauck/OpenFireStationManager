@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 import { Flame, ShieldCheck, Users, Building2 } from "lucide-react"
 
+import { meQuery } from "#/api/auth.queries"
 import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
 import {
@@ -10,7 +11,15 @@ import {
   CardTitle,
 } from "#/components/ui/card"
 
-export const Route = createFileRoute("/")({ component: App })
+export const Route = createFileRoute("/")({
+  beforeLoad: async ({ context }) => {
+    const data = await context.queryClient.ensureQueryData(meQuery())
+    if (data.authenticated) {
+      throw redirect({ to: "/dashboard" })
+    }
+  },
+  component: App,
+})
 
 function App() {
   const highlights = [

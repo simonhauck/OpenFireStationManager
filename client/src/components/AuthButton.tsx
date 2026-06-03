@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { LogOut } from "lucide-react"
 
 import { logoutMutation, meQuery } from "#/api/auth.queries"
@@ -15,11 +15,18 @@ import {
 
 export default function AuthButton() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const { data, isError } = useQuery(meQuery())
   const isAuthenticated = data?.authenticated === true && !isError
   const user = data?.user
 
   const { mutate: logout } = useMutation(logoutMutation(queryClient))
+
+  function handleLogout() {
+    logout(undefined, {
+      onSuccess: () => void navigate({ to: "/", replace: true }),
+    })
+  }
 
   if (!isAuthenticated) {
     return (
@@ -53,7 +60,7 @@ export default function AuthButton() {
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onSelect={() => logout()}>
+        <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
           <LogOut />
           Abmelden
         </DropdownMenuItem>

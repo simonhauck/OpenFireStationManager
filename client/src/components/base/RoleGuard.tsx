@@ -2,11 +2,10 @@ import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 
 import { meQuery } from "#/api/auth.queries"
-import type { components } from "#/api/schema"
+import { hasRequiredRole } from "#/api/auth.utils"
+import type { UserRole } from "#/api/auth.utils"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
-
-type UserRole = components["schemas"]["UserAccount"]["roles"][number]
 
 export interface RoleGuardProps {
   allowedRoles: UserRole[]
@@ -39,19 +38,15 @@ export default function RoleGuard(props: RoleGuardProps) {
 
   const userRoles = data?.user?.roles ?? []
   const isAuthenticated = data?.authenticated === true
-  const hasRequiredRole = props.allowedRoles.some((role) =>
-    userRoles.includes(role),
-  )
-  const hasAdminRole = userRoles.includes("ADMIN")
 
-  if (!isAuthenticated && !props.hideChildComponent) {
+  if (!isAuthenticated) {
     return showChildOrNothing(
       hideChildOrDefault,
       <ErrorState message={errorOrDefault} />,
     )
   }
 
-  if (!(hasRequiredRole || hasAdminRole)) {
+  if (!hasRequiredRole(userRoles, props.allowedRoles)) {
     return showChildOrNothing(
       hideChildOrDefault,
       <ErrorState message={errorOrDefault} />,

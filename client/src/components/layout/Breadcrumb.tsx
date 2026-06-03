@@ -32,6 +32,8 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   settings: "Einstellungen",
   types: "Typen",
   "user-management": "Nutzer Management",
+  dashboard: "Dashboard",
+  impressum: "Impressum",
 }
 
 function isStaticSegment(segment: string): segment is StaticSegment {

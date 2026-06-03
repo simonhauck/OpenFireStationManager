@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
-import { loginMutation } from "#/api/auth.queries"
+import { loginMutation, meQuery } from "#/api/auth.queries"
 import { Button } from "#/components/ui/button"
 import {
   Card,
@@ -16,12 +16,22 @@ import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
+  beforeLoad: async ({ context }) => {
+    const data = await context.queryClient.ensureQueryData(meQuery())
+    if (data.authenticated) {
+      throw redirect({ to: "/dashboard" })
+    }
+  },
   component: Login,
 })
 
 function Login() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { redirect: redirectTo } = Route.useSearch()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -39,7 +49,11 @@ function Login() {
       { username, password, rememberMe },
       {
         onSuccess: () => {
-          void navigate({ to: "/" })
+          if (redirectTo) {
+            void navigate({ to: redirectTo, replace: true })
+          } else {
+            void navigate({ to: "/dashboard", replace: true })
+          }
         },
       },
     )
