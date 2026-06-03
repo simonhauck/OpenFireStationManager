@@ -78,7 +78,7 @@ export default function CheckoutPage() {
 
   return (
     <PageSection
-      title="Klamotten Ausgabe"
+      title="Klamotten tauschen"
       buttons={
         <TouchButton
           variant="outline"

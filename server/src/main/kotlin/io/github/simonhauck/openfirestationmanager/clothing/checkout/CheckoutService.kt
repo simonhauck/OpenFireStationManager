@@ -28,33 +28,21 @@ class CheckoutService(
         val takeItems = request.takeItemIds.map { getItemOrBadRequest(it) }
         val returnItems = request.returnItemIds.map { getItemOrBadRequest(it) }
 
-        // Returns: item must be at the target PERSONAL location. Frontend ensures that
-        for (item in returnItems) {
-            val currentLocationId = item.locationId?.id
-            val isAtTarget = currentLocationId == request.targetLocationId
-            if (!isAtTarget) {
-                throw PublicApiException(
-                    HttpStatus.CONFLICT,
-                    "Item ${item.id} is not at the expected PERSONAL location",
-                )
-            }
-        }
-
-        // Write all movements in one transaction with a shared batchId.
         val batchId = UUID.randomUUID().toString()
 
-        for (item in takeItems) {
-            val fromLocationId = item.locationId?.id
-            movementService.recordMovement(
-                item = item,
-                fromLocationId = fromLocationId,
-                toLocationId = request.targetLocationId,
-                reason = MovementReason.CHECKOUT,
-                batchId = batchId,
-            )
-            itemRepository.save(
-                item.copy(locationId = AggregateReference.to(request.targetLocationId))
-            )
+        if (takeItems.isNotEmpty()) {
+            val targetId = request.targetLocationId!!
+            for (item in takeItems) {
+                val fromLocationId = item.locationId?.id
+                movementService.recordMovement(
+                    item = item,
+                    fromLocationId = fromLocationId,
+                    toLocationId = targetId,
+                    reason = MovementReason.CHECKOUT,
+                    batchId = batchId,
+                )
+                itemRepository.save(item.copy(locationId = AggregateReference.to(targetId)))
+            }
         }
 
         val returnToLocationId = request.returnLocationId
@@ -91,16 +79,26 @@ class CheckoutService(
             )
         }
 
-        val targetLocation =
-            locationRepository.findById(request.targetLocationId)
-                ?: throw PublicApiException(HttpStatus.BAD_REQUEST, "targetLocationId not found")
-        if (targetLocation.type != LocationType.PERSONAL) {
+        if (request.targetLocationId != null) {
+            val targetLocation =
+                locationRepository.findById(request.targetLocationId)
+                    ?: throw PublicApiException(
+                        HttpStatus.BAD_REQUEST,
+                        "targetLocationId not found",
+                    )
+            if (targetLocation.type != LocationType.PERSONAL) {
+                throw PublicApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "targetLocationId must be a PERSONAL location",
+                )
+            }
+            checkLocationVisibility(targetLocation, isKleiderwart)
+        } else if (request.takeItemIds.isNotEmpty()) {
             throw PublicApiException(
                 HttpStatus.BAD_REQUEST,
-                "targetLocationId must be a PERSONAL location",
+                "targetLocationId must not be null when takeItemIds are present",
             )
         }
-        checkLocationVisibility(targetLocation, isKleiderwart)
 
         if (request.returnLocationId != null) {
             val returnLocation =
@@ -109,10 +107,13 @@ class CheckoutService(
                         HttpStatus.BAD_REQUEST,
                         "returnLocationId not found",
                     )
-            if (returnLocation.type != LocationType.WAESCHE) {
+            if (
+                returnLocation.type != LocationType.WAESCHE &&
+                    returnLocation.type != LocationType.POOL
+            ) {
                 throw PublicApiException(
                     HttpStatus.BAD_REQUEST,
-                    "returnLocationId must be a WAESCHE location",
+                    "returnLocationId must be a WAESCHE or POOL location",
                 )
             }
             checkLocationVisibility(returnLocation, isKleiderwart)

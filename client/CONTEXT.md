@@ -27,7 +27,7 @@ Informal vs. formal labels for clothing items. Both appear in the UI; "Klamotten
 
 ### Location type
 
-UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creating/editing a `Standort`. Only POOL is selectable as a checkout source; only PERSONAL is selectable as a checkout target; only WAESCHE is selectable as a return target.
+UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creating/editing a `Standort`. Only POOL is selectable as a checkout source; only PERSONAL is selectable as a checkout target; WAESCHE and POOL are selectable as return targets.
 
 ### Tablet routes
 
@@ -37,7 +37,7 @@ UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creatin
 
 The `/pool-clothing/checkout` route is a single route that runs an internal step machine; it is not a set of sub-routes. Wizard steps in order: pick target PERSONAL → pick items to take → review locker contents and toggle returns (auto-pre-toggled by type match) → if any returns, pick WAESCHE → review screen → submit. There is no source-pool pre-selection; the source is inferred per item from the item's current `locationId`.
 
-The route is reached from a "Klamotten Ausgabe" button on `/pool-clothing` (top-right of the page); it is also reachable by direct URL. The route itself is `RoleGuard`-ed for the `USER` role.
+The route is reached from a "Klamotten tauschen" button on `/pool-clothing` (top-right of the page); it is also reachable by direct URL. The route itself is `RoleGuard`-ed for the `USER` role.
 
 When the user scans or selects an item that is not at a POOL location, a client-side confirmation dialog is shown before the item is added to the list. This is a purely frontend UX guard — the backend does not validate the source location type and performs no two-phase protocol.
 
@@ -49,6 +49,15 @@ Picker UI scales by cardinality:
 ### Umlagerung (Relocation)
 
 The `/pool-clothing/relocation` route is a KLEIDERWART-only batch operation for moving items between locations of any type. Reached from an "Umlagerung starten" button on `/pool-clothing`. The route is `RoleGuard`-ed for the `KLEIDERWART` role.
+
+### Rückgabe (Return)
+
+The `/pool-clothing/return` route handles clothing returns without taking new items. Two variants reached from separate buttons on `/pool-clothing`:
+
+- **"Klamotten in die Wäsche geben"** → `?returnTarget=WAESCHE` — return items to a laundry basket.
+- **"Klamotten zurück in den Pool geben"** → `?returnTarget=POOL` — return clean items to the pool.
+
+The route uses an internal step machine (separate from Checkout): select return items → pick return target (tile grid, filtered by mode) → review → submit. The item selection screen supports three input modes on a tab toggle: barcode scanner (with internal scan/manual-search toggle), location-based picker (dialog: pick Spind → checkboxes → add). Scanner has no discrepancy guard. Returns may originate from different PERSONAL locations. Submits to `POST /api/clothing/checkouts` with null `targetLocationId`. `RoleGuard`-ed for `USER`.
 
 ### Page Section
 

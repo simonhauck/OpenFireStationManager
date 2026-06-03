@@ -30,7 +30,20 @@ export default function PoolKlamottenPage() {
             </TouchButton>
           </RoleGuard>
           <TouchButton asChild>
-            <Link to="/pool-clothing/checkout">Klamotten Ausgabe</Link>
+            <Link to="/pool-clothing/checkout">Klamotten tauschen</Link>
+          </TouchButton>
+          <TouchButton asChild variant="outline">
+            <Link
+              to="/pool-clothing/return"
+              search={{ returnTarget: "WAESCHE" }}
+            >
+              Klamotten in die Wäsche geben
+            </Link>
+          </TouchButton>
+          <TouchButton asChild variant="outline">
+            <Link to="/pool-clothing/return" search={{ returnTarget: "POOL" }}>
+              Klamotten zurück in den Pool geben
+            </Link>
           </TouchButton>
         </>
       }

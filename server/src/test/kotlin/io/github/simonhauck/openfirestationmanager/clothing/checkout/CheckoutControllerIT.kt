@@ -129,29 +129,6 @@ class CheckoutControllerIT : IntegrationTest() {
         assertThat(returnMovement.batchId).isEqualTo(body.batchId)
     }
 
-    // ─── Conflict (409) ───────────────────────────────────────────────────────
-
-    @Test
-    fun `returns 409 when return item is not at the target PERSONAL location`() {
-        val type = createType()
-        val pool = createLocation(LocationType.POOL)
-        val personal = createLocation(LocationType.PERSONAL)
-        val waesche = createLocation(LocationType.WAESCHE)
-        val item = createItem(type, pool) // Not at PERSONAL
-
-        val response =
-            checkoutCalls.checkoutExpectingError(
-                CheckoutRequest(
-                    targetLocationId = personal.id,
-                    returnLocationId = waesche.id,
-                    returnItemIds = listOf(item.id),
-                ),
-                authCookie = validCookieHeader,
-            )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)
-    }
-
     // ─── Hard 400 validation ──────────────────────────────────────────────────
 
     @Test
@@ -241,6 +218,109 @@ class CheckoutControllerIT : IntegrationTest() {
                     takeItemIds = listOf(item.id),
                 ),
                 authCookie = userCookie,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    // ─── Return-only (nullable target) ────────────────────────────────────────
+
+    @Test
+    fun `return-only checkout with null targetLocationId writes RETURN movements`() {
+        val type = createType()
+        val personal = createLocation(LocationType.PERSONAL)
+        val waesche = createLocation(LocationType.WAESCHE)
+        val item = createItem(type, personal)
+
+        val response =
+            checkoutCalls.checkout(
+                CheckoutRequest(
+                    targetLocationId = null,
+                    returnLocationId = waesche.id,
+                    returnItemIds = listOf(item.id),
+                ),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        val body = response.body!!
+        assertThat(body.batchId).isNotBlank()
+
+        val updatedItem = itemRepository.findById(item.id)!!
+        assertThat(updatedItem.locationId?.id).isEqualTo(waesche.id)
+
+        val movements = movementRepository.findAllByItemId(AggregateReference.to(item.id))
+        val returnMovement = movements.first { it.reason == MovementReason.RETURN }
+        assertThat(returnMovement.fromLocationId?.id).isEqualTo(personal.id)
+        assertThat(returnMovement.toLocationId?.id).isEqualTo(waesche.id)
+        assertThat(returnMovement.batchId).isEqualTo(body.batchId)
+    }
+
+    @Test
+    fun `return-only checkout with POOL returnLocationId succeeds`() {
+        val type = createType()
+        val personal = createLocation(LocationType.PERSONAL)
+        val pool = createLocation(LocationType.POOL)
+        val item = createItem(type, personal)
+
+        val response =
+            checkoutCalls.checkout(
+                CheckoutRequest(
+                    targetLocationId = null,
+                    returnLocationId = pool.id,
+                    returnItemIds = listOf(item.id),
+                ),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        val body = response.body!!
+        assertThat(body.batchId).isNotBlank()
+
+        val updatedItem = itemRepository.findById(item.id)!!
+        assertThat(updatedItem.locationId?.id).isEqualTo(pool.id)
+
+        val movements = movementRepository.findAllByItemId(AggregateReference.to(item.id))
+        val returnMovement = movements.first { it.reason == MovementReason.RETURN }
+        assertThat(returnMovement.fromLocationId?.id).isEqualTo(personal.id)
+        assertThat(returnMovement.toLocationId?.id).isEqualTo(pool.id)
+    }
+
+    @Test
+    fun `return items from different PERSONAL locations succeeds`() {
+        val type = createType()
+        val personal1 = createLocation(LocationType.PERSONAL)
+        val personal2 = createLocation(LocationType.PERSONAL)
+        val waesche = createLocation(LocationType.WAESCHE)
+        val item1 = createItem(type, personal1)
+        val item2 = createItem(type, personal2)
+
+        val response =
+            checkoutCalls.checkout(
+                CheckoutRequest(
+                    targetLocationId = null,
+                    returnLocationId = waesche.id,
+                    returnItemIds = listOf(item1.id, item2.id),
+                ),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+
+        assertThat(itemRepository.findById(item1.id)!!.locationId?.id).isEqualTo(waesche.id)
+        assertThat(itemRepository.findById(item2.id)!!.locationId?.id).isEqualTo(waesche.id)
+    }
+
+    @Test
+    fun `returns 400 when targetLocationId is null but takeItemIds are present`() {
+        val type = createType()
+        val pool = createLocation(LocationType.POOL)
+        val item = createItem(type, pool)
+
+        val response =
+            checkoutCalls.checkoutExpectingError(
+                CheckoutRequest(targetLocationId = null, takeItemIds = listOf(item.id)),
+                authCookie = validCookieHeader,
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)

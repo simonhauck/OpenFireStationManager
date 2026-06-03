@@ -1583,7 +1583,7 @@
             }
           }
         },
-        "required": ["returnItemIds", "takeItemIds", "targetLocationId"]
+        "required": ["returnItemIds", "takeItemIds"]
       },
       "CheckoutResponse": {
         "type": "object",
