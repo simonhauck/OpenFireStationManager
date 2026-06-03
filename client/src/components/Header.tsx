@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router"
 import { Menu, X } from "lucide-react"
 
 import { meQuery } from "#/api/auth.queries"
+import { hasRequiredRole } from "#/api/auth.utils"
 import AuthButton from "#/components/AuthButton"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
@@ -46,7 +47,13 @@ const MENU_ITEMS: MenuItem[] = [
 ]
 
 export default function Header() {
-  useQuery(meQuery())
+  const { data } = useQuery(meQuery())
+
+  const userRoles = data?.user?.roles ?? []
+  const visibleItems = MENU_ITEMS.filter(
+    (item) =>
+      !item.allowedRoles || hasRequiredRole(userRoles, item.allowedRoles),
+  )
 
   return (
     <header className="sticky top-0 z-50 border-b border-(--line) bg-(--header-bg) px-4 backdrop-blur-lg">
@@ -60,22 +67,24 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav links — hidden on mobile */}
-        <DesktopNav />
+        <DesktopNav items={visibleItems} />
 
         {/* Right: auth + theme + mobile menu trigger */}
         <div className="ml-auto flex items-center gap-2">
           <AuthButton />
           <ThemeToggle />
-          <div className="sm:hidden">
-            <MobileMenu />
-          </div>
+          <RenderIf when={visibleItems.length > 0}>
+            <div className="sm:hidden">
+              <MobileMenu items={visibleItems} />
+            </div>
+          </RenderIf>
         </div>
       </nav>
     </header>
   )
 }
 
-function MobileMenu() {
+function MobileMenu({ items }: { items: MenuItem[] }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -98,7 +107,7 @@ function MobileMenu() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {MENU_ITEMS.map((item) => (
+        {items.map((item) => (
           <MenuItemRenderer
             key={item.href}
             item={item}
@@ -111,10 +120,10 @@ function MobileMenu() {
   )
 }
 
-function DesktopNav() {
+function DesktopNav({ items }: { items: MenuItem[] }) {
   return (
     <div className="hidden items-center gap-4 text-sm font-semibold sm:flex">
-      {MENU_ITEMS.map((item) => (
+      {items.map((item) => (
         <MenuItemRenderer key={item.href} item={item} />
       ))}
     </div>
