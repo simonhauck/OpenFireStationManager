@@ -324,7 +324,25 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["getPrivacyPolicy"]
+    /** Serve the active privacy policy document */
+    get: operations["serve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/public/privacy-policy/exists": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether a privacy policy document has been uploaded */
+    get: operations["exists"]
     put?: never
     post?: never
     delete?: never
@@ -350,23 +368,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/public/privacy-policy/exists": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Check whether a privacy policy document has been uploaded */
-    get: operations["existsPublic"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/public/impressum/exists": {
     parameters: {
       query?: never
@@ -375,7 +376,7 @@ export interface paths {
       cookie?: never
     }
     /** Check whether an Impressum has been configured */
-    get: operations["exists"]
+    get: operations["exists_1"]
     put?: never
     post?: never
     delete?: never
@@ -476,7 +477,7 @@ export interface paths {
       cookie?: never
     }
     /** Check whether a privacy policy document has been uploaded */
-    get: operations["exists_1"]
+    get: operations["exists_2"]
     put?: never
     post?: never
     delete?: never
@@ -493,7 +494,7 @@ export interface paths {
       cookie?: never
     }
     /** Check whether an Impressum has been configured */
-    get: operations["exists_2"]
+    get: operations["exists_3"]
     put?: never
     post?: never
     delete?: never
@@ -644,6 +645,9 @@ export interface components {
       lastName: string
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
+    PrivacyPolicyExists: {
+      exists: boolean
+    }
     ImpressumExists: {
       exists: boolean
     }
@@ -682,9 +686,6 @@ export interface components {
       clothingItem: components["schemas"]["ClothingItem"]
       location?: components["schemas"]["ClothingLocation"]
       clothingType: components["schemas"]["ClothingType"]
-    }
-    PrivacyPolicyExists: {
-      exists: boolean
     }
   }
   responses: never
@@ -1506,7 +1507,7 @@ export interface operations {
       }
     }
   }
-  getPrivacyPolicy: {
+  serve: {
     parameters: {
       query?: never
       header?: never
@@ -1522,6 +1523,35 @@ export interface operations {
         }
         content: {
           "*/*": string
+        }
+      }
+      /** @description No privacy policy document has been uploaded */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": string
+        }
+      }
+    }
+  }
+  exists: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["PrivacyPolicyExists"]
         }
       }
     }
@@ -1546,27 +1576,7 @@ export interface operations {
       }
     }
   }
-  existsPublic: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["PrivacyPolicyExists"]
-        }
-      }
-    }
-  }
-  exists: {
+  exists_1: {
     parameters: {
       query?: never
       header?: never
@@ -1691,7 +1701,7 @@ export interface operations {
       }
     }
   }
-  exists_1: {
+  exists_2: {
     parameters: {
       query?: never
       header?: never
@@ -1711,7 +1721,7 @@ export interface operations {
       }
     }
   }
-  exists_2: {
+  exists_3: {
     parameters: {
       query?: never
       header?: never
