@@ -16,7 +16,7 @@ export default function EditClothingLocationPage() {
 
 function EditClothingLocationPageContent() {
   const { clothingLocationId } = useParams({
-    from: "/clothing-management/locations/$clothingLocationId/edit",
+    from: "/_authenticated/clothing-management/locations/$clothingLocationId/edit",
   })
   const numericLocationId = Number(clothingLocationId)
 

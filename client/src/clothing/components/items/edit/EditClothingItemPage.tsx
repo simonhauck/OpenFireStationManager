@@ -7,7 +7,7 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 
 export default function EditClothingItemPage() {
   const { clothingItemId } = useParams({
-    from: "/clothing-management/items/$clothingItemId/edit",
+    from: "/_authenticated/clothing-management/items/$clothingItemId/edit",
   })
   const numericClothingItemId = Number(clothingItemId)
 

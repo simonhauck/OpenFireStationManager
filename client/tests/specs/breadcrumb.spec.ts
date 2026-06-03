@@ -16,7 +16,7 @@ test.describe("Breadcrumb", () => {
     await page.goto("/user-management")
 
     await breadcrumb.homeLink().click()
-    await expect(page).toHaveURL("/")
+    await expect(page).toHaveURL("/dashboard")
   })
 
   test("breadcrumb link on parent segment navigates to that route", async ({

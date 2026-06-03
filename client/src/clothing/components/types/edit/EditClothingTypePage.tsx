@@ -21,7 +21,7 @@ export default function EditClothingTypePage() {
 
 function EditClothingTypePageContent() {
   const { clothingTypeId } = useParams({
-    from: "/clothing-management/types/$clothingTypeId/edit",
+    from: "/_authenticated/clothing-management/types/$clothingTypeId/edit",
   })
   const numericClothingTypeId = Number(clothingTypeId)
 
