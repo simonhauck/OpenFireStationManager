@@ -13,13 +13,12 @@ import type { ReturnStep } from "#/clothing/return/useReturnWizard"
 import { returnMutation } from "#/clothing/return/service/returnQueries"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
-import { VerticalStepper } from "#/components/base/VerticalStepper"
 import type { Step } from "#/components/base/VerticalStepper"
+import StepperWizard from "#/components/base/StepperWizard"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import { LockerItemDialog } from "#/clothing/return/components/LockerItemDialog"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import PageSection from "#/components/base/PageSection"
 import type { CheckoutRequest } from "#/clothing/model/checkout"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
@@ -65,7 +64,6 @@ export default function ReturnPage({
       : "Klamotten in die Wäsche geben"
   const steps = buildSteps()
 
-  // Check for zero targets
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const targets = (allLocations ?? []).filter((l) => l.type === locationType)
 
@@ -95,65 +93,51 @@ export default function ReturnPage({
         </TouchButton>
       }
     >
-      <div className="flex items-stretch">
-        <aside className="hidden shrink-0 sm:block">
-          <div className="pr-6 pb-2">
-            <VerticalStepper
-              steps={steps}
-              currentStep={state.step}
-              onStepClick={(n) => {
-                if (state.step === 4) return
-                goToStep(n as ReturnStep)
-              }}
-            />
-          </div>
-        </aside>
-
-        <div className="min-w-0 flex-1 space-y-4">
-          <RenderIf when={state.step === 1}>
-            <StepItemPicker
+      <StepperWizard
+        steps={steps}
+        currentStep={state.step}
+        onStepClick={(n) => goToStep(n as ReturnStep)}
+        stepContents={{
+          1: (
+            <StepItemPickerContent
               state={state}
               onAddItem={addItem}
               onRemoveItem={removeItem}
               onNext={advanceToTarget}
             />
-          </RenderIf>
-
-          <RenderIf when={state.step === 2}>
-            <StepReturnTargetPicker
+          ),
+          2: (
+            <StepReturnTargetPickerContent
               locationType={locationType}
               targets={targets}
               onSelect={selectTarget}
             />
-          </RenderIf>
-
-          <RenderIf when={state.step === 3}>
-            <StepReview
+          ),
+          3: (
+            <StepReviewContent
               state={state}
-              locationType={locationType}
               allLocations={allLocations ?? []}
               onSubmitOk={submitOk}
               onBack={goBack}
             />
-          </RenderIf>
-
-          <RenderIf when={state.step === 4}>
-            <StepSuccess
+          ),
+          4: (
+            <StepSuccessContent
               onReset={reset}
               onNavigateToOverview={() =>
                 void navigate({ to: "/pool-clothing" })
               }
             />
-          </RenderIf>
-        </div>
-      </div>
+          ),
+        }}
+      />
     </PageSection>
   )
 }
 
 // ─── Step 1: Item Picker ──────────────────────────────────────────────────────
 
-interface StepItemPickerProps {
+interface StepItemPickerContentProps {
   state: ReturnType<typeof useReturnWizard>["state"]
   onAddItem: (item: ResolvedClothingItem) => void
   onRemoveItem: (itemId: number) => void
@@ -162,12 +146,12 @@ interface StepItemPickerProps {
 
 type PickerTab = "scanner" | "locker"
 
-function StepItemPicker({
+function StepItemPickerContent({
   state,
   onAddItem,
   onRemoveItem,
   onNext,
-}: StepItemPickerProps) {
+}: StepItemPickerContentProps) {
   const [activeTab, setActiveTab] = useState<PickerTab>("scanner")
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -176,124 +160,108 @@ function StepItemPicker({
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 1: Kleidung auswählen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Tab toggle */}
-        <div className="flex rounded-lg border p-1">
-          <TouchButton
-            variant={activeTab === "scanner" ? "default" : "ghost"}
-            className="flex-1"
-            onClick={() => setActiveTab("scanner")}
-          >
-            Scannen
-          </TouchButton>
-          <TouchButton
-            variant={activeTab === "locker" ? "default" : "ghost"}
-            className="flex-1"
-            onClick={() => setDialogOpen(true)}
-          >
-            Aus Spind auswählen
-          </TouchButton>
-        </div>
+    <div className="space-y-4">
+      <div className="flex rounded-lg border p-1">
+        <TouchButton
+          variant={activeTab === "scanner" ? "default" : "ghost"}
+          className="flex-1"
+          onClick={() => setActiveTab("scanner")}
+        >
+          Scannen
+        </TouchButton>
+        <TouchButton
+          variant={activeTab === "locker" ? "default" : "ghost"}
+          className="flex-1"
+          onClick={() => setDialogOpen(true)}
+        >
+          Aus Spind auswählen
+        </TouchButton>
+      </div>
 
-        <RenderIf when={activeTab === "scanner"}>
-          <ClothingItemScanner
-            items={state.returnItems}
-            onItemResolved={onAddItem}
-            onRemoveItem={onRemoveItem}
-            renderItemBadge={() => null}
-          />
-        </RenderIf>
-
-        <LockerItemDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          existingItemIds={existingItemIds}
-          onAddItems={(items) => {
-            for (const item of items) {
-              onAddItem(item)
-            }
-          }}
+      <RenderIf when={activeTab === "scanner"}>
+        <ClothingItemScanner
+          items={state.returnItems}
+          onItemResolved={onAddItem}
+          onRemoveItem={onRemoveItem}
+          renderItemBadge={() => null}
         />
+      </RenderIf>
 
-        <div className="flex justify-end gap-3 pt-2">
-          <TouchButton
-            disabled={state.returnItems.length === 0}
-            onClick={onNext}
-          >
-            Weiter →
-          </TouchButton>
-        </div>
-      </CardContent>
-    </Card>
+      <LockerItemDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        existingItemIds={existingItemIds}
+        onAddItems={(items) => {
+          for (const item of items) {
+            onAddItem(item)
+          }
+        }}
+      />
+
+      <div className="flex justify-end gap-3 pt-2">
+        <TouchButton disabled={state.returnItems.length === 0} onClick={onNext}>
+          Weiter →
+        </TouchButton>
+      </div>
+    </div>
   )
 }
 
 // ─── Step 2: Return Target Picker ─────────────────────────────────────────────
 
-interface StepReturnTargetPickerProps {
+interface StepReturnTargetPickerContentProps {
   locationType: "WAESCHE" | "POOL"
   targets: ClothingLocation[]
   onSelect: (locationId: number) => void
 }
 
-function StepReturnTargetPicker({
+function StepReturnTargetPickerContent({
   locationType,
   targets,
   onSelect,
-}: StepReturnTargetPickerProps) {
-  const targetLabel = locationType === "POOL" ? "Pool-Ziel" : "Wäsche-Ziel"
+}: StepReturnTargetPickerContentProps) {
   const description =
     locationType === "POOL"
       ? "Wähle den Pool-Standort aus, in den die Kleidung zurückgegeben wird."
       : "Wähle den Wäschekorb aus, in den die Kleidung soll."
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 2: {targetLabel} wählen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-muted-foreground text-sm">{description}</p>
+    <div className="space-y-4">
+      <p className="text-muted-foreground text-sm">{description}</p>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {targets.map((loc) => (
-            <TouchButton
-              key={loc.id}
-              variant="outline"
-              className="h-auto min-h-16 flex-col gap-1 p-4 text-wrap"
-              onClick={() => onSelect(loc.id)}
-            >
-              <span className="text-base font-medium">
-                {formatClothingLocationLabel(loc)}
-              </span>
-            </TouchButton>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {targets.map((loc) => (
+          <TouchButton
+            key={loc.id}
+            variant="outline"
+            className="h-auto min-h-16 flex-col gap-1 p-4 text-wrap"
+            onClick={() => onSelect(loc.id)}
+          >
+            <span className="text-base font-medium">
+              {formatClothingLocationLabel(loc)}
+            </span>
+          </TouchButton>
+        ))}
+      </div>
+    </div>
   )
 }
 
 // ─── Step 3: Review ───────────────────────────────────────────────────────────
 
-interface StepReviewProps {
+interface StepReviewContentProps {
   state: ReturnType<typeof useReturnWizard>["state"]
-  locationType: "WAESCHE" | "POOL"
   allLocations: ClothingLocation[]
   onSubmitOk: () => void
   onBack: () => void
 }
 
-function StepReview({
+function StepReviewContent({
   state,
   allLocations,
   onSubmitOk,
   onBack,
-}: StepReviewProps) {
+}: StepReviewContentProps) {
   const queryClient = useQueryClient()
   const mutation = useMutation(returnMutation(queryClient))
 
@@ -320,49 +288,44 @@ function StepReview({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 3: Überprüfen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">
-            Rückgabe ({state.returnItems.length})
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <p className="text-sm font-semibold">
+          Rückgabe ({state.returnItems.length})
+        </p>
+        <RenderIf when={state.returnItems.length === 0}>
+          <p className="text-muted-foreground text-sm italic">
+            Keine Kleidung ausgewählt.
           </p>
-          <RenderIf when={state.returnItems.length === 0}>
-            <p className="text-muted-foreground text-sm italic">
-              Keine Kleidung ausgewählt.
-            </p>
-          </RenderIf>
-          <RenderIf when={state.returnItems.length > 0}>
-            <div className="space-y-1">
-              {state.returnItems.map((item) => (
-                <ClothingItemRow key={item.clothingItem.id} item={item} />
-              ))}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              Ziel: <strong>{targetName}</strong>
-            </p>
-          </RenderIf>
-        </div>
+        </RenderIf>
+        <RenderIf when={state.returnItems.length > 0}>
+          <div className="space-y-1">
+            {state.returnItems.map((item) => (
+              <ClothingItemRow key={item.clothingItem.id} item={item} />
+            ))}
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Ziel: <strong>{targetName}</strong>
+          </p>
+        </RenderIf>
+      </div>
 
-        <div className="flex justify-end gap-3 pt-2">
-          <TouchButton
-            variant="outline"
-            onClick={onBack}
-            disabled={mutation.isPending}
-          >
-            ← Zurück
-          </TouchButton>
-          <TouchButton
-            disabled={mutation.isPending}
-            onClick={() => void handleSubmit()}
-          >
-            {mutation.isPending ? "Wird gesendet…" : "Bestätigen"}
-          </TouchButton>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="flex justify-end gap-3 pt-2">
+        <TouchButton
+          variant="outline"
+          onClick={onBack}
+          disabled={mutation.isPending}
+        >
+          ← Zurück
+        </TouchButton>
+        <TouchButton
+          disabled={mutation.isPending}
+          onClick={() => void handleSubmit()}
+        >
+          {mutation.isPending ? "Wird gesendet…" : "Bestätigen"}
+        </TouchButton>
+      </div>
+    </div>
   )
 }
 
@@ -370,12 +333,15 @@ function StepReview({
 
 const SUCCESS_REDIRECT_SECONDS = 15
 
-interface StepSuccessProps {
+interface StepSuccessContentProps {
   onReset: () => void
   onNavigateToOverview: () => void
 }
 
-function StepSuccess({ onReset, onNavigateToOverview }: StepSuccessProps) {
+function StepSuccessContent({
+  onReset,
+  onNavigateToOverview,
+}: StepSuccessContentProps) {
   const [secondsLeft, setSecondsLeft] = useState(SUCCESS_REDIRECT_SECONDS)
 
   useEffect(() => {
