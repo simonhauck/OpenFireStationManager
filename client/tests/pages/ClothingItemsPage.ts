@@ -82,6 +82,10 @@ export class ClothingItemsPage {
     return this.page.getByRole("row").filter({ hasText: barcode })
   }
 
+  formErrorAlert() {
+    return this.page.getByRole("alert")
+  }
+
   // --- Batch import ---
 
   async selectBatchType(typeName: string) {
