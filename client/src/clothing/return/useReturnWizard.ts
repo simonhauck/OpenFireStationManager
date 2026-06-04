@@ -6,7 +6,7 @@ export type ReturnStep = 1 | 2 | 3 | 4
 export interface ReturnWizardState {
   step: ReturnStep
   returnItems: ResolvedClothingItem[]
-  returnLocationId: number | null
+  returnLocationId: number | undefined
 }
 
 type Action =
@@ -70,7 +70,7 @@ function reducer(state: ReturnWizardState, action: Action): ReturnWizardState {
 const initialState: ReturnWizardState = {
   step: 1,
   returnItems: [],
-  returnLocationId: null,
+  returnLocationId: undefined,
 }
 
 export interface UseReturnWizardReturn {

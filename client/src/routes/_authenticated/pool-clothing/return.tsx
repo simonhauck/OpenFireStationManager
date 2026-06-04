@@ -7,15 +7,16 @@ export const Route = createFileRoute("/_authenticated/pool-clothing/return")({
   component: ReturnRoute,
   validateSearch: (
     search: Record<string, unknown>,
-  ): { returnTarget: string } => ({
-    returnTarget: (search.returnTarget as string) || "WAESCHE",
+  ): { returnTarget: "WAESCHE" | "POOL" } => ({
+    returnTarget: (search.returnTarget as "WAESCHE" | "POOL" | undefined) ?? "WAESCHE",
   }),
 })
 
 function ReturnRoute() {
+  const { returnTarget } = Route.useSearch()
   return (
     <RoleGuard allowedRoles={["USER"]}>
-      <ReturnPage />
+      <ReturnPage returnTarget={returnTarget} />
     </RoleGuard>
   )
 }

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useNavigate, useSearch } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useEffect, useState } from "react"
 
@@ -21,37 +21,33 @@ import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import { LockerItemDialog } from "#/clothing/return/components/LockerItemDialog"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import PageSection from "#/components/base/PageSection"
-import type { components } from "#/api/schema"
+import type {
+  CheckoutRequest,
+  ClothingLocation,
+} from "#/clothing/model/clothingType.ts"
 
-type ClothingLocation = components["schemas"]["ClothingLocation"]
-
-const TARGET_LABELS: Record<string, string> = {
-  WAESCHE: "Klamotten in die Wäsche geben",
-  POOL: "Klamotten in den Pool geben",
-}
-
-function buildSteps(returnTarget: string): Step[] {
-  const targetLabel = returnTarget === "POOL" ? "Pool" : "Wäsche"
+function buildSteps(): Step[] {
   return [
     {
       label: "Kleidung auswählen",
       description: "Scannen oder aus Standort wählen",
     },
     {
-      label: `${targetLabel}-Ziel wählen`,
-      description: `Ziel-${targetLabel}standort auswählen`,
+      label: `Ziel wählen`,
+      description: `Ziel Standort auswählen`,
     },
     { label: "Überprüfen", description: "Rückgabe prüfen" },
     { label: "Bestätigen", description: "Vorgang abschließen" },
   ]
 }
 
-export default function ReturnPage() {
+export default function ReturnPage({
+  returnTarget,
+}: {
+  returnTarget: "WAESCHE" | "POOL"
+}) {
   const navigate = useNavigate()
-  const { returnTarget } = useSearch({
-    from: "/_authenticated/pool-clothing/return",
-  })
-  const locationType = returnTarget as "WAESCHE" | "POOL"
+  const locationType = returnTarget
 
   const {
     state,
@@ -65,8 +61,11 @@ export default function ReturnPage() {
     reset,
   } = useReturnWizard()
 
-  const title = TARGET_LABELS[returnTarget] || "Klamotten zurückgeben"
-  const steps = buildSteps(returnTarget)
+  const title =
+    locationType == "POOL"
+      ? "Klamotten in den Pool geben"
+      : "Klamotten in die Wäsche geben"
+  const steps = buildSteps()
 
   // Check for zero targets
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
@@ -293,7 +292,6 @@ interface StepReviewProps {
 
 function StepReview({
   state,
-  locationType,
   allLocations,
   onSubmitOk,
   onBack,
@@ -307,11 +305,11 @@ function StepReview({
   )
 
   async function handleSubmit() {
-    const body = {
-      targetLocationId: null,
+    const body: CheckoutRequest = {
+      targetLocationId: undefined,
       takeItemIds: [],
       returnItemIds: state.returnItems.map((i) => i.clothingItem.id),
-      returnLocationId: state.returnLocationId!,
+      returnLocationId: state.returnLocationId,
     }
     try {
       await mutation.mutateAsync(body)
