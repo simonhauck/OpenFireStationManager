@@ -126,7 +126,7 @@ class ClothingItemService(
         if (barcode == null) return
         val existing = repository.findByBarcode(barcode)
         if (existing != null && existing.id != excludeId) {
-            throw ConflictException("Barcode '$barcode' is already in use")
+            throw ConflictException(barcodeAlreadyInUseMessage(barcode))
         }
     }
 
@@ -135,11 +135,19 @@ class ClothingItemService(
 
         val duplicates = barcodes.toSet().intersect(existingBarcodes)
         if (duplicates.isNotEmpty()) {
-            throw ConflictException(
-                "Die folgenden Barcodes sind bereits in Verwendung: ${duplicates.joinToString(", ")}"
-            )
+            throw ConflictException(barcodesAlreadyInUseMessage(duplicates))
         }
     }
+
+    private fun barcodeAlreadyInUseMessage(barcode: String): String =
+        "Der Barcode '$barcode' ist bereits in Verwendung."
+
+    private fun barcodesAlreadyInUseMessage(barcodes: Set<String>): String =
+        when (barcodes.size) {
+            1 -> barcodeAlreadyInUseMessage(barcodes.first())
+            else ->
+                "Die folgenden Barcodes sind bereits in Verwendung: ${barcodes.joinToString(", ")}"
+        }
 
     private fun checkNoDuplicateBarcodesProvided(barcodes: List<String>) {
         require(barcodes.size == barcodes.toSet().size) {

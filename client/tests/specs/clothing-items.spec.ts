@@ -20,6 +20,31 @@ test.describe("Clothing Items", () => {
     await page.close()
   })
 
+  test("shows German error when creating an item with a duplicate barcode", async ({
+    page,
+  }) => {
+    const barcode = `BC-DUP-${randomUUID().slice(0, 8)}`
+    const itemsPage = new ClothingItemsPage(page)
+
+    await itemsPage.gotoNew()
+    await itemsPage.selectType(typeName)
+    await itemsPage.fillSize("L")
+    await itemsPage.fillBarcode(barcode)
+    await itemsPage.submitForm()
+    await expect(page).toHaveURL(/\/clothing-management\/items$/)
+
+    await itemsPage.gotoNew()
+    await itemsPage.selectType(typeName)
+    await itemsPage.fillSize("M")
+    await itemsPage.fillBarcode(barcode)
+    await itemsPage.submitForm()
+
+    await expect(page).toHaveURL(/\/clothing-management\/items\/new$/)
+    await expect(itemsPage.formErrorAlert()).toHaveText(
+      `Der Barcode '${barcode}' ist bereits in Verwendung.`,
+    )
+  })
+
   test("creates a new item and shows it in the list", async ({ page }) => {
     const barcode = `BC-${randomUUID().slice(0, 8)}`
     const itemsPage = new ClothingItemsPage(page)
