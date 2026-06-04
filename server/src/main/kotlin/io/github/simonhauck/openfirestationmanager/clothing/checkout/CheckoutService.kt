@@ -2,14 +2,16 @@ package io.github.simonhauck.openfirestationmanager.clothing.checkout
 
 import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItem
 import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemRepository
+import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemService
 import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocation
-import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocationRepository
+import io.github.simonhauck.openfirestationmanager.clothing.location.ClothingLocationService
 import io.github.simonhauck.openfirestationmanager.clothing.location.LocationType
 import io.github.simonhauck.openfirestationmanager.clothing.movement.MovementReason
 import io.github.simonhauck.openfirestationmanager.clothing.movement.MovementService
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
+import io.github.simonhauck.openfirestationmanager.security.auth.CurrentUserProvider
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import java.util.UUID
-import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,120 +19,80 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CheckoutService(
     private val itemRepository: ClothingItemRepository,
-    private val locationRepository: ClothingLocationRepository,
     private val movementService: MovementService,
+    private val locationService: ClothingLocationService,
+    private val clothingItemService: ClothingItemService,
+    private val currentUserProvider: CurrentUserProvider,
 ) {
 
     @Transactional
-    fun checkout(request: CheckoutRequest, isKleiderwart: Boolean): CheckoutResponse {
-        validateRequest(request, isKleiderwart)
-
-        val takeItems = request.takeItemIds.map { getItemOrBadRequest(it) }
-        val returnItems = request.returnItemIds.map { getItemOrBadRequest(it) }
+    fun checkout(request: CheckoutRequest): CheckoutResponse {
 
         val batchId = UUID.randomUUID().toString()
 
-        if (takeItems.isNotEmpty()) {
-            val targetId = request.targetLocationId!!
-            for (item in takeItems) {
-                val fromLocationId = item.locationId?.id
-                movementService.recordMovement(
-                    item = item,
-                    fromLocationId = fromLocationId,
-                    toLocationId = targetId,
-                    reason = MovementReason.CHECKOUT,
-                    batchId = batchId,
-                )
-                itemRepository.save(item.copy(locationId = AggregateReference.to(targetId)))
-            }
+        if (request.targetLocationId != null) {
+            val takeItems = request.takeItemIds.map { clothingItemService.getItemById(it) }
+
+            val location =
+                locationService
+                    .getLocationById(request.targetLocationId)
+                    .validate(listOf(LocationType.PERSONAL))
+
+            takeItems.moveItemsToLocation(location, batchId, MovementReason.CHECKOUT)
         }
 
-        val returnToLocationId = request.returnLocationId
-        for (item in returnItems) {
-            val fromLocationId = item.locationId?.id
-            movementService.recordMovement(
-                item = item,
-                fromLocationId = fromLocationId,
-                toLocationId = returnToLocationId,
-                reason = MovementReason.RETURN,
-                batchId = batchId,
-            )
-            val newLocationRef =
-                returnToLocationId?.let { AggregateReference.to<ClothingLocation, Long>(it) }
-            itemRepository.save(item.copy(locationId = newLocationRef))
+        if (request.returnLocationId != null) {
+            val returnItems = request.returnItemIds.map { clothingItemService.getItemById(it) }
+            val location =
+                locationService
+                    .getLocationById(request.returnLocationId)
+                    .validate(listOf(LocationType.WAESCHE, LocationType.POOL))
+
+            returnItems.moveItemsToLocation(location, batchId, MovementReason.RETURN)
         }
 
         return CheckoutResponse(batchId)
     }
 
-    private fun validateRequest(request: CheckoutRequest, isKleiderwart: Boolean) {
-        if (request.takeItemIds.isEmpty() && request.returnItemIds.isEmpty()) {
-            throw PublicApiException(
-                HttpStatus.BAD_REQUEST,
-                "takeItemIds and returnItemIds cannot both be empty",
+    private fun List<ClothingItem>.moveItemsToLocation(
+        location: ClothingLocation,
+        batchId: String,
+        reason: MovementReason,
+    ) {
+        this.forEach {
+            movementService.recordMovement(
+                item = it,
+                fromLocationId = it.locationId?.id,
+                toLocationId = location.id,
+                reason = reason,
+                batchId = batchId, // batchId will be set later after validation
             )
-        }
-
-        val overlap = request.takeItemIds.toSet().intersect(request.returnItemIds.toSet())
-        if (overlap.isNotEmpty()) {
-            throw PublicApiException(
-                HttpStatus.BAD_REQUEST,
-                "Same item cannot appear in both takeItemIds and returnItemIds",
-            )
-        }
-
-        if (request.targetLocationId != null) {
-            val targetLocation =
-                locationRepository.findById(request.targetLocationId)
-                    ?: throw PublicApiException(
-                        HttpStatus.BAD_REQUEST,
-                        "targetLocationId not found",
-                    )
-            if (targetLocation.type != LocationType.PERSONAL) {
-                throw PublicApiException(
-                    HttpStatus.BAD_REQUEST,
-                    "targetLocationId must be a PERSONAL location",
-                )
-            }
-            checkLocationVisibility(targetLocation, isKleiderwart)
-        } else if (request.takeItemIds.isNotEmpty()) {
-            throw PublicApiException(
-                HttpStatus.BAD_REQUEST,
-                "targetLocationId must not be null when takeItemIds are present",
-            )
-        }
-
-        if (request.returnLocationId != null) {
-            val returnLocation =
-                locationRepository.findById(request.returnLocationId)
-                    ?: throw PublicApiException(
-                        HttpStatus.BAD_REQUEST,
-                        "returnLocationId not found",
-                    )
-            if (
-                returnLocation.type != LocationType.WAESCHE &&
-                    returnLocation.type != LocationType.POOL
-            ) {
-                throw PublicApiException(
-                    HttpStatus.BAD_REQUEST,
-                    "returnLocationId must be a WAESCHE or POOL location",
-                )
-            }
-            checkLocationVisibility(returnLocation, isKleiderwart)
+            itemRepository.save(it.copy(locationId = location.getIdAsReference()))
         }
     }
 
-    private fun checkLocationVisibility(location: ClothingLocation, isKleiderwart: Boolean) {
-        if (location.onlyVisibleForKleiderwart && !isKleiderwart) {
+    private fun ClothingLocation.validate(
+        allowedLocationTypes: List<LocationType>
+    ): ClothingLocation {
+        val hasMatchingType = allowedLocationTypes.any { it == this.type }
+
+        if (
+            this.onlyVisibleForKleiderwart &&
+                !currentUserProvider.checkCurrentUserHasRole(UserRole.KLEIDERWART)
+        ) {
             throw PublicApiException(
                 HttpStatus.BAD_REQUEST,
-                "Location is restricted to Kleiderwart",
+                "Location benötigt rolle ${UserRole.KLEIDERWART}",
             )
         }
-    }
 
-    private fun getItemOrBadRequest(id: Long): ClothingItem {
-        return itemRepository.findById(id)
-            ?: throw PublicApiException(HttpStatus.BAD_REQUEST, "Item with id $id not found")
+        if (!hasMatchingType) {
+            throw PublicApiException(
+                HttpStatus.BAD_REQUEST,
+                "Location typ ${this.type} für location ${this.name} ist für diese Aktion nicht gültig. Der Typ muss einer der folgenden sein: ${allowedLocationTypes.joinToString(", ")}",
+            )
+        }
+
+        return this
     }
 }

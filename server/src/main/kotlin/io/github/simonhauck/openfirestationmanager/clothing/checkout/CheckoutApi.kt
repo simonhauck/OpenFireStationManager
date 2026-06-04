@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.clothing.checkout
 
+@ValidCheckout
 data class CheckoutRequest(
     val targetLocationId: Long?,
     val returnLocationId: Long? = null,
