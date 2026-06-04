@@ -4,10 +4,8 @@ import { KeyRound, Pencil } from "lucide-react"
 import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
 import { Button } from "#/components/ui/button"
-import type { components } from "#/api/schema"
 import { getRoleLabel } from "#/users/roleMetadata"
-
-type UserAccount = components["schemas"]["UserAccount"]
+import type { UserAccount } from "#/users/model/user"
 
 interface UsersTableProps {
   users: UserAccount[]

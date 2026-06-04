@@ -8,7 +8,8 @@ export const Route = createFileRoute("/_authenticated/pool-clothing/return")({
   validateSearch: (
     search: Record<string, unknown>,
   ): { returnTarget: "WAESCHE" | "POOL" } => ({
-    returnTarget: (search.returnTarget as "WAESCHE" | "POOL" | undefined) ?? "WAESCHE",
+    returnTarget:
+      (search.returnTarget as "WAESCHE" | "POOL" | undefined) ?? "WAESCHE",
   }),
 })
 

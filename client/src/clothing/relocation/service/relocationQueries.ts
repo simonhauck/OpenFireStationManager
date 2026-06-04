@@ -3,9 +3,7 @@ import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-export type RelocationRequest = components["schemas"]["RelocationRequest"]
+import type { RelocationRequest } from "#/clothing/model/relocation"
 
 export const relocationMutation = (queryClient: QueryClient) =>
   mutationOptions({

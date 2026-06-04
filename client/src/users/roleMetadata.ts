@@ -1,6 +1,4 @@
-import type { components } from "#/api/schema"
-
-export type UserRole = components["schemas"]["UserAccount"]["roles"][number]
+import type { UserRole } from "#/users/model/user"
 
 export const ROLE_OPTIONS: Array<{
   value: UserRole

@@ -3,11 +3,11 @@ import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-export type ResolvedClothingItem = components["schemas"]["ResolvedClothingItem"]
-export type CheckoutRequest = components["schemas"]["CheckoutRequest"]
-export type CheckoutResponse = components["schemas"]["CheckoutResponse"]
+import type {
+  CheckoutRequest,
+  CheckoutResponse,
+} from "#/clothing/model/checkout"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 
 export async function searchClothingItems(
   q: string,

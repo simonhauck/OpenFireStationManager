@@ -248,9 +248,32 @@ src/
 
 ---
 
+## Schema-Derived Types
+
+All types extracted from the generated API schema (`components["schemas"]["..."]`)
+**must** live in a central model file under the corresponding domain's `model/` directory.
+
+- Use `src/<domain>/model/` for domain-specific types (e.g. `clothing/model/clothingItems.ts`,
+  `users/model/user.ts`, `legal/model/legal.ts`).
+- Use `src/api/model/` for auth/API-level types (e.g. `api/model/auth.ts`).
+- Do **not** define schema-derived type aliases inline in query, service, or component files —
+  always import them from the domain's model file.
+
+```ts
+// ✅ correct — import from the domain's model
+import type { ClothingItem } from "#/clothing/model/clothingItems"
+
+// ❌ avoid — inline type alias in a query/service file
+import type { components } from "#/api/schema"
+type ClothingItem = components["schemas"]["ClothingItem"]
+```
+
+---
+
 ## Implementation Preferences
 
 - Keep code type-safe; avoid `any`.
+- Prefer `undefined` over `null` for absent values.
 - Prefer guard clauses and explicit error handling over silent failure.
 - Reuse existing utilities/components before creating new ones.
 - Keep edits minimal and feature-focused; avoid unrelated refactors.

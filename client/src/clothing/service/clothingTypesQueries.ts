@@ -3,11 +3,10 @@ import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-import type { ClothingType } from "#/clothing/model/clothingType"
-
-type CreateOrUpdateClothingTypeRequest =
-  components["schemas"]["CreateOrUpdateClothingTypeRequest"]
+import type {
+  ClothingType,
+  CreateOrUpdateClothingTypeRequest,
+} from "#/clothing/model/clothingType"
 
 type UpdateClothingTypeVariables = {
   id: number

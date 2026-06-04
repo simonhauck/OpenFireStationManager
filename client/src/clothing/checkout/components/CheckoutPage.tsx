@@ -13,7 +13,7 @@ import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQuerie
 import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
 import type { CheckoutStep } from "#/clothing/checkout/useCheckoutWizard"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
-import type { ResolvedClothingItem } from "#/clothing/checkout/autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import {
   TouchButton,
@@ -39,9 +39,7 @@ import {
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
 import { Badge } from "#/components/ui/badge"
-import type { components } from "#/api/schema"
-
-type ClothingLocation = components["schemas"]["ClothingLocation"]
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 const CHECKOUT_STEPS: Step[] = [
   { label: "Spind wählen", description: "PERSONAL-Standort auswählen" },

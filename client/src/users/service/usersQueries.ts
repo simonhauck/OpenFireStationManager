@@ -2,9 +2,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-type UserAccount = components["schemas"]["UserAccount"]
+import type { UserAccount } from "#/users/model/user"
 
 export function useUsers() {
   return useQuery(

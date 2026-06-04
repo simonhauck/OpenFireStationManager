@@ -11,7 +11,7 @@ import {
 import { useReturnWizard } from "#/clothing/return/useReturnWizard"
 import type { ReturnStep } from "#/clothing/return/useReturnWizard"
 import { returnMutation } from "#/clothing/return/service/returnQueries"
-import type { ResolvedClothingItem } from "#/clothing/checkout/autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
 import { VerticalStepper } from "#/components/base/VerticalStepper"
 import type { Step } from "#/components/base/VerticalStepper"
@@ -21,10 +21,8 @@ import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import { LockerItemDialog } from "#/clothing/return/components/LockerItemDialog"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import PageSection from "#/components/base/PageSection"
-import type {
-  CheckoutRequest,
-  ClothingLocation,
-} from "#/clothing/model/clothingType.ts"
+import type { CheckoutRequest } from "#/clothing/model/checkout"
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 function buildSteps(): Step[] {
   return [

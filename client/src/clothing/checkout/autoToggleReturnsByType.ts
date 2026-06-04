@@ -1,9 +1,9 @@
-import type { components } from "#/api/schema"
-
-export type ResolvedClothingItem = components["schemas"]["ResolvedClothingItem"]
-export type ClothingLocation = components["schemas"]["ClothingLocation"]
-export type ClothingItem = components["schemas"]["ClothingItem"]
-export type ClothingType = components["schemas"]["ClothingType"]
+export type {
+  ResolvedClothingItem,
+  ClothingItem,
+} from "#/clothing/model/clothingItems"
+export type { ClothingLocation } from "#/clothing/model/clothingLocations"
+export type { ClothingType } from "#/clothing/model/clothingType"
 
 /**
  * Given a list of items being taken (with their types) and the items currently

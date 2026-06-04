@@ -1,6 +1,4 @@
-import type { components } from "#/api/schema"
-
-export type UserRole = components["schemas"]["UserAccount"]["roles"][number]
+import type { UserRole } from "#/users/model/user"
 
 /**
  * Returns true if the user has at least one of the required roles.
