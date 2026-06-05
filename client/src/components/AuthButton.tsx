@@ -31,7 +31,7 @@ export default function AuthButton() {
   if (!isAuthenticated) {
     return (
       <Button asChild size="sm">
-        <Link to="/login" search={}>
+        <Link to="/login" search={{ redirect: undefined }}>
           Anmelden
         </Link>
       </Button>

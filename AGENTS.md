@@ -22,13 +22,14 @@ testing, TypeScript rules, code style, routing, and PWA notes.
 **Quick reference:**
 
 | Purpose                        | Command (from `client/`) |
-| ------------------------------ | ------------------------ |
+|--------------------------------|--------------------------|
 | Start dev server               | `npm run dev`            |
 | Run tests                      | `npm run test`           |
 | Production build               | `npm run build`          |
-| Lint                           | `npm run lint`           |
-| Format check                   | `npm run format`         |
-| Format + lint auto-fix         | `npm run check`          |
+| Lint                           | `npm run lint:check`     |
+| Format check                   | `npm run format:check`   |
+| TypeScript type check          | `npm run build:check`    |
+| Format + lint auto-fix         | `npm run fix`            |
 | Generate frontend API bindings | `npm run prepareEnv`     |
 
 ---
@@ -41,7 +42,7 @@ testing, code style, API design, and database conventions.
 **Quick reference:**
 
 | Purpose            | Command (from `server/`)                                                               |
-| ------------------ | -------------------------------------------------------------------------------------- |
+|--------------------|----------------------------------------------------------------------------------------|
 | Build              | `./gradlew build`                                                                      |
 | Run                | `./gradlew bootRun`                                                                    |
 | Test all           | `./gradlew test`                                                                       |
@@ -74,8 +75,10 @@ GitHub Issues at `simonhauck/OpenFireStationManager`. See `docs/agents/issue-tra
 
 ### Triage labels
 
-Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See
+`docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Multi-context: `CONTEXT-MAP.md` at the root, with per-component `CONTEXT.md` and `docs/adr/` under `client/` and `server/`. See `docs/agents/domain.md`.
+Multi-context: `CONTEXT-MAP.md` at the root, with per-component `CONTEXT.md` and `docs/adr/` under `client/` and
+`server/`. See `docs/agents/domain.md`.

@@ -25,6 +25,10 @@ jobs:
         working-directory: client
         run: npm ci
 
+      - name: Typescript compile check
+        working-directory: client
+        run: npm run build:check
+
       - name: Lint client
         working-directory: client
         run: npm run lint:check

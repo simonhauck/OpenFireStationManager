@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
-import React, { type ReactNode } from "react"
+import React from "react"
+import type { ReactNode } from "react"
 
 import { meQuery } from "#/api/auth.queries"
 import { hasRequiredRole } from "#/api/auth.utils"

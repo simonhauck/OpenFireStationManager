@@ -1,23 +1,10 @@
 import ReactDOM from "react-dom/client"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { RouterProvider, createRouter } from "@tanstack/react-router"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { RouterProvider } from "@tanstack/react-router"
 import { Toaster } from "sonner"
-import { routeTree } from "./routeTree.gen"
+import { getRouter } from "./router"
 
-const queryClient = new QueryClient()
-
-const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-  scrollRestoration: true,
-  context: { queryClient },
-})
-
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router
-  }
-}
+const { router, queryClient } = getRouter()
 
 const rootElement = document.getElementById("app")!
 

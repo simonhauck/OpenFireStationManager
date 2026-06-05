@@ -27,18 +27,23 @@ All commands below are run from the `client/` directory.
 
 ## Commands
 
-| Purpose                        | Command               |
-| ------------------------------ | --------------------- |
-| Start dev server               | `npm run dev`         |
-| Production build               | `npm run build`       |
-| Preview production build       | `npm run preview`     |
-| Run unit tests                 | `npm run test`        |
-| Run Playwright tests           | `npm run test:e2e`    |
-| Run Playwright tests (UI mode) | `npm run test:e2e:ui` |
-| Lint                           | `npm run lint`        |
-| Format check                   | `npm run format`      |
-| Format + lint auto-fix         | `npm run check`       |
-| Generate frontend API bindings | `npm run prepareEnv`  |
+
+
+
+
+| Purpose                        | Command                |
+|--------------------------------|------------------------|
+| Start dev server               | `npm run dev`          |
+| Production build               | `npm run build`        |
+| Preview production build       | `npm run preview`      |
+| Run unit tests                 | `npm run test`         |
+| Run Playwright tests           | `npm run test:e2e`     |
+| Run Playwright tests (UI mode) | `npm run test:e2e:ui`  |
+| Lint                           | `npm run lint:check`   |
+| Format check                   | `npm run format:check` |
+| TypeScript type check          | `npm run build:check`  |
+| Format + lint auto-fix         | `npm run fix`          |
+| Generate frontend API bindings | `npm run prepareEnv`   |
 
 ---
 
@@ -82,7 +87,7 @@ UUID-suffixed usernames (so parallel runs and shared databases never collide), l
 in via the browser, and saves the resulting session cookies:
 
 | Persona       | Roles         | Auth file                           |
-| ------------- | ------------- | ----------------------------------- |
+|---------------|---------------|-------------------------------------|
 | `admin`       | `ADMIN`       | `playwright/.auth/admin.json`       |
 | `kleiderwart` | `KLEIDERWART` | `playwright/.auth/kleiderwart.json` |
 | `user`        | `USER`        | `playwright/.auth/user.json`        |
@@ -90,7 +95,7 @@ in via the browser, and saves the resulting session cookies:
 Activate a persona in a spec with `test.use`:
 
 ```ts
-test.use({ storageState: "playwright/.auth/kleiderwart.json" })
+test.use({storageState: "playwright/.auth/kleiderwart.json"})
 ```
 
 ### Page Object pattern
@@ -123,16 +128,16 @@ depends on — never to perform the action being tested.
 
 ```ts
 // ✅ correct — flow used as precondition, spec tests the real behaviour
-test.beforeAll(async ({ browser }) => {
-  const page = await browser.newPage({
-    storageState: "playwright/.auth/kleiderwart.json",
-  })
-  typeName = await createClothingType(page, `Typ-${randomUUID().slice(0, 8)}`)
-  await page.close()
+test.beforeAll(async ({browser}) => {
+    const page = await browser.newPage({
+        storageState: "playwright/.auth/kleiderwart.json",
+    })
+    typeName = await createClothingType(page, `Typ-${randomUUID().slice(0, 8)}`)
+    await page.close()
 })
 
-test("creates an item of that type", async ({ page }) => {
-  // ... uses typeName as a precondition, not the thing under test
+test("creates an item of that type", async ({page}) => {
+    // ... uses typeName as a precondition, not the thing under test
 })
 ```
 
@@ -173,15 +178,19 @@ every invariant or validation edge case through Playwright; those belong in unit
 ```tsx
 // ✅ correct
 <RenderIf when={isLoading}>
-  <LoadingIndicator />
+    <LoadingIndicator/>
 </RenderIf>
 <RenderIf when={!isLoading}>
-  <Content />
+    <Content/>
 </RenderIf>
 
 // ❌ avoid
-{isLoading ? <LoadingIndicator /> : <Content />}
-{isLoading && <LoadingIndicator />}
+{
+    isLoading ? <LoadingIndicator/> : <Content/>
+}
+{
+    isLoading && <LoadingIndicator/>
+}
 ```
 
 ### shadcn/ui Update Safety
@@ -260,11 +269,12 @@ All types extracted from the generated API schema (`components["schemas"]["..."]
   always import them from the domain's model file.
 
 ```ts
-// ✅ correct — import from the domain's model
-import type { ClothingItem } from "#/clothing/model/clothingItems"
+// ✅ correct — import from the domain's model (use .ts extension)
+import type {ClothingItem} from "#/clothing/model/clothingItems.ts"
 
-// ❌ avoid — inline type alias in a query/service file
-import type { components } from "#/api/schema"
+// ❌ avoid — inline type alias in a query/service file (extensionless import)
+import type {components} from "#/api/schema"
+
 type ClothingItem = components["schemas"]["ClothingItem"]
 ```
 
