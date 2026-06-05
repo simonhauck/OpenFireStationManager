@@ -2,14 +2,10 @@ import { queryOptions, useQuery } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-export type ClothingLocationSizeSummary =
-  components["schemas"]["ClothingLocationSummary"]
-export type ClothingTypeSizeSummary =
-  components["schemas"]["ClothingTypeSummary"]
-export type SizeGroupSummary = components["schemas"]["SizeGroupSummary"]
-export type SizeSummary = components["schemas"]["SizeSummary"]
+import type {
+  ClothingLocationSizeSummary,
+  ClothingTypeSizeSummary,
+} from "#/clothing/model/overview.ts"
 
 export const getClothingOverviewQuery = () =>
   queryOptions({

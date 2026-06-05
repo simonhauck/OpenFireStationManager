@@ -1,9 +1,5 @@
 import { Link } from "@tanstack/react-router"
 
-import type {
-  ClothingLocationSizeSummary,
-  ClothingTypeSizeSummary,
-} from "#/clothing/service/clothingOverviewQueries"
 import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
 import ErrorState from "#/components/base/ErrorState"
@@ -14,6 +10,10 @@ import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Badge } from "#/components/ui/badge"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
+import type {
+  ClothingLocationSizeSummary,
+  ClothingTypeSizeSummary,
+} from "#/clothing/model/overview.ts"
 
 export default function PoolKlamottenPage() {
   const { data: overview, isLoading, isError } = useClothingOverview()
@@ -30,7 +30,20 @@ export default function PoolKlamottenPage() {
             </TouchButton>
           </RoleGuard>
           <TouchButton asChild>
-            <Link to="/pool-clothing/checkout">Klamotten Ausgabe</Link>
+            <Link to="/pool-clothing/checkout">Klamotten tauschen</Link>
+          </TouchButton>
+          <TouchButton asChild variant="outline">
+            <Link
+              to="/pool-clothing/return"
+              search={{ returnTarget: "WAESCHE" }}
+            >
+              Klamotten in die Wäsche geben
+            </Link>
+          </TouchButton>
+          <TouchButton asChild variant="outline">
+            <Link to="/pool-clothing/return" search={{ returnTarget: "POOL" }}>
+              Klamotten zurück in den Pool geben
+            </Link>
           </TouchButton>
         </>
       }

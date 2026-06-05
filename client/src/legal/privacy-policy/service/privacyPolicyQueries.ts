@@ -3,10 +3,7 @@ import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-export type PrivacyPolicyMetadata =
-  components["schemas"]["PrivacyPolicyMetadata"]
+import type { PrivacyPolicyMetadata } from "#/legal/model/legal"
 
 export type PrivacyPolicyState =
   | { exists: false; metadata: null }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { autoToggleReturnsByType } from "./autoToggleReturnsByType"
-import type { ResolvedClothingItem } from "./autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
+import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType.ts"
 
 // Helper to build a minimal ResolvedClothingItem
 function makeItem(
@@ -21,7 +21,6 @@ function makeItem(
         lastModifiedAt: "",
         lastModifiedBy: "",
       },
-      idAsReference: { id: itemId },
     },
     clothingType: {
       id: typeId,
@@ -32,7 +31,6 @@ function makeItem(
         lastModifiedAt: "",
         lastModifiedBy: "",
       },
-      idAsReference: { id: typeId },
     },
   }
 }

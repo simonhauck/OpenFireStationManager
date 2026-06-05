@@ -2,10 +2,7 @@ import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-type AuthStateResponse = components["schemas"]["AuthStateResponse"]
-type LoginRequest = components["schemas"]["LoginRequest"]
+import type { AuthStateResponse, LoginRequest } from "#/api/model/auth"
 
 export const meQuery = () =>
   queryOptions({

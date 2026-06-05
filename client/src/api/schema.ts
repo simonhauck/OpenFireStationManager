@@ -616,7 +616,7 @@ export interface components {
     }
     CheckoutRequest: {
       /** Format: int64 */
-      targetLocationId: number
+      targetLocationId?: number
       /** Format: int64 */
       returnLocationId?: number
       takeItemIds: number[]

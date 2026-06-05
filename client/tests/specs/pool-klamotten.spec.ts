@@ -14,7 +14,7 @@ test.describe("Pool Klamotten Dashboard", () => {
     await expect(poolPage.errorState()).not.toBeVisible()
     // Page action button is visible
     await expect(
-      page.getByRole("link", { name: "Klamotten Ausgabe" }),
+      page.getByRole("link", { name: "Klamotten tauschen" }),
     ).toBeVisible()
   })
 })

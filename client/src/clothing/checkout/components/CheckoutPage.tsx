@@ -13,19 +13,18 @@ import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQuerie
 import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
 import type { CheckoutStep } from "#/clothing/checkout/useCheckoutWizard"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
-import type { ResolvedClothingItem } from "#/clothing/checkout/autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import {
   TouchButton,
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import { VerticalStepper } from "#/components/base/VerticalStepper"
-import type { Step } from "#/components/base/VerticalStepper"
+import type { StepperWizardStep } from "#/components/base/StepperWizard"
+import StepperWizard from "#/components/base/StepperWizard"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import PageSection from "#/components/base/PageSection"
 import { Checkbox } from "#/components/ui/checkbox"
 import {
@@ -39,24 +38,7 @@ import {
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
 import { Badge } from "#/components/ui/badge"
-import type { components } from "#/api/schema"
-
-type ClothingLocation = components["schemas"]["ClothingLocation"]
-
-const CHECKOUT_STEPS: Step[] = [
-  { label: "Spind wählen", description: "PERSONAL-Standort auswählen" },
-  {
-    label: "Kleidung scannen",
-    description: "Barcode scannen oder manuell suchen",
-  },
-  {
-    label: "Rückgabe wählen",
-    description: "Kleidung aus dem Spind zurückgeben",
-  },
-  { label: "Wäsche-Ziel wählen", description: "Ziel-Wäschekorb auswählen" },
-  { label: "Überprüfen", description: "Ausgabe und Rückgabe prüfen" },
-  { label: "Bestätigen", description: "Vorgang abschließen" },
-]
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
@@ -76,9 +58,70 @@ export default function CheckoutPage() {
     reset,
   } = useCheckoutWizard()
 
+  const steps: StepperWizardStep[] = [
+    {
+      label: "Spind wählen",
+      description: "Wähle deinen Haken / Spind um ihm Klamotten zuzuweisen",
+      content: <StepTargetPickerContent onSelect={selectTarget} />,
+    },
+    {
+      label: "Kleidung scannen",
+      description: "Barcode scannen oder manuell suchen",
+      content: (
+        <StepItemScannerContent
+          state={state}
+          onAddItem={addItem}
+          onRemoveItem={removeItem}
+          onBack={goBack}
+          onNext={advanceToReturns}
+        />
+      ),
+    },
+    {
+      label: "Rückgabe wählen",
+      description: "Kleidung aus dem Spind zurückgeben",
+      content: (
+        <StepReturnTogglesContent
+          state={state}
+          onSetReturnItemIds={setReturnItemIds}
+          onToggleReturnItem={toggleReturnItem}
+          onBack={goBack}
+          onConfirm={confirmReturns}
+        />
+      ),
+    },
+    {
+      label: "Wäsche-Ziel wählen",
+      description: "Ziel-Wäschekorb auswählen",
+      content: <StepWashLocationPickerContent onSelect={selectWashLocation} />,
+    },
+    {
+      label: "Überprüfen",
+      description: "Ausgabe und Rückgabe prüfen",
+      content: (
+        <StepReviewContent
+          state={state}
+          onSubmitOk={submitOk}
+          onBack={goBack}
+          onReset={reset}
+        />
+      ),
+    },
+    {
+      label: "Bestätigen",
+      description: "Vorgang abschließen",
+      content: (
+        <StepSuccessContent
+          onReset={reset}
+          onNavigateToOverview={() => void navigate({ to: "/pool-clothing" })}
+        />
+      ),
+    },
+  ]
+
   return (
     <PageSection
-      title="Klamotten Ausgabe"
+      title="Klamotten tauschen"
       buttons={
         <TouchButton
           variant="outline"
@@ -90,81 +133,22 @@ export default function CheckoutPage() {
         </TouchButton>
       }
     >
-      <div className="flex items-stretch">
-        {/* Stepper sidebar — hidden on mobile */}
-        <aside className="hidden shrink-0 sm:block">
-          <div className="pr-6 pb-2">
-            <VerticalStepper
-              steps={CHECKOUT_STEPS}
-              currentStep={state.step}
-              onStepClick={(n) => {
-                if (state.step === 6) return
-                goToStep(n as CheckoutStep)
-              }}
-            />
-          </div>
-        </aside>
-
-        {/* Step content */}
-        <div className="min-w-0 flex-1 space-y-4">
-          <RenderIf when={state.step === 1}>
-            <StepTargetPicker onSelect={selectTarget} />
-          </RenderIf>
-
-          <RenderIf when={state.step === 2}>
-            <StepItemScanner
-              state={state}
-              onAddItem={addItem}
-              onRemoveItem={removeItem}
-              onBack={goBack}
-              onNext={advanceToReturns}
-            />
-          </RenderIf>
-
-          <RenderIf when={state.step === 3}>
-            <StepReturnToggles
-              state={state}
-              onSetReturnItemIds={setReturnItemIds}
-              onToggleReturnItem={toggleReturnItem}
-              onBack={goBack}
-              onConfirm={confirmReturns}
-            />
-          </RenderIf>
-
-          <RenderIf when={state.step === 4}>
-            <StepWashLocationPicker onSelect={selectWashLocation} />
-          </RenderIf>
-
-          <RenderIf when={state.step === 5}>
-            <StepReview
-              state={state}
-              onSubmitOk={submitOk}
-              onBack={goBack}
-              onReset={reset}
-            />
-          </RenderIf>
-
-          <RenderIf when={state.step === 6}>
-            <StepSuccess
-              onReset={reset}
-              onNavigateToOverview={() =>
-                void navigate({ to: "/pool-clothing" })
-              }
-            />
-          </RenderIf>
-        </div>
-      </div>
+      <StepperWizard
+        steps={steps}
+        currentStep={state.step}
+        onStepClick={(n) => goToStep(n as CheckoutStep)}
+      />
     </PageSection>
   )
 }
 
 // ─── Step 1: Target Picker ────────────────────────────────────────────────────
 
-interface StepTargetPickerProps {
+interface StepTargetPickerContentProps {
   onSelect: (locationId: number) => void
 }
 
-function StepTargetPicker({ onSelect }: StepTargetPickerProps) {
+function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const [search] = useState("")
 
@@ -182,30 +166,25 @@ function StepTargetPicker({ onSelect }: StepTargetPickerProps) {
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 1: Spind wählen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-muted-foreground text-sm">
-          Wähle den Spind (PERSONAL-Standort) aus, für den die Ausgabe erfolgt.
-        </p>
-        <TouchCombobox
-          options={filteredOptions}
-          value={null}
-          onSelect={(value) => onSelect(Number(value))}
-          placeholder="Spind auswählen..."
-          searchPlaceholder="Spind suchen..."
-          emptyMessage="Kein Spind gefunden."
-        />
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <p className="text-muted-foreground text-sm">
+        Wähle den Spind (PERSONAL-Standort) aus, für den die Ausgabe erfolgt.
+      </p>
+      <TouchCombobox
+        options={filteredOptions}
+        value={null}
+        onSelect={(value) => onSelect(Number(value))}
+        placeholder="Spind auswählen..."
+        searchPlaceholder="Spind suchen..."
+        emptyMessage="Kein Spind gefunden."
+      />
+    </div>
   )
 }
 
 // ─── Step 2: Item Scanner ─────────────────────────────────────────────────────
 
-interface StepItemScannerProps {
+interface StepItemScannerContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onAddItem: (item: ResolvedClothingItem) => void
   onRemoveItem: (itemId: number) => void
@@ -218,20 +197,19 @@ interface PendingConfirmation {
   actualLocationName: string
 }
 
-function StepItemScanner({
+function StepItemScannerContent({
   state,
   onAddItem,
   onRemoveItem,
   onBack,
   onNext,
-}: StepItemScannerProps) {
+}: StepItemScannerContentProps) {
   const [pendingConfirmation, setPendingConfirmation] =
     useState<PendingConfirmation | null>(null)
 
   function handleItemResolved(item: ResolvedClothingItem) {
     const location = item.location
 
-    // No location set — add silently without a discrepancy warning
     if (!location) {
       onAddItem(item)
       return
@@ -240,7 +218,6 @@ function StepItemScanner({
     const isAtPool = location.type === "POOL"
 
     if (!isAtPool) {
-      // Known non-POOL location — show discrepancy dialog
       setPendingConfirmation({
         item,
         actualLocationName: formatClothingLocationLabel(location),
@@ -253,46 +230,36 @@ function StepItemScanner({
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Schritt 2: Kleidung scannen</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground text-sm">
-            Scanne einen Barcode oder suche manuell nach einem Kleidungsstück.
-          </p>
+      <div className="space-y-4">
+        <p className="text-muted-foreground text-sm">
+          Scanne einen Barcode oder suche manuell nach einem Kleidungsstück.
+        </p>
 
-          <ClothingItemScanner
-            items={state.takeItems}
-            onItemResolved={handleItemResolved}
-            onRemoveItem={onRemoveItem}
-            renderItemBadge={(item) => {
-              const loc = item.location
-              if (!loc || loc.type === "POOL") return null
-              return (
-                <Badge variant="outline">
-                  {formatClothingLocationLabel(loc)}
-                </Badge>
-              )
-            }}
-          />
+        <ClothingItemScanner
+          items={state.takeItems}
+          onItemResolved={handleItemResolved}
+          onRemoveItem={onRemoveItem}
+          renderItemBadge={(item) => {
+            const loc = item.location
+            if (!loc || loc.type === "POOL") return null
+            return (
+              <Badge variant="outline">
+                {formatClothingLocationLabel(loc)}
+              </Badge>
+            )
+          }}
+        />
 
-          {/* Weiter button */}
-          <div className="flex justify-end gap-3 pt-2">
-            <TouchButton variant="outline" onClick={onBack}>
-              ← Zurück
-            </TouchButton>
-            <TouchButton
-              disabled={state.takeItems.length === 0}
-              onClick={onNext}
-            >
-              Weiter →
-            </TouchButton>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="flex justify-end gap-3 pt-2">
+          <TouchButton variant="outline" onClick={onBack}>
+            ← Zurück
+          </TouchButton>
+          <TouchButton disabled={state.takeItems.length === 0} onClick={onNext}>
+            Weiter →
+          </TouchButton>
+        </div>
+      </div>
 
-      {/* Discrepancy confirmation dialog */}
       <AlertDialog
         open={pendingConfirmation !== null}
         onOpenChange={(open) => {
@@ -339,7 +306,7 @@ function StepItemScanner({
 
 // ─── Step 3: Return Toggles ───────────────────────────────────────────────────
 
-interface StepReturnTogglesProps {
+interface StepReturnTogglesContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onSetReturnItemIds: (ids: Set<number>) => void
   onToggleReturnItem: (itemId: number) => void
@@ -347,17 +314,16 @@ interface StepReturnTogglesProps {
   onConfirm: () => void
 }
 
-function StepReturnToggles({
+function StepReturnTogglesContent({
   state,
   onSetReturnItemIds,
   onToggleReturnItem,
   onBack,
   onConfirm,
-}: StepReturnTogglesProps) {
+}: StepReturnTogglesContentProps) {
   const { data: allItems } = useQuery(getAllClothingItemsQuery())
   const { data: allTypes } = useQuery(getAllClothingTypesQuery())
 
-  // Build resolved locker items (items at the selected PERSONAL location)
   const lockerItems: ResolvedClothingItem[] = (() => {
     if (!allItems || !allTypes || state.targetLocationId === null) return []
     const typeMap = new Map(allTypes.map((t) => [t.id, t]))
@@ -370,7 +336,6 @@ function StepReturnToggles({
       })
   })()
 
-  // Auto-toggle on first render when locker items are available
   const didAutoToggle = useRef(false)
   useEffect(() => {
     if (didAutoToggle.current || lockerItems.length === 0) return
@@ -380,64 +345,61 @@ function StepReturnToggles({
   }, [lockerItems.length])
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 3: Rückgabe wählen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-muted-foreground text-sm">
-          Wähle die Kleidungsstücke aus dem Spind aus, die zurückgegeben werden
-          sollen. Passende Typen wurden bereits vorausgewählt.
+    <div className="space-y-4">
+      <p className="text-muted-foreground text-sm">
+        Wähle die Kleidungsstücke aus dem Spind aus, die zurückgegeben werden
+        sollen. Passende Typen wurden bereits vorausgewählt.
+      </p>
+
+      <RenderIf when={lockerItems.length === 0}>
+        <p className="text-muted-foreground text-sm italic">
+          Keine Kleidung im Spind gefunden.
         </p>
+      </RenderIf>
 
-        <RenderIf when={lockerItems.length === 0}>
-          <p className="text-muted-foreground text-sm italic">
-            Keine Kleidung im Spind gefunden.
-          </p>
-        </RenderIf>
-
-        <RenderIf when={lockerItems.length > 0}>
-          <div className="space-y-2">
-            {lockerItems.map((item) => {
-              const checked = state.returnItemIds.has(item.clothingItem.id)
-              return (
-                <ClothingItemRow
-                  key={item.clothingItem.id}
-                  item={item}
-                  asLabel
-                  leading={
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={() =>
-                        onToggleReturnItem(item.clothingItem.id)
-                      }
-                      className="size-5"
-                    />
-                  }
-                />
-              )
-            })}
-          </div>
-        </RenderIf>
-
-        <div className="flex justify-end gap-3 pt-2">
-          <TouchButton variant="outline" onClick={onBack}>
-            ← Zurück
-          </TouchButton>
-          <TouchButton onClick={onConfirm}>Weiter →</TouchButton>
+      <RenderIf when={lockerItems.length > 0}>
+        <div className="space-y-2">
+          {lockerItems.map((item) => {
+            const checked = state.returnItemIds.has(item.clothingItem.id)
+            return (
+              <ClothingItemRow
+                key={item.clothingItem.id}
+                item={item}
+                asLabel
+                leading={
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={() =>
+                      onToggleReturnItem(item.clothingItem.id)
+                    }
+                    className="size-5"
+                  />
+                }
+              />
+            )
+          })}
         </div>
-      </CardContent>
-    </Card>
+      </RenderIf>
+
+      <div className="flex justify-end gap-3 pt-2">
+        <TouchButton variant="outline" onClick={onBack}>
+          ← Zurück
+        </TouchButton>
+        <TouchButton onClick={onConfirm}>Weiter →</TouchButton>
+      </div>
+    </div>
   )
 }
 
 // ─── Step 4: Wash Location Picker ─────────────────────────────────────────────
 
-interface StepWashLocationPickerProps {
+interface StepWashLocationPickerContentProps {
   onSelect: (locationId: number) => void
 }
 
-function StepWashLocationPicker({ onSelect }: StepWashLocationPickerProps) {
+function StepWashLocationPickerContent({
+  onSelect,
+}: StepWashLocationPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
 
   const washLocations: ClothingLocation[] = (allLocations ?? []).filter(
@@ -445,52 +407,51 @@ function StepWashLocationPicker({ onSelect }: StepWashLocationPickerProps) {
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 4: Wäsche-Ziel wählen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-muted-foreground text-sm">
-          Wähle den Wäschekorb aus, in den die zurückgegebene Kleidung soll.
+    <div className="space-y-4">
+      <p className="text-muted-foreground text-sm">
+        Wähle den Wäschekorb aus, in den die zurückgegebene Kleidung soll.
+      </p>
+
+      <RenderIf when={washLocations.length === 0}>
+        <p className="text-muted-foreground text-sm italic">
+          Keine Wäsche-Standorte gefunden.
         </p>
+      </RenderIf>
 
-        <RenderIf when={washLocations.length === 0}>
-          <p className="text-muted-foreground text-sm italic">
-            Keine Wäsche-Standorte gefunden.
-          </p>
-        </RenderIf>
-
-        <RenderIf when={washLocations.length > 0}>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {washLocations.map((loc) => (
-              <TouchButton
-                key={loc.id}
-                variant="outline"
-                className="h-auto min-h-16 flex-col gap-1 p-4 text-wrap"
-                onClick={() => onSelect(loc.id)}
-              >
-                <span className="text-base font-medium">
-                  {formatClothingLocationLabel(loc)}
-                </span>
-              </TouchButton>
-            ))}
-          </div>
-        </RenderIf>
-      </CardContent>
-    </Card>
+      <RenderIf when={washLocations.length > 0}>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {washLocations.map((loc) => (
+            <TouchButton
+              key={loc.id}
+              variant="outline"
+              className="h-auto min-h-16 flex-col gap-1 p-4 text-wrap"
+              onClick={() => onSelect(loc.id)}
+            >
+              <span className="text-base font-medium">
+                {formatClothingLocationLabel(loc)}
+              </span>
+            </TouchButton>
+          ))}
+        </div>
+      </RenderIf>
+    </div>
   )
 }
 
 // ─── Step 5: Review + Submit ──────────────────────────────────────────────────
 
-interface StepReviewProps {
+interface StepReviewContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onSubmitOk: () => void
   onBack: () => void
   onReset: () => void
 }
 
-function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
+function StepReviewContent({
+  state,
+  onSubmitOk,
+  onBack,
+}: StepReviewContentProps) {
   const { data: allItems } = useQuery(getAllClothingItemsQuery())
   const { data: allTypes } = useQuery(getAllClothingTypesQuery())
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
@@ -504,7 +465,6 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
     locationMap.get(state.targetLocationId!),
   )
 
-  // Resolved return items
   const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
     (id) => {
       const raw = (allItems ?? []).find((i) => i.id === id)
@@ -539,72 +499,63 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Schritt 5: Überprüfen</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Take items */}
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">
-            Ausgabe ({state.takeItems.length})
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <p className="text-sm font-semibold">
+          Ausgabe ({state.takeItems.length})
+        </p>
+        <RenderIf when={state.takeItems.length === 0}>
+          <p className="text-muted-foreground text-sm italic">
+            Keine Kleidung ausgewählt.
           </p>
-          <RenderIf when={state.takeItems.length === 0}>
-            <p className="text-muted-foreground text-sm italic">
-              Keine Kleidung ausgewählt.
-            </p>
-          </RenderIf>
-          <RenderIf when={state.takeItems.length > 0}>
-            <div className="space-y-1">
-              {state.takeItems.map((item) => (
-                <ClothingItemRow key={item.clothingItem.id} item={item} />
-              ))}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              Ziel: <strong>{targetLocationName}</strong>
-            </p>
-          </RenderIf>
-        </div>
-
-        {/* Return items */}
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">
-            Rückgabe ({returnItems.length})
+        </RenderIf>
+        <RenderIf when={state.takeItems.length > 0}>
+          <div className="space-y-1">
+            {state.takeItems.map((item) => (
+              <ClothingItemRow key={item.clothingItem.id} item={item} />
+            ))}
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Ziel: <strong>{targetLocationName}</strong>
           </p>
-          <RenderIf when={returnItems.length === 0}>
-            <p className="text-muted-foreground text-sm italic">
-              Keine Rückgabe.
-            </p>
-          </RenderIf>
-          <RenderIf when={returnItems.length > 0}>
-            <div className="space-y-1">
-              {returnItems.map((item) => (
-                <ClothingItemRow key={item.clothingItem.id} item={item} />
-              ))}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              Ziel: <strong>{washLocationName}</strong>
-            </p>
-          </RenderIf>
-        </div>
+        </RenderIf>
+      </div>
 
-        <div className="flex justify-end gap-3 pt-2">
-          <TouchButton
-            variant="outline"
-            onClick={onBack}
-            disabled={checkout.isPending}
-          >
-            ← Zurück
-          </TouchButton>
-          <TouchButton
-            disabled={checkout.isPending}
-            onClick={() => void handleSubmit()}
-          >
-            {checkout.isPending ? "Wird gesendet…" : "Bestätigen"}
-          </TouchButton>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="space-y-2">
+        <p className="text-sm font-semibold">Rückgabe ({returnItems.length})</p>
+        <RenderIf when={returnItems.length === 0}>
+          <p className="text-muted-foreground text-sm italic">
+            Keine Rückgabe.
+          </p>
+        </RenderIf>
+        <RenderIf when={returnItems.length > 0}>
+          <div className="space-y-1">
+            {returnItems.map((item) => (
+              <ClothingItemRow key={item.clothingItem.id} item={item} />
+            ))}
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Ziel: <strong>{washLocationName}</strong>
+          </p>
+        </RenderIf>
+      </div>
+
+      <div className="flex justify-end gap-3 pt-2">
+        <TouchButton
+          variant="outline"
+          onClick={onBack}
+          disabled={checkout.isPending}
+        >
+          ← Zurück
+        </TouchButton>
+        <TouchButton
+          disabled={checkout.isPending}
+          onClick={() => void handleSubmit()}
+        >
+          {checkout.isPending ? "Wird gesendet…" : "Bestätigen"}
+        </TouchButton>
+      </div>
+    </div>
   )
 }
 
@@ -612,12 +563,15 @@ function StepReview({ state, onSubmitOk, onBack }: StepReviewProps) {
 
 const SUCCESS_REDIRECT_SECONDS = 15
 
-interface StepSuccessProps {
+interface StepSuccessContentProps {
   onReset: () => void
   onNavigateToOverview: () => void
 }
 
-function StepSuccess({ onReset, onNavigateToOverview }: StepSuccessProps) {
+function StepSuccessContent({
+  onReset,
+  onNavigateToOverview,
+}: StepSuccessContentProps) {
   const [secondsLeft, setSecondsLeft] = useState(SUCCESS_REDIRECT_SECONDS)
 
   useEffect(() => {

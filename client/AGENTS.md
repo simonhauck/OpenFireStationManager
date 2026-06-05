@@ -27,18 +27,19 @@ All commands below are run from the `client/` directory.
 
 ## Commands
 
-| Purpose                        | Command               |
-| ------------------------------ | --------------------- |
-| Start dev server               | `npm run dev`         |
-| Production build               | `npm run build`       |
-| Preview production build       | `npm run preview`     |
-| Run unit tests                 | `npm run test`        |
-| Run Playwright tests           | `npm run test:e2e`    |
-| Run Playwright tests (UI mode) | `npm run test:e2e:ui` |
-| Lint                           | `npm run lint`        |
-| Format check                   | `npm run format`      |
-| Format + lint auto-fix         | `npm run check`       |
-| Generate frontend API bindings | `npm run prepareEnv`  |
+| Purpose                        | Command                |
+| ------------------------------ | ---------------------- |
+| Start dev server               | `npm run dev`          |
+| Production build               | `npm run build`        |
+| Preview production build       | `npm run preview`      |
+| Run unit tests                 | `npm run test`         |
+| Run Playwright tests           | `npm run test:e2e`     |
+| Run Playwright tests (UI mode) | `npm run test:e2e:ui`  |
+| Lint                           | `npm run lint:check`   |
+| Format check                   | `npm run format:check` |
+| TypeScript type check          | `npm run build:check`  |
+| Format + lint auto-fix         | `npm run fix`          |
+| Generate frontend API bindings | `npm run prepareEnv`   |
 
 ---
 
@@ -173,15 +174,19 @@ every invariant or validation edge case through Playwright; those belong in unit
 ```tsx
 // ✅ correct
 <RenderIf when={isLoading}>
-  <LoadingIndicator />
+    <LoadingIndicator/>
 </RenderIf>
 <RenderIf when={!isLoading}>
-  <Content />
+    <Content/>
 </RenderIf>
 
 // ❌ avoid
-{isLoading ? <LoadingIndicator /> : <Content />}
-{isLoading && <LoadingIndicator />}
+{
+    isLoading ? <LoadingIndicator/> : <Content/>
+}
+{
+    isLoading && <LoadingIndicator/>
+}
 ```
 
 ### shadcn/ui Update Safety
@@ -248,9 +253,33 @@ src/
 
 ---
 
+## Schema-Derived Types
+
+All types extracted from the generated API schema (`components["schemas"]["..."]`)
+**must** live in a central model file under the corresponding domain's `model/` directory.
+
+- Use `src/<domain>/model/` for domain-specific types (e.g. `clothing/model/clothingItems.ts`,
+  `users/model/user.ts`, `legal/model/legal.ts`).
+- Use `src/api/model/` for auth/API-level types (e.g. `api/model/auth.ts`).
+- Do **not** define schema-derived type aliases inline in query, service, or component files —
+  always import them from the domain's model file.
+
+```ts
+// ✅ correct — import from the domain's model (use .ts extension)
+import type { ClothingItem } from "#/clothing/model/clothingItems.ts"
+
+// ❌ avoid — inline type alias in a query/service file (extensionless import)
+import type { components } from "#/api/schema"
+
+type ClothingItem = components["schemas"]["ClothingItem"]
+```
+
+---
+
 ## Implementation Preferences
 
 - Keep code type-safe; avoid `any`.
+- Prefer `undefined` over `null` for absent values.
 - Prefer guard clauses and explicit error handling over silent failure.
 - Reuse existing utilities/components before creating new ones.
 - Keep edits minimal and feature-focused; avoid unrelated refactors.

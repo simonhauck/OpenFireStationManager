@@ -2,12 +2,12 @@ import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
-
-type CreateUserRequest = components["schemas"]["CreateUserRequest"]
-type UpdateUserRequest = components["schemas"]["UpdateUserRequest"]
-type ChangePasswordRequest = components["schemas"]["ChangePasswordRequest"]
-type UserAccount = components["schemas"]["UserAccount"]
+import type {
+  CreateUserRequest,
+  UpdateUserRequest,
+  ChangePasswordRequest,
+  UserAccount,
+} from "#/users/model/user"
 
 type UpdateUserVariables = {
   id: number

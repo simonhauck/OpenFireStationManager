@@ -1,8 +1,6 @@
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
 import ClearableSelect from "#/components/base/ClearableSelect"
-import type { components } from "#/api/schema"
-
-type ClothingLocation = components["schemas"]["ClothingLocation"]
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 type ClothingLocationSelectProps = {
   selectedLocationId: number | undefined

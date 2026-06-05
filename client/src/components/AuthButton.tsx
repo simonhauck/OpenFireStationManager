@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link, useNavigate } from "@tanstack/react-router"
 import { LogOut } from "lucide-react"
 
 import { logoutMutation, meQuery } from "#/api/auth.queries"
@@ -12,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu"
+import { Link, useNavigate } from "@tanstack/react-router"
 
 export default function AuthButton() {
   const queryClient = useQueryClient()
@@ -31,7 +31,9 @@ export default function AuthButton() {
   if (!isAuthenticated) {
     return (
       <Button asChild size="sm">
-        <Link to="/login">Anmelden</Link>
+        <Link to="/login" search={{ redirect: undefined }}>
+          Anmelden
+        </Link>
       </Button>
     )
   }

@@ -4,7 +4,6 @@ import { Settings, ShieldCheck, Shirt, Users } from "lucide-react"
 
 import { meQuery } from "#/api/auth.queries"
 import { hasRequiredRole } from "#/api/auth.utils"
-import type { UserRole } from "#/api/auth.utils"
 import PageSection from "#/components/base/PageSection"
 import {
   Card,
@@ -12,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card"
+import type { UserRole } from "#/users/model/user.ts"
+import React from "react"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,

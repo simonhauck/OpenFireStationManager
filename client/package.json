@@ -15,6 +15,7 @@
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "fix": "prettier --write . && eslint --fix",
+    "build:check": "tsc --noEmit",
     "prepareEnv": "npx openapi-typescript ./../server/src/main/resources/open-api-contract.json -o ./src/api/schema.ts && prettier --write ./src/api/schema.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

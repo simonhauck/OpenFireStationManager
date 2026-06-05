@@ -3,13 +3,12 @@ import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { components } from "#/api/schema"
+import type {
+  ClothingLocation,
+  CreateClothingLocationRequest,
+  BatchCreateClothingLocationsRequest,
+} from "#/clothing/model/clothingLocations"
 
-type ClothingLocation = components["schemas"]["ClothingLocation"]
-type CreateClothingLocationRequest =
-  components["schemas"]["CreateClothingLocationRequest"]
-type BatchCreateClothingLocationsRequest =
-  components["schemas"]["BatchCreateClothingLocationsRequest"]
 type LocationType = CreateClothingLocationRequest["type"]
 
 type UpdateClothingLocationVariables = {

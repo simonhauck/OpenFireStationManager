@@ -1,4 +1,4 @@
-import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 type LocationType = ClothingLocation["type"]
 

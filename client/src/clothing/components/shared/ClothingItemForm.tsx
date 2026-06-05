@@ -17,7 +17,7 @@ import { Card, CardContent } from "#/components/ui/card"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
-import type { CreateOrUpdateClothingItemRequest } from "#/clothing/components/shared/CreateOrUpdateClothingItemRequest.tsx"
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/model/clothingItems"
 
 type ClothingItemFormProps = {
   existingItem?: ClothingItem

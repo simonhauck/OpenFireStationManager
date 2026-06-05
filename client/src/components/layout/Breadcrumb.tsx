@@ -20,7 +20,7 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   admin: "Administration",
   batch: "Stapelverarbeitung",
   "change-password": "Passwort ändern",
-  checkout: "Klamotten Ausgabe",
+  checkout: "Klamotten tauschen",
   "clothing-management": "Klamotten Management",
   edit: "Bearbeiten",
   items: "Kleidungsstücke",
@@ -29,11 +29,13 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   new: "Neu",
   "pool-clothing": "Pool Klamotten",
   relocation: "Umlagerung",
+  return: "Klamotten Rückgabe",
   settings: "Einstellungen",
   types: "Typen",
   "user-management": "Nutzer Management",
   dashboard: "Dashboard",
   impressum: "Impressum",
+  _authenticated: "Authenticated",
 }
 
 function isStaticSegment(segment: string): segment is StaticSegment {
