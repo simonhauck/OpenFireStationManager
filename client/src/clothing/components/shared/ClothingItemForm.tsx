@@ -66,7 +66,9 @@ export default function ClothingItemForm({
   const submitLabel = "Speichern"
   const pendingLabel = "Wird gespeichert..."
   const errorMessage = error
-    ? "Das Kleidungsstück konnte nicht gespeichert werden."
+    ? error instanceof Error
+      ? error.message
+      : "Das Kleidungsstück konnte nicht gespeichert werden."
     : null
 
   function handleSubmit(e: React.FormEvent) {

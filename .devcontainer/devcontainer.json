@@ -2,7 +2,7 @@
   "name": "OpenFireStationManager",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/OpenFireStationManager",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"

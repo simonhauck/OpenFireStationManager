@@ -1,16 +1,28 @@
 services:
   app:
     image: mcr.microsoft.com/devcontainers/base:ubuntu
-    network_mode: host
     volumes:
-      - ..:/workspace:cached
+      - ..:/workspaces/OpenFireStationManager:cached
     command: sleep infinity
+    depends_on:
+      - db
+    networks:
+      - devnet
 
   db:
     image: postgres:18
     restart: unless-stopped
-    network_mode: host
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: ofsm
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - devnet
+
+networks:
+  devnet:
+
+volumes:
+  pgdata:
