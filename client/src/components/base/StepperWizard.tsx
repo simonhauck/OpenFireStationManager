@@ -4,12 +4,17 @@ import RenderIf from "#/components/base/RenderIf"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import React from "react"
 
+export interface StepperWizardStep {
+  label: string
+  description?: string
+  content: React.ReactNode
+}
+
 export interface StepperWizardProps {
-  steps: Step[]
+  steps: StepperWizardStep[]
   currentStep: number
   onStepClick: (step: number) => void
   disableStepClickOnLastStep?: boolean
-  stepContents: Record<number, React.ReactNode>
 }
 
 export default function StepperWizard({
@@ -17,14 +22,18 @@ export default function StepperWizard({
   currentStep,
   onStepClick,
   disableStepClickOnLastStep = true,
-  stepContents,
 }: StepperWizardProps) {
+  const stepperSteps: Step[] = steps.map((s) => ({
+    label: s.label,
+    description: s.description,
+  }))
+
   return (
     <div className="flex items-stretch">
       <aside className="hidden shrink-0 sm:block">
         <div className="pr-6 pb-2">
           <VerticalStepper
-            steps={steps}
+            steps={stepperSteps}
             currentStep={currentStep}
             onStepClick={(n) => {
               if (disableStepClickOnLastStep && currentStep === steps.length)
@@ -46,7 +55,7 @@ export default function StepperWizard({
                     Schritt {stepNumber}: {step.label}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>{stepContents[stepNumber]}</CardContent>
+                <CardContent>{step.content}</CardContent>
               </Card>
             </RenderIf>
           )

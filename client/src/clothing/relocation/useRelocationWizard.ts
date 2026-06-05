@@ -1,5 +1,5 @@
 import { useReducer } from "react"
-import type { ResolvedClothingItem } from "#/clothing/checkout/service/checkoutQueries"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 export type RelocationStep = 1 | 2 | 3 | 4
 

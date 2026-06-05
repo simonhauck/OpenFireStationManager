@@ -16,21 +16,11 @@ import {
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import type { Step } from "#/components/base/VerticalStepper"
+import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
-
-const RELOCATION_STEPS: Step[] = [
-  { label: "Ziel wählen", description: "Ziel-Standort auswählen" },
-  {
-    label: "Kleidung scannen",
-    description: "Barcode scannen oder manuell suchen",
-  },
-  { label: "Überprüfen", description: "Batch vor Bestätigung prüfen" },
-  { label: "Fertig", description: "Umlagerung abgeschlossen" },
-]
 
 const SUCCESS_REDIRECT_SECONDS = 15
 
@@ -47,6 +37,49 @@ export default function RelocationPage() {
     reset,
   } = useRelocationWizard()
 
+  const steps: StepperWizardStep[] = [
+    {
+      label: "Ziel wählen",
+      description: "Ziel-Standort auswählen",
+      content: <StepTargetPickerContent onSelect={selectTarget} />,
+    },
+    {
+      label: "Kleidung scannen",
+      description: "Barcode scannen oder manuell suchen",
+      content: (
+        <StepItemScannerContent
+          state={state}
+          onAddItem={addItem}
+          onRemoveItem={removeItem}
+          onBack={goBack}
+          onNext={advanceToReview}
+        />
+      ),
+    },
+    {
+      label: "Überprüfen",
+      description: "Batch vor Bestätigung prüfen",
+      content: (
+        <StepReviewContent
+          state={state}
+          onSubmitOk={submitOk}
+          onBack={goBack}
+        />
+      ),
+    },
+    {
+      label: "Fertig",
+      description: "Umlagerung abgeschlossen",
+      content: (
+        <StepSuccessContent
+          state={state}
+          onReset={reset}
+          onNavigateToOverview={() => void navigate({ to: "/pool-clothing" })}
+        />
+      ),
+    },
+  ]
+
   return (
     <PageSection
       title="Umlagerung"
@@ -62,40 +95,12 @@ export default function RelocationPage() {
       }
     >
       <StepperWizard
-        steps={RELOCATION_STEPS}
+        steps={steps}
         currentStep={state.step}
         onStepClick={() => {
-          /* wizard is linear — no jump navigation */
+          /* wizard is linear */
         }}
         disableStepClickOnLastStep={false}
-        stepContents={{
-          1: <StepTargetPickerContent onSelect={selectTarget} />,
-          2: (
-            <StepItemScannerContent
-              state={state}
-              onAddItem={addItem}
-              onRemoveItem={removeItem}
-              onBack={goBack}
-              onNext={advanceToReview}
-            />
-          ),
-          3: (
-            <StepReviewContent
-              state={state}
-              onSubmitOk={submitOk}
-              onBack={goBack}
-            />
-          ),
-          4: (
-            <StepSuccessContent
-              state={state}
-              onReset={reset}
-              onNavigateToOverview={() =>
-                void navigate({ to: "/pool-clothing" })
-              }
-            />
-          ),
-        }}
       />
     </PageSection>
   )

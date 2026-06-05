@@ -1,9 +1,4 @@
-export type {
-  ResolvedClothingItem,
-  ClothingItem,
-} from "#/clothing/model/clothingItems"
-export type { ClothingLocation } from "#/clothing/model/clothingLocations"
-export type { ClothingType } from "#/clothing/model/clothingType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 /**
  * Given a list of items being taken (with their types) and the items currently

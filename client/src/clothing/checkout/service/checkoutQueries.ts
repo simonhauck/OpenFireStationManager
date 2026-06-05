@@ -7,7 +7,7 @@ import type {
   CheckoutRequest,
   CheckoutResponse,
 } from "#/clothing/model/checkout"
-import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 export async function searchClothingItems(
   q: string,

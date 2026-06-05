@@ -1,5 +1,5 @@
 import { useReducer } from "react"
-import type { ResolvedClothingItem } from "#/clothing/checkout/autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 export type ReturnStep = 1 | 2 | 3 | 4
 

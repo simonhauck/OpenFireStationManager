@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest"
 import { renderHook, act } from "@testing-library/react"
 import { useCheckoutWizard } from "./useCheckoutWizard"
-import type { ResolvedClothingItem } from "./autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 function makeItem(itemId: number, typeId: number): ResolvedClothingItem {
   return {
@@ -16,7 +16,6 @@ function makeItem(itemId: number, typeId: number): ResolvedClothingItem {
         lastModifiedAt: "",
         lastModifiedBy: "",
       },
-      idAsReference: { id: itemId },
     },
     clothingType: {
       id: typeId,
@@ -27,7 +26,6 @@ function makeItem(itemId: number, typeId: number): ResolvedClothingItem {
         lastModifiedAt: "",
         lastModifiedBy: "",
       },
-      idAsReference: { id: typeId },
     },
   }
 }

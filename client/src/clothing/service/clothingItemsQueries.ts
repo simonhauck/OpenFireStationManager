@@ -8,6 +8,8 @@ import type {
   CreateOrUpdateClothingItemRequest,
 } from "#/clothing/model/clothingItems"
 
+export type { ClothingItem, CreateOrUpdateClothingItemRequest }
+
 type UpdateClothingItemVariables = {
   id: number
   body: CreateOrUpdateClothingItemRequest

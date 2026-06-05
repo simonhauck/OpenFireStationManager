@@ -7,7 +7,6 @@ import {
   getItemByBarcode,
   searchClothingItems,
 } from "#/clothing/checkout/service/checkoutQueries"
-import type { ResolvedClothingItem } from "#/clothing/checkout/service/checkoutQueries"
 import {
   TouchButton,
   TouchCombobox,
@@ -15,6 +14,7 @@ import {
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 type InputMode = "scanner" | "manual"
 

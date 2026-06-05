@@ -20,7 +20,7 @@ import {
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import type { Step } from "#/components/base/VerticalStepper"
+import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
@@ -40,21 +40,6 @@ import {
 import { Badge } from "#/components/ui/badge"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
-const CHECKOUT_STEPS: Step[] = [
-  { label: "Spind wählen", description: "PERSONAL-Standort auswählen" },
-  {
-    label: "Kleidung scannen",
-    description: "Barcode scannen oder manuell suchen",
-  },
-  {
-    label: "Rückgabe wählen",
-    description: "Kleidung aus dem Spind zurückgeben",
-  },
-  { label: "Wäsche-Ziel wählen", description: "Ziel-Wäschekorb auswählen" },
-  { label: "Überprüfen", description: "Ausgabe und Rückgabe prüfen" },
-  { label: "Bestätigen", description: "Vorgang abschließen" },
-]
-
 export default function CheckoutPage() {
   const navigate = useNavigate()
   const {
@@ -73,6 +58,67 @@ export default function CheckoutPage() {
     reset,
   } = useCheckoutWizard()
 
+  const steps: StepperWizardStep[] = [
+    {
+      label: "Spind wählen",
+      description: "Wähle deinen Haken / Spind um ihm Klamotten zuzuweisen",
+      content: <StepTargetPickerContent onSelect={selectTarget} />,
+    },
+    {
+      label: "Kleidung scannen",
+      description: "Barcode scannen oder manuell suchen",
+      content: (
+        <StepItemScannerContent
+          state={state}
+          onAddItem={addItem}
+          onRemoveItem={removeItem}
+          onBack={goBack}
+          onNext={advanceToReturns}
+        />
+      ),
+    },
+    {
+      label: "Rückgabe wählen",
+      description: "Kleidung aus dem Spind zurückgeben",
+      content: (
+        <StepReturnTogglesContent
+          state={state}
+          onSetReturnItemIds={setReturnItemIds}
+          onToggleReturnItem={toggleReturnItem}
+          onBack={goBack}
+          onConfirm={confirmReturns}
+        />
+      ),
+    },
+    {
+      label: "Wäsche-Ziel wählen",
+      description: "Ziel-Wäschekorb auswählen",
+      content: <StepWashLocationPickerContent onSelect={selectWashLocation} />,
+    },
+    {
+      label: "Überprüfen",
+      description: "Ausgabe und Rückgabe prüfen",
+      content: (
+        <StepReviewContent
+          state={state}
+          onSubmitOk={submitOk}
+          onBack={goBack}
+          onReset={reset}
+        />
+      ),
+    },
+    {
+      label: "Bestätigen",
+      description: "Vorgang abschließen",
+      content: (
+        <StepSuccessContent
+          onReset={reset}
+          onNavigateToOverview={() => void navigate({ to: "/pool-clothing" })}
+        />
+      ),
+    },
+  ]
+
   return (
     <PageSection
       title="Klamotten tauschen"
@@ -88,47 +134,9 @@ export default function CheckoutPage() {
       }
     >
       <StepperWizard
-        steps={CHECKOUT_STEPS}
+        steps={steps}
         currentStep={state.step}
         onStepClick={(n) => goToStep(n as CheckoutStep)}
-        stepContents={{
-          1: <StepTargetPickerContent onSelect={selectTarget} />,
-          2: (
-            <StepItemScannerContent
-              state={state}
-              onAddItem={addItem}
-              onRemoveItem={removeItem}
-              onBack={goBack}
-              onNext={advanceToReturns}
-            />
-          ),
-          3: (
-            <StepReturnTogglesContent
-              state={state}
-              onSetReturnItemIds={setReturnItemIds}
-              onToggleReturnItem={toggleReturnItem}
-              onBack={goBack}
-              onConfirm={confirmReturns}
-            />
-          ),
-          4: <StepWashLocationPickerContent onSelect={selectWashLocation} />,
-          5: (
-            <StepReviewContent
-              state={state}
-              onSubmitOk={submitOk}
-              onBack={goBack}
-              onReset={reset}
-            />
-          ),
-          6: (
-            <StepSuccessContent
-              onReset={reset}
-              onNavigateToOverview={() =>
-                void navigate({ to: "/pool-clothing" })
-              }
-            />
-          ),
-        }}
       />
     </PageSection>
   )

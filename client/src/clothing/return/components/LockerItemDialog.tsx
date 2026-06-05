@@ -5,7 +5,6 @@ import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocatio
 import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
-import type { ResolvedClothingItem } from "#/clothing/checkout/autoToggleReturnsByType"
 import {
   TouchButton,
   TouchCombobox,
@@ -20,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "#/components/ui/dialog"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 interface LockerItemDialogProps {
   open: boolean

@@ -1,4 +1,4 @@
-import type { UserRole } from "#/users/model/user"
+import type { UserRole } from "#/users/model/user.ts"
 
 /**
  * Returns true if the user has at least one of the required roles.

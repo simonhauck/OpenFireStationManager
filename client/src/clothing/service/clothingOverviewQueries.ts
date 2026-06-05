@@ -2,13 +2,10 @@ import { queryOptions, useQuery } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-
-export type {
+import type {
   ClothingLocationSizeSummary,
   ClothingTypeSizeSummary,
-  SizeGroupSummary,
-  SizeSummary,
-} from "#/clothing/model/overview"
+} from "#/clothing/model/overview.ts"
 
 export const getClothingOverviewQuery = () =>
   queryOptions({

@@ -13,7 +13,7 @@ import type { ReturnStep } from "#/clothing/return/useReturnWizard"
 import { returnMutation } from "#/clothing/return/service/returnQueries"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
-import type { Step } from "#/components/base/VerticalStepper"
+import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
 import RenderIf from "#/components/base/RenderIf"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
@@ -22,21 +22,6 @@ import { LockerItemDialog } from "#/clothing/return/components/LockerItemDialog"
 import PageSection from "#/components/base/PageSection"
 import type { CheckoutRequest } from "#/clothing/model/checkout"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
-
-function buildSteps(): Step[] {
-  return [
-    {
-      label: "Kleidung auswählen",
-      description: "Scannen oder aus Standort wählen",
-    },
-    {
-      label: `Ziel wählen`,
-      description: `Ziel Standort auswählen`,
-    },
-    { label: "Überprüfen", description: "Rückgabe prüfen" },
-    { label: "Bestätigen", description: "Vorgang abschließen" },
-  ]
-}
 
 export default function ReturnPage({
   returnTarget,
@@ -62,10 +47,57 @@ export default function ReturnPage({
     locationType == "POOL"
       ? "Klamotten in den Pool geben"
       : "Klamotten in die Wäsche geben"
-  const steps = buildSteps()
 
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const targets = (allLocations ?? []).filter((l) => l.type === locationType)
+
+  const steps: StepperWizardStep[] = [
+    {
+      label: "Kleidung auswählen",
+      description: "Scannen oder aus Standort wählen",
+      content: (
+        <StepItemPickerContent
+          state={state}
+          onAddItem={addItem}
+          onRemoveItem={removeItem}
+          onNext={advanceToTarget}
+        />
+      ),
+    },
+    {
+      label: "Ziel wählen",
+      description: "Ziel Standort auswählen",
+      content: (
+        <StepReturnTargetPickerContent
+          locationType={locationType}
+          targets={targets}
+          onSelect={selectTarget}
+        />
+      ),
+    },
+    {
+      label: "Überprüfen",
+      description: "Rückgabe prüfen",
+      content: (
+        <StepReviewContent
+          state={state}
+          allLocations={allLocations ?? []}
+          onSubmitOk={submitOk}
+          onBack={goBack}
+        />
+      ),
+    },
+    {
+      label: "Bestätigen",
+      description: "Vorgang abschließen",
+      content: (
+        <StepSuccessContent
+          onReset={reset}
+          onNavigateToOverview={() => void navigate({ to: "/pool-clothing" })}
+        />
+      ),
+    },
+  ]
 
   if (targets.length === 0) {
     return (
@@ -97,39 +129,6 @@ export default function ReturnPage({
         steps={steps}
         currentStep={state.step}
         onStepClick={(n) => goToStep(n as ReturnStep)}
-        stepContents={{
-          1: (
-            <StepItemPickerContent
-              state={state}
-              onAddItem={addItem}
-              onRemoveItem={removeItem}
-              onNext={advanceToTarget}
-            />
-          ),
-          2: (
-            <StepReturnTargetPickerContent
-              locationType={locationType}
-              targets={targets}
-              onSelect={selectTarget}
-            />
-          ),
-          3: (
-            <StepReviewContent
-              state={state}
-              allLocations={allLocations ?? []}
-              onSubmitOk={submitOk}
-              onBack={goBack}
-            />
-          ),
-          4: (
-            <StepSuccessContent
-              onReset={reset}
-              onNavigateToOverview={() =>
-                void navigate({ to: "/pool-clothing" })
-              }
-            />
-          ),
-        }}
       />
     </PageSection>
   )

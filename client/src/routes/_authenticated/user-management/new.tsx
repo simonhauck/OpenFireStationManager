@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useState } from "react"
+import React, { useState } from "react"
 
 import { createUserMutation } from "#/api/users.queries"
 import ErrorState from "#/components/base/ErrorState"
@@ -12,7 +12,7 @@ import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { ROLE_OPTIONS } from "#/users/roleMetadata"
-import type { UserRole } from "#/users/roleMetadata"
+import type { UserRole } from "#/users/model/user.ts"
 
 export const Route = createFileRoute("/_authenticated/user-management/new")({
   component: CreateUserPage,

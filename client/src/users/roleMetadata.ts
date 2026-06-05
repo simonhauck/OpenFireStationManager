@@ -1,4 +1,4 @@
-import type { UserRole } from "#/users/model/user"
+import type { UserRole } from "#/users/model/user.ts"
 
 export const ROLE_OPTIONS: Array<{
   value: UserRole

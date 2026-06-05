@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
-import type { ReactNode } from "react"
+import React, { type ReactNode } from "react"
 
 import { meQuery } from "#/api/auth.queries"
 import { hasRequiredRole } from "#/api/auth.utils"
-import type { UserRole } from "#/api/auth.utils"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
+import type { UserRole } from "#/users/model/user.ts"
 
 export interface RoleGuardProps {
   allowedRoles: UserRole[]

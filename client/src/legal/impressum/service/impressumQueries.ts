@@ -3,7 +3,7 @@ import type { QueryClient } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
-import type { ImpressumDto } from "#/legal/model/legal"
+import type { ImpressumDto } from "#/legal/model/legal.ts"
 
 export type ImpressumState =
   | { exists: false; impressum: null }

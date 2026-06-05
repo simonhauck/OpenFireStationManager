@@ -1,5 +1,5 @@
 import { useReducer } from "react"
-import type { ResolvedClothingItem } from "./autoToggleReturnsByType"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 export type CheckoutStep = 1 | 2 | 3 | 4 | 5 | 6
 
