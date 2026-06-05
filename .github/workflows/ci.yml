@@ -27,7 +27,7 @@ jobs:
 
       - name: Typescript compile check
         working-directory: client
-        run: npm run build:check
+        run: npm run build && npm run build:check
 
       - name: Lint client
         working-directory: client
