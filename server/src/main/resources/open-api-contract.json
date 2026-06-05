@@ -430,6 +430,7 @@
       "post": {
         "tags": ["checkout-controller"],
         "summary": "Perform a checkout",
+        "description": "Perform checkout and returns for clothing items",
         "operationId": "checkout",
         "requestBody": {
           "content": {
