@@ -5,6 +5,11 @@ import { AdminSettingsPage } from "../pages/AdminSettingsPage"
 test.use({ storageState: "playwright/.auth/admin.json" })
 
 test.describe.serial("Admin Settings – Datenschutzerklärung", () => {
+  test.beforeEach(async ({ page }) => {
+    const adminSettings = new AdminSettingsPage(page)
+    await adminSettings.cleanupAll()
+  })
+
   test("uploads a privacy policy document and serves it publicly", async ({
     page,
   }) => {

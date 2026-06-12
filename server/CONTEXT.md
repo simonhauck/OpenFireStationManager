@@ -21,6 +21,10 @@ The `type` replaces the older `shouldBeShownOnDashboard` boolean: dashboard visi
 
 The clothing officer role (`UserRole.KLEIDERWART`). Manages clothing types, items, and locations. Distinct from `ADMIN` and `USER`.
 
+### ClothingItemResolver
+
+Owns all read access to `resolved_clothing_item_view`, a PostgreSQL view that left-joins `clothing_items`, `clothing_locations`, and `clothing_types` into a single denormalised row per item. Queried via `JdbcTemplate` + custom `RowMapper` that hydrates the nested `ResolvedClothingItem` DTO. Three methods: `resolveOne(id)`, `resolveAll()`, `resolveByBarcode(barcode)`. See ADR-0006.
+
 ### ClothingMovement
 
 An append-only record of an item moving from one location to another (or being assigned a location for the first time). One row per item per move. Reasons: `CHECKOUT` (POOL → PERSONAL), `RETURN` (PERSONAL → WAESCHE), `MANUAL_CORRECTION` (Kleiderwart edits), `INITIAL_PLACEMENT` (item created with a location), `RELOCATION` (Kleiderwart bulk move to any location type). Movements created by the same batch operation share a `batchId`. See ADR-0001.

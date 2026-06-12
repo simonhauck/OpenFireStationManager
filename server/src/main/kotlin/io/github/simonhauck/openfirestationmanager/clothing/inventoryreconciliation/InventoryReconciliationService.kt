@@ -11,7 +11,6 @@ import io.github.simonhauck.openfirestationmanager.clothing.movement.MovementRea
 import io.github.simonhauck.openfirestationmanager.clothing.movement.MovementService
 import io.github.simonhauck.openfirestationmanager.common.PublicApiException
 import java.util.UUID
-import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,9 +30,7 @@ class InventoryReconciliationService(
         val location = getLocationOrThrow(locationId)
 
         val itemsAtLocation =
-            itemRepository
-                .findAllByLocationId(location.getIdAsReference())
-                .associateBy { it.id }
+            itemRepository.findAllByLocationId(location.getIdAsReference()).associateBy { it.id }
 
         val scannedItemIds = request.scannedItemIds.toSet()
         val unchanged: MutableList<ResolvedClothingItem> = mutableListOf()
