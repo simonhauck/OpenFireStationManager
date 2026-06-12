@@ -12,6 +12,7 @@ class ClothingItemLookupService(
     private val itemRepository: ClothingItemRepository,
     private val typeRepository: ClothingTypeRepository,
     private val locationRepository: ClothingLocationRepository,
+    private val itemResolver: ClothingItemResolver,
 ) {
 
     fun findByBarcode(barcode: String, isKleiderwart: Boolean): ResolvedClothingItem {
@@ -19,17 +20,17 @@ class ClothingItemLookupService(
             itemRepository.findByBarcode(barcode)
                 ?: throw NotFoundException("Item not found for barcode: $barcode")
 
-        val location = item.locationId?.id?.let { locationRepository.findById(it) }
+        val resolved = itemResolver.resolveOne(item.id)
 
-        if (location != null && location.onlyVisibleForKleiderwart && !isKleiderwart) {
+        if (
+            resolved.location != null &&
+            resolved.location.onlyVisibleForKleiderwart &&
+            !isKleiderwart
+        ) {
             throw NotFoundException("Item not found for barcode: $barcode")
         }
 
-        val type =
-            typeRepository.findById(item.typeId.id)
-                ?: throw NotFoundException("Type not found for item ${item.id}")
-
-        return ResolvedClothingItem(clothingItem = item, location = location, clothingType = type)
+        return resolved
     }
 
     fun search(q: String, limit: Int, isKleiderwart: Boolean): List<ResolvedClothingItem> {
