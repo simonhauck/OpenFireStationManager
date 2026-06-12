@@ -52,6 +52,21 @@ Two purpose-built endpoints serve the Checkout flow's item picker:
 
 A Kleiderwart-only batch operation that moves one or more clothing items to any target location regardless of location type. Unlike Checkout, there is no discrepancy protocol — the source location is inferred per item from its current `locationId` in the database. All movements are written atomically in a single transaction sharing a `batchId` with `reason = RELOCATION`. Endpoint: `POST /api/clothing/relocation`. See ADR-0003.
 
+### Inventarisierung (Inventory Reconciliation)
+
+A Kleiderwart-only batch operation that reconciles the system's records for a location against physical reality. The Kleiderwart scans all items physically present at a location, the system compares against its records, and two sets of movements are produced:
+
+- **Found items:** scanned items whose recorded `locationId` differs from the checked location → `fromLocationId = current locationId, toLocationId = checked locationId`
+- **Missing items:** items recorded at the checked location but not scanned → `fromLocationId = checked locationId, toLocationId = null` ("Kein Standort")
+
+Movement reason for both: `INVENTORY_RECONCILIATION`. All movements in one batch share a single `batchId` and are written atomically in a single transaction.
+
+Endpoints (Kleiderwart-only, no discrepancy protocol — the Kleiderwart is the authority):
+- `POST /api/clothing/inventory-reconciliation/{locationId}/preview` — computes diff (no side effects). Input: `{ scannedItemIds: number[] }`. Response: `{ unchangedItems: ResolvedClothingItem[], foundItems: ResolvedClothingItem[], missingItems: ResolvedClothingItem[] }`.
+- `POST /api/clothing/inventory-reconciliation/{locationId}/execute` — applies changes. Input: the full preview response body. Response: `{ batchId: string, foundItemsCount: number, missingItemsCount: number, unchangedItemsCount: number }`.
+
+The execute endpoint trusts the preview — no re-validation. The location picker allows any location type.
+
 ### Rückgabe (Return)
 
 A ClothingMovement batch where items move from PERSONAL locations to a POOL or WAESCHE location without taking new items. Implemented as a Checkout with null `targetLocationId` and non-empty `returnItemIds`. Returns items may originate from different PERSONAL locations. Movement reason: `RETURN`. Two variants: wash-return (PERSONAL → WAESCHE) and pool-return (PERSONAL → POOL). See ADR-0004.

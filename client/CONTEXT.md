@@ -46,6 +46,12 @@ Picker UI scales by cardinality:
 - **Few items (a handful of WAESCHE locations):** tile grid, single tap, no search.
 - **Many items (>100 PERSONAL locations, >1000 clothing items):** searchable Combobox with typeahead, primary input on tablet. For items the barcode scanner is the primary input and the Combobox is the backup.
 
+### Inventarisierung (Inventory Reconciliation)
+
+The `/pool-clothing/inventory-reconciliation` route is a KLEIDERWART-only wizard for reconciling the system's records for a location against physical reality. Reached from an "Inventarisierung starten" button on `/pool-clothing`. The route is `RoleGuard`-ed for the `KLEIDERWART` role.
+
+4-step wizard: 1) Standort wählen → 2) Kleidung scannen (running count) → 3) Differenzen & Bestätigen (preview diff, warn about missing items → Kein Standort, confirm) → 4) Fertig (summary with auto-redirect).
+
 ### Umlagerung (Relocation)
 
 The `/pool-clothing/relocation` route is a KLEIDERWART-only batch operation for moving items between locations of any type. Reached from an "Umlagerung starten" button on `/pool-clothing`. The route is `RoleGuard`-ed for the `KLEIDERWART` role.
