@@ -26,6 +26,13 @@ export default function PoolKlamottenPage() {
         <>
           <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
             <TouchButton asChild variant="outline">
+              <Link to="/pool-clothing/inventory-reconciliation">
+                Inventarisierung starten
+              </Link>
+            </TouchButton>
+          </RoleGuard>
+          <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
+            <TouchButton asChild variant="outline">
               <Link to="/pool-clothing/relocation">Umlagerung starten</Link>
             </TouchButton>
           </RoleGuard>

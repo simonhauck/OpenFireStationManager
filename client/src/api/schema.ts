@@ -192,6 +192,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/inventory-reconciliation/{locationId}/preview": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Preview the diff between scanned items and system records for a location */
+    post: operations["preview"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/inventory-reconciliation/{locationId}/execute": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Execute the inventory reconciliation, applying the changes from the preview */
+    post: operations["execute"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/checkouts": {
     parameters: {
       query?: never
@@ -201,7 +235,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Perform a checkout */
+    /**
+     * Perform a checkout
+     * @description Perform checkout and returns for clothing items
+     */
     post: operations["checkout"]
     delete?: never
     options?: never
@@ -614,6 +651,28 @@ export interface components {
     BatchCreateClothingItemsRequest: {
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
     }
+    InventoryReconciliationPreviewRequest: {
+      scannedItemIds: number[]
+    }
+    InventoryReconciliationPreviewResponse: {
+      unchangedItems: components["schemas"]["ResolvedClothingItem"][]
+      foundItems: components["schemas"]["ResolvedClothingItem"][]
+      missingItems: components["schemas"]["ResolvedClothingItem"][]
+    }
+    ResolvedClothingItem: {
+      clothingItem: components["schemas"]["ClothingItem"]
+      location?: components["schemas"]["ClothingLocation"]
+      clothingType: components["schemas"]["ClothingType"]
+    }
+    InventoryReconciliationExecuteResponse: {
+      batchId: string
+      /** Format: int32 */
+      foundItemsCount: number
+      /** Format: int32 */
+      missingItemsCount: number
+      /** Format: int32 */
+      unchangedItemsCount: number
+    }
     CheckoutRequest: {
       /** Format: int64 */
       targetLocationId?: number
@@ -681,11 +740,6 @@ export interface components {
       types: components["schemas"]["ClothingTypeSummary"][]
       /** Format: int32 */
       totalCount: number
-    }
-    ResolvedClothingItem: {
-      clothingItem: components["schemas"]["ClothingItem"]
-      location?: components["schemas"]["ClothingLocation"]
-      clothingType: components["schemas"]["ClothingType"]
     }
   }
   responses: never
@@ -1073,6 +1127,112 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["ClothingItem"][]
+        }
+      }
+    }
+  }
+  preview: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        locationId: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InventoryReconciliationPreviewRequest"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["InventoryReconciliationPreviewResponse"]
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Forbidden — KLEIDERWART role required */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Location or item not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  execute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        locationId: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InventoryReconciliationPreviewResponse"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["InventoryReconciliationExecuteResponse"]
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Forbidden — KLEIDERWART role required */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Location or item not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ProblemDetail"]
         }
       }
     }

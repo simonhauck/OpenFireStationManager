@@ -35,6 +35,7 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   "user-management": "Nutzer Management",
   dashboard: "Dashboard",
   impressum: "Impressum",
+  "inventory-reconciliation": "Inventarisierung",
   _authenticated: "Authenticated",
 }
 

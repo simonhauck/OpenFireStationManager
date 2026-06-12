@@ -426,6 +426,146 @@
         }
       }
     },
+    "/api/clothing/inventory-reconciliation/{locationId}/preview": {
+      "post": {
+        "tags": ["inventory-reconciliation-controller"],
+        "summary": "Preview the diff between scanned items and system records for a location",
+        "operationId": "preview",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryReconciliationPreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryReconciliationPreviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — KLEIDERWART role required",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location or item not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clothing/inventory-reconciliation/{locationId}/execute": {
+      "post": {
+        "tags": ["inventory-reconciliation-controller"],
+        "summary": "Execute the inventory reconciliation, applying the changes from the preview",
+        "operationId": "execute",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryReconciliationPreviewResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryReconciliationExecuteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — KLEIDERWART role required",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location or item not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clothing/checkouts": {
       "post": {
         "tags": ["checkout-controller"],
@@ -1558,6 +1698,84 @@
         },
         "required": ["items"]
       },
+      "InventoryReconciliationPreviewRequest": {
+        "type": "object",
+        "properties": {
+          "scannedItemIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "required": ["scannedItemIds"]
+      },
+      "InventoryReconciliationPreviewResponse": {
+        "type": "object",
+        "properties": {
+          "unchangedItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedClothingItem"
+            }
+          },
+          "foundItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedClothingItem"
+            }
+          },
+          "missingItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedClothingItem"
+            }
+          }
+        },
+        "required": ["foundItems", "missingItems", "unchangedItems"]
+      },
+      "ResolvedClothingItem": {
+        "type": "object",
+        "properties": {
+          "clothingItem": {
+            "$ref": "#/components/schemas/ClothingItem"
+          },
+          "location": {
+            "$ref": "#/components/schemas/ClothingLocation"
+          },
+          "clothingType": {
+            "$ref": "#/components/schemas/ClothingType"
+          }
+        },
+        "required": ["clothingItem", "clothingType"]
+      },
+      "InventoryReconciliationExecuteResponse": {
+        "type": "object",
+        "properties": {
+          "batchId": {
+            "type": "string"
+          },
+          "foundItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "missingItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unchangedItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "batchId",
+          "foundItemsCount",
+          "missingItemsCount",
+          "unchangedItemsCount"
+        ]
+      },
       "CheckoutRequest": {
         "type": "object",
         "properties": {
@@ -1777,21 +1995,6 @@
           }
         },
         "required": ["locationId", "locationName", "totalCount", "types"]
-      },
-      "ResolvedClothingItem": {
-        "type": "object",
-        "properties": {
-          "clothingItem": {
-            "$ref": "#/components/schemas/ClothingItem"
-          },
-          "location": {
-            "$ref": "#/components/schemas/ClothingLocation"
-          },
-          "clothingType": {
-            "$ref": "#/components/schemas/ClothingType"
-          }
-        },
-        "required": ["clothingItem", "clothingType"]
       }
     }
   }

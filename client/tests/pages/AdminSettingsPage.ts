@@ -29,12 +29,22 @@ export class AdminSettingsPage {
     return this.page.getByTestId("privacy-policy-empty")
   }
 
-  deleteButton() {
-    return this.page.getByRole("button", { name: "Löschen" })
+  privacyPolicyDeleteButton() {
+    return this.page
+      .getByTestId("privacy-policy-current")
+      .getByRole("button", { name: "Löschen" })
   }
 
-  confirmDeleteButton() {
-    return this.page.getByRole("button", { name: "Löschen" })
+  impressumDeleteButton() {
+    return this.page
+      .getByTestId("impressum-current")
+      .getByRole("button", { name: "Löschen" })
+  }
+
+  dialogConfirmButton() {
+    return this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Löschen" })
   }
 
   async selectFile(name: string, mimeType: string, contents: string) {
@@ -51,7 +61,30 @@ export class AdminSettingsPage {
   }
 
   async deleteDocument() {
-    await this.deleteButton().click()
-    await this.confirmDeleteButton().click()
+    await this.privacyPolicyDeleteButton().click()
+    await this.dialogConfirmButton().click()
+  }
+
+  async deleteImpressum() {
+    await this.impressumDeleteButton().click()
+    await this.dialogConfirmButton().click()
+  }
+
+  async cleanupAll() {
+    await this.goto()
+
+    if ((await this.privacyPolicyDeleteButton().count()) > 0) {
+      await this.privacyPolicyDeleteButton().click()
+      await this.dialogConfirmButton().click()
+      await this.emptyState().waitFor({ state: "visible" })
+    }
+
+    if ((await this.impressumDeleteButton().count()) > 0) {
+      await this.impressumDeleteButton().click()
+      await this.dialogConfirmButton().click()
+      await this.page
+        .getByTestId("impressum-empty")
+        .waitFor({ state: "visible" })
+    }
   }
 }
