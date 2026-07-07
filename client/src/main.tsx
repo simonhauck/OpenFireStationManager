@@ -3,6 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider } from "@tanstack/react-router"
 import { Toaster } from "sonner"
 import { getRouter } from "./router"
+import KioskProvider from "#/components/kiosk/KioskProvider"
 
 const { router, queryClient } = getRouter()
 
@@ -12,8 +13,10 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <Toaster richColors position="top-right" />
+      <KioskProvider>
+        <RouterProvider router={router} />
+        <Toaster richColors position="top-right" />
+      </KioskProvider>
     </QueryClientProvider>,
   )
 }
