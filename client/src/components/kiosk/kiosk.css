@@ -1,0 +1,47 @@
+.hg-theme-default {
+  padding: 4px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.hg-theme-default .hg-row {
+  justify-content: center;
+}
+
+.hg-theme-default .hg-row:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+.hg-theme-default .hg-button {
+  height: 48px;
+  margin: 0 2px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.hg-theme-default .hg-button:active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.hg-theme-default .hg-button.hg-activeButton {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.hg-theme-default .hg-button[data-skbtn="{space}"] {
+  max-width: 280px;
+  flex: 3 1 0;
+}
+
+@media (min-width: 640px) {
+  .hg-theme-default .hg-button {
+    height: 52px;
+  }
+}

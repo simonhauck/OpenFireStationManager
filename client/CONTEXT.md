@@ -33,6 +33,14 @@ UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creatin
 
 `/pool-clothing` and `/pool-clothing/checkout` are the tablet-facing routes. Both apply Material-standard minimum tap-target sizes (48 dp / 48 px) via thin feature-local wrappers around shadcn primitives. The rest of the app uses default shadcn sizing because it is operated on desktop by Kleiderwart and Admin users.
 
+### Kiosk Mode
+
+A device-level configuration that activates the on-screen keyboard. When kiosk mode is enabled, a virtual keyboard (German QWERTZ layout with numeric layer) appears automatically whenever any text input field gains focus, and disappears on blur. The keyboard pushes page content upward, shrinking the visible viewport while active.
+
+Kiosk mode is intended for touchscreen devices without a physical keyboard (e.g. Raspberry Pi with Chromium in kiosk mode). It is not coupled to any specific route or role — any page in the app responds to the setting.
+
+The mode is toggled via a switch on `/admin/settings` and persisted in `localStorage` under the key `kiosk`. The keyboard height is determined dynamically from the layout (rows × key height) so it adapts to different screen sizes.
+
 ### Checkout flow
 
 The `/pool-clothing/checkout` route is a single route that runs an internal step machine; it is not a set of sub-routes. Wizard steps in order: pick target PERSONAL → pick items to take → review locker contents and toggle returns (auto-pre-toggled by type match) → if any returns, pick WAESCHE → review screen → submit. There is no source-pool pre-selection; the source is inferred per item from the item's current `locationId`.
