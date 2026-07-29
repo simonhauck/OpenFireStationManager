@@ -57,3 +57,4 @@ npm run build
 - `client/README.md` - frontend details
 - `client/AGENTS.md` - frontend commands and conventions
 - `server/AGENTS.md` - backend commands and conventions
+- `infrastructure/kiosk/README.md` - Raspberry Pi production kiosk deployment
