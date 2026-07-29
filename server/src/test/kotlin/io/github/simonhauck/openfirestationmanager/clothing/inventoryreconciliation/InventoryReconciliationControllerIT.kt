@@ -173,16 +173,18 @@ class InventoryReconciliationControllerIT : IntegrationTest() {
 
         val movementsElsewhere =
             movementRepository.findAllByItemId(AggregateReference.to(itemElsewhere.id))
-        val foundMovement =
-            movementsElsewhere.first { it.reason == MovementReason.INVENTORY_RECONCILIATION }
+        val foundMovement = movementsElsewhere.first {
+            it.reason == MovementReason.INVENTORY_RECONCILIATION
+        }
         assertThat(foundMovement.fromLocationId?.id).isEqualTo(otherLocation.id)
         assertThat(foundMovement.toLocationId?.id).isEqualTo(location.id)
         assertThat(foundMovement.batchId).isEqualTo(result.batchId)
 
         val movementsMissing =
             movementRepository.findAllByItemId(AggregateReference.to(itemNotScanned.id))
-        val missingMovement =
-            movementsMissing.first { it.reason == MovementReason.INVENTORY_RECONCILIATION }
+        val missingMovement = movementsMissing.first {
+            it.reason == MovementReason.INVENTORY_RECONCILIATION
+        }
         assertThat(missingMovement.fromLocationId?.id).isEqualTo(location.id)
         assertThat(missingMovement.toLocationId).isNull()
         assertThat(missingMovement.batchId).isEqualTo(result.batchId)

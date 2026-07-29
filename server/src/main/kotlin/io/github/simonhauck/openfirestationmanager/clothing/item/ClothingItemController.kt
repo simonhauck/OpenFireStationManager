@@ -86,5 +86,6 @@ class ClothingItemController(
     }
 }
 
-private fun Authentication.isKleiderwart(): Boolean =
-    authorities.any { it.authority == "ROLE_KLEIDERWART" }
+private fun Authentication.isKleiderwart(): Boolean = authorities.any {
+    it.authority == "ROLE_KLEIDERWART"
+}

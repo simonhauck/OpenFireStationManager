@@ -52,15 +52,14 @@ class ClothingItemService(
 
         checkBarcodesNotAlreadyKnown(barcodes)
 
-        val entities =
-            requests.map { req ->
-                ClothingItem(
-                    typeId = AggregateReference.to(req.typeId),
-                    size = req.size,
-                    barcode = req.barcodeSanitized(),
-                    locationId = req.locationId,
-                )
-            }
+        val entities = requests.map { req ->
+            ClothingItem(
+                typeId = AggregateReference.to(req.typeId),
+                size = req.size,
+                barcode = req.barcodeSanitized(),
+                locationId = req.locationId,
+            )
+        }
         val saved = repository.saveAll(entities)
 
         val batchId = java.util.UUID.randomUUID().toString()
