@@ -34,5 +34,5 @@ kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotli
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
 springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 spotless = { id = "com.diffplug.spotless", version = "8.8.0" }
-jib = { id = "com.google.cloud.tools.jib", version = "3.5.3" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.5.4" }
 testLoggerPlugin = { id = "com.adarshr.test-logger", version = "4.0.0" }
