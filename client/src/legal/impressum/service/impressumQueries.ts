@@ -6,8 +6,7 @@ import { queryKeys } from "#/api/queryKeys"
 import type { ImpressumDto } from "#/legal/model/legal.ts"
 
 export type ImpressumState =
-  | { exists: false; impressum: null }
-  | { exists: true; impressum: ImpressumDto }
+  { exists: false; impressum: null } | { exists: true; impressum: ImpressumDto }
 
 export const impressumAdminQuery = () =>
   queryOptions({
