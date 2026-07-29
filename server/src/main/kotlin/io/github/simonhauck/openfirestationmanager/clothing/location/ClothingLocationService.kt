@@ -32,15 +32,14 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
     fun createBatchLocations(
         requests: List<CreateClothingLocationRequest>
     ): List<ClothingLocation> {
-        val entities =
-            requests.map { req ->
-                ClothingLocation(
-                    name = req.name,
-                    comment = req.comment,
-                    onlyVisibleForKleiderwart = req.onlyVisibleForKleiderwart,
-                    type = req.type,
-                )
-            }
+        val entities = requests.map { req ->
+            ClothingLocation(
+                name = req.name,
+                comment = req.comment,
+                onlyVisibleForKleiderwart = req.onlyVisibleForKleiderwart,
+                type = req.type,
+            )
+        }
         return repository.saveAll(entities)
     }
 

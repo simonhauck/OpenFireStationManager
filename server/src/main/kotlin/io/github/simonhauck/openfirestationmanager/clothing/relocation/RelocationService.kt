@@ -28,16 +28,15 @@ class RelocationService(
 
         val batchId = UUID.randomUUID().toString()
 
-        val movements =
-            items.map {
-                ClothingMovement(
-                    it.getIdAsReference(),
-                    it.locationId,
-                    location.getIdAsReference(),
-                    MovementReason.RELOCATION,
-                    batchId,
-                )
-            }
+        val movements = items.map {
+            ClothingMovement(
+                it.getIdAsReference(),
+                it.locationId,
+                location.getIdAsReference(),
+                MovementReason.RELOCATION,
+                batchId,
+            )
+        }
 
         val updatedItems = items.map { it.copy(locationId = location.getIdAsReference()) }
 
