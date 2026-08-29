@@ -51,27 +51,31 @@ locals {
   db_password = neon_project.open_fire_station_manager.database_password
   db_name     = neon_project.open_fire_station_manager.database_name
 
-  _jdbc   = "jdbc:postgresql://"
-  _params = "/${local.db_name}?user=${local.db_user}&password=${local.db_password}&sslmode=require&channelBinding=require"
+  _jdbc               = "jdbc:postgresql://"
+  _params             = "/${local.db_name}?user=${local.db_user}&password=${local.db_password}&sslmode=require&channelBinding=require"
+  _data_export_params = "?sslmode=require&channel_binding=require"
 
   db_urls = {
     production = {
-      direct = "${local._jdbc}${neon_project.open_fire_station_manager.database_host}${local._params}"
-      pooler = "${local._jdbc}${neon_project.open_fire_station_manager.database_host_pooler}${local._params}"
+      direct      = "${local._jdbc}${neon_project.open_fire_station_manager.database_host}${local._params}"
+      pooler      = "${local._jdbc}${neon_project.open_fire_station_manager.database_host_pooler}${local._params}"
+      data_export = "postgresql://${urlencode(local.db_user)}:${urlencode(local.db_password)}@${neon_project.open_fire_station_manager.database_host}/${local.db_name}${local._data_export_params}"
     }
     develop = {
-      direct = "${local._jdbc}${neon_endpoint.develop_endpoint.host}${local._params}"
-      pooler = "${local._jdbc}${neon_endpoint.develop_endpoint.id}-pooler.${neon_endpoint.develop_endpoint.proxy_host}${local._params}"
+      direct      = "${local._jdbc}${neon_endpoint.develop_endpoint.host}${local._params}"
+      pooler      = "${local._jdbc}${neon_endpoint.develop_endpoint.id}-pooler.${neon_endpoint.develop_endpoint.proxy_host}${local._params}"
+      data_export = "postgresql://${urlencode(local.db_user)}:${urlencode(local.db_password)}@${neon_endpoint.develop_endpoint.host}/${local.db_name}${local._data_export_params}"
     }
     local = {
-      direct = "${local._jdbc}${neon_endpoint.local_endpoint.host}${local._params}"
-      pooler = "${local._jdbc}${neon_endpoint.local_endpoint.id}-pooler.${neon_endpoint.local_endpoint.proxy_host}${local._params}"
+      direct      = "${local._jdbc}${neon_endpoint.local_endpoint.host}${local._params}"
+      pooler      = "${local._jdbc}${neon_endpoint.local_endpoint.id}-pooler.${neon_endpoint.local_endpoint.proxy_host}${local._params}"
+      data_export = "postgresql://${urlencode(local.db_user)}:${urlencode(local.db_password)}@${neon_endpoint.local_endpoint.host}/${local.db_name}${local._data_export_params}"
     }
   }
 }
 
 output "db_urls" {
-  description = "JDBC connection strings for all branches and connection types (direct / pooler)"
+  description = "JDBC connection strings and direct PostgreSQL export connection strings for all branches"
   sensitive   = true
   value       = local.db_urls
 }
