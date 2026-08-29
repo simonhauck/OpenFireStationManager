@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test"
 import { LoginPage } from "../pages/LoginPage"
 
+function requiredEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) throw new Error(`Missing required environment variable: ${name}`)
+  return value
+}
+
 test.describe("Auth", () => {
   test("shows error message on invalid credentials", async ({ page }) => {
     const loginPage = new LoginPage(page)
@@ -12,8 +18,8 @@ test.describe("Auth", () => {
   test("logs in successfully and redirects away from login", async ({
     page,
   }) => {
-    const username = process.env.E2E_USER_USERNAME!
-    const password = process.env.E2E_USER_PASSWORD!
+    const username = requiredEnv("E2E_USER_USERNAME")
+    const password = requiredEnv("E2E_USER_PASSWORD")
 
     const loginPage = new LoginPage(page)
     await loginPage.goto()
@@ -44,8 +50,8 @@ test.describe("Auth – redirect after login", () => {
   test("after login the user is redirected back to the originally requested page", async ({
     page,
   }) => {
-    const username = process.env.E2E_USER_USERNAME!
-    const password = process.env.E2E_USER_PASSWORD!
+    const username = requiredEnv("E2E_USER_USERNAME")
+    const password = requiredEnv("E2E_USER_PASSWORD")
 
     await page.goto(protectedRoute)
     await expect(page).toHaveURL(/\/login/)
@@ -59,8 +65,8 @@ test.describe("Auth – redirect after login", () => {
   test("after redirect-login the login page is not in the history stack", async ({
     page,
   }) => {
-    const username = process.env.E2E_USER_USERNAME!
-    const password = process.env.E2E_USER_PASSWORD!
+    const username = requiredEnv("E2E_USER_USERNAME")
+    const password = requiredEnv("E2E_USER_PASSWORD")
 
     await page.goto(protectedRoute)
     await expect(page).toHaveURL(/\/login/)

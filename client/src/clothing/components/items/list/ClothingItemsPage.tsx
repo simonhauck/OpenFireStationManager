@@ -57,8 +57,8 @@ export default function ClothingItemsPage() {
         <RenderIf when={canRenderTable}>
           <ClothingItemsTable
             items={clothingItems ?? []}
-            types={clothingTypes!}
-            locations={clothingLocations!}
+            types={clothingTypes ?? []}
+            locations={clothingLocations ?? []}
           />
         </RenderIf>
       </PageSection>

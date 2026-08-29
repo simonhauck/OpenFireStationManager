@@ -1,3 +1,4 @@
+
 # Context Map
 
 OpenFireStationManager is a monorepo with two independent contexts. Each has its own glossary and architectural decisions.

@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query"
 
-import { client } from "#/api/client"
+import { client, ensureData } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type {
   ClothingType,
@@ -17,8 +17,8 @@ export const getAllClothingTypesQuery = () =>
   queryOptions({
     queryKey: queryKeys.clothingTypes(),
     queryFn: async (): Promise<ClothingType[]> => {
-      const { data } = await client.GET("/api/clothing/types")
-      return data!
+      const { data, error } = await client.GET("/api/clothing/types")
+      return ensureData(data, error, "GET /api/clothing/types")
     },
   })
 
@@ -26,10 +26,10 @@ export const getClothingTypeByIdQuery = (id: number) =>
   queryOptions({
     queryKey: queryKeys.clothingType(id),
     queryFn: async (): Promise<ClothingType> => {
-      const { data } = await client.GET("/api/clothing/types/{id}", {
+      const { data, error } = await client.GET("/api/clothing/types/{id}", {
         params: { path: { id } },
       })
-      return data!
+      return ensureData(data, error, "GET /api/clothing/types/{id}")
     },
   })
 
@@ -39,8 +39,8 @@ export const createClothingTypeMutation = (queryClient: QueryClient) =>
     mutationFn: async (
       body: CreateOrUpdateClothingTypeRequest,
     ): Promise<ClothingType> => {
-      const { data } = await client.POST("/api/clothing/types", { body })
-      return data!
+      const { data, error } = await client.POST("/api/clothing/types", { body })
+      return ensureData(data, error, "POST /api/clothing/types")
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -55,11 +55,11 @@ export const updateClothingTypeMutation = (queryClient: QueryClient) =>
     mutationFn: async (
       variables: UpdateClothingTypeVariables,
     ): Promise<ClothingType> => {
-      const { data } = await client.PATCH("/api/clothing/types/{id}", {
+      const { data, error } = await client.PATCH("/api/clothing/types/{id}", {
         params: { path: { id: variables.id } },
         body: variables.body,
       })
-      return data!
+      return ensureData(data, error, "PATCH /api/clothing/types/{id}")
     },
     onSuccess: async (_, variables) => {
       await Promise.all([

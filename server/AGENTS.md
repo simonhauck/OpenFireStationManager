@@ -1,3 +1,4 @@
+
 # AGENTS.md — server
 
 Guidance for agentic coding assistants working in the `server/` component.
@@ -44,13 +45,13 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 > the OpenAPI schema (`schema.json`) by running `HttpApiContractIT` with `UPDATE_SNAPSHOT=true`,
 > then applies Spotless formatting in a separate step to avoid a race condition.
 
-| Build (compile + test + JAR)  | `./gradlew build`                                                                      |
-| Run application               | `./gradlew bootRun`                                                                    |
-| Run all tests                 | `./gradlew test`                                                                       |
-| Run a single test class       | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
-| Run a single test method      | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
-| Run tests with verbose output | `./gradlew test --info`                                                                |
-| Clean build artifacts         | `./gradlew clean`                                                                      |
+| Build (compile + test + JAR) | `./gradlew build` |
+| Run application | `./gradlew bootRun` |
+| Run all tests | `./gradlew test` |
+| Run a single test class | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
+| Run a single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
+| Run tests with verbose output | `./gradlew test --info` |
+| Clean build artifacts | `./gradlew clean` |
 
 ---
 
@@ -198,4 +199,3 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   Docker Compose lifecycle `start_only` so the container persists across restarts.
 - Database credentials for local dev: `POSTGRES_USER=myuser`, `POSTGRES_PASSWORD=secret`,
   `POSTGRES_DB=mydatabase`.
-

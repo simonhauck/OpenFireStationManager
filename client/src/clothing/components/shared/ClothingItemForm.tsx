@@ -161,7 +161,7 @@ export default function ClothingItemForm({
             />
 
             <RenderIf when={errorMessage !== null}>
-              <ErrorState message={errorMessage!} />
+              <ErrorState message={errorMessage ?? "Unbekannter Fehler."} />
             </RenderIf>
 
             <div className="flex flex-wrap justify-end gap-2 pt-2">

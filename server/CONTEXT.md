@@ -1,3 +1,4 @@
+
 # Server Glossary
 
 Domain language for the Spring Boot / Kotlin backend.

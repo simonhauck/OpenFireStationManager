@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { mutationOptions, queryOptions } from "@tanstack/react-query"
 
-import { client } from "#/api/client"
+import { client, ensureData } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type { ImpressumDto } from "#/legal/model/legal.ts"
 
@@ -19,8 +19,11 @@ export const impressumAdminQuery = () =>
       if (!existsData?.exists) {
         return { exists: false, impressum: null }
       }
-      const { data } = await client.GET("/api/admin/impressum")
-      return { exists: true, impressum: data! }
+      const { data, error } = await client.GET("/api/admin/impressum")
+      return {
+        exists: true,
+        impressum: ensureData(data, error, "GET /api/admin/impressum"),
+      }
     },
   })
 
@@ -34,18 +37,21 @@ export const impressumPublicQuery = () =>
       if (!existsData?.exists) {
         return { exists: false, impressum: null }
       }
-      const { data } = await client.GET("/api/public/impressum")
-      return { exists: true, impressum: data! }
+      const { data, error } = await client.GET("/api/public/impressum")
+      return {
+        exists: true,
+        impressum: ensureData(data, error, "GET /api/public/impressum"),
+      }
     },
   })
 
 export const upsertImpressumMutation = (queryClient: QueryClient) =>
   mutationOptions({
     mutationFn: async (request: ImpressumDto): Promise<ImpressumDto> => {
-      const { data } = await client.PUT("/api/admin/impressum", {
+      const { data, error } = await client.PUT("/api/admin/impressum", {
         body: request,
       })
-      return data!
+      return ensureData(data, error, "PUT /api/admin/impressum")
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.impressum() })

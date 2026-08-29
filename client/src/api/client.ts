@@ -8,6 +8,22 @@ export const client = createClient<paths>({
   credentials: "include",
 })
 
+export function ensureData<T>(
+  data: T | undefined,
+  error: unknown,
+  requestName: string,
+): T {
+  if (error) {
+    throw error
+  }
+
+  if (data === undefined) {
+    throw new Error(`${requestName} returned no data`)
+  }
+
+  return data
+}
+
 /**
  * Global middleware: throws an Error for every non-2xx response.
  *

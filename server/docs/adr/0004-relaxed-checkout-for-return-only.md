@@ -1,3 +1,4 @@
+
 # ADR-0004: Relaxed Checkout endpoint for return-only clothing operations
 
 **Status:** Accepted
@@ -31,4 +32,3 @@ Reuse `POST /api/clothing/checkouts` with relaxed validation:
 
 - **New `/api/clothing/returns` endpoint:** Would duplicate the atomic batch transaction logic, movement recording, and location visibility checks from `CheckoutService`. Reusing the existing endpoint avoids this duplication and keeps clothing auditing simpler (one code path for all user-facing item movements).
 - **Relocation endpoint for pool-return:** Relocation is KLEIDERWART-only. Users must be able to return items without a Kleiderwart present.
-

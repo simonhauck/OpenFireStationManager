@@ -58,7 +58,7 @@ export default function RoleGuard(props: RoleGuardProps) {
 }
 
 function showChildOrNothing(hide: boolean, children: React.ReactNode) {
-  if (hide) return <></>
+  if (hide) return null
 
-  return <>{children}</>
+  return children
 }

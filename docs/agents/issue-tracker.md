@@ -1,3 +1,4 @@
+
 # Issue tracker: GitHub
 
 Issues and PRDs for this repo live as GitHub issues at `simonhauck/OpenFireStationManager`. Use the `gh` CLI for all operations.

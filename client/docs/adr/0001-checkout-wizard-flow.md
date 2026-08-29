@@ -1,3 +1,4 @@
+
 # ADR-0001: Checkout wizard step order and auto-toggle returns
 
 **Status:** Accepted
@@ -35,4 +36,3 @@ The wizard is a single TanStack Router route (`/pool-clothing/checkout`) with in
 - **Auto-toggle returns by type + size.** Misses the exchange-for-different-size case, which is one of the main reasons users return clothing. Type-only catches both same-size and exchange cases.
 - **Quantity-matched auto-toggle (toggle N existing items when taking N of that type).** Requires a heuristic to pick which existing items; the user has to disagree with the heuristic when it's wrong. Loose toggle-all is simpler and the user adjusts on the same screen.
 - **Auto-skip the return step when the locker is empty or nothing matches.** Saves one tap in rare cases at the cost of a non-deterministic wizard shape. Always-show keeps the flow predictable.
-

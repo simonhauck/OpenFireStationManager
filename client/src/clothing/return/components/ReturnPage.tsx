@@ -43,7 +43,7 @@ export default function ReturnPage({
   } = useReturnWizard()
 
   const title =
-    locationType == "POOL"
+    locationType === "POOL"
       ? "Klamotten in den Pool geben"
       : "Klamotten in die Wäsche geben"
 
@@ -264,8 +264,9 @@ function StepReviewContent({
   const mutation = useMutation(returnMutation(queryClient))
 
   const locationMap = new Map(allLocations.map((l) => [l.id, l]))
+  const returnLocationId = state.returnLocationId
   const targetName = formatClothingLocationLabelOrDefault(
-    locationMap.get(state.returnLocationId!),
+    returnLocationId != null ? locationMap.get(returnLocationId) : undefined,
   )
 
   async function handleSubmit() {

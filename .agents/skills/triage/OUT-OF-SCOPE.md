@@ -1,3 +1,4 @@
+
 # Out-of-Scope Knowledge Base
 
 The `.out-of-scope/` directory in a repo stores persistent records of rejected feature requests. It serves two purposes:
@@ -48,15 +49,15 @@ interface ThemeConfig {
 
 ## Prior requests
 
-- 
+-
 
 # 42 — "Add dark mode support"
 
-- 
+-
 
 # 87 — "Night theme for accessibility"
 
-- 
+-
 
 # 134 — "Dark theme option"
 
@@ -109,4 +110,3 @@ If the maintainer changes their mind about a previously rejected concept:
 - The skill does not need to reopen old issues — they're historical records
 - The new issue that triggered the reconsideration proceeds through normal triage
 ```
-

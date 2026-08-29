@@ -1,5 +1,6 @@
 import { CheckIcon } from "lucide-react"
 
+import RenderIf from "#/components/base/RenderIf"
 import { cn } from "#/lib/utils"
 
 export type StepStatus = "completed" | "active" | "upcoming"
@@ -68,13 +69,15 @@ export function VerticalStepper({
             </div>
 
             {/* Right column: label + description */}
-            <div
+            <button
+              type="button"
+              disabled={!isClickable}
               className={cn(
-                "pb-6",
+                "block w-full pb-6 text-left",
                 isLast && "pb-0",
                 isClickable && "cursor-pointer",
               )}
-              onClick={isClickable ? () => onStepClick(stepNumber) : undefined}
+              onClick={() => onStepClick?.(stepNumber)}
             >
               <p
                 className={cn(
@@ -98,7 +101,7 @@ export function VerticalStepper({
                   {step.description}
                 </p>
               </RenderIf>
-            </div>
+            </button>
           </li>
         )
       })}
@@ -122,18 +125,11 @@ function StepCircle({
   onClick,
 }: StepCircleProps) {
   return (
-    <div
+    <button
+      type="button"
       aria-current={status === "active" ? "step" : undefined}
-      role={isClickable ? "button" : undefined}
-      tabIndex={isClickable ? 0 : undefined}
+      disabled={!isClickable}
       onClick={onClick}
-      onKeyDown={
-        isClickable
-          ? (e) => {
-              if (e.key === "Enter" || e.key === " ") onClick?.()
-            }
-          : undefined
-      }
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold",
         status === "completed" &&
@@ -150,17 +146,6 @@ function StepCircle({
       <RenderIf when={status !== "completed"}>
         <span>{stepNumber}</span>
       </RenderIf>
-    </div>
+    </button>
   )
-}
-
-// Inline RenderIf to avoid circular dep concerns (same logic)
-function RenderIf({
-  when,
-  children,
-}: {
-  when: boolean
-  children: React.ReactNode
-}) {
-  return when ? <>{children}</> : null
 }

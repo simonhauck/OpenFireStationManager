@@ -33,7 +33,7 @@ export default function ClothingLocationsPage() {
         </RenderIf>
 
         <RenderIf when={canRenderTable}>
-          <ClothingLocationsTable locations={locations!} />
+          <ClothingLocationsTable locations={locations ?? []} />
         </RenderIf>
       </PageSection>
     </RoleGuard>

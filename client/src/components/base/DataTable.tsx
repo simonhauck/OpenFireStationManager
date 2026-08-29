@@ -93,8 +93,8 @@ function renderCellValue(value: DataTableCellValue): ReactNode {
   if (Array.isArray(value)) {
     return (
       <div className="flex flex-wrap gap-1">
-        {value.map((item: DataTablePrimitiveValue, itemIndex: number) => (
-          <Badge key={`${itemIndex}-${String(item)}`} variant="secondary">
+        {value.map((item: DataTablePrimitiveValue) => (
+          <Badge key={formatPrimitiveCellValue(item)} variant="secondary">
             {formatPrimitiveCellValue(item)}
           </Badge>
         ))}
@@ -271,17 +271,13 @@ export default function DataTable<TRow>({
                 rowIndex: number,
               ) => (
                 <TableRow key={String(originalRowIndex)}>
-                  {columns.map(
-                    (column: DataTableColumn<TRow>, columnIndex: number) => (
-                      <TableCell
-                        key={`${rowIndex}-${column.id}-${columnIndex}`}
-                      >
-                        {column.renderCell
-                          ? column.renderCell(row)
-                          : renderCellValue(column.getValue(row))}
-                      </TableCell>
-                    ),
-                  )}
+                  {columns.map((column: DataTableColumn<TRow>) => (
+                    <TableCell key={column.id}>
+                      {column.renderCell
+                        ? column.renderCell(row)
+                        : renderCellValue(column.getValue(row))}
+                    </TableCell>
+                  ))}
                   <RenderIf when={hasActionColumn}>
                     <TableCell className="text-right">
                       {renderAction(row, rowIndex, originalRowIndex)}

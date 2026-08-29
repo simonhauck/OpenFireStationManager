@@ -1,3 +1,4 @@
+
 # ADR-0003: Single-phase relocation endpoint with no discrepancy protocol
 
 **Status:** Accepted
@@ -40,4 +41,3 @@ Validation:
 - **Adding a discrepancy protocol to Relocation:** The Kleiderwart is physically performing the move; there is no meaningful discrepancy to report. A single-phase design is simpler and faster.
 - **Restricting target location type:** The PRD explicitly allows any location type as a target for relocations.
 - **Reusing the Checkout endpoint with special flags:** Would complicate the existing checkout flow and blur the semantic distinction between Checkout and Relocation in the movement log.
-

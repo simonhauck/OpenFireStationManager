@@ -1,3 +1,4 @@
+
 # ADR-0003: Inventory Reconciliation wizard — location-first step order with server-side diff
 
 **Status:** Accepted
@@ -51,4 +52,3 @@ Follows the `useReducer` pattern used by `useRelocationWizard` and `useReturnWiz
 - **Client-side diff:** Trivial to compute (set difference), but locks diff logic into one consumer. Server-side diff is reusable and keeps the client thin.
 - **Single-phase API (like Relocation):** Would mean the diff is only visible after execution, removing the confirmation safety net. The preview step gives the Kleiderwart a chance to catch mistakes.
 - **Different step order (scan-first):** The location is the primary decision. Scan-first would require backfilling the location after scanning, which is confusing.
-

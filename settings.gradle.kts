@@ -1,4 +1,5 @@
-pluginManagement { includeBuild("conventions")
+pluginManagement {
+    includeBuild("conventions")
     plugins {
         kotlin("plugin.spring") version "2.4.0"
     }

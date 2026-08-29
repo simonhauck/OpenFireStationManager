@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { mutationOptions, queryOptions } from "@tanstack/react-query"
 
-import { client } from "#/api/client"
+import { client, ensureData } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type {
   InventoryReconciliationExecuteResponse,
@@ -21,14 +21,18 @@ export function inventoryReconciliationPreviewQuery(
       request.scannedItemIds,
     ],
     queryFn: async (): Promise<InventoryReconciliationPreviewResponse> => {
-      const { data } = await client.POST(
+      const { data, error } = await client.POST(
         "/api/clothing/inventory-reconciliation/{locationId}/preview",
         {
           params: { path: { locationId } },
           body: request,
         },
       )
-      return data!
+      return ensureData(
+        data,
+        error,
+        "POST /api/clothing/inventory-reconciliation/{locationId}/preview",
+      )
     },
   })
 }
@@ -44,14 +48,18 @@ export const inventoryReconciliationExecuteMutation = (
       locationId: number
       body: InventoryReconciliationPreviewResponse
     }): Promise<InventoryReconciliationExecuteResponse> => {
-      const { data } = await client.POST(
+      const { data, error } = await client.POST(
         "/api/clothing/inventory-reconciliation/{locationId}/execute",
         {
           params: { path: { locationId } },
           body,
         },
       )
-      return data!
+      return ensureData(
+        data,
+        error,
+        "POST /api/clothing/inventory-reconciliation/{locationId}/execute",
+      )
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({

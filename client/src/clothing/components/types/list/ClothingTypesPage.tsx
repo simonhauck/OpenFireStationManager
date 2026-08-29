@@ -41,7 +41,7 @@ function ClothingTypesPageContent() {
       </RenderIf>
 
       <RenderIf when={canRenderTable}>
-        <ClothingTypesTable types={clothingTypes!} />
+        <ClothingTypesTable types={clothingTypes ?? []} />
       </RenderIf>
     </PageSection>
   )

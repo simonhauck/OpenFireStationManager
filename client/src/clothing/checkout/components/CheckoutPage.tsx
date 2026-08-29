@@ -341,7 +341,7 @@ function StepReturnTogglesContent({
     didAutoToggle.current = true
     const autoToggled = autoToggleReturnsByType(state.takeItems, lockerItems)
     onSetReturnItemIds(autoToggled)
-  }, [lockerItems.length])
+  }, [lockerItems, onSetReturnItemIds, state.takeItems])
 
   return (
     <div className="space-y-4">
@@ -365,8 +365,10 @@ function StepReturnTogglesContent({
                 key={item.clothingItem.id}
                 item={item}
                 asLabel
+                labelFor={`checkout-return-item-${item.clothingItem.id}`}
                 leading={
                   <Checkbox
+                    id={`checkout-return-item-${item.clothingItem.id}`}
                     checked={checked}
                     onCheckedChange={() =>
                       onToggleReturnItem(item.clothingItem.id)
@@ -461,7 +463,9 @@ function StepReviewContent({
   const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
   const targetLocationName = formatClothingLocationLabelOrDefault(
-    locationMap.get(state.targetLocationId!),
+    state.targetLocationId !== null
+      ? locationMap.get(state.targetLocationId)
+      : undefined,
   )
 
   const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
@@ -481,8 +485,9 @@ function StepReviewContent({
   const washLocationName = formatClothingLocationLabelOrDefault(location)
 
   async function handleSubmit() {
+    if (state.targetLocationId === null) return
     const body = {
-      targetLocationId: state.targetLocationId!,
+      targetLocationId: state.targetLocationId,
       takeItemIds: state.takeItems.map((i) => i.clothingItem.id),
       returnItemIds: [...state.returnItemIds],
       returnLocationId: state.returnLocationId ?? undefined,

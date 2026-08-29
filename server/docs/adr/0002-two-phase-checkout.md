@@ -1,3 +1,4 @@
+
 # ADR-0002: Two-phase Checkout with warning acknowledgement
 
 **Status:** Accepted
@@ -63,4 +64,3 @@ The following are malformed requests, not data inconsistencies, and return `400`
 - **Silently accept the user's claim.** Loses the chance to surface drift to the user, who might catch a real mistake (wrong barcode scanned).
 - **Compensating `MANUAL_CORRECTION` movement before each discrepant `CHECKOUT`** (Option Y in the grilling). Honest about the system's prior belief, but doubles row count for drift events and surfaces an internal-bookkeeping concept in user-visible history. Rejected as disproportionate.
 - **Single-phase `force: true` flag.** Encourages clients to set the flag unconditionally and bypass the warning flow entirely.
-

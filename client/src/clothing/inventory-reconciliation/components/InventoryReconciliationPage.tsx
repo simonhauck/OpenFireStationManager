@@ -196,16 +196,22 @@ function StepDiffContent({ state, onSubmitOk, onBack }: StepDiffContentProps) {
     inventoryReconciliationExecuteMutation(queryClient),
   )
 
-  const previewQuery = inventoryReconciliationPreviewQuery(state.locationId!, {
-    scannedItemIds: state.scannedItems.map((i) => i.clothingItem.id),
+  const previewQuery = inventoryReconciliationPreviewQuery(
+    state.locationId ?? 0,
+    {
+      scannedItemIds: state.scannedItems.map((i) => i.clothingItem.id),
+    },
+  )
+  const { data: diff, isLoading } = useQuery({
+    ...previewQuery,
+    enabled: state.locationId !== null,
   })
-  const { data: diff, isLoading } = useQuery(previewQuery)
 
   async function handleConfirm() {
-    if (!diff) return
+    if (!diff || state.locationId === null) return
     try {
       await executeMutation.mutateAsync({
-        locationId: state.locationId!,
+        locationId: state.locationId,
         body: diff,
       })
       onSubmitOk()

@@ -74,7 +74,8 @@ test.describe("Clothing Items", () => {
     const idCell = row.getByRole("cell").first()
     const id = await idCell.textContent()
 
-    await itemsPage.clickEditForItem(id!.trim())
+    if (!id) throw new Error("Expected the item ID cell to contain text")
+    await itemsPage.clickEditForItem(id.trim())
     await itemsPage.fillSize("XL")
     await itemsPage.submitForm()
 
@@ -99,7 +100,8 @@ test.describe("Clothing Items", () => {
     const idCell = row.getByRole("cell").first()
     const id = await idCell.textContent()
 
-    await itemsPage.clickDeleteForItem(id!.trim())
+    if (!id) throw new Error("Expected the item ID cell to contain text")
+    await itemsPage.clickDeleteForItem(id.trim())
     await itemsPage.confirmDelete()
 
     await expect(itemsPage.itemRow(barcode)).not.toBeVisible()
@@ -129,7 +131,8 @@ test.describe("Clothing Items", () => {
     const idCell = row.getByRole("cell").first()
     const id = await idCell.textContent()
 
-    await itemsPage.clickEditForItem(id!.trim())
+    if (!id) throw new Error("Expected the item ID cell to contain text")
+    await itemsPage.clickEditForItem(id.trim())
 
     // The clear button should be visible because a location is selected
     await expect(

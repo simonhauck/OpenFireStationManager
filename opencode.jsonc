@@ -1,28 +1,29 @@
 {
-  // https://opencode.ai/config.json
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
-    "playwright": {
-      "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp"]
-    },
-    "shadcn": {
-      "type": "local",
-      "command": ["npx", "shadcn@latest", "mcp"]
-    },
-    "terraform": {
-      "type": "local",
-      "command": [
-        "docker",
-        "run",
-        "-i",
-        "--rm",
-        "-e", "TFE_TOKEN",
-        "-e", "TFE_ADDRESS",
-        "hashicorp/terraform-mcp-server:0.5.2"
-      ],
-      "enabled": true
-    }
-
-  }
+	// https://opencode.ai/config.json
+	"$schema": "https://opencode.ai/config.json",
+	"mcp": {
+		"playwright": {
+			"type": "local",
+			"command": ["npx", "-y", "@playwright/mcp"]
+		},
+		"shadcn": {
+			"type": "local",
+			"command": ["npx", "shadcn@latest", "mcp"]
+		},
+		"terraform": {
+			"type": "local",
+			"command": [
+				"docker",
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"TFE_TOKEN",
+				"-e",
+				"TFE_ADDRESS",
+				"hashicorp/terraform-mcp-server:0.5.2"
+			],
+			"enabled": true
+		}
+	}
 }

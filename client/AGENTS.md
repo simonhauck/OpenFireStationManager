@@ -1,3 +1,4 @@
+
 # AGENTS.md — OpenFireStationManagerClient
 
 Guidance for agentic coding assistants working in the `client/` component.
@@ -282,4 +283,3 @@ type ClothingItem = components["schemas"]["ClothingItem"]
 - Prefer guard clauses and explicit error handling over silent failure.
 - Reuse existing utilities/components before creating new ones.
 - Keep edits minimal and feature-focused; avoid unrelated refactors.
-

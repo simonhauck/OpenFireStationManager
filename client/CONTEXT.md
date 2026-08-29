@@ -1,3 +1,4 @@
+
 # Client Glossary
 
 Domain language for the React / TypeScript frontend.

@@ -1,3 +1,4 @@
+
 # ADR-0006: PostgreSQL view for resolved clothing items
 
 **Status:** Accepted
@@ -58,4 +59,3 @@ The data volume is small (hundreds of clothing items, tens of locations, tens of
 - **Keep in-memory assembly.** Works and is simple, but the N+1 query pattern scales poorly and `search()` already loads everything into memory anyway — a view eliminates the N+1 without adding complexity.
 - **Materialised view.** Adds refresh management (triggers, cron, or manual refresh) for a dataset that fits in memory. No benefit at current scale.
 - **Spring Data JDBC mapping to the view.** Requires `AggregateReference` fields that the view cannot produce because FK columns in the view are plain values, not references. Would need a new entity class anyway — `JdbcTemplate` is simpler.
-

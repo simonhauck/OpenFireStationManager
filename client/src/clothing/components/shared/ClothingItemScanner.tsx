@@ -1,6 +1,6 @@
 import { Trash2Icon } from "lucide-react"
 import type { ReactNode } from "react"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import {
@@ -53,6 +53,36 @@ export default function ClothingItemScanner({
   }, [items])
   const isScanningRef = useRef(false)
 
+  const handleResolved = useCallback(
+    (item: ResolvedClothingItem) => {
+      const alreadyInList = itemsRef.current.some(
+        (i) => i.clothingItem.id === item.clothingItem.id,
+      )
+      if (alreadyInList) return // silent duplicate ignore
+
+      onItemResolved(item)
+    },
+    [onItemResolved],
+  )
+
+  const processBarcode = useCallback(
+    async (barcode: string) => {
+      if (isScanningRef.current) return
+      isScanningRef.current = true
+      setIsScanning(true)
+      try {
+        const item = await getItemByBarcode(barcode)
+        handleResolved(item)
+      } catch {
+        toast.error(`Unbekannter Barcode: ${barcode}`)
+      } finally {
+        isScanningRef.current = false
+        setIsScanning(false)
+      }
+    },
+    [handleResolved],
+  )
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       // Ignore when the user is typing inside an actual input / textarea / combobox
@@ -98,31 +128,7 @@ export default function ClothingItemScanner({
       window.removeEventListener("keydown", handleKeyDown)
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [])
-
-  async function processBarcode(barcode: string) {
-    if (isScanningRef.current) return
-    isScanningRef.current = true
-    setIsScanning(true)
-    try {
-      const item = await getItemByBarcode(barcode)
-      handleResolved(item)
-    } catch {
-      toast.error(`Unbekannter Barcode: ${barcode}`)
-    } finally {
-      isScanningRef.current = false
-      setIsScanning(false)
-    }
-  }
-
-  function handleResolved(item: ResolvedClothingItem) {
-    const alreadyInList = itemsRef.current.some(
-      (i) => i.clothingItem.id === item.clothingItem.id,
-    )
-    if (alreadyInList) return // silent duplicate ignore
-
-    onItemResolved(item)
-  }
+  }, [processBarcode])
 
   async function handleSearchSelect(value: string) {
     const found = searchResults.find((r) => String(r.clothingItem.id) === value)

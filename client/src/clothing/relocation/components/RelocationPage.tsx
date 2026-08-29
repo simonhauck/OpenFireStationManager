@@ -204,9 +204,10 @@ function StepReviewContent({
   })
 
   async function handleSubmit() {
+    if (state.targetLocationId === null) return
     try {
       await relocate.mutateAsync({
-        targetLocationId: state.targetLocationId!,
+        targetLocationId: state.targetLocationId,
         itemIds: state.items.map((i) => i.clothingItem.id),
       })
       onSubmitOk()

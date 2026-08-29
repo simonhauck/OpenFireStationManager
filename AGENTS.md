@@ -1,3 +1,4 @@
+
 # AGENTS.md — OpenFireStationManager
 
 Guidance for agentic coding assistants working in this repository.

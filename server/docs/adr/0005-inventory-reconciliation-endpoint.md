@@ -1,3 +1,4 @@
+
 # ADR-0005: Two-phase inventory reconciliation endpoint with new movement reason
 
 **Status:** Accepted
@@ -58,4 +59,3 @@ Using `MANUAL_CORRECTION` would make bulk inventory checks indistinguishable in 
 - **Reusing `MANUAL_CORRECTION` reason:** Loses audit trail clarity. A future "when was item X lost?" query cannot distinguish a bulk inventory result from a one-off manual edit.
 - **Revalidation on execute:** The window is a single Kleiderwart session. Re-validation adds complexity for no practical benefit.
 - **Client-side diff:** Duplicates logic and makes reconciliation unavailable to non-UI consumers.
-

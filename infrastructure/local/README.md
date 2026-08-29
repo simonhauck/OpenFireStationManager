@@ -1,3 +1,4 @@
+
 # Local Infrastructure
 
 This directory contains the Docker Compose configuration for the local PostgreSQL database and a
@@ -41,4 +42,3 @@ To import from another PostgreSQL database explicitly, pass its connection strin
 ```bash
 ./infrastructure/local/neon-to-local.sh "postgresql://user:password@host/database?sslmode=require"
 ```
-

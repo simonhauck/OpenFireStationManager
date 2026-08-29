@@ -8,7 +8,7 @@ interface ClothingItemRowProps {
   trailing?: ReactNode
   /** Render the row as a <label> element (e.g. for checkbox rows). */
   asLabel?: boolean
-  onClick?: () => void
+  labelFor?: string
 }
 
 export default function ClothingItemRow({
@@ -16,7 +16,7 @@ export default function ClothingItemRow({
   leading,
   trailing,
   asLabel = false,
-  onClick,
+  labelFor,
 }: ClothingItemRowProps) {
   const inner = (
     <>
@@ -45,15 +45,14 @@ export default function ClothingItemRow({
 
   if (asLabel) {
     return (
-      <label className={`${className} cursor-pointer hover:bg-muted/50`}>
+      <label
+        htmlFor={labelFor}
+        className={`${className} cursor-pointer hover:bg-muted/50`}
+      >
         {inner}
       </label>
     )
   }
 
-  return (
-    <div className={className} onClick={onClick}>
-      {inner}
-    </div>
-  )
+  return <div className={className}>{inner}</div>
 }

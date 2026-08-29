@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { mutationOptions, queryOptions } from "@tanstack/react-query"
 
-import { client } from "#/api/client"
+import { client, ensureData } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type { PrivacyPolicyMetadata } from "#/legal/model/legal"
 
@@ -19,8 +19,13 @@ export const privacyPolicyQuery = () =>
       if (!existsData?.exists) {
         return { exists: false, metadata: null }
       }
-      const { data: metadata } = await client.GET("/api/admin/privacy-policy")
-      return { exists: true, metadata: metadata! }
+      const { data: metadata, error } = await client.GET(
+        "/api/admin/privacy-policy",
+      )
+      return {
+        exists: true,
+        metadata: ensureData(metadata, error, "GET /api/admin/privacy-policy"),
+      }
     },
   })
 
@@ -40,10 +45,10 @@ export const uploadPrivacyPolicyMutation = (queryClient: QueryClient) =>
       const formData = new FormData()
       formData.append("file", file)
 
-      const { data } = await client.POST("/api/admin/privacy-policy", {
+      const { data, error } = await client.POST("/api/admin/privacy-policy", {
         body: formData as unknown as { file: string },
       })
-      return data!
+      return ensureData(data, error, "POST /api/admin/privacy-policy")
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({

@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { mutationOptions, queryOptions } from "@tanstack/react-query"
-import { client } from "#/api/client"
+import { client, ensureData } from "#/api/client"
 import type { AuthStateResponse, LoginRequest } from "#/api/model/auth"
 import { queryKeys } from "#/api/queryKeys"
 
@@ -8,8 +8,8 @@ export const meQuery = () =>
   queryOptions({
     queryKey: queryKeys.me(),
     queryFn: async (): Promise<AuthStateResponse> => {
-      const { data } = await client.GET("/api/public/auth/me")
-      return data!
+      const { data, error } = await client.GET("/api/public/auth/me")
+      return ensureData(data, error, "GET /api/public/auth/me")
     },
   })
 

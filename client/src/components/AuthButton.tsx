@@ -45,6 +45,7 @@ export default function AuthButton() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
+          type="button"
           className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground ring-offset-background transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label={`Benutzermenü für ${fullName}`}
         >

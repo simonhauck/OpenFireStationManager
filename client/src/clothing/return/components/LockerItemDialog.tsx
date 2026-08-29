@@ -130,8 +130,10 @@ export function LockerItemDialog({
                     key={item.clothingItem.id}
                     item={item}
                     asLabel
+                    labelFor={`locker-item-${item.clothingItem.id}`}
                     leading={
                       <Checkbox
+                        id={`locker-item-${item.clothingItem.id}`}
                         checked={
                           alreadyAdded || checkedIds.has(item.clothingItem.id)
                         }
