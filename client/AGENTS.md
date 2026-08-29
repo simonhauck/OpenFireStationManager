@@ -2,7 +2,7 @@
 
 Guidance for agentic coding assistants working in the `client/` component.
 
-> For monorepo-level context (project overview, Prettier scoping, CI/CD status) see the
+> For monorepo-level context (project overview, formatting ownership, CI/CD status) see the
 > root `AGENTS.md`.
 
 ---
@@ -35,10 +35,9 @@ All commands below are run from the `client/` directory.
 | Run unit tests                 | `npm run test`         |
 | Run Playwright tests           | `npm run test:e2e`     |
 | Run Playwright tests (UI mode) | `npm run test:e2e:ui`  |
-| Lint                           | `npm run lint:check`   |
-| Format check                   | `npm run format:check` |
+| Format and lint check          | `npm run format:check` |
 | TypeScript type check          | `npm run build:check`  |
-| Format + lint auto-fix         | `npm run fix`          |
+| Format and lint auto-fix       | `npm run format:fix`   |
 | Generate frontend API bindings | `npm run prepareEnv`   |
 
 ---

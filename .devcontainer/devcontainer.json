@@ -1,39 +1,37 @@
 {
-  "name": "OpenFireStationManager",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "app",
-  "workspaceFolder": "/workspaces/OpenFireStationManager",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    },
-    "ghcr.io/devcontainers/features/java": {
-      "version": "25"
-    },
-    "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/docker-outside-of-docker": {}
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "bradlc.vscode-tailwindcss",
-        "YoavBls.pretty-ts-errors",
-        "prettier.prettier-vscode",
-        "usernamehw.errorlens"
-      ],
-      "settings": {
-        "editor.formatOnSave": true
-      },
-      "mcp": {
-        "servers": {
-          "playwright": {
-            "command": "/bin/bash",
-            "args": ["-c", "npx shadcn@latest mcp"]
-          }
-        }
-      }
-    },
-    "remoteUser": "vscode"
-  }
+	"name": "OpenFireStationManager",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/OpenFireStationManager",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "lts"
+		},
+		"ghcr.io/devcontainers/features/java": {
+			"version": "25"
+		},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bradlc.vscode-tailwindcss",
+				"YoavBls.pretty-ts-errors",
+				"usernamehw.errorlens"
+			],
+			"settings": {
+				"editor.formatOnSave": true
+			},
+			"mcp": {
+				"servers": {
+					"playwright": {
+						"command": "/bin/bash",
+						"args": ["-c", "npx shadcn@latest mcp"]
+					}
+				}
+			}
+		},
+		"remoteUser": "vscode"
+	}
 }

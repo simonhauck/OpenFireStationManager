@@ -1,16 +1,31 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":dependencyDashboard", ":automergeAll"],
-  "automergeType": "branch",
-  "labels": ["dependencies"],
-  "npm": {
-    "enabled": true
-  },
-  "minimumReleaseAge": "14 days",
-  "packageRules": [
-    {
-      "groupName": "Tanstack packages",
-      "matchPackageNames": ["@tanstack/**"]
-    }
-  ]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended", ":dependencyDashboard", ":automergeAll"],
+	"automergeType": "branch",
+	"labels": ["dependencies"],
+	"npm": {
+		"enabled": true
+	},
+	"minimumReleaseAge": "14 days",
+	"customManagers": [
+		{
+			"customType": "regex",
+			"managerFilePatterns": ["/(^|/)build\\.gradle\\.kts$/"],
+			"matchStrings": [
+				"// renovate: datasource=npm depName=@biomejs/biome\\n\\s*biome\\(\\\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\\\"\\)"
+			],
+			"depNameTemplate": "@biomejs/biome",
+			"datasourceTemplate": "npm"
+		}
+	],
+	"packageRules": [
+		{
+			"groupName": "Tanstack packages",
+			"matchPackageNames": ["@tanstack/**"]
+		},
+		{
+			"groupName": "Biome",
+			"matchPackageNames": ["@biomejs/biome"]
+		}
+	]
 }

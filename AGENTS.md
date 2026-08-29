@@ -26,10 +26,9 @@ testing, TypeScript rules, code style, routing, and PWA notes.
 | Start dev server               | `npm run dev`            |
 | Run tests                      | `npm run test`           |
 | Production build               | `npm run build`          |
-| Lint                           | `npm run lint:check`     |
-| Format check                   | `npm run format:check`   |
+| Format and lint check          | `npm run format:check`   |
 | TypeScript type check          | `npm run build:check`    |
-| Format + lint auto-fix         | `npm run fix`            |
+| Format and lint auto-fix       | `npm run format:fix`     |
 | Generate frontend API bindings | `npm run prepareEnv`     |
 
 ---
@@ -55,10 +54,10 @@ testing, code style, API design, and database conventions.
 
 ## Repository-level Notes
 
-- **Prettier scoping:** The root `.prettierrc.json` applies to non-client, non-Kotlin files.
-  `client/` has its own `prettier.config.js`. Kotlin files are excluded from Prettier entirely.
+- **Formatting ownership:** Biome formats and lints the frontend. Spotless formats root JSON/JSONC,
+  backend JSON, Kotlin, and Markdown. YAML is not formatted automatically.
 - **Root Gradle usage:** Root `./gradlew` is mainly for Spotless checks/formatting on
-  repo-level files (`*.gradle.kts`, JSON, YAML). Build/run/test workflows remain component-local
+  repo-level files (`*.gradle.kts`, JSON/JSONC, and Markdown). Build/run/test workflows remain component-local
   in `client/` and `server/`.
 - **Dependency updates:** Managed by Renovate (see `renovate.json`) with auto-merge enabled and
   a 14-day minimum release age. npm updates are enabled (including grouped `@tanstack/**` updates).

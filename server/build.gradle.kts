@@ -67,14 +67,9 @@ spotless {
         ktfmt().kotlinlangStyle()
     }
 
-    format("json") {
+    json {
         target("src/**/*.json")
-        prettier()
-    }
-
-    format("yaml") {
-        target("src/**/*.yml", "src/**/*.yaml")
-        prettier()
+        jackson()
     }
 }
 

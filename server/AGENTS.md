@@ -2,7 +2,7 @@
 
 Guidance for agentic coding assistants working in the `server/` component.
 
-> For monorepo-level context (project overview, root Prettier config, CI/CD status) see the
+> For monorepo-level context (project overview, formatting ownership, CI/CD status) see the
 > root `AGENTS.md`.
 
 ---

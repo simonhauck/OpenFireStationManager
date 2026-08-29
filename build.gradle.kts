@@ -24,15 +24,23 @@ spotless {
         ktfmt().kotlinlangStyle()
     }
 
-    json {
-        target("**/*.json")
-        targetExclude("client/**", "server/**", "conventions", "build/**", ".gradle/**")
-        prettier()
+    format("json") {
+        target("**/*.json", "**/*.jsonc")
+        targetExclude("client/**", "server/**", "conventions/**", "build/**", ".gradle/**")
+        // renovate: datasource=npm depName=@biomejs/biome
+        biome("2.5.11").configPath(rootProject.file("biome.json"))
     }
 
-    yaml {
-        target("**/*.yml", "**/*.yaml")
-        targetExclude("client/**", "server/**", "conventions", "build/**", ".gradle/**")
-        prettier()
+    flexmark {
+        target("**/*.md")
+        targetExclude("**/build/**", "**/.gradle/**", "**/node_modules/**")
+        flexmark("0.64.8")
+            .extensions(
+                "Tables",
+                "GfmTaskList",
+                "StrikethroughSubscript",
+                "GfmUsers",
+                "GfmIssues",
+            )
     }
 }

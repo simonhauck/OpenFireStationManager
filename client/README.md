@@ -40,11 +40,11 @@ If you prefer not to use Tailwind CSS:
 
 ## Linting & Formatting
 
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
+This project uses [Biome](https://biomejs.dev/) for linting, formatting, and import organization. The following scripts are available:
 
 ```bash
-npm run lint:check
 npm run format:check
+npm run format:fix
 npm run build:check
 ```
 

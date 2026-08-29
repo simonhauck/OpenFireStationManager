@@ -29,11 +29,7 @@ jobs:
         working-directory: client
         run: npm run build && npm run build:check
 
-      - name: Lint client
-        working-directory: client
-        run: npm run lint:check
-
-      - name: Check client formatting
+      - name: Check client formatting and linting
         working-directory: client
         run: npm run format:check
 
