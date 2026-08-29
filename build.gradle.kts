@@ -33,14 +33,16 @@ spotless {
 
     flexmark {
         target("**/*.md")
-        targetExclude("**/build/**", "**/.gradle/**", "**/node_modules/**")
+        targetExclude(
+            "**/build/**",
+            "**/.gradle/**",
+            "**/.terraform/**",
+            "**/node_modules/**",
+        )
         flexmark("0.64.8")
             .extensions(
                 "Tables",
-                "GfmTaskList",
-                "StrikethroughSubscript",
-                "GfmUsers",
-                "GfmIssues",
+                "TaskList",
             )
     }
 }
