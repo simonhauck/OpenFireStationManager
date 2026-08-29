@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { Settings, ShieldCheck, Shirt, Users } from "lucide-react"
-
+import type React from "react"
 import { meQuery } from "#/api/auth.queries"
 import { hasRequiredRole } from "#/api/auth.utils"
 import PageSection from "#/components/base/PageSection"
@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "#/components/ui/card"
 import type { UserRole } from "#/users/model/user.ts"
-import React from "react"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,

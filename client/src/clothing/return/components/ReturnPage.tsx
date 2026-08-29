@@ -1,27 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { toast } from "sonner"
 import { useEffect, useState } from "react"
-
-import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import { toast } from "sonner"
+import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
+import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
+import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import {
   formatClothingLocationLabel,
   formatClothingLocationLabelOrDefault,
 } from "#/clothing/components/shared/clothingLocationLabel"
-import { useReturnWizard } from "#/clothing/return/useReturnWizard"
-import type { ReturnStep } from "#/clothing/return/useReturnWizard"
-import { returnMutation } from "#/clothing/return/service/returnQueries"
+import type { CheckoutRequest } from "#/clothing/model/checkout"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
-import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
+import { LockerItemDialog } from "#/clothing/return/components/LockerItemDialog"
+import { returnMutation } from "#/clothing/return/service/returnQueries"
+import type { ReturnStep } from "#/clothing/return/useReturnWizard"
+import { useReturnWizard } from "#/clothing/return/useReturnWizard"
+import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import PageSection from "#/components/base/PageSection"
+import RenderIf from "#/components/base/RenderIf"
 import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
-import RenderIf from "#/components/base/RenderIf"
-import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
-import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
-import { LockerItemDialog } from "#/clothing/return/components/LockerItemDialog"
-import PageSection from "#/components/base/PageSection"
-import type { CheckoutRequest } from "#/clothing/model/checkout"
-import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 export default function ReturnPage({
   returnTarget,

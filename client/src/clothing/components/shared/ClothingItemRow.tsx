@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
-import RenderIf from "#/components/base/RenderIf"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
+import RenderIf from "#/components/base/RenderIf"
 
 interface ClothingItemRowProps {
   item: ResolvedClothingItem

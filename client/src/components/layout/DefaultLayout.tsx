@@ -1,8 +1,7 @@
 import type { ReactNode } from "react"
-
+import ErrorBoundary from "#/components/ErrorBoundary"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
-import ErrorBoundary from "#/components/ErrorBoundary"
 import Breadcrumb from "#/components/layout/Breadcrumb"
 
 interface DefaultLayoutProps {

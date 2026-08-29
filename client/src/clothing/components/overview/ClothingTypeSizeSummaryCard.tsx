@@ -1,3 +1,4 @@
+import type { ClothingTypeSizeSummary } from "#/clothing/model/overview.ts"
 import ErrorState from "#/components/base/ErrorState"
 import LabelWithCount from "#/components/base/LabelWithCount"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
@@ -12,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "#/components/ui/table"
-import type { ClothingTypeSizeSummary } from "#/clothing/model/overview.ts"
 
 interface ClothingTypeSizeSummaryCardProps {
   summary: ClothingTypeSizeSummary[] | undefined

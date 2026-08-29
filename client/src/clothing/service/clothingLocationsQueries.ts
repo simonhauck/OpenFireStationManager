@@ -1,12 +1,12 @@
-import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
+import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type {
+  BatchCreateClothingLocationsRequest,
   ClothingLocation,
   CreateClothingLocationRequest,
-  BatchCreateClothingLocationsRequest,
 } from "#/clothing/model/clothingLocations"
 
 type LocationType = CreateClothingLocationRequest["type"]
@@ -134,8 +134,8 @@ export function useClothingLocationById(id: number) {
 }
 
 export type {
+  BatchCreateClothingLocationsRequest,
   ClothingLocation,
   CreateClothingLocationRequest,
-  BatchCreateClothingLocationsRequest,
   LocationType,
 }

@@ -1,4 +1,4 @@
-import * as React from "react"
+import type * as React from "react"
 
 import { cn } from "#/lib/utils"
 
@@ -73,4 +73,4 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   )
 }
 
-export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell }
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow }

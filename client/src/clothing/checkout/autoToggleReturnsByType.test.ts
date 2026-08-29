@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType.ts"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 // Helper to build a minimal ResolvedClothingItem
 function makeItem(

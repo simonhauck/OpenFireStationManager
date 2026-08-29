@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test"
 import { randomUUID } from "node:crypto"
+import { expect, test } from "@playwright/test"
 import { createClothingType } from "../flows/createClothingType"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
 import { ClothingLocationsPage } from "../pages/ClothingLocationsPage"

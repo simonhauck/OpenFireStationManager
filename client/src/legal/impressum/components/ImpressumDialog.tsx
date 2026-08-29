@@ -1,8 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
-
-import { upsertImpressumMutation } from "#/legal/impressum/service/impressumQueries"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
 import {
@@ -15,6 +13,7 @@ import {
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { Textarea } from "#/components/ui/textarea"
+import { upsertImpressumMutation } from "#/legal/impressum/service/impressumQueries"
 import type { ImpressumDto } from "#/legal/model/legal.ts"
 
 type ImpressumDialogProps = {

@@ -1,5 +1,5 @@
-import { Link, useLocation, useRouter } from "@tanstack/react-router"
 import type { FileRoutesByPath } from "@tanstack/react-router"
+import { Link, useLocation, useRouter } from "@tanstack/react-router"
 import { ChevronRight, Home } from "lucide-react"
 
 // ─── Derive StaticSegment from the generated route tree ───────────────────────

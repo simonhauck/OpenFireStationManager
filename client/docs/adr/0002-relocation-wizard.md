@@ -70,3 +70,4 @@ The route is role-guarded to `KLEIDERWART` via the existing `RoleGuard` componen
 - **Scan-first step order:** The target location is the primary decision in a relocation. Scan-first would require changing the target after scanning, which is confusing.
 - **Sub-routes for each step:** The wizard is a single transaction. Browser back exits the wizard intentionally (same decision as Checkout, ADR-0001).
 - **Keeping item scanner logic duplicated:** Would diverge over time and lead to UX inconsistencies. The extraction investment is small and the reuse benefit is clear.
+

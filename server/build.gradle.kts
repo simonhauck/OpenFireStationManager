@@ -48,6 +48,7 @@ dependencies {
     testImplementation(libs.kotlinTestJunit5)
     testImplementation(libs.assertjCore)
     testRuntimeOnly(libs.junitPlatformLauncher)
+    testImplementation(kotlin("test"))
 }
 
 kotlin {

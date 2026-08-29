@@ -12,6 +12,7 @@ A PostgreSQL view (`resolved_clothing_item_view`) that left-joins the three tabl
 ## Decision
 
 - Create `resolved_clothing_item_view` via V017 migration:
+
   ```sql
   CREATE VIEW resolved_clothing_item_view AS
   SELECT
@@ -22,10 +23,15 @@ A PostgreSQL view (`resolved_clothing_item_view`) that left-joins the three tabl
   LEFT JOIN clothing_locations c_l ON c_l.id = c_i.location_id
   JOIN clothing_types c_t ON c_t.id = c_i.type_id
   ```
+
   All 12 metadata columns from the three tables are included with table-prefixed aliases.
+
 - `ClothingItemResolver` owns all view access via `JdbcTemplate` + a custom `RowMapper` that hydrates `ResolvedClothingItem` from the flat row. Three methods: `resolveOne(id)`, `resolveAll()`, `resolveByBarcode(barcode)`.
+
 - `ClothingItemResolver` drops its `ClothingItemRepository`, `ClothingTypeRepository`, and `ClothingLocationRepository` dependencies.
+
 - `ClothingItemLookupService` drops `ClothingTypeRepository` and `ClothingLocationRepository`; its `findByBarcode` delegates to `resolveByBarcode` and its `search` method calls `resolveAll()` then filters by text and Kleiderwart visibility in-memory.
+
 - The `ResolvedClothingItem` DTO shape (nested entities) remains unchanged — consumers see no difference.
 
 ### Why `JdbcTemplate` instead of Spring Data JDBC?
@@ -52,3 +58,4 @@ The data volume is small (hundreds of clothing items, tens of locations, tens of
 - **Keep in-memory assembly.** Works and is simple, but the N+1 query pattern scales poorly and `search()` already loads everything into memory anyway — a view eliminates the N+1 without adding complexity.
 - **Materialised view.** Adds refresh management (triggers, cron, or manual refresh) for a dataset that fits in memory. No benefit at current scale.
 - **Spring Data JDBC mapping to the view.** Requires `AggregateReference` fields that the view cannot produce because FK columns in the view are plain values, not references. Would need a new entity class anyway — `JdbcTemplate` is simpler.
+

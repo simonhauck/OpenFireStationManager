@@ -2,13 +2,11 @@
   "detail": "Validation failed for request body",
   "instance": "/api/admin/users",
   "properties": {
-    "errors": [
-      {
-        "field": "username",
-        "message": "must not be blank",
-        "rejectedValue": ""
-      }
-    ]
+    "errors": [ {
+      "field": "username",
+      "message": "must not be blank",
+      "rejectedValue": ""
+    } ]
   },
   "status": 400,
   "title": "Invalid request",

@@ -4,7 +4,7 @@
     "username": "chief",
     "firstName": "Initial",
     "lastName": "Admin",
-    "roles": ["ADMIN"],
+    "roles": [ "ADMIN" ],
     "enabled": true,
     "id": 1,
     "metaData": {

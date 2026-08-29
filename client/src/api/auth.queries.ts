@@ -1,8 +1,8 @@
-import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
+import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import { client } from "#/api/client"
-import { queryKeys } from "#/api/queryKeys"
 import type { AuthStateResponse, LoginRequest } from "#/api/model/auth"
+import { queryKeys } from "#/api/queryKeys"
 
 export const meQuery = () =>
   queryOptions({

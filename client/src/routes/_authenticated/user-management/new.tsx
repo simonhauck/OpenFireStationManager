@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import React, { useState } from "react"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import type React from "react"
+import { useState } from "react"
 
 import { createUserMutation } from "#/api/users.queries"
 import ErrorState from "#/components/base/ErrorState"
@@ -11,8 +12,8 @@ import { Card, CardContent } from "#/components/ui/card"
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
-import { ROLE_OPTIONS } from "#/users/roleMetadata"
 import type { UserRole } from "#/users/model/user.ts"
+import { ROLE_OPTIONS } from "#/users/roleMetadata"
 
 export const Route = createFileRoute("/_authenticated/user-management/new")({
   component: CreateUserPage,

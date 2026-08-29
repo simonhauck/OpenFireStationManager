@@ -1,32 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { toast } from "sonner"
 import { useEffect, useRef, useState } from "react"
-
-import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import {
-  formatClothingLocationLabel,
-  formatClothingLocationLabelOrDefault,
-} from "#/clothing/components/shared/clothingLocationLabel"
-import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
-import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
-import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
-import type { CheckoutStep } from "#/clothing/checkout/useCheckoutWizard"
-import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
-import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import { toast } from "sonner"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
+import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import {
   TouchButton,
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
+import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
+import type { CheckoutStep } from "#/clothing/checkout/useCheckoutWizard"
+import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
+import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
+import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
+import {
+  formatClothingLocationLabel,
+  formatClothingLocationLabelOrDefault,
+} from "#/clothing/components/shared/clothingLocationLabel"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import type { ClothingLocation } from "#/clothing/model/clothingLocations"
+import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
+import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
+import PageSection from "#/components/base/PageSection"
+import RenderIf from "#/components/base/RenderIf"
 import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
-import RenderIf from "#/components/base/RenderIf"
-import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
-import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
-import PageSection from "#/components/base/PageSection"
-import { Checkbox } from "#/components/ui/checkbox"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,7 +37,7 @@ import {
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
 import { Badge } from "#/components/ui/badge"
-import type { ClothingLocation } from "#/clothing/model/clothingLocations"
+import { Checkbox } from "#/components/ui/checkbox"
 
 export default function CheckoutPage() {
   const navigate = useNavigate()

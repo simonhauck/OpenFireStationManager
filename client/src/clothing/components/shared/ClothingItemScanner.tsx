@@ -1,20 +1,19 @@
-import { useEffect, useRef, useState } from "react"
-import type { ReactNode } from "react"
-import { toast } from "sonner"
 import { Trash2Icon } from "lucide-react"
-
-import {
-  getItemByBarcode,
-  searchClothingItems,
-} from "#/clothing/checkout/service/checkoutQueries"
+import type { ReactNode } from "react"
+import { useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
+import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import {
   TouchButton,
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import RenderIf from "#/components/base/RenderIf"
+import {
+  getItemByBarcode,
+  searchClothingItems,
+} from "#/clothing/checkout/service/checkoutQueries"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
+import RenderIf from "#/components/base/RenderIf"
 
 type InputMode = "scanner" | "manual"
 

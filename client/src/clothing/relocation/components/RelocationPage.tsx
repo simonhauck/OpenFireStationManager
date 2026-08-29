@@ -1,26 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { toast } from "sonner"
 import { useEffect, useState } from "react"
-
-import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import {
-  formatClothingLocationLabel,
-  formatClothingLocationLabelOrDefault,
-} from "#/clothing/components/shared/clothingLocationLabel"
-import { useRelocationWizard } from "#/clothing/relocation/useRelocationWizard"
-import { relocationMutation } from "#/clothing/relocation/service/relocationQueries"
-import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import { toast } from "sonner"
+import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import {
   TouchButton,
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import type { StepperWizardStep } from "#/components/base/StepperWizard"
-import StepperWizard from "#/components/base/StepperWizard"
+import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
+import {
+  formatClothingLocationLabel,
+  formatClothingLocationLabelOrDefault,
+} from "#/clothing/components/shared/clothingLocationLabel"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import { relocationMutation } from "#/clothing/relocation/service/relocationQueries"
+import { useRelocationWizard } from "#/clothing/relocation/useRelocationWizard"
+import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
-import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
+import type { StepperWizardStep } from "#/components/base/StepperWizard"
+import StepperWizard from "#/components/base/StepperWizard"
 
 const SUCCESS_REDIRECT_SECONDS = 15
 

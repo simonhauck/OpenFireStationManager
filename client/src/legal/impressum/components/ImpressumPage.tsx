@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
-
-import { impressumPublicQuery } from "#/legal/impressum/service/impressumQueries"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
+import { impressumPublicQuery } from "#/legal/impressum/service/impressumQueries"
 
 export default function ImpressumPage() {
   const { data, isLoading, isError } = useQuery(impressumPublicQuery())

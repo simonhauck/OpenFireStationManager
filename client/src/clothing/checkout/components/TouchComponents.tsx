@@ -3,10 +3,9 @@
  * These wrap shadcn primitives to enforce Material 48dp minimum tap-target size
  * without modifying the originals in src/components/ui/*.
  */
-import * as React from "react"
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 
-import { cn } from "#/lib/utils"
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
+import * as React from "react"
 import { Button } from "#/components/ui/button"
 import {
   Command,
@@ -21,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "#/components/ui/popover"
+import { cn } from "#/lib/utils"
 
 /**
  * A Button with a minimum height of 48px (Material touch target).

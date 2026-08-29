@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
+
+import { act, renderHook } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
-import { renderHook, act } from "@testing-library/react"
-import { useCheckoutWizard } from "./useCheckoutWizard"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
+import { useCheckoutWizard } from "./useCheckoutWizard"
 
 function makeItem(itemId: number, typeId: number): ResolvedClothingItem {
   return {

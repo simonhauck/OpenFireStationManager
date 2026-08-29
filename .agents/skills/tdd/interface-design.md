@@ -13,7 +13,6 @@ Good interfaces make testing natural:
      const gateway = new StripeGateway();
    }
    ```
-
 2. **Return results, don't produce side effects**
 
    ```typescript
@@ -25,7 +24,7 @@ Good interfaces make testing natural:
      cart.total -= discount;
    }
    ```
-
 3. **Small surface area**
    - Fewer methods = fewer tests needed
    - Fewer params = simpler test setup
+

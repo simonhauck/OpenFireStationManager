@@ -1,11 +1,10 @@
 import { Link } from "@tanstack/react-router"
 import { KeyRound, Pencil } from "lucide-react"
-
-import DataTable from "#/components/base/DataTable"
 import type { DataTableColumn } from "#/components/base/DataTable"
+import DataTable from "#/components/base/DataTable"
 import { Button } from "#/components/ui/button"
-import { getRoleLabel } from "#/users/roleMetadata"
 import type { UserAccount } from "#/users/model/user"
+import { getRoleLabel } from "#/users/roleMetadata"
 
 interface UsersTableProps {
   users: UserAccount[]

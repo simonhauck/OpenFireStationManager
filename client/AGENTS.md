@@ -27,8 +27,8 @@ All commands below are run from the `client/` directory.
 
 ## Commands
 
-| Purpose                        | Command                |
-| ------------------------------ | ---------------------- |
+|            Purpose             |        Command         |
+|--------------------------------|------------------------|
 | Start dev server               | `npm run dev`          |
 | Production build               | `npm run build`        |
 | Preview production build       | `npm run preview`      |
@@ -81,8 +81,8 @@ Specs live under `tests/specs/` and follow the naming convention `<feature>.spec
 UUID-suffixed usernames (so parallel runs and shared databases never collide), logs each one
 in via the browser, and saves the resulting session cookies:
 
-| Persona       | Roles         | Auth file                           |
-| ------------- | ------------- | ----------------------------------- |
+|    Persona    |     Roles     |              Auth file              |
+|---------------|---------------|-------------------------------------|
 | `admin`       | `ADMIN`       | `playwright/.auth/admin.json`       |
 | `kleiderwart` | `KLEIDERWART` | `playwright/.auth/kleiderwart.json` |
 | `user`        | `USER`        | `playwright/.auth/user.json`        |
@@ -282,3 +282,4 @@ type ClothingItem = components["schemas"]["ClothingItem"]
 - Prefer guard clauses and explicit error handling over silent failure.
 - Reuse existing utilities/components before creating new ones.
 - Keep edits minimal and feature-focused; avoid unrelated refactors.
+

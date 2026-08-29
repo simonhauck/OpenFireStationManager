@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
-
-import LoadingIndicator from "#/components/base/LoadingIndicator"
 import ErrorState from "#/components/base/ErrorState"
+import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"

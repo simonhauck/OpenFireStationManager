@@ -7,20 +7,18 @@
   "paths": {
     "/api/admin/users/{id}/password": {
       "put": {
-        "tags": ["admin-user-controller"],
+        "tags": [ "admin-user-controller" ],
         "operationId": "changePassword",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -47,7 +45,7 @@
     },
     "/api/admin/impressum": {
       "get": {
-        "tags": ["impressum-admin-controller"],
+        "tags": [ "impressum-admin-controller" ],
         "summary": "Get the current Impressum",
         "operationId": "get",
         "responses": {
@@ -74,7 +72,7 @@
         }
       },
       "put": {
-        "tags": ["impressum-admin-controller"],
+        "tags": [ "impressum-admin-controller" ],
         "summary": "Create or update the Impressum",
         "operationId": "upsert",
         "requestBody": {
@@ -101,7 +99,7 @@
         }
       },
       "delete": {
-        "tags": ["impressum-admin-controller"],
+        "tags": [ "impressum-admin-controller" ],
         "summary": "Delete the Impressum",
         "operationId": "delete",
         "responses": {
@@ -113,7 +111,7 @@
     },
     "/api/public/setup/initial-admin": {
       "post": {
-        "tags": ["initial-setup-controller"],
+        "tags": [ "initial-setup-controller" ],
         "operationId": "initializeAdmin",
         "requestBody": {
           "content": {
@@ -141,19 +139,19 @@
     },
     "/api/public/auth/logout": {
       "post": {
-        "tags": ["auth-controller"],
+        "tags": [ "auth-controller" ],
         "operationId": "logout",
         "responses": {
           "204": {
             "description": "No Content",
-            "content": {}
+            "content": { }
           }
         }
       }
     },
     "/api/public/auth/login": {
       "post": {
-        "tags": ["auth-controller"],
+        "tags": [ "auth-controller" ],
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -168,14 +166,14 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": { }
           }
         }
       }
     },
     "/api/clothing/types": {
       "get": {
-        "tags": ["clothing-type-controller"],
+        "tags": [ "clothing-type-controller" ],
         "summary": "List all protective clothing types",
         "operationId": "getAllTypes",
         "responses": {
@@ -195,7 +193,7 @@
         }
       },
       "post": {
-        "tags": ["clothing-type-controller"],
+        "tags": [ "clothing-type-controller" ],
         "summary": "Create a new protective clothing type",
         "operationId": "createType",
         "requestBody": {
@@ -224,7 +222,7 @@
     },
     "/api/clothing/relocation": {
       "post": {
-        "tags": ["relocation-controller"],
+        "tags": [ "relocation-controller" ],
         "summary": "Relocate clothing items to a target location",
         "operationId": "relocate",
         "requestBody": {
@@ -266,7 +264,7 @@
     },
     "/api/clothing/locations": {
       "get": {
-        "tags": ["clothing-location-controller"],
+        "tags": [ "clothing-location-controller" ],
         "summary": "List all clothing locations",
         "operationId": "getAllLocations",
         "responses": {
@@ -286,7 +284,7 @@
         }
       },
       "post": {
-        "tags": ["clothing-location-controller"],
+        "tags": [ "clothing-location-controller" ],
         "summary": "Create a new clothing location",
         "operationId": "createLocation",
         "requestBody": {
@@ -315,7 +313,7 @@
     },
     "/api/clothing/locations/batch": {
       "post": {
-        "tags": ["clothing-location-controller"],
+        "tags": [ "clothing-location-controller" ],
         "summary": "Create multiple clothing locations in a single request",
         "operationId": "createBatchLocations",
         "requestBody": {
@@ -347,7 +345,7 @@
     },
     "/api/clothing/items": {
       "get": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "List all clothing items",
         "operationId": "getAllItems",
         "responses": {
@@ -367,7 +365,7 @@
         }
       },
       "post": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Create a new clothing item",
         "operationId": "createItem",
         "requestBody": {
@@ -396,7 +394,7 @@
     },
     "/api/clothing/items/batch": {
       "post": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Create multiple clothing items in a single request",
         "operationId": "createBatchItems",
         "requestBody": {
@@ -428,20 +426,18 @@
     },
     "/api/clothing/inventory-reconciliation/{locationId}/preview": {
       "post": {
-        "tags": ["inventory-reconciliation-controller"],
+        "tags": [ "inventory-reconciliation-controller" ],
         "summary": "Preview the diff between scanned items and system records for a location",
         "operationId": "preview",
-        "parameters": [
-          {
-            "name": "locationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+        "parameters": [ {
+          "name": "locationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -498,20 +494,18 @@
     },
     "/api/clothing/inventory-reconciliation/{locationId}/execute": {
       "post": {
-        "tags": ["inventory-reconciliation-controller"],
+        "tags": [ "inventory-reconciliation-controller" ],
         "summary": "Execute the inventory reconciliation, applying the changes from the preview",
         "operationId": "execute",
-        "parameters": [
-          {
-            "name": "locationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+        "parameters": [ {
+          "name": "locationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -568,7 +562,7 @@
     },
     "/api/clothing/checkouts": {
       "post": {
-        "tags": ["checkout-controller"],
+        "tags": [ "checkout-controller" ],
         "summary": "Perform a checkout",
         "description": "Perform checkout and returns for clothing items",
         "operationId": "checkout",
@@ -598,7 +592,7 @@
     },
     "/api/admin/users": {
       "get": {
-        "tags": ["admin-user-controller"],
+        "tags": [ "admin-user-controller" ],
         "operationId": "getAllUsers",
         "responses": {
           "200": {
@@ -617,7 +611,7 @@
         }
       },
       "post": {
-        "tags": ["admin-user-controller"],
+        "tags": [ "admin-user-controller" ],
         "operationId": "createUser",
         "requestBody": {
           "content": {
@@ -645,7 +639,7 @@
     },
     "/api/admin/privacy-policy": {
       "get": {
-        "tags": ["privacy-policy-admin-controller"],
+        "tags": [ "privacy-policy-admin-controller" ],
         "summary": "Get metadata of the active privacy policy document",
         "operationId": "getMetadata",
         "responses": {
@@ -672,7 +666,7 @@
         }
       },
       "post": {
-        "tags": ["privacy-policy-admin-controller"],
+        "tags": [ "privacy-policy-admin-controller" ],
         "summary": "Upload a new privacy policy document, replacing any existing one",
         "operationId": "upload",
         "requestBody": {
@@ -686,7 +680,7 @@
                     "format": "binary"
                   }
                 },
-                "required": ["file"]
+                "required": [ "file" ]
               }
             }
           }
@@ -715,7 +709,7 @@
         }
       },
       "delete": {
-        "tags": ["privacy-policy-admin-controller"],
+        "tags": [ "privacy-policy-admin-controller" ],
         "summary": "Delete the active privacy policy document",
         "operationId": "delete_1",
         "responses": {
@@ -727,22 +721,20 @@
     },
     "/api/clothing/types/{id}": {
       "get": {
-        "tags": ["clothing-type-controller"],
+        "tags": [ "clothing-type-controller" ],
         "summary": "Get a protective clothing type by ID",
         "operationId": "getTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the protective clothing type",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the protective clothing type",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "200": {
             "description": "OK",
@@ -757,22 +749,20 @@
         }
       },
       "delete": {
-        "tags": ["clothing-type-controller"],
+        "tags": [ "clothing-type-controller" ],
         "summary": "Delete a protective clothing type",
         "operationId": "deleteType",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the protective clothing type",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the protective clothing type",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -800,22 +790,20 @@
         }
       },
       "patch": {
-        "tags": ["clothing-type-controller"],
+        "tags": [ "clothing-type-controller" ],
         "summary": "Update a protective clothing type",
         "operationId": "updateType",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the protective clothing type",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the protective clothing type",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -842,22 +830,20 @@
     },
     "/api/clothing/locations/{id}": {
       "get": {
-        "tags": ["clothing-location-controller"],
+        "tags": [ "clothing-location-controller" ],
         "summary": "Get a clothing location by ID",
         "operationId": "getLocationById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing location",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing location",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "200": {
             "description": "OK",
@@ -872,22 +858,20 @@
         }
       },
       "delete": {
-        "tags": ["clothing-location-controller"],
+        "tags": [ "clothing-location-controller" ],
         "summary": "Delete a clothing location",
         "operationId": "deleteLocation",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing location",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing location",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -895,22 +879,20 @@
         }
       },
       "patch": {
-        "tags": ["clothing-location-controller"],
+        "tags": [ "clothing-location-controller" ],
         "summary": "Update a clothing location",
         "operationId": "updateLocation",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing location",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing location",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -937,22 +919,20 @@
     },
     "/api/clothing/items/{id}": {
       "get": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Get a clothing item by ID",
         "operationId": "getItemById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing item",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing item",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "200": {
             "description": "OK",
@@ -967,22 +947,20 @@
         }
       },
       "delete": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Delete a clothing item",
         "operationId": "deleteItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing item",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing item",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -990,22 +968,20 @@
         }
       },
       "patch": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Update a clothing item",
         "operationId": "updateItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the clothing item",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing item",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1032,20 +1008,18 @@
     },
     "/api/admin/users/{id}": {
       "get": {
-        "tags": ["admin-user-controller"],
+        "tags": [ "admin-user-controller" ],
         "operationId": "getUserById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1060,20 +1034,18 @@
         }
       },
       "patch": {
-        "tags": ["admin-user-controller"],
+        "tags": [ "admin-user-controller" ],
         "operationId": "updateUser",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "exclusiveMinimum": 0
-            }
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
           }
-        ],
+        } ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1100,7 +1072,7 @@
     },
     "/privacy-policy": {
       "get": {
-        "tags": ["privacy-policy-public-controller"],
+        "tags": [ "privacy-policy-public-controller" ],
         "summary": "Serve the active privacy policy document",
         "operationId": "serve",
         "responses": {
@@ -1131,7 +1103,7 @@
     },
     "/api/public/privacy-policy/exists": {
       "get": {
-        "tags": ["privacy-policy-public-controller"],
+        "tags": [ "privacy-policy-public-controller" ],
         "summary": "Check whether a privacy policy document has been uploaded",
         "operationId": "exists",
         "responses": {
@@ -1150,7 +1122,7 @@
     },
     "/api/public/impressum": {
       "get": {
-        "tags": ["impressum-public-controller"],
+        "tags": [ "impressum-public-controller" ],
         "summary": "Get the current Impressum",
         "operationId": "get_1",
         "responses": {
@@ -1169,7 +1141,7 @@
     },
     "/api/public/impressum/exists": {
       "get": {
-        "tags": ["impressum-public-controller"],
+        "tags": [ "impressum-public-controller" ],
         "summary": "Check whether an Impressum has been configured",
         "operationId": "exists_1",
         "responses": {
@@ -1188,7 +1160,7 @@
     },
     "/api/public/auth/me": {
       "get": {
-        "tags": ["auth-controller"],
+        "tags": [ "auth-controller" ],
         "operationId": "me",
         "responses": {
           "200": {
@@ -1206,7 +1178,7 @@
     },
     "/api/clothing/overview/summary/type": {
       "get": {
-        "tags": ["clothing-overview-controller"],
+        "tags": [ "clothing-overview-controller" ],
         "summary": "List clothing item counts by type and size",
         "operationId": "getSummariesByType",
         "responses": {
@@ -1228,7 +1200,7 @@
     },
     "/api/clothing/overview/dashboard/location": {
       "get": {
-        "tags": ["clothing-overview-controller"],
+        "tags": [ "clothing-overview-controller" ],
         "summary": "Get clothing availability overview for dashboard locations",
         "operationId": "getDashboardLocationSummaries",
         "responses": {
@@ -1250,29 +1222,26 @@
     },
     "/api/clothing/items/search": {
       "get": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Search clothing items by type name, size, or barcode",
         "operationId": "searchItems",
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 50
-            }
+        "parameters": [ {
+          "name": "q",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }, {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "format": "int32",
+            "default": 50
+          }
+        } ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1292,19 +1261,17 @@
     },
     "/api/clothing/items/by-barcode/{barcode}": {
       "get": {
-        "tags": ["clothing-item-controller"],
+        "tags": [ "clothing-item-controller" ],
         "summary": "Look up a clothing item by barcode",
         "operationId": "getItemByBarcode",
-        "parameters": [
-          {
-            "name": "barcode",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [ {
+          "name": "barcode",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        } ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1321,7 +1288,7 @@
     },
     "/api/admin/privacy-policy/exists": {
       "get": {
-        "tags": ["privacy-policy-admin-controller"],
+        "tags": [ "privacy-policy-admin-controller" ],
         "summary": "Check whether a privacy policy document has been uploaded",
         "operationId": "exists_2",
         "responses": {
@@ -1340,7 +1307,7 @@
     },
     "/api/admin/impressum/exists": {
       "get": {
-        "tags": ["impressum-admin-controller"],
+        "tags": [ "impressum-admin-controller" ],
         "summary": "Check whether an Impressum has been configured",
         "operationId": "exists_3",
         "responses": {
@@ -1369,7 +1336,7 @@
             "minLength": 4
           }
         },
-        "required": ["newPassword"]
+        "required": [ "newPassword" ]
       },
       "EntityMetaData": {
         "type": "object",
@@ -1389,12 +1356,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "createdAt",
-          "createdBy",
-          "lastModifiedAt",
-          "lastModifiedBy"
-        ]
+        "required": [ "createdAt", "createdBy", "lastModifiedAt", "lastModifiedBy" ]
       },
       "UserAccount": {
         "type": "object",
@@ -1412,7 +1374,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["USER", "ADMIN", "KLEIDERWART"]
+              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
             }
           },
           "enabled": {
@@ -1426,15 +1388,7 @@
             "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required": [
-          "enabled",
-          "firstName",
-          "id",
-          "lastName",
-          "metaData",
-          "roles",
-          "username"
-        ]
+        "required": [ "enabled", "firstName", "id", "lastName", "metaData", "roles", "username" ]
       },
       "ImpressumDto": {
         "type": "object",
@@ -1452,7 +1406,7 @@
             "type": "string"
           }
         },
-        "required": ["address", "contactEmail", "name"]
+        "required": [ "address", "contactEmail", "name" ]
       },
       "InitialAdminSetupRequest": {
         "type": "object",
@@ -1477,7 +1431,7 @@
             "minLength": 0
           }
         },
-        "required": ["firstName", "lastName", "password", "username"]
+        "required": [ "firstName", "lastName", "password", "username" ]
       },
       "LoginRequest": {
         "type": "object",
@@ -1494,7 +1448,7 @@
             "type": "boolean"
           }
         },
-        "required": ["password", "rememberMe", "username"]
+        "required": [ "password", "rememberMe", "username" ]
       },
       "CreateOrUpdateClothingTypeRequest": {
         "type": "object",
@@ -1505,7 +1459,7 @@
             "minLength": 0
           }
         },
-        "required": ["name"]
+        "required": [ "name" ]
       },
       "ClothingType": {
         "type": "object",
@@ -1521,7 +1475,7 @@
             "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required": ["id", "metaData", "name"]
+        "required": [ "id", "metaData", "name" ]
       },
       "RelocationRequest": {
         "type": "object",
@@ -1538,7 +1492,7 @@
             }
           }
         },
-        "required": ["itemIds", "targetLocationId"]
+        "required": [ "itemIds", "targetLocationId" ]
       },
       "ProblemDetail": {
         "type": "object",
@@ -1563,7 +1517,7 @@
           },
           "properties": {
             "type": "object",
-            "additionalProperties": {}
+            "additionalProperties": { }
           }
         }
       },
@@ -1585,10 +1539,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["POOL", "WAESCHE", "PERSONAL", "OTHER"]
+            "enum": [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
           }
         },
-        "required": ["comment", "name", "onlyVisibleForKleiderwart", "type"]
+        "required": [ "comment", "name", "onlyVisibleForKleiderwart", "type" ]
       },
       "ClothingLocation": {
         "type": "object",
@@ -1604,7 +1558,7 @@
           },
           "type": {
             "type": "string",
-            "enum": ["POOL", "WAESCHE", "PERSONAL", "OTHER"]
+            "enum": [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
           },
           "id": {
             "type": "integer",
@@ -1614,14 +1568,7 @@
             "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required": [
-          "comment",
-          "id",
-          "metaData",
-          "name",
-          "onlyVisibleForKleiderwart",
-          "type"
-        ]
+        "required": [ "comment", "id", "metaData", "name", "onlyVisibleForKleiderwart", "type" ]
       },
       "BatchCreateClothingLocationsRequest": {
         "type": "object",
@@ -1633,7 +1580,7 @@
             }
           }
         },
-        "required": ["items"]
+        "required": [ "items" ]
       },
       "CreateOrUpdateClothingItemRequest": {
         "type": "object",
@@ -1657,7 +1604,7 @@
             "format": "int64"
           }
         },
-        "required": ["size", "typeId"]
+        "required": [ "size", "typeId" ]
       },
       "ClothingItem": {
         "type": "object",
@@ -1684,7 +1631,7 @@
             "$ref": "#/components/schemas/EntityMetaData"
           }
         },
-        "required": ["id", "metaData", "size", "typeId"]
+        "required": [ "id", "metaData", "size", "typeId" ]
       },
       "BatchCreateClothingItemsRequest": {
         "type": "object",
@@ -1696,7 +1643,7 @@
             }
           }
         },
-        "required": ["items"]
+        "required": [ "items" ]
       },
       "InventoryReconciliationPreviewRequest": {
         "type": "object",
@@ -1709,7 +1656,7 @@
             }
           }
         },
-        "required": ["scannedItemIds"]
+        "required": [ "scannedItemIds" ]
       },
       "InventoryReconciliationPreviewResponse": {
         "type": "object",
@@ -1733,7 +1680,7 @@
             }
           }
         },
-        "required": ["foundItems", "missingItems", "unchangedItems"]
+        "required": [ "foundItems", "missingItems", "unchangedItems" ]
       },
       "ResolvedClothingItem": {
         "type": "object",
@@ -1748,7 +1695,7 @@
             "$ref": "#/components/schemas/ClothingType"
           }
         },
-        "required": ["clothingItem", "clothingType"]
+        "required": [ "clothingItem", "clothingType" ]
       },
       "InventoryReconciliationExecuteResponse": {
         "type": "object",
@@ -1769,12 +1716,7 @@
             "format": "int32"
           }
         },
-        "required": [
-          "batchId",
-          "foundItemsCount",
-          "missingItemsCount",
-          "unchangedItemsCount"
-        ]
+        "required": [ "batchId", "foundItemsCount", "missingItemsCount", "unchangedItemsCount" ]
       },
       "CheckoutRequest": {
         "type": "object",
@@ -1802,7 +1744,7 @@
             }
           }
         },
-        "required": ["returnItemIds", "takeItemIds"]
+        "required": [ "returnItemIds", "takeItemIds" ]
       },
       "CheckoutResponse": {
         "type": "object",
@@ -1811,7 +1753,7 @@
             "type": "string"
           }
         },
-        "required": ["batchId"]
+        "required": [ "batchId" ]
       },
       "CreateUserRequest": {
         "type": "object",
@@ -1839,11 +1781,11 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["USER", "ADMIN", "KLEIDERWART"]
+              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
             }
           }
         },
-        "required": ["firstName", "lastName", "password", "roles", "username"]
+        "required": [ "firstName", "lastName", "password", "roles", "username" ]
       },
       "PrivacyPolicyMetadata": {
         "type": "object",
@@ -1863,7 +1805,7 @@
             "format": "date-time"
           }
         },
-        "required": ["contentType", "fileName", "fileSize", "uploadedAt"]
+        "required": [ "contentType", "fileName", "fileSize", "uploadedAt" ]
       },
       "UpdateUserRequest": {
         "type": "object",
@@ -1882,11 +1824,11 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["USER", "ADMIN", "KLEIDERWART"]
+              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
             }
           }
         },
-        "required": ["firstName", "lastName", "roles"]
+        "required": [ "firstName", "lastName", "roles" ]
       },
       "PrivacyPolicyExists": {
         "type": "object",
@@ -1895,7 +1837,7 @@
             "type": "boolean"
           }
         },
-        "required": ["exists"]
+        "required": [ "exists" ]
       },
       "ImpressumExists": {
         "type": "object",
@@ -1904,7 +1846,7 @@
             "type": "boolean"
           }
         },
-        "required": ["exists"]
+        "required": [ "exists" ]
       },
       "AuthStateResponse": {
         "type": "object",
@@ -1916,7 +1858,7 @@
             "$ref": "#/components/schemas/UserAccount"
           }
         },
-        "required": ["authenticated"]
+        "required": [ "authenticated" ]
       },
       "ClothingTypeSummary": {
         "type": "object",
@@ -1939,7 +1881,7 @@
             "format": "int32"
           }
         },
-        "required": ["sizeGroupSummary", "totalCount", "typeId", "typeName"]
+        "required": [ "sizeGroupSummary", "totalCount", "typeId", "typeName" ]
       },
       "SizeGroupSummary": {
         "type": "object",
@@ -1958,7 +1900,7 @@
             "format": "int32"
           }
         },
-        "required": ["name", "sizes", "totalCount"]
+        "required": [ "name", "sizes", "totalCount" ]
       },
       "SizeSummary": {
         "type": "object",
@@ -1971,7 +1913,7 @@
             "format": "int32"
           }
         },
-        "required": ["count", "size"]
+        "required": [ "count", "size" ]
       },
       "ClothingLocationSummary": {
         "type": "object",
@@ -1994,7 +1936,7 @@
             "format": "int32"
           }
         },
-        "required": ["locationId", "locationName", "totalCount", "types"]
+        "required": [ "locationId", "locationName", "totalCount", "types" ]
       }
     }
   }

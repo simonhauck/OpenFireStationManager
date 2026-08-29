@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { LogOut } from "lucide-react"
-
 import { logoutMutation, meQuery } from "#/api/auth.queries"
 import { Button } from "#/components/ui/button"
 import {
@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu"
-import { Link, useNavigate } from "@tanstack/react-router"
 
 export default function AuthButton() {
   const queryClient = useQueryClient()

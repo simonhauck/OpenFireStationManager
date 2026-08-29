@@ -1,19 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Pencil, Plus, Trash2 } from "lucide-react"
-
-import {
-  deleteImpressumMutation,
-  impressumAdminQuery,
-} from "#/legal/impressum/service/impressumQueries"
-import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
+import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
+import {
+  deleteImpressumMutation,
+  impressumAdminQuery,
+} from "#/legal/impressum/service/impressumQueries"
 
 export default function ImpressumSection() {
   const queryClient = useQueryClient()

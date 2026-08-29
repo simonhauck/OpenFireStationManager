@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test"
 import { randomUUID } from "node:crypto"
-import { ReturnPage } from "../pages/ReturnPage"
-import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
-import { createClothingType } from "../flows/createClothingType"
-import { createClothingLocation } from "../flows/createClothingLocation"
+import { expect, test } from "@playwright/test"
 import { createClothingItem } from "../flows/createClothingItem"
+import { createClothingLocation } from "../flows/createClothingLocation"
+import { createClothingType } from "../flows/createClothingType"
+import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
+import { ReturnPage } from "../pages/ReturnPage"
 
 test.use({ storageState: "playwright/.auth/user.json" })
 

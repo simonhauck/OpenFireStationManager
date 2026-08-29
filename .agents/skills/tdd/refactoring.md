@@ -8,3 +8,4 @@ After TDD cycle, look for:
 - **Feature envy** → Move logic to where data lives
 - **Primitive obsession** → Introduce value objects
 - **Existing code** the new code reveals as problematic
+

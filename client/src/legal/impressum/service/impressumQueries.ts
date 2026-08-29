@@ -1,12 +1,13 @@
-import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
+import { mutationOptions, queryOptions } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
 import type { ImpressumDto } from "#/legal/model/legal.ts"
 
 export type ImpressumState =
-  { exists: false; impressum: null } | { exists: true; impressum: ImpressumDto }
+  | { exists: false; impressum: null }
+  | { exists: true; impressum: ImpressumDto }
 
 export const impressumAdminQuery = () =>
   queryOptions({

@@ -1,29 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { toast } from "sonner"
 import { useEffect, useState } from "react"
-
-import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
-import { useInventoryReconciliationWizard } from "#/clothing/inventory-reconciliation/useInventoryReconciliationWizard"
-import type { InventoryReconciliationStep } from "#/clothing/inventory-reconciliation/useInventoryReconciliationWizard"
-import {
-  inventoryReconciliationExecuteMutation,
-  inventoryReconciliationPreviewQuery,
-} from "#/clothing/inventory-reconciliation/service/inventoryReconciliationQueries"
-import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import { toast } from "sonner"
+import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import {
   TouchButton,
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import type { StepperWizardStep } from "#/components/base/StepperWizard"
-import StepperWizard from "#/components/base/StepperWizard"
-import PageSection from "#/components/base/PageSection"
-import RenderIf from "#/components/base/RenderIf"
-import { Badge } from "#/components/ui/badge"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
+import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
+import {
+  inventoryReconciliationExecuteMutation,
+  inventoryReconciliationPreviewQuery,
+} from "#/clothing/inventory-reconciliation/service/inventoryReconciliationQueries"
+import type { InventoryReconciliationStep } from "#/clothing/inventory-reconciliation/useInventoryReconciliationWizard"
+import { useInventoryReconciliationWizard } from "#/clothing/inventory-reconciliation/useInventoryReconciliationWizard"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
+import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import PageSection from "#/components/base/PageSection"
+import RenderIf from "#/components/base/RenderIf"
+import type { StepperWizardStep } from "#/components/base/StepperWizard"
+import StepperWizard from "#/components/base/StepperWizard"
+import { Badge } from "#/components/ui/badge"
 
 const SUCCESS_REDIRECT_SECONDS = 15
 

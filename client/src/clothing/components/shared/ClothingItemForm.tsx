@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
-
+import ClothingLocationSelect from "#/clothing/components/shared/ClothingLocationSelect"
+import type { CreateOrUpdateClothingItemRequest } from "#/clothing/model/clothingItems"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import {
   createClothingItemMutation,
   updateClothingItemMutation,
 } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
-import ClothingLocationSelect from "#/clothing/components/shared/ClothingLocationSelect"
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
@@ -17,7 +17,6 @@ import { Card, CardContent } from "#/components/ui/card"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
-import type { CreateOrUpdateClothingItemRequest } from "#/clothing/model/clothingItems"
 
 type ClothingItemFormProps = {
   existingItem?: ClothingItem

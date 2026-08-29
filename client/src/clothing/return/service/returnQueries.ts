@@ -1,5 +1,5 @@
-import { mutationOptions } from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
+import { mutationOptions } from "@tanstack/react-query"
 
 import { client } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
@@ -9,8 +9,8 @@ import type {
 } from "#/clothing/model/checkout"
 
 export {
-  searchClothingItems,
   getItemByBarcode,
+  searchClothingItems,
 } from "#/clothing/checkout/service/checkoutQueries"
 
 export const returnMutation = (queryClient: QueryClient) =>

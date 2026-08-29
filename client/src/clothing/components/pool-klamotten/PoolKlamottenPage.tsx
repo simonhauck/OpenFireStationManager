@@ -1,19 +1,18 @@
 import { Link } from "@tanstack/react-router"
-
-import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
+import type {
+  ClothingLocationSizeSummary,
+  ClothingTypeSizeSummary,
+} from "#/clothing/model/overview.ts"
+import { useClothingOverview } from "#/clothing/service/clothingOverviewQueries"
 import ErrorState from "#/components/base/ErrorState"
 import LabelWithCount from "#/components/base/LabelWithCount"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
-import { Badge } from "#/components/ui/badge"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
-import type {
-  ClothingLocationSizeSummary,
-  ClothingTypeSizeSummary,
-} from "#/clothing/model/overview.ts"
+import { Badge } from "#/components/ui/badge"
 
 export default function PoolKlamottenPage() {
   const { data: overview, isLoading, isError } = useClothingOverview()

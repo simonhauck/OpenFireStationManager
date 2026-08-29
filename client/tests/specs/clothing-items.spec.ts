@@ -1,7 +1,7 @@
-import { expect, test } from "@playwright/test"
 import { randomUUID } from "node:crypto"
-import { createClothingType } from "../flows/createClothingType"
+import { expect, test } from "@playwright/test"
 import { createClothingLocation } from "../flows/createClothingLocation"
+import { createClothingType } from "../flows/createClothingType"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })

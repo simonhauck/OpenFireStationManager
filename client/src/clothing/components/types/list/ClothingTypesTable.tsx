@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
-
-import type { ClothingType } from "#/clothing/model/clothingType"
 import DeleteClothingTypeDialog from "#/clothing/components/types/list/DeleteClothingTypeDialog"
+import type { ClothingType } from "#/clothing/model/clothingType"
 import FormattedDate from "#/components/base/FormattedDate"
 import { Button } from "#/components/ui/button"
 import {

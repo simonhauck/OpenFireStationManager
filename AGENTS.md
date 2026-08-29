@@ -21,7 +21,7 @@ testing, TypeScript rules, code style, routing, and PWA notes.
 
 **Quick reference:**
 
-| Purpose                        | Command (from `client/`) |
+|            Purpose             | Command (from `client/`) |
 |--------------------------------|--------------------------|
 | Start dev server               | `npm run dev`            |
 | Run tests                      | `npm run test`           |
@@ -40,7 +40,7 @@ testing, code style, API design, and database conventions.
 
 **Quick reference:**
 
-| Purpose            | Command (from `server/`)                                                               |
+|      Purpose       |                                Command (from `server/`)                                |
 |--------------------|----------------------------------------------------------------------------------------|
 | Build              | `./gradlew build`                                                                      |
 | Run                | `./gradlew bootRun`                                                                    |

@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-
+import RenderIf from "#/components/base/RenderIf"
 import { impressumPublicQuery } from "#/legal/impressum/service/impressumQueries"
 import { privacyPolicyPublicQuery } from "#/legal/privacy-policy/service/privacyPolicyQueries"
-import RenderIf from "#/components/base/RenderIf"
 
 export default function Footer() {
   const year = new Date().getFullYear()

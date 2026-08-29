@@ -1,13 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { ExternalLink, Trash2, Upload } from "lucide-react"
 import { useRef, useState } from "react"
 import { toast } from "sonner"
-import { ExternalLink, Trash2, Upload } from "lucide-react"
-
-import {
-  deletePrivacyPolicyMutation,
-  privacyPolicyQuery,
-  uploadPrivacyPolicyMutation,
-} from "#/legal/privacy-policy/service/privacyPolicyQueries"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
 import FormattedDate from "#/components/base/FormattedDate"
@@ -16,6 +10,11 @@ import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
 import { Button } from "#/components/ui/button"
 import { Input } from "#/components/ui/input"
+import {
+  deletePrivacyPolicyMutation,
+  privacyPolicyQuery,
+  uploadPrivacyPolicyMutation,
+} from "#/legal/privacy-policy/service/privacyPolicyQueries"
 
 const ACCEPTED_TYPES =
   ".pdf,.html,.htm,.txt,application/pdf,text/html,text/plain"

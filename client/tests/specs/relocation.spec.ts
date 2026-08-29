@@ -1,10 +1,10 @@
-import { expect, test } from "@playwright/test"
 import { randomUUID } from "node:crypto"
-import { createClothingType } from "../flows/createClothingType"
-import { createClothingLocation } from "../flows/createClothingLocation"
+import { expect, test } from "@playwright/test"
 import { createClothingItem } from "../flows/createClothingItem"
-import { RelocationPage } from "../pages/RelocationPage"
+import { createClothingLocation } from "../flows/createClothingLocation"
+import { createClothingType } from "../flows/createClothingType"
 import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
+import { RelocationPage } from "../pages/RelocationPage"
 
 // Relocation is guarded to KLEIDERWART role.
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })

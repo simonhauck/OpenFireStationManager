@@ -44,5 +44,11 @@ spotless {
                 "Tables",
                 "TaskList",
             )
+            .formatterOptions(
+                mapOf(
+                    "FORMAT_FLAGS" to "7",
+                    "MAX_TRAILING_BLANK_LINES" to "0",
+                )
+            )
     }
 }

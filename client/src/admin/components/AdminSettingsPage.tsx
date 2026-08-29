@@ -1,7 +1,7 @@
 import PageSection from "#/components/base/PageSection"
 import RoleGuard from "#/components/base/RoleGuard"
-import PrivacyPolicySection from "#/legal/privacy-policy/components/PrivacyPolicySection"
 import ImpressumSection from "#/legal/impressum/components/ImpressumSection"
+import PrivacyPolicySection from "#/legal/privacy-policy/components/PrivacyPolicySection"
 
 export default function AdminSettingsPage() {
   return (

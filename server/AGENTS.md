@@ -36,8 +36,8 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 
 ## Commands
 
-| Purpose                       | Command                                                                                |
-| ----------------------------- | -------------------------------------------------------------------------------------- |
+|            Purpose             |                    Command                    |
+|--------------------------------|-----------------------------------------------|
 | Update API definition (schema) | `./update-api-definition.sh` (from repo root) |
 
 > **After any API change**, run `./update-api-definition.sh` from the repo root. It regenerates
@@ -121,8 +121,8 @@ Spotless is configured to format Kotlin code with `ktfmt`. Follow standard Intel
 
 ### Naming Conventions
 
-| Element                        | Convention                | Example                                               |
-| ------------------------------ | ------------------------- | ----------------------------------------------------- |
+|            Element             |        Convention         |                        Example                        |
+|--------------------------------|---------------------------|-------------------------------------------------------|
 | Classes / objects / interfaces | `PascalCase`              | `StationController`                                   |
 | Functions and properties       | `camelCase`               | `findById`                                            |
 | Local variables                | `camelCase`               | `stationId`                                           |
@@ -198,3 +198,4 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   Docker Compose lifecycle `start_only` so the container persists across restarts.
 - Database credentials for local dev: `POSTGRES_USER=myuser`, `POSTGRES_PASSWORD=secret`,
   `POSTGRES_DB=mydatabase`.
+

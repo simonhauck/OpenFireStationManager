@@ -58,3 +58,4 @@ npm run build
 - `client/AGENTS.md` - frontend commands and conventions
 - `server/AGENTS.md` - backend commands and conventions
 - `infrastructure/raspberry-pi/README.md` - Raspberry Pi touchscreen setup
+

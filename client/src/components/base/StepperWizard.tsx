@@ -1,8 +1,8 @@
-import { VerticalStepper } from "#/components/base/VerticalStepper"
-import type { Step } from "#/components/base/VerticalStepper"
+import type React from "react"
 import RenderIf from "#/components/base/RenderIf"
+import type { Step } from "#/components/base/VerticalStepper"
+import { VerticalStepper } from "#/components/base/VerticalStepper"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
-import React from "react"
 
 export interface StepperWizardStep {
   label: string

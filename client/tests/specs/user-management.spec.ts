@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test"
 import { randomUUID } from "node:crypto"
+import { expect, test } from "@playwright/test"
 import { UserManagementPage } from "../pages/UserManagementPage"
 
 test.use({ storageState: "playwright/.auth/admin.json" })

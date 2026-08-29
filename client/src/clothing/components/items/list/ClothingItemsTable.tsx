@@ -1,16 +1,15 @@
-import { Link } from "@tanstack/react-router"
-import { useMemo } from "react"
-import { Pencil, Trash2 } from "lucide-react"
-
-import type { ClothingType } from "#/clothing/model/clothingType"
-import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
-import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
-import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
-import DataTable from "#/components/base/DataTable"
-import type { DataTableColumn } from "#/components/base/DataTable"
-import { Button } from "#/components/ui/button"
-import DeleteDialogComponent from "#/components/base/DeleteDialogComponent.tsx"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
+import { Pencil, Trash2 } from "lucide-react"
+import { useMemo } from "react"
+import type { ClothingType } from "#/clothing/model/clothingType"
+import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
+import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
+import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
+import type { DataTableColumn } from "#/components/base/DataTable"
+import DataTable from "#/components/base/DataTable"
+import DeleteDialogComponent from "#/components/base/DeleteDialogComponent.tsx"
+import { Button } from "#/components/ui/button"
 
 interface ClothingItemsTableProps {
   items: ClothingItem[]

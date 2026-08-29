@@ -36,3 +36,4 @@ Within the event-log option, a further branch: keep `ClothingItem.locationId` as
 - **Stateless update (no log).** Cheapest, but the checkout feature's actual value is the audit trail; without it we've built a slower version of the existing edit form.
 - **Derive current location from the log (no cache).** Forces rewriting every list view (`findByLocationId`, dashboard summary, item overview) into window-function queries and demands a genesis movement for every existing item. Disproportionate for a feature whose hot path is "list items at location X".
 - **Skip movements for manual Kleiderwart edits.** Creates invisible gaps in the audit trail and breaks the cache invariant. Rejected to keep the log authoritative.
+

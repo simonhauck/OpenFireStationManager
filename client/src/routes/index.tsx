@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
-import { Flame, ShieldCheck, Users, Building2 } from "lucide-react"
+import { Building2, Flame, ShieldCheck, Users } from "lucide-react"
 
 import { meQuery } from "#/api/auth.queries"
 import { Badge } from "#/components/ui/badge"

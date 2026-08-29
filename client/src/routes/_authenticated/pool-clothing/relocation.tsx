@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
-
-import RoleGuard from "#/components/base/RoleGuard"
 import RelocationPage from "#/clothing/relocation/components/RelocationPage"
+import RoleGuard from "#/components/base/RoleGuard"
 
 export const Route = createFileRoute(
   "/_authenticated/pool-clothing/relocation",

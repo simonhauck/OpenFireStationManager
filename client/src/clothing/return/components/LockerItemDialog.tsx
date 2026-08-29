@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
-
-import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
-import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
-import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
+import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import {
   TouchButton,
   TouchCombobox,
 } from "#/clothing/checkout/components/TouchComponents"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
+import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
+import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
+import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
+import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import RenderIf from "#/components/base/RenderIf"
 import { Checkbox } from "#/components/ui/checkbox"
 import {
@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "#/components/ui/dialog"
-import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
 interface LockerItemDialogProps {
   open: boolean
