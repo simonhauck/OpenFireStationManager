@@ -30,4 +30,4 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ./gradlew :server:jib --no-daemon --no-configuration-cache
+        run: ./gradlew :server:jib --no-daemon
