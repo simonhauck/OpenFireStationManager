@@ -184,6 +184,56 @@ class ClothingItemLookupIT : IntegrationTest() {
         assertThat(response.body?.map { it.clothingItem.barcode }).doesNotContain(uniqueBarcode)
     }
 
+    // --- location items ---
+
+    @Test
+    fun `location items returns resolved items at the location`() {
+        val type = createType()
+        val location = createLocation(LocationType.POOL)
+        val barcode = "LOCATION-${System.nanoTime()}"
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(
+                typeId = type.id,
+                size = "L",
+                barcode = barcode,
+                locationId = AggregateReference.to(location.id),
+            ),
+            authCookie = validCookieHeader,
+        )
+
+        val response = locationCalls.getItems(location.id, authCookie = validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        val resolved = response.body!!.first { it.clothingItem.barcode == barcode }
+        assertThat(resolved.clothingType.name).isEqualTo(type.name)
+        assertThat(resolved.location?.id).isEqualTo(location.id)
+    }
+
+    @Test
+    fun `location items returns an empty list for an empty location`() {
+        val location = createLocation(LocationType.POOL)
+
+        val response = locationCalls.getItems(location.id, authCookie = validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isEmpty()
+    }
+
+    @Test
+    fun `location items returns 404 for restricted location to non-Kleiderwart caller`() {
+        val restrictedLocation =
+            createLocation(LocationType.PERSONAL, onlyVisibleForKleiderwart = true)
+        val regularUserCookie = createRegularUserCookie()
+
+        val response =
+            locationCalls.getItemsExpectingError(
+                restrictedLocation.id,
+                authCookie = regularUserCookie,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
     // --- helpers ---
 
     private fun getByBarcode(

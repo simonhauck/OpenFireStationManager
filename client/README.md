@@ -1,202 +1,140 @@
 
-Welcome to your new TanStack Start app!
+# OpenFireStationManager — Frontend
 
-# Getting Started
+The React web app for [OpenFireStationManager](../README.md). It is a single-page application built
+with Vite and TanStack Router, and it is served in production by the Kotlin backend rather than by a
+Node server.
 
-To run this application:
+For what the product does and how to run the whole thing with Docker, see the
+[root README](../README.md).
+
+---
+
+## Before you start
+
+**The backend must be running.** This app has no server of its own and no mock layer — every screen
+reads live data from the API. Start it first, from the repository root:
+
+```bash
+./gradlew :server:bootRun
+```
+
+That serves the API on port `8080`. The Vite dev server proxies `/api` and `/privacy-policy` to it,
+so no environment variables are needed for local development.
+
+You will also need a user account to sign in with. A fresh database has none — see
+[Create the first account](../README.md#create-the-first-account) in the root README.
+
+---
+
+## Getting started
 
 ```bash
 npm install
-npm run dev
+npm run prepareEnv     # generate the typed API client
+npm run dev            # http://localhost:3000
 ```
 
-# Building For Production
+`prepareEnv` is not optional on a first checkout. It generates `src/api/schema.ts` from the
+backend's OpenAPI contract, and nothing compiles without it.
 
-To build this application for production:
+---
 
-```bash
-npm run build
-```
+## How it talks to the backend
+
+All API types are **generated, not hand-written**. `npm run prepareEnv` reads
+`server/src/main/resources/open-api-contract.json` and writes `src/api/schema.ts`, which types the
+`openapi-fetch` client in `src/api/client.ts`. Calling an endpoint that does not exist, or passing
+the wrong body, is therefore a compile error rather than a runtime surprise.
+
+**Re-run `prepareEnv` whenever the backend API changes.** Nothing in CI checks that the generated
+file is current, so a stale one will pass the build and only fail when you touch the changed
+endpoint. If a request 404s or a type looks wrong, regenerate before debugging anything else.
+
+Authentication is a session cookie set by the backend; the client sends `credentials: "include"` and
+holds no token.
+
+---
+
+## How it is built and deployed
+
+`npm run build` does **not** produce a standalone bundle. It writes into
+`server/src/main/resources/static/`, so the compiled frontend is packaged inside the backend JAR and
+the whole product ships as one Docker image on one port.
+
+Two consequences worth knowing:
+
+- The output directory is emptied on each build, and it lives outside this folder.
+- In production the app is served from the same origin as the API, which is why no API base URL is
+  configured. `VITE_API_BASE_URL` exists as an override but is normally unset.
+
+---
 
 ## Testing
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+End-to-end tests are the primary strategy here, because most of the value is in multi-step flows
+like checkout and stock-taking rather than in isolated components.
 
 ```bash
-npm run test
+npm run test        # Vitest — pure logic only
+npm run test:e2e    # Playwright — the real coverage
+npm run test:e2e:ui # Playwright, interactive
 ```
 
-## Styling
+Playwright starts the backend and dev server itself, creates three test personas (`admin`,
+`kleiderwart`, `user`), and signs each one in before the suite runs. Reuse an existing local server
+if you have one — it will not start a second copy.
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+---
 
-### Removing Tailwind CSS
+## Commands
 
-If you prefer not to use Tailwind CSS:
+|         Purpose          |        Command         |
+|--------------------------|------------------------|
+| Dev server               | `npm run dev`          |
+| Regenerate API bindings  | `npm run prepareEnv`   |
+| Production build         | `npm run build`        |
+| Type check               | `npm run build:check`  |
+| Lint and format check    | `npm run format:check` |
+| Lint and format auto-fix | `npm run format:fix`   |
+| Unit tests               | `npm run test`         |
+| End-to-end tests         | `npm run test:e2e`     |
 
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Uninstall the packages: `npm install @tailwindcss/vite tailwindcss -D`
+---
 
-## Linting & Formatting
+## Layout
 
-This project uses [Biome](https://biomejs.dev/) for linting, formatting, and import organization. The following scripts are available:
-
-```bash
-npm run format:check
-npm run format:fix
-npm run build:check
+```text
+src/
+├── api/            generated schema, typed client, shared query keys
+├── clothing/       the main feature area — checkout, relocation, stock-taking
+├── users/          account management
+├── legal/          Impressum and privacy policy
+├── components/
+│   ├── ui/         shadcn/ui primitives — treat as managed, do not edit
+│   ├── base/       app-wide building blocks
+│   └── layout/     page shell
+└── routes/         TanStack Router file-based routes (slim — they delegate to feature folders)
 ```
 
-## Routing
+Routes stay thin on purpose: a route file wires up a page, and the actual UI and data fetching live
+in the feature folder next to the rest of that domain.
 
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
+---
 
-### Adding A Route
+## A note on language
 
-To add a new route to your application just add a new file in the `./src/routes` directory.
+The **user interface is in German** — labels, routes, and component names often use domain terms
+like *Kleiderwart*, *Standort*, and *Umlagerung*. The code and comments are English.
 
-TanStack will automatically generate the content of the route file for you.
+[`CONTEXT.md`](CONTEXT.md) is the glossary for those terms and explains what each screen is for. Read
+it before working on a feature; it will save you guessing what *Inventarisierung* or *Pool Klamotten*
+mean.
 
-Now that you have two routes you can use a `Link` component to navigate between them.
+---
 
-### Adding Links
+## Conventions
 
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router"
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "My App" },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from "@tanstack/react-start"
-
-const getServerTime = createServerFn({
-  method: "GET",
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState("")
-
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router"
-import { json } from "@tanstack/react-start"
-
-export const Route = createFileRoute("/api/hello")({
-  server: {
-    handlers: {
-      GET: () => json({ message: "Hello, World!" }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router"
-
-export const Route = createFileRoute("/people")({
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people")
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+[`AGENTS.md`](AGENTS.md) is the full contributor guide for this folder — component rules, the
+required `RenderIf` pattern, routing structure, page-object conventions for Playwright, and how
+schema-derived types must be organised. Read it before your first pull request.

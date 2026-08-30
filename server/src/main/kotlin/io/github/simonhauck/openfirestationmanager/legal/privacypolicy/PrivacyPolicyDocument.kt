@@ -2,19 +2,44 @@ package io.github.simonhauck.openfirestationmanager.legal.privacypolicy
 
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.ZonedDateTime
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
+@Schema(
+    description =
+        "Details about the stored privacy policy file, without its contents. Download the file " +
+            "itself from `GET /privacy-policy`."
+)
 data class PrivacyPolicyMetadata(
+    @field:Schema(
+        description = "Original name of the uploaded file.",
+        example = "datenschutzerklaerung.pdf",
+    )
     val fileName: String,
+    @field:Schema(
+        description =
+            "MIME type of the stored file — one of `application/pdf`, `text/html`, " +
+                "or `text/plain`.",
+        example = "application/pdf",
+    )
     val contentType: String,
+    @field:Schema(description = "Size of the file in bytes.", example = "254118")
     val fileSize: Long,
-    val uploadedAt: ZonedDateTime,
+    @field:Schema(description = "When the file was uploaded.") val uploadedAt: ZonedDateTime,
 )
 
-data class PrivacyPolicyExists(val exists: Boolean)
+@Schema(
+    description =
+        "Whether a privacy policy document has been uploaded. Lets a caller check without " +
+            "downloading the file."
+)
+data class PrivacyPolicyExists(
+    @field:Schema(description = "True when a document is stored.", example = "true")
+    val exists: Boolean
+)
 
 @Table("privacy_policy")
 data class PrivacyPolicyDocument(

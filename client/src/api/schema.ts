@@ -12,7 +12,15 @@ export interface paths {
       cookie?: never
     }
     get?: never
-    put: operations["changePassword"]
+    /**
+     * Set a user's password
+     * @description Overwrites an account's password. This is an administrative reset: the account's current password is **not** required, and existing sessions are not invalidated.
+     *
+     *     Returns the account, which as always omits the password hash.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    put: operations["changeUserPassword"]
     post?: never
     delete?: never
     options?: never
@@ -27,13 +35,32 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the current Impressum */
-    get: operations["get"]
-    /** Create or update the Impressum */
-    put: operations["upsert"]
+    /**
+     * Read the site notice for editing
+     * @description Returns the current site notice (`Impressum`). Identical in content to the public endpoint; it exists separately so the admin UI can read it without depending on the public route.
+     *
+     *     Call `impressumExists` first if you only need to know whether one is configured.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    get: operations["getImpressum"]
+    /**
+     * Create or replace the site notice
+     * @description Writes the site notice. At most one exists at a time, so this always **replaces** any previous notice rather than adding a second — there is no create/update distinction and no id to address.
+     *
+     *     Every field is applied as given, so send the complete notice, not just the parts you are changing.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    put: operations["upsertImpressum"]
     post?: never
-    /** Delete the Impressum */
-    delete: operations["delete"]
+    /**
+     * Remove the site notice
+     * @description Deletes the site notice, after which the public endpoint reports it as absent. Succeeds even when no notice is configured, so it is safe to call blindly.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deleteImpressum"]
     options?: never
     head?: never
     patch?: never
@@ -48,7 +75,17 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["initializeAdmin"]
+    /**
+     * Bootstrap the first administrator account
+     * @description Creates the very first user and grants it the `ADMIN` role. This exists to solve the chicken-and-egg problem of a fresh installation: it is the only way to create an account without already holding one.
+     *
+     *     It is therefore public, but usable **exactly once**. The moment any user account exists — including one created here — this endpoint refuses every further call with `409 Conflict`. Create subsequent accounts with `createUser` instead.
+     *
+     *     A `409` is the normal response on an already-configured installation and should be treated as "setup already done", not as an error to retry.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["createInitialAdmin"]
     delete?: never
     options?: never
     head?: never
@@ -64,6 +101,14 @@ export interface paths {
     }
     get?: never
     put?: never
+    /**
+     * End the current session
+     * @description Invalidates the server-side session and clears both the session and remember-me cookies.
+     *
+     *     Safe to call when not signed in — it succeeds either way rather than failing, so it can be used unconditionally to guarantee a clean slate.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
     post: operations["logout"]
     delete?: never
     options?: never
@@ -80,6 +125,16 @@ export interface paths {
     }
     get?: never
     put?: never
+    /**
+     * Start a session
+     * @description Exchanges a username and password for a session cookie. This API has no bearer tokens: on success the server sets an `OFSM_AUTH` cookie (plus `OFSM_AUTH_REMEMBER_ME` when `rememberMe` is true), and every subsequent request must carry it.
+     *
+     *     The response body is deliberately empty — call `getCurrentSession` afterwards to find out who you are signed in as and which roles you hold.
+     *
+     *     Wrong credentials and unknown usernames are reported identically, as `401`, so the response cannot be used to discover which accounts exist.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
     post: operations["login"]
     delete?: never
     options?: never
@@ -94,11 +149,25 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** List all protective clothing types */
-    get: operations["getAllTypes"]
+    /**
+     * List every clothing type
+     * @description Returns all garment categories (`Kleidungsart`) known to the station, such as `Einsatzjacke` or `Helm`. Types are the vocabulary the rest of the clothing API is built on: start here to discover the valid `typeId` values before creating or searching for items.
+     *
+     *     The list is small and is returned unpaginated.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listClothingTypes"]
     put?: never
-    /** Create a new protective clothing type */
-    post: operations["createType"]
+    /**
+     * Create a new clothing type
+     * @description Registers a new garment category. Do this before creating items of a kind the station has never held before.
+     *
+     *     Names are not enforced to be unique, so check the existing list first to avoid creating a near-duplicate that will split the overview reports in two.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["createClothingType"]
     delete?: never
     options?: never
     head?: never
@@ -114,8 +183,17 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Relocate clothing items to a target location */
-    post: operations["relocate"]
+    /**
+     * Move a set of garments into one location
+     * @description Bulk-moves garments (`Umlagerung`) into a single destination, whatever their current locations are. This is stock management rather than everyday use: emptying a laundry batch back into the pool, or clearing out a locker.
+     *
+     *     Unlike `checkoutClothingItems`, the destination may be **any** location type, and no rule ties the move to a particular member. Every move is logged with reason `RELOCATION`, and all of them share one batch id.
+     *
+     *     The whole request runs in one transaction: if any item or the destination is unknown, nothing is moved. The response echoes the items in their updated state.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["relocateClothingItems"]
     delete?: never
     options?: never
     head?: never
@@ -129,11 +207,23 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** List all clothing locations */
-    get: operations["getAllLocations"]
+    /**
+     * List every clothing location
+     * @description Returns all places garments can be kept (`Standort`), including personal lockers, the shared pool, and the laundry. Start here to discover valid `locationId` values for checkout, relocation, and reconciliation.
+     *
+     *     This endpoint returns locations flagged `onlyVisibleForKleiderwart` to every caller; it is the item lookups, not this list, that apply that visibility rule.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listClothingLocations"]
     put?: never
-    /** Create a new clothing location */
-    post: operations["createLocation"]
+    /**
+     * Create a new clothing location
+     * @description Registers a new place where garments can be kept. Choose the `type` carefully: it determines whether the location behaves as shared stock (`POOL`), as a laundry staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`).
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["createClothingLocation"]
     delete?: never
     options?: never
     head?: never
@@ -149,8 +239,13 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Create multiple clothing locations in a single request */
-    post: operations["createBatchLocations"]
+    /**
+     * Create many clothing locations in one request
+     * @description Creates several locations at once — the usual way to set up a whole row of lockers in a single call.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["createClothingLocationsBatch"]
     delete?: never
     options?: never
     head?: never
@@ -164,11 +259,27 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** List all clothing items */
-    get: operations["getAllItems"]
+    /**
+     * List every clothing item
+     * @description Returns all clothing items in the station, unfiltered and unpaginated. Each item is returned in its raw form: `typeId` and `locationId` are numeric references, not expanded objects. To get the type and location names alongside each item, use `searchClothingItems` or `getClothingItemByBarcode` instead, which return the resolved form.
+     *
+     *     Unlike the search and barcode endpoints, this endpoint does **not** hide items stored in locations flagged `onlyVisibleForKleiderwart`.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listClothingItems"]
     put?: never
-    /** Create a new clothing item */
-    post: operations["createItem"]
+    /**
+     * Register a new clothing item
+     * @description Creates one physical garment. The `typeId` must reference an existing clothing type; create the type first if it does not exist yet.
+     *
+     *     `locationId` is optional — an item created without one is unassigned and will not appear in any location's stock until it is moved. Supplying one records an `INITIAL_PLACEMENT` movement. A blank `barcode` is normalised to null rather than stored as an empty string.
+     *
+     *     Returns `200 OK` with the created item, including its assigned `id`. This API deliberately does not use `201 Created`.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["createClothingItem"]
     delete?: never
     options?: never
     head?: never
@@ -184,8 +295,15 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Create multiple clothing items in a single request */
-    post: operations["createBatchItems"]
+    /**
+     * Register many clothing items in one request
+     * @description Creates several garments at once — the usual way to record a newly delivered box of identical items. Each entry is validated and created exactly as it would be by `createClothingItem`.
+     *
+     *     The whole batch is applied in a single transaction: if any one entry is rejected, none of them are created.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["createClothingItemsBatch"]
     delete?: never
     options?: never
     head?: never
@@ -201,8 +319,17 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Preview the diff between scanned items and system records for a location */
-    post: operations["preview"]
+    /**
+     * Compare a scanned stock-take against the recorded contents of a location
+     * @description First of the two steps of a stock-take (`Inventarisierung`). Send the ids of every garment physically present at the location; the response classifies the difference without changing anything.
+     *
+     *     Scanned items already recorded here come back as `unchangedItems`. Scanned items the system thought were elsewhere come back as `foundItems`. Items recorded here but not scanned come back as `missingItems`.
+     *
+     *     This call is read-only and safe to repeat. Nothing is applied until you pass the result to `executeInventoryReconciliation`.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["previewInventoryReconciliation"]
     delete?: never
     options?: never
     head?: never
@@ -218,8 +345,19 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Execute the inventory reconciliation, applying the changes from the preview */
-    post: operations["execute"]
+    /**
+     * Apply the outcome of a stock-take
+     * @description Second of the two steps of a stock-take. The request body is the response from `previewInventoryReconciliation` — pass it back unchanged to apply exactly what the preview described.
+     *
+     *     You may edit the body first, and doing so is the intended way to correct a scan. Dropping an entry from `missingItems` leaves that garment recorded here untouched; dropping one from `foundItems` leaves it where it was.
+     *
+     *     Applying moves every `foundItems` entry into this location and clears the location of every `missingItems` entry, leaving those garments unassigned rather than relocated. `unchangedItems` is only counted. All changes are written in one transaction under a single batch id, with reason `INVENTORY_RECONCILIATION`.
+     *
+     *     The server does not re-verify the classification, so a stale body applies stale decisions. Preview again if the stock may have moved in the meantime.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["executeInventoryReconciliation"]
     delete?: never
     options?: never
     head?: never
@@ -236,10 +374,18 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * Perform a checkout
-     * @description Perform checkout and returns for clothing items
+     * Take garments out, hand garments back, or both at once
+     * @description Records a member taking protective clothing out of stock and/or returning it. This is the everyday operation of the clothing domain, and the correct way to move garments in normal use — it updates each item's location *and* writes an auditable movement entry, which editing an item directly does not.
+     *
+     *     A single request can do both halves of a swap. Items listed in `takeItemIds` move to `targetLocationId`, which must be a `PERSONAL` location. Items listed in `returnItemIds` move to `returnLocationId`, which must be a `WAESCHE` or `POOL` location. Sending a location of the wrong type is rejected with `400`.
+     *
+     *     The entire request is applied in one transaction, so a failure part-way through leaves nothing changed. The returned `batchId` tags every movement the request produced, making the transaction traceable as a unit.
+     *
+     *     Note that garments are not validated against who is checking them out: any signed-in user may check any item out to any `PERSONAL` location.
+     *
+     *     **Authorisation:** any signed-in user.
      */
-    post: operations["checkout"]
+    post: operations["checkoutClothingItems"]
     delete?: never
     options?: never
     head?: never
@@ -253,8 +399,24 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["getAllUsers"]
+    /**
+     * List every user account
+     * @description Returns all accounts with their roles. Password hashes are never included.
+     *
+     *     This is the way to discover which account holds which role — useful before changing someone's permissions, or to find out who the quartermasters are.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    get: operations["listUsers"]
     put?: never
+    /**
+     * Create a user account
+     * @description Registers a new account with an initial password and a set of roles. The password is hashed before storage and never returned.
+     *
+     *     Usernames must be unique. Granting `ADMIN` implicitly grants every other role, so there is no need to list `KLEIDERWART` alongside it.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
     post: operations["createUser"]
     delete?: never
     options?: never
@@ -269,13 +431,32 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get metadata of the active privacy policy document */
-    get: operations["getMetadata"]
+    /**
+     * Describe the stored privacy policy document
+     * @description Returns the file name, MIME type, size, and upload time of the stored privacy policy (`Datenschutzerklärung`) — but not the file itself. Download the contents from `GET /privacy-policy`, which is public.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    get: operations["getPrivacyPolicyMetadata"]
     put?: never
-    /** Upload a new privacy policy document, replacing any existing one */
-    post: operations["upload"]
-    /** Delete the active privacy policy document */
-    delete: operations["delete_1"]
+    /**
+     * Upload the privacy policy document
+     * @description Stores a privacy policy file as `multipart/form-data`. At most one document exists at a time, so uploading always **replaces** the previous one.
+     *
+     *     Only `application/pdf`, `text/html`, and `text/plain` are accepted; anything else is rejected with `422`. Files are capped at 10 MB by the server's multipart limits, and an oversized upload fails before this endpoint is reached.
+     *
+     *     This is the one place in the API that answers `201 Created` rather than `200`.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["uploadPrivacyPolicy"]
+    /**
+     * Remove the stored privacy policy document
+     * @description Deletes the document, after which the public download returns `404`. Succeeds even when nothing is stored, so it is safe to call blindly.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deletePrivacyPolicy"]
     options?: never
     head?: never
     patch?: never
@@ -288,16 +469,31 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get a protective clothing type by ID */
-    get: operations["getTypeById"]
+    /**
+     * Get one clothing type by its numeric id
+     * @description Looks up a single garment category by its database id.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingType"]
     put?: never
     post?: never
-    /** Delete a protective clothing type */
-    delete: operations["deleteType"]
+    /**
+     * Delete a clothing type
+     * @description Removes a garment category. This is only possible once no clothing item references the type any more — the request is refused with `409 Conflict` otherwise, rather than cascading. Delete or re-type the remaining items first.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deleteClothingType"]
     options?: never
     head?: never
-    /** Update a protective clothing type */
-    patch: operations["updateType"]
+    /**
+     * Rename a clothing type
+     * @description Changes the display name of a category. Items already assigned to this type keep their assignment and immediately report the new name.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    patch: operations["updateClothingType"]
     trace?: never
   }
   "/api/clothing/locations/{id}": {
@@ -307,16 +503,33 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get a clothing location by ID */
-    get: operations["getLocationById"]
+    /**
+     * Get one clothing location by its numeric id
+     * @description Looks up a single location by its database id. This returns the location's own properties only — it does not list the garments currently stored there. To find those, use `searchClothingItems`.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingLocation"]
     put?: never
     post?: never
-    /** Delete a clothing location */
-    delete: operations["deleteLocation"]
+    /**
+     * Delete a clothing location
+     * @description Removes a place from the station. Move any garments still stored here first — deleting a location does not delete or relocate its contents, and items left pointing at it become hard to find.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deleteClothingLocation"]
     options?: never
     head?: never
-    /** Update a clothing location */
-    patch: operations["updateLocation"]
+    /**
+     * Replace the details of a clothing location
+     * @description Despite the `PATCH` verb this is a **full replacement**: `name`, `comment`, `type`, and `onlyVisibleForKleiderwart` are all applied from the request body. Read the location first and resend the fields you want to keep.
+     *
+     *     Garments stored here are unaffected and stay where they are.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    patch: operations["updateClothingLocation"]
     trace?: never
   }
   "/api/clothing/items/{id}": {
@@ -326,16 +539,37 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get a clothing item by ID */
-    get: operations["getItemById"]
+    /**
+     * Get one clothing item by its numeric id
+     * @description Looks up a single clothing item by its database id. Returns the raw item, whose `typeId` and `locationId` are numeric references rather than expanded objects.
+     *
+     *     If you are scanning a physical garment, prefer `getClothingItemByBarcode`.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingItem"]
     put?: never
     post?: never
-    /** Delete a clothing item */
-    delete: operations["deleteItem"]
+    /**
+     * Permanently delete a clothing item
+     * @description Removes a garment from the inventory entirely — use this when an item is discarded or lost, not when it is merely returned or moved.
+     *
+     *     This is irreversible and succeeds regardless of where the item currently is. Returns an empty `204 No Content` body.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deleteClothingItem"]
     options?: never
     head?: never
-    /** Update a clothing item */
-    patch: operations["updateItem"]
+    /**
+     * Replace the details of a clothing item
+     * @description Despite the `PATCH` verb this is a **full replacement**: every field of the request body is applied, and any optional field you omit is reset to null. Read the item first and resend the fields you want to keep.
+     *
+     *     Changing `locationId` records a movement with reason `MANUAL_CORRECTION` (or `INITIAL_PLACEMENT` if the item had no location before). Clearing `locationId` to null records **nothing** — the item silently becomes unassigned. For moving garments as part of normal operations, prefer `checkoutClothingItems` or `relocateClothingItems`, which capture intent more precisely.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    patch: operations["updateClothingItem"]
     trace?: never
   }
   "/api/admin/users/{id}": {
@@ -345,12 +579,26 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["getUserById"]
+    /**
+     * Get one user account by its numeric id
+     * @description Looks up a single account. The password hash is never included.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    get: operations["getUser"]
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
+    /**
+     * Replace a user's profile and roles
+     * @description Despite the `PATCH` verb this is a **full replacement** of the name and the role set. The `roles` list you send becomes the account's complete set of roles, so omitting a role revokes it — read the account first if you mean to add one.
+     *
+     *     The username cannot be changed here, and the password is changed through `changeUserPassword`.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
     patch: operations["updateUser"]
     trace?: never
   }
@@ -361,8 +609,15 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Serve the active privacy policy document */
-    get: operations["serve"]
+    /**
+     * Download the published privacy policy document
+     * @description Streams the privacy policy (`Datenschutzerklärung`) file itself. The response is the raw document — a PDF, HTML, or plain-text body, not JSON — served with the stored MIME type and `Content-Disposition: inline` so browsers display rather than download it.
+     *
+     *     Note the path: this endpoint sits at the site root, **outside** the `/api` namespace, because it is linked to directly from the website footer.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    get: operations["downloadPrivacyPolicy"]
     put?: never
     post?: never
     delete?: never
@@ -378,8 +633,13 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Check whether a privacy policy document has been uploaded */
-    get: operations["exists"]
+    /**
+     * Check whether a privacy policy is published
+     * @description Returns a boolean so a page can decide whether to show a privacy policy link before attempting the download.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    get: operations["publicPrivacyPolicyExists"]
     put?: never
     post?: never
     delete?: never
@@ -395,8 +655,13 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the current Impressum */
-    get: operations["get_1"]
+    /**
+     * Read the publicly published site notice
+     * @description Returns the station's site notice (`Impressum`) — the operator details German law requires a public website to display. No session is needed.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    get: operations["getPublicImpressum"]
     put?: never
     post?: never
     delete?: never
@@ -412,8 +677,13 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Check whether an Impressum has been configured */
-    get: operations["exists_1"]
+    /**
+     * Check whether a site notice is published
+     * @description Returns a boolean without the notice itself, so a page can decide whether to show an Impressum link before fetching it.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    get: operations["publicImpressumExists"]
     put?: never
     post?: never
     delete?: never
@@ -429,7 +699,15 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["me"]
+    /**
+     * Report who the caller is signed in as
+     * @description Describes the current session. Call this after `login`, or on start-up, to discover the caller's identity and — importantly — the roles that decide which other endpoints will be permitted.
+     *
+     *     This endpoint never fails on missing authentication. When no valid cookie is present it returns `200` with `authenticated: false` and a null `user`, which makes it a safe way to probe session state without handling a `401`.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    get: operations["getCurrentSession"]
     put?: never
     post?: never
     delete?: never
@@ -445,8 +723,15 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** List clothing item counts by type and size */
-    get: operations["getSummariesByType"]
+    /**
+     * Count garments across the whole station, grouped by type and size
+     * @description Aggregated stock across every location, answering "how many jackets do we own, in which sizes?". Each type carries a `totalCount` and a breakdown into size bands, so a long tail of individual sizes stays readable.
+     *
+     *     Counts include every garment regardless of where it is or whether it is currently checked out. Use this for reporting rather than availability — for what is on the shelf right now, use `getClothingDashboardByLocation`.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingSummaryByType"]
     put?: never
     post?: never
     delete?: never
@@ -462,8 +747,41 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get clothing availability overview for dashboard locations */
-    get: operations["getDashboardLocationSummaries"]
+    /**
+     * Show available stock per location, for the dashboard
+     * @description Stock broken down by location, then by type and size. This powers the station dashboard's availability view.
+     *
+     *     Only locations of type `POOL` and `WAESCHE` are included — shared stock and laundry. Personal lockers are deliberately excluded, so these figures represent what is available to the station rather than everything it owns.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingDashboardByLocation"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/locations/{id}/items": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List the garments currently held at a location
+     * @description Returns everything the system records as being at this location — the answer to "what is in this locker?".
+     *
+     *     Results are in **resolved** form, each embedding its full clothing type and location, so no follow-up lookups are needed. An empty list means the location exists but is empty.
+     *
+     *     Locations flagged `onlyVisibleForKleiderwart` are hidden from callers without that role: they receive `404` rather than `403`, so the existence of a restricted location is not revealed.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listItemsAtClothingLocation"]
     put?: never
     post?: never
     delete?: never
@@ -479,8 +797,17 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Search clothing items by type name, size, or barcode */
-    get: operations["searchItems"]
+    /**
+     * Search clothing items by type name, size, or barcode
+     * @description Free-text search across the clothing type name, the size, and the barcode. Use this to answer questions like "which jackets in size 52 do we have?" — pass the type name and the size together as one query string.
+     *
+     *     Results are returned in **resolved** form, each embedding its full clothing type and current location. Callers without the `KLEIDERWART` role never see items held in locations flagged `onlyVisibleForKleiderwart`.
+     *
+     *     The result set is capped at 50 entries regardless of the `limit` supplied, so a full result set is never guaranteed; narrow the query rather than raising the limit.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["searchClothingItems"]
     put?: never
     post?: never
     delete?: never
@@ -496,8 +823,17 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Look up a clothing item by barcode */
-    get: operations["getItemByBarcode"]
+    /**
+     * Look up a clothing item by its barcode
+     * @description Resolves the barcode printed on a physical garment to the item it identifies. This is the endpoint to use when a scanner is involved.
+     *
+     *     The response is the **resolved** form: it embeds the full clothing type and the full current location alongside the item, so no follow-up lookups are needed. `location` is null when the item is not currently assigned anywhere.
+     *
+     *     Barcodes are unique across all items. Callers without the `KLEIDERWART` role cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for them such an item reads as not found.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingItemByBarcode"]
     put?: never
     post?: never
     delete?: never
@@ -513,8 +849,13 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Check whether a privacy policy document has been uploaded */
-    get: operations["exists_2"]
+    /**
+     * Check whether a privacy policy document is stored
+     * @description Returns a boolean without the document or its details. Use it to decide whether to call `getPrivacyPolicyMetadata`, which fails with `404` when nothing is stored.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    get: operations["privacyPolicyExists"]
     put?: never
     post?: never
     delete?: never
@@ -530,8 +871,13 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Check whether an Impressum has been configured */
-    get: operations["exists_3"]
+    /**
+     * Check whether a site notice is configured
+     * @description Returns a boolean without the notice itself. Use it to decide whether to call `getImpressum`, which fails with `404` when nothing is configured.
+     *
+     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    get: operations["impressumExists"]
     put?: never
     post?: never
     delete?: never
@@ -544,58 +890,6 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
-    ChangePasswordRequest: {
-      newPassword: string
-    }
-    EntityMetaData: {
-      /** Format: date-time */
-      createdAt: string
-      createdBy: string
-      /** Format: date-time */
-      lastModifiedAt: string
-      lastModifiedBy: string
-    }
-    UserAccount: {
-      username: string
-      firstName: string
-      lastName: string
-      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
-      enabled: boolean
-      /** Format: int64 */
-      id: number
-      metaData: components["schemas"]["EntityMetaData"]
-    }
-    ImpressumDto: {
-      name: string
-      address: string
-      contactEmail: string
-      phone?: string
-    }
-    InitialAdminSetupRequest: {
-      username: string
-      password: string
-      firstName: string
-      lastName: string
-    }
-    LoginRequest: {
-      username: string
-      password: string
-      rememberMe: boolean
-    }
-    CreateOrUpdateClothingTypeRequest: {
-      name: string
-    }
-    ClothingType: {
-      name: string
-      /** Format: int64 */
-      id: number
-      metaData: components["schemas"]["EntityMetaData"]
-    }
-    RelocationRequest: {
-      /** Format: int64 */
-      targetLocationId: number
-      itemIds: number[]
-    }
     ProblemDetail: {
       /** Format: uri */
       type?: string
@@ -609,136 +903,617 @@ export interface components {
         [key: string]: unknown
       }
     }
-    CreateClothingLocationRequest: {
-      name: string
-      comment: string
-      onlyVisibleForKleiderwart: boolean
-      /** @enum {string} */
-      type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+    /** @description A single field-level validation failure. */
+    ValidationError: {
+      /**
+       * @description Path of the offending field within the request body, e.g. `size`. Empty when the rule applies to the request as a whole rather than one field.
+       * @example size
+       */
+      field?: string
+      /**
+       * @description Human-readable reason the value was rejected.
+       * @example must not be blank
+       */
+      message?: string
+      /** @description The value that was submitted and rejected. May be null. */
+      rejectedValue?: Record<string, never>
     }
-    ClothingLocation: {
-      name: string
-      comment: string
-      onlyVisibleForKleiderwart: boolean
-      /** @enum {string} */
-      type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
-      /** Format: int64 */
+    /** @description RFC 9457 problem document describing a request that failed validation, extended with an `errors` array naming each offending field. */
+    ValidationProblemDetail: {
+      /** @example about:blank */
+      type?: string
+      /** @example Invalid request */
+      title?: string
+      /**
+       * Format: int32
+       * @example 400
+       */
+      status?: number
+      /** @example Validation failed for request body */
+      detail?: string
+      /** @description URI of the request that failed, when available. */
+      instance?: string
+      /** @description Every field-level failure detected in this request. */
+      errors?: components["schemas"]["ValidationError"][]
+    }
+    /** @description A new password for an existing account. */
+    ChangePasswordRequest: {
+      /**
+       * @description New plaintext password, between 4 and 32 characters. The current password is not required, because only an administrator may call this.
+       * @example correct-horse
+       */
+      newPassword: string
+    }
+    /** @description Audit trail attached to every stored record. Maintained by the server on save — these fields are ignored if supplied in a request. `System` appears as the actor for changes made outside a user session, such as database migrations. */
+    EntityMetaData: {
+      /**
+       * Format: date-time
+       * @description When the record was first stored.
+       */
+      createdAt: string
+      /**
+       * @description Username of whoever created the record, or `System`.
+       * @example m.mustermann
+       */
+      createdBy: string
+      /**
+       * Format: date-time
+       * @description When the record was last changed.
+       */
+      lastModifiedAt: string
+      /**
+       * @description Username of whoever last changed the record, or `System`.
+       * @example m.mustermann
+       */
+      lastModifiedBy: string
+    }
+    /** @description A user account. The password hash is never serialised, so it is absent from every response. */
+    UserAccount: {
+      /**
+       * @description Login name.
+       * @example m.mustermann
+       */
+      username: string
+      /**
+       * @description Given name.
+       * @example Max
+       */
+      firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
+      lastName: string
+      /**
+       * @description Roles held by this account, governing what it may call.
+       * @example [
+       *       "USER",
+       *       "KLEIDERWART"
+       *     ]
+       */
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+      /**
+       * @description Whether the account may sign in. Disabled accounts are rejected at login.
+       * @example true
+       */
+      enabled: boolean
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 5
+       */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
     }
+    /** @description The legally required site notice (`Impressum`). At most one exists at a time — writing replaces the previous one rather than adding to it. */
+    ImpressumDto: {
+      /**
+       * @description Name of the responsible organisation or person.
+       * @example Freiwillige Feuerwehr Musterstadt
+       */
+      name: string
+      /**
+       * @description Postal address, as a single free-text block.
+       * @example Hauptstraße 1, 12345 Musterstadt
+       */
+      address: string
+      /**
+       * Format: email
+       * @description Public contact email address.
+       * @example kontakt@feuerwehr-musterstadt.de
+       */
+      contactEmail: string
+      /**
+       * @description Public contact phone number. Optional.
+       * @example +49 1234 567890
+       */
+      phone?: string
+    }
+    /** @description Details of the very first administrator account. */
+    InitialAdminSetupRequest: {
+      /**
+       * @description Username for the new administrator.
+       * @example admin
+       */
+      username: string
+      /**
+       * @description Plaintext password. Between 4 and 32 characters.
+       * @example correct-horse
+       */
+      password: string
+      /**
+       * @description Given name of the administrator.
+       * @example Max
+       */
+      firstName: string
+      /**
+       * @description Family name of the administrator.
+       * @example Mustermann
+       */
+      lastName: string
+    }
+    /** @description Credentials for starting a session. */
+    LoginRequest: {
+      /**
+       * @description The account's username.
+       * @example m.mustermann
+       */
+      username: string
+      /**
+       * @description The account's plaintext password.
+       * @example correct-horse
+       */
+      password: string
+      /**
+       * @description When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.
+       * @example false
+       */
+      rememberMe: boolean
+    }
+    /** @description The name of a clothing type. Used for both creation and update. */
+    CreateOrUpdateClothingTypeRequest: {
+      /**
+       * @description Display name of the category, e.g. `Einsatzjacke` or `Helm`. Names are not required to be unique, but duplicates make the overview reports ambiguous.
+       * @example Einsatzjacke
+       */
+      name: string
+    }
+    /** @description A category of garment (`Kleidungsart`), such as `Einsatzjacke` or `Helm`. Types carry no size or quantity of their own — those live on the individual clothing items. */
+    ClothingType: {
+      /**
+       * @description Display name of the category.
+       * @example Einsatzjacke
+       */
+      name: string
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 3
+       */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    /** @description A bulk move of garments into one destination, regardless of where each of them is now. */
+    RelocationRequest: {
+      /**
+       * Format: int64
+       * @description Id of the location every listed garment is moved into. Any location type is accepted — unlike checkout, relocation places no restriction on the destination.
+       * @example 7
+       */
+      targetLocationId: number
+      /**
+       * @description Ids of the garments to move. Must contain at least one entry. If any id is unknown the whole request fails and nothing is moved.
+       * @example [
+       *       41,
+       *       42,
+       *       43
+       *     ]
+       */
+      itemIds: number[]
+    }
+    /** @description One physical garment. `typeId` and `locationId` are numeric references, not embedded objects; see `ResolvedClothingItem` for the form that includes them in full. */
+    ClothingItem: {
+      /**
+       * Format: int64
+       * @description Id of the clothing type this garment belongs to.
+       * @example 3
+       */
+      typeId: number
+      /**
+       * @description Size label as printed on the garment.
+       * @example 52
+       */
+      size: string
+      /**
+       * @description Barcode printed on the garment, unique across all items. Null if untagged.
+       * @example 1234567890128
+       */
+      barcode?: string
+      /**
+       * Format: int64
+       * @description Id of the location holding this garment. Null when unassigned.
+       * @example 7
+       */
+      locationId?: number
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 42
+       */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    /** @description Full set of properties for a clothing location. Used for both creation and update; on update every field is applied, so this is a full replacement. */
+    CreateClothingLocationRequest: {
+      /**
+       * @description Display name of the place, e.g. `Spind 12` or `Lager Regal B`.
+       * @example Spind 12
+       */
+      name: string
+      /**
+       * @description Free-text note about this location. Required, but may be an empty string — it is not nullable.
+       * @example Zweite Reihe, links
+       */
+      comment: string
+      /**
+       * @description When true, this location and every garment in it are hidden from users who do not hold the `KLEIDERWART` role. Such items read as not found in barcode lookup and never appear in search results.
+       * @example false
+       */
+      onlyVisibleForKleiderwart: boolean
+      /**
+       * @description What kind of place this is.
+       * @enum {string}
+       */
+      type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+    }
+    /** @description A place where garments are kept (`Standort`) — the shared pool, the laundry, a member's personal locker, or anywhere else. */
+    ClothingLocation: {
+      /**
+       * @description Display name of the place.
+       * @example Spind 12
+       */
+      name: string
+      /** @description Free-text note. May be empty, never null. */
+      comment: string
+      /**
+       * @description When true, only `KLEIDERWART` users may see this location and its contents.
+       * @example false
+       */
+      onlyVisibleForKleiderwart: boolean
+      /**
+       * @description What kind of place this is.
+       * @enum {string}
+       */
+      type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 7
+       */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    /** @description A set of clothing locations to create together in a single request. */
     BatchCreateClothingLocationsRequest: {
+      /** @description Locations to create. Must contain at least one entry, and every entry is validated individually. */
       items: components["schemas"]["CreateClothingLocationRequest"][]
     }
+    /** @description Full set of properties for a clothing item. Used for both creation and replacement; on update every field is applied, so omitted optional fields are cleared. */
     CreateOrUpdateClothingItemRequest: {
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Id of an existing clothing type (`Kleidungsart`) this garment belongs to. Must reference a type that already exists.
+       * @example 3
+       */
       typeId: number
+      /**
+       * @description Size label exactly as printed on the garment. Free text rather than an enum, because sizing schemes differ per type — may be `52`, `XL`, or `Gr. 3`.
+       * @example 52
+       */
       size: string
+      /**
+       * @description Barcode printed on the garment. Must be unique across all items. Optional — a blank value is stored as null rather than an empty string.
+       * @example 1234567890128
+       */
       barcode?: string
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Id of the location where this garment currently is. Null means the item is not assigned anywhere and will not show up in any location's stock.
+       * @example 7
+       */
       locationId?: number
     }
-    ClothingItem: {
-      /** Format: int64 */
-      typeId: number
-      size: string
-      barcode?: string
-      /** Format: int64 */
-      locationId?: number
-      /** Format: int64 */
-      id: number
-      metaData: components["schemas"]["EntityMetaData"]
-    }
+    /** @description A set of clothing items to create together in a single transaction. */
     BatchCreateClothingItemsRequest: {
+      /** @description Items to create. Must contain at least one entry. If any entry is invalid, or any barcode collides with an existing item or another entry in this list, the whole batch is rejected and nothing is created. */
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
     }
+    /** @description The set of garments physically found at a location during a stock-take. */
     InventoryReconciliationPreviewRequest: {
+      /**
+       * @description Ids of every garment actually seen at the location, typically collected by scanning barcodes. Send the complete set: anything currently recorded at the location but absent from this list is treated as missing. Duplicates are ignored.
+       * @example [
+       *       41,
+       *       42,
+       *       43
+       *     ]
+       */
       scannedItemIds: number[]
     }
+    /**
+     * @description The difference between what was scanned and what the system believed, split three ways.
+     *
+     *             This is both the output of the preview step and the input to the execute step. Passing it
+     *             back unchanged applies exactly what the preview described. You may also **edit it first** —
+     *             removing an entry from `missingItems` leaves that garment recorded at the location instead
+     *             of unassigning it, which is how a user resolves "I know it's here, I just didn't scan it".
+     */
     InventoryReconciliationPreviewResponse: {
+      /** @description Scanned garments that the system already recorded at this location. Executing does nothing to these beyond counting them. */
       unchangedItems: components["schemas"]["ResolvedClothingItem"][]
+      /** @description Scanned garments the system believed were somewhere else. Executing moves each of them to this location. */
       foundItems: components["schemas"]["ResolvedClothingItem"][]
+      /** @description Garments the system records at this location but which were not scanned. Executing clears their location entirely, leaving them unassigned rather than moving them somewhere else. */
       missingItems: components["schemas"]["ResolvedClothingItem"][]
     }
+    /** @description A clothing item with its type and current location embedded in full, so no follow-up lookups are needed to display it. */
     ResolvedClothingItem: {
+      /** @description The garment itself. */
       clothingItem: components["schemas"]["ClothingItem"]
+      /** @description Where the garment currently is. Null when the item is not assigned to any location. */
       location?: components["schemas"]["ClothingLocation"]
+      /** @description The type (`Kleidungsart`) this garment belongs to. */
       clothingType: components["schemas"]["ClothingType"]
     }
+    /** @description Summary of what an executed reconciliation changed. */
     InventoryReconciliationExecuteResponse: {
+      /**
+       * @description Identifier shared by every movement this reconciliation produced, for tracing the stock-take as one unit.
+       * @example 3f2b1c9e-5d47-4a1b-9f8e-2c6d0a7b4e13
+       */
       batchId: string
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description How many garments were moved into this location.
+       * @example 2
+       */
       foundItemsCount: number
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description How many garments were left unassigned.
+       * @example 1
+       */
       missingItemsCount: number
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description How many garments were already recorded correctly and were left alone.
+       * @example 17
+       */
       unchangedItemsCount: number
     }
+    /**
+     * @description A single checkout transaction. One request may take garments out, return garments, or do
+     *             both at once — a member swapping a dirty jacket for a clean one is one request, not two.
+     *
+     *             The rules enforced across the whole request are:
+     *
+     *             - At least one of `takeItemIds` and `returnItemIds` must be non-empty.
+     *             - `targetLocationId` is required whenever `takeItemIds` is non-empty.
+     *             - `returnLocationId` is required whenever `returnItemIds` is non-empty.
+     *             - The same item id may not appear in both lists.
+     *
+     *             Breaking any of these yields `400`, with the offending rule named in the `errors` array.
+     */
     CheckoutRequest: {
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Where the taken garments end up. Must be a location of type `PERSONAL` — you check items out *to* a member's own storage, never to the shared pool. Required if `takeItemIds` is non-empty; ignored otherwise.
+       * @example 12
+       */
       targetLocationId?: number
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Where the returned garments are put. Must be a location of type `WAESCHE` (going to the laundry) or `POOL` (going straight back into shared stock). Required if `returnItemIds` is non-empty; ignored otherwise.
+       * @example 3
+       */
       returnLocationId?: number
+      /**
+       * @description Ids of the garments being taken out. Each is moved to `targetLocationId` and logged with reason `CHECKOUT`.
+       * @example [
+       *       41,
+       *       42
+       *     ]
+       */
       takeItemIds: number[]
+      /**
+       * @description Ids of the garments being handed back. Each is moved to `returnLocationId` and logged with reason `RETURN`.
+       * @example [
+       *       17
+       *     ]
+       */
       returnItemIds: number[]
     }
+    /** @description Confirmation that a checkout was applied. */
     CheckoutResponse: {
+      /**
+       * @description Identifier shared by every movement this request produced. Use it to group or trace the whole transaction in the movement log.
+       * @example 3f2b1c9e-5d47-4a1b-9f8e-2c6d0a7b4e13
+       */
       batchId: string
     }
+    /** @description Details of a new user account, including its initial password. */
     CreateUserRequest: {
+      /**
+       * @description Login name. Must not already be taken.
+       * @example m.mustermann
+       */
       username: string
+      /**
+       * @description Initial plaintext password, between 4 and 32 characters. Stored hashed.
+       * @example correct-horse
+       */
       password: string
+      /**
+       * @description Given name.
+       * @example Max
+       */
       firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
       lastName: string
+      /**
+       * @description Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.
+       * @example [
+       *       "USER"
+       *     ]
+       */
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
+    /** @description Details about the stored privacy policy file, without its contents. Download the file itself from `GET /privacy-policy`. */
     PrivacyPolicyMetadata: {
+      /**
+       * @description Original name of the uploaded file.
+       * @example datenschutzerklaerung.pdf
+       */
       fileName: string
+      /**
+       * @description MIME type of the stored file — one of `application/pdf`, `text/html`, or `text/plain`.
+       * @example application/pdf
+       */
       contentType: string
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Size of the file in bytes.
+       * @example 254118
+       */
       fileSize: number
-      /** Format: date-time */
+      /**
+       * Format: date-time
+       * @description When the file was uploaded.
+       */
       uploadedAt: string
     }
+    /** @description Replacement values for an existing account's profile and roles. The username cannot be changed, and the password is changed through its own endpoint. */
     UpdateUserRequest: {
+      /**
+       * @description Given name.
+       * @example Max
+       */
       firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
       lastName: string
+      /**
+       * @description The complete set of roles the account should have afterwards. This replaces the existing roles rather than adding to them, so omitting a role revokes it.
+       * @example [
+       *       "USER",
+       *       "KLEIDERWART"
+       *     ]
+       */
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
+    /** @description Whether a privacy policy document has been uploaded. Lets a caller check without downloading the file. */
     PrivacyPolicyExists: {
+      /**
+       * @description True when a document is stored.
+       * @example true
+       */
       exists: boolean
     }
+    /** @description Whether a site notice has been configured. Lets a caller check without needing permission to read the notice itself. */
     ImpressumExists: {
+      /**
+       * @description True when a site notice exists.
+       * @example true
+       */
       exists: boolean
     }
+    /** @description Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session. */
     AuthStateResponse: {
+      /**
+       * @description True when a valid session cookie was supplied.
+       * @example true
+       */
       authenticated: boolean
+      /** @description The signed-in account, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
       user?: components["schemas"]["UserAccount"]
     }
+    /** @description Stock of one clothing type, broken down by size band. */
     ClothingTypeSummary: {
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Id of the clothing type.
+       * @example 3
+       */
       typeId: number
+      /**
+       * @description Name of the clothing type.
+       * @example Einsatzjacke
+       */
       typeName: string
+      /** @description Stock grouped into size bands. */
       sizeGroupSummary: components["schemas"]["SizeGroupSummary"][]
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description Total garments of this type.
+       * @example 37
+       */
       totalCount: number
     }
+    /** @description A band of related sizes, so that a long list of individual sizes stays readable. Numeric sizes are grouped under `#`, and anything unrecognised under `Sonstige`. */
     SizeGroupSummary: {
+      /**
+       * @description Name of the size band, e.g. `M`, `XL`, `#`.
+       * @example XL
+       */
       name: string
+      /** @description The individual sizes making up this band. */
       sizes: components["schemas"]["SizeSummary"][]
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description Total garments across every size in this band.
+       * @example 9
+       */
       totalCount: number
     }
+    /** @description How many garments exist in one specific size. */
     SizeSummary: {
+      /**
+       * @description The size label.
+       * @example 52
+       */
       size: string
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description Number of garments in this size.
+       * @example 4
+       */
       count: number
     }
+    /** @description Stock held at one location, broken down by clothing type and size. */
     ClothingLocationSummary: {
-      /** Format: int64 */
+      /**
+       * Format: int64
+       * @description Id of the location.
+       * @example 7
+       */
       locationId: number
+      /**
+       * @description Name of the location.
+       * @example Lager Regal B
+       */
       locationName: string
+      /** @description Stock at this location, grouped by clothing type. */
       types: components["schemas"]["ClothingTypeSummary"][]
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description Total garments held at this location.
+       * @example 112
+       */
       totalCount: number
     }
   }
@@ -750,11 +1525,15 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  changePassword: {
+  changeUserPassword: {
     parameters: {
       query?: never
       header?: never
       path: {
+        /**
+         * @description Numeric id of the user account.
+         * @example 5
+         */
         id: number
       }
       cookie?: never
@@ -765,7 +1544,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The account, with its password changed. */
       200: {
         headers: {
           [name: string]: unknown
@@ -774,9 +1553,54 @@ export interface operations {
           "*/*": components["schemas"]["UserAccount"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No user exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  get: {
+  getImpressum: {
     parameters: {
       query?: never
       header?: never
@@ -785,7 +1609,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The current site notice. */
       200: {
         headers: {
           [name: string]: unknown
@@ -794,18 +1618,45 @@ export interface operations {
           "*/*": components["schemas"]["ImpressumDto"]
         }
       }
-      /** @description No Impressum has been configured */
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No site notice has been configured yet. */
       404: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  upsert: {
+  upsertImpressum: {
     parameters: {
       query?: never
       header?: never
@@ -818,7 +1669,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The stored site notice. */
       200: {
         headers: {
           [name: string]: unknown
@@ -827,9 +1678,45 @@ export interface operations {
           "*/*": components["schemas"]["ImpressumDto"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  delete: {
+  deleteImpressum: {
     parameters: {
       query?: never
       header?: never
@@ -838,16 +1725,43 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description No Content */
+      /** @description No notice is configured now. */
       204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  initializeAdmin: {
+  createInitialAdmin: {
     parameters: {
       query?: never
       header?: never
@@ -860,13 +1774,40 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The administrator account was created and is ready to sign in. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
           "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description At least one user already exists, so setup has already been completed. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
@@ -880,12 +1821,30 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description No Content */
+      /** @description The session was ended. */
       204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
       }
     }
   }
@@ -902,16 +1861,43 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Signed in. The session cookie is in the `Set-Cookie` header. */
+      204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description The username does not exist, or the password is wrong. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getAllTypes: {
+  listClothingTypes: {
     parameters: {
       query?: never
       header?: never
@@ -929,9 +1915,27 @@ export interface operations {
           "*/*": components["schemas"]["ClothingType"][]
         }
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  createType: {
+  createClothingType: {
     parameters: {
       query?: never
       header?: never
@@ -944,7 +1948,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The newly created type. */
       200: {
         headers: {
           [name: string]: unknown
@@ -953,9 +1957,45 @@ export interface operations {
           "*/*": components["schemas"]["ClothingType"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  relocate: {
+  relocateClothingItems: {
     parameters: {
       query?: never
       header?: never
@@ -968,34 +2008,63 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The garments were moved. The body carries them in their updated state. */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          "*/*": components["schemas"]["ClothingItem"][]
+        }
       }
-      /** @description Bad Request */
+      /** @description The request failed validation. The `errors` array names each offending field. */
       400: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
-      /** @description Forbidden — KLEIDERWART role required */
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
       403: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description The destination location, or one of the listed items, does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  getAllLocations: {
+  listClothingLocations: {
     parameters: {
       query?: never
       header?: never
@@ -1013,9 +2082,27 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"][]
         }
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  createLocation: {
+  createClothingLocation: {
     parameters: {
       query?: never
       header?: never
@@ -1028,7 +2115,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The newly created location. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1037,9 +2124,45 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  createBatchLocations: {
+  createClothingLocationsBatch: {
     parameters: {
       query?: never
       header?: never
@@ -1052,7 +2175,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The newly created locations. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1061,9 +2184,45 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"][]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getAllItems: {
+  listClothingItems: {
     parameters: {
       query?: never
       header?: never
@@ -1081,9 +2240,27 @@ export interface operations {
           "*/*": components["schemas"]["ClothingItem"][]
         }
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  createItem: {
+  createClothingItem: {
     parameters: {
       query?: never
       header?: never
@@ -1096,7 +2273,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The newly created clothing item. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1105,9 +2282,54 @@ export interface operations {
           "*/*": components["schemas"]["ClothingItem"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Another item already carries this barcode. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  createBatchItems: {
+  createClothingItemsBatch: {
     parameters: {
       query?: never
       header?: never
@@ -1120,7 +2342,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The newly created clothing items. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1129,13 +2351,62 @@ export interface operations {
           "*/*": components["schemas"]["ClothingItem"][]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description A barcode in the batch is already taken, or repeated within the batch. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  preview: {
+  previewInventoryReconciliation: {
     parameters: {
       query?: never
       header?: never
       path: {
+        /**
+         * @description Numeric id of the location being stock-taken.
+         * @example 7
+         */
         locationId: number
       }
       cookie?: never
@@ -1146,7 +2417,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The classified difference. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1155,40 +2426,62 @@ export interface operations {
           "*/*": components["schemas"]["InventoryReconciliationPreviewResponse"]
         }
       }
-      /** @description Bad Request */
+      /** @description The request failed validation. The `errors` array names each offending field. */
       400: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
-      /** @description Forbidden — KLEIDERWART role required */
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
       403: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description Location or item not found */
+      /** @description The location, or one of the scanned item ids, does not exist. */
       404: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  execute: {
+  executeInventoryReconciliation: {
     parameters: {
       query?: never
       header?: never
       path: {
+        /**
+         * @description Numeric id of the location being stock-taken.
+         * @example 7
+         */
         locationId: number
       }
       cookie?: never
@@ -1199,7 +2492,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The reconciliation was applied. The body summarises what changed. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1208,36 +2501,54 @@ export interface operations {
           "*/*": components["schemas"]["InventoryReconciliationExecuteResponse"]
         }
       }
-      /** @description Bad Request */
+      /** @description The request failed validation. The `errors` array names each offending field. */
       400: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
-      /** @description Forbidden — KLEIDERWART role required */
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
       403: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description Location or item not found */
+      /** @description The location, or one of the referenced items, does not exist. */
       404: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  checkout: {
+  checkoutClothingItems: {
     parameters: {
       query?: never
       header?: never
@@ -1250,7 +2561,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The checkout was applied. The body carries the batch id. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1259,9 +2570,45 @@ export interface operations {
           "*/*": components["schemas"]["CheckoutResponse"]
         }
       }
+      /** @description The request broke a checkout rule — both item lists empty, a missing location id, the same item in both lists, a location of the wrong type, or a `KLEIDERWART`-only location used by a caller without that role. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description One of the referenced clothing items or locations does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getAllUsers: {
+  listUsers: {
     parameters: {
       query?: never
       header?: never
@@ -1270,13 +2617,40 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description All user accounts. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
           "*/*": components["schemas"]["UserAccount"][]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
@@ -1294,7 +2668,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The newly created account. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1303,9 +2677,54 @@ export interface operations {
           "*/*": components["schemas"]["UserAccount"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description That username is already taken. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getMetadata: {
+  getPrivacyPolicyMetadata: {
     parameters: {
       query?: never
       header?: never
@@ -1314,7 +2733,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Details of the stored document. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1323,18 +2742,45 @@ export interface operations {
           "*/*": components["schemas"]["PrivacyPolicyMetadata"]
         }
       }
-      /** @description No privacy policy document has been uploaded */
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No privacy policy document has been uploaded. */
       404: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  upload: {
+  uploadPrivacyPolicy: {
     parameters: {
       query?: never
       header?: never
@@ -1344,13 +2790,16 @@ export interface operations {
     requestBody?: {
       content: {
         "multipart/form-data": {
-          /** Format: binary */
+          /**
+           * Format: binary
+           * @description The document to store. Must be a PDF, HTML, or plain-text file of at most 10 MB.
+           */
           file: string
         }
       }
     }
     responses: {
-      /** @description Created */
+      /** @description Details of the newly stored document. */
       201: {
         headers: {
           [name: string]: unknown
@@ -1359,18 +2808,54 @@ export interface operations {
           "*/*": components["schemas"]["PrivacyPolicyMetadata"]
         }
       }
-      /** @description Unsupported file type or file too large */
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description The file's MIME type is not one of the three accepted types. Nothing was stored and any previous document is untouched. */
       422: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  delete_1: {
+  deletePrivacyPolicy: {
     parameters: {
       query?: never
       header?: never
@@ -1379,28 +2864,58 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description No Content */
+      /** @description No document is stored now. */
       204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getTypeById: {
+  getClothingType: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the protective clothing type */
+        /**
+         * @description Numeric id of the clothing type.
+         * @example 3
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The clothing type. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1409,53 +2924,131 @@ export interface operations {
           "*/*": components["schemas"]["ClothingType"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing type exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  deleteType: {
+  deleteClothingType: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the protective clothing type */
+        /**
+         * @description Numeric id of the clothing type to delete.
+         * @example 3
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description No Content */
+      /** @description The type was deleted. */
       204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
-      /** @description Not Found */
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing type exists with this id. */
       404: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description Conflict – type still referenced by clothing items */
+      /** @description Clothing items still reference this type. Nothing was deleted; the message states how many items remain. */
       409: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
   }
-  updateType: {
+  updateClothingType: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the protective clothing type */
+        /**
+         * @description Numeric id of the clothing type to rename.
+         * @example 3
+         */
         id: number
       }
       cookie?: never
@@ -1466,7 +3059,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The updated type. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1475,21 +3068,69 @@ export interface operations {
           "*/*": components["schemas"]["ClothingType"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing type exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getLocationById: {
+  getClothingLocation: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the clothing location */
+        /**
+         * @description Numeric id of the clothing location.
+         * @example 7
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The clothing location. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1498,35 +3139,122 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing location exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  deleteLocation: {
+  deleteClothingLocation: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the clothing location */
+        /**
+         * @description Numeric id of the clothing location to delete.
+         * @example 7
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description No Content */
+      /** @description The location was deleted. */
       204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing location exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  updateLocation: {
+  updateClothingLocation: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the clothing location */
+        /**
+         * @description Numeric id of the clothing location to replace.
+         * @example 7
+         */
         id: number
       }
       cookie?: never
@@ -1537,7 +3265,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The updated location. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1546,21 +3274,69 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing location exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getItemById: {
+  getClothingItem: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the clothing item */
+        /**
+         * @description Numeric id of the clothing item.
+         * @example 42
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The clothing item. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1569,35 +3345,122 @@ export interface operations {
           "*/*": components["schemas"]["ClothingItem"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing item exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  deleteItem: {
+  deleteClothingItem: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the clothing item */
+        /**
+         * @description Numeric id of the clothing item to delete.
+         * @example 42
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description No Content */
+      /** @description The item was deleted. */
       204: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing item exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  updateItem: {
+  updateClothingItem: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description ID of the clothing item */
+        /**
+         * @description Numeric id of the clothing item to replace.
+         * @example 42
+         */
         id: number
       }
       cookie?: never
@@ -1608,7 +3471,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The updated clothing item. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1617,26 +3480,129 @@ export interface operations {
           "*/*": components["schemas"]["ClothingItem"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing item exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Another item already carries this barcode. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getUserById: {
+  getUser: {
     parameters: {
       query?: never
       header?: never
       path: {
+        /**
+         * @description Numeric id of the user account.
+         * @example 5
+         */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The user account. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
           "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No user exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }
@@ -1646,6 +3612,10 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /**
+         * @description Numeric id of the user account to update.
+         * @example 5
+         */
         id: number
       }
       cookie?: never
@@ -1656,7 +3626,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
+      /** @description The updated account. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1665,9 +3635,54 @@ export interface operations {
           "*/*": components["schemas"]["UserAccount"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No user exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  serve: {
+  downloadPrivacyPolicy: {
     parameters: {
       query?: never
       header?: never
@@ -1676,16 +3691,16 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The document contents, in the MIME type it was uploaded with. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": string
+          "application/octet-stream": string
         }
       }
-      /** @description No privacy policy document has been uploaded */
+      /** @description No privacy policy document has been uploaded. */
       404: {
         headers: {
           [name: string]: unknown
@@ -1694,9 +3709,18 @@ export interface operations {
           "*/*": string
         }
       }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  exists: {
+  publicPrivacyPolicyExists: {
     parameters: {
       query?: never
       header?: never
@@ -1705,7 +3729,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Whether a document exists. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1714,9 +3738,18 @@ export interface operations {
           "*/*": components["schemas"]["PrivacyPolicyExists"]
         }
       }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  get_1: {
+  getPublicImpressum: {
     parameters: {
       query?: never
       header?: never
@@ -1725,7 +3758,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The published site notice. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1734,9 +3767,27 @@ export interface operations {
           "*/*": components["schemas"]["ImpressumDto"]
         }
       }
+      /** @description No site notice has been configured yet. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  exists_1: {
+  publicImpressumExists: {
     parameters: {
       query?: never
       header?: never
@@ -1745,7 +3796,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Whether a notice exists. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1754,9 +3805,18 @@ export interface operations {
           "*/*": components["schemas"]["ImpressumExists"]
         }
       }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  me: {
+  getCurrentSession: {
     parameters: {
       query?: never
       header?: never
@@ -1765,7 +3825,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The current session state. Check `authenticated` before relying on `user`. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1774,9 +3834,18 @@ export interface operations {
           "*/*": components["schemas"]["AuthStateResponse"]
         }
       }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getSummariesByType: {
+  getClothingSummaryByType: {
     parameters: {
       query?: never
       header?: never
@@ -1785,7 +3854,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Stock grouped by type. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1794,9 +3863,27 @@ export interface operations {
           "*/*": components["schemas"]["ClothingTypeSummary"][]
         }
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getDashboardLocationSummaries: {
+  getClothingDashboardByLocation: {
     parameters: {
       query?: never
       header?: never
@@ -1805,7 +3892,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Stock grouped by pool and laundry locations. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1814,12 +3901,100 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocationSummary"][]
         }
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  searchItems: {
+  listItemsAtClothingLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the clothing location to list the contents of.
+         * @example 7
+         */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The garments held at this location. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ResolvedClothingItem"][]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No location exists with this id, or it is restricted to `KLEIDERWART` and the caller does not hold that role. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  searchClothingItems: {
     parameters: {
       query: {
+        /**
+         * @description Search term matched against clothing type name, size, and barcode. Required, and must not be blank.
+         * @example Einsatzjacke 52
+         */
         q: string
+        /**
+         * @description Maximum number of results to return. Values above the server-side cap of 50 are silently reduced to 50.
+         * @example 50
+         */
         limit?: number
       }
       header?: never
@@ -1837,20 +4012,51 @@ export interface operations {
           "*/*": components["schemas"]["ResolvedClothingItem"][]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  getItemByBarcode: {
+  getClothingItemByBarcode: {
     parameters: {
       query?: never
       header?: never
       path: {
+        /**
+         * @description Barcode exactly as printed on the garment.
+         * @example 1234567890128
+         */
         barcode: string
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description The resolved clothing item. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1859,9 +4065,45 @@ export interface operations {
           "*/*": components["schemas"]["ResolvedClothingItem"]
         }
       }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No item carries this barcode, or the item is in a location the caller may not see. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  exists_2: {
+  privacyPolicyExists: {
     parameters: {
       query?: never
       header?: never
@@ -1870,7 +4112,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Whether a document exists. */
       200: {
         headers: {
           [name: string]: unknown
@@ -1879,9 +4121,36 @@ export interface operations {
           "*/*": components["schemas"]["PrivacyPolicyExists"]
         }
       }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
     }
   }
-  exists_3: {
+  impressumExists: {
     parameters: {
       query?: never
       header?: never
@@ -1890,13 +4159,40 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Whether a notice exists. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
           "*/*": components["schemas"]["ImpressumExists"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
     }

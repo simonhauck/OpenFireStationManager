@@ -2,6 +2,25 @@
 	// https://opencode.ai/config.json
 	"$schema": "https://opencode.ai/config.json",
 	"mcp": {
+		// Exposes the OpenFireStationManager REST API as MCP tools, generated from the
+		// checked-in OpenAPI contract. See server/AGENTS.md ("Consuming the API over MCP")
+		// for how to obtain OFSM_AUTH_COOKIE and how to narrow the tool surface.
+		"ofsm-api": {
+			"type": "local",
+			"command": ["npx", "-y", "@ivotoby/openapi-mcp-server"],
+			"enabled": true,
+			"environment": {
+				"API_BASE_URL": "http://localhost:8080",
+				"OPENAPI_SPEC_PATH": "server/src/main/resources/open-api-contract.json",
+				// Operation ids are all well under the 64-character limit, so keep the
+				// readable names instead of letting the server abbreviate them.
+				"DISABLE_ABBREVIATION": "true",
+				// The API authenticates with a cookie, not a bearer token. The remember-me
+				// cookie authenticates on its own and lasts 30 days, so it needs refreshing
+				// far less often than a session cookie.
+				"API_HEADERS": "Cookie:OFSM_AUTH_REMEMBER_ME={env:OFSM_AUTH_COOKIE}"
+			}
+		},
 		"playwright": {
 			"type": "local",
 			"command": ["npx", "-y", "@playwright/mcp"]
