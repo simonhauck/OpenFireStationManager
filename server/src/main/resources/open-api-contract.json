@@ -1220,6 +1220,39 @@
         }
       }
     },
+    "/api/clothing/locations/{id}/items": {
+      "get": {
+        "tags": [ "clothing-location-controller" ],
+        "summary": "List clothing items at a location",
+        "operationId": "getItemsAtLocation",
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "ID of the clothing location",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          }
+        } ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedClothingItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clothing/items/search": {
       "get": {
         "tags": [ "clothing-item-controller" ],

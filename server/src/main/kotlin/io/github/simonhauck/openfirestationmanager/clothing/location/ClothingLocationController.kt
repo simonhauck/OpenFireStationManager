@@ -53,11 +53,9 @@ class ClothingLocationController(
                 "Clothing location $id is restricted to Kleiderwart; hiding it from ${authentication.name}"
             }
 
-            private fun Authentication.isKleiderwart(): Boolean = authorities.any {
-                it.authority == "ROLE_KLEIDERWART"
-            }
             throw NotFoundException("Clothing location not found for id: $id")
         }
+
         return itemResolver.resolveByLocation(id)
     }
 
@@ -92,4 +90,8 @@ class ClothingLocationController(
     ) {
         service.deleteLocation(id)
     }
+}
+
+private fun Authentication.isKleiderwart(): Boolean = authorities.any {
+    it.authority == "ROLE_KLEIDERWART"
 }

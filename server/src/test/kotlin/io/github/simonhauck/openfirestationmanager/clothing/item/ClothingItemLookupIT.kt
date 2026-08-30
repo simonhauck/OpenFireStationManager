@@ -204,11 +204,9 @@ class ClothingItemLookupIT : IntegrationTest() {
         val response = locationCalls.getItems(location.id, authCookie = validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.clothingItem.barcode }).contains(barcode)
-        assertThat(response.body?.first { it.clothingItem.barcode == barcode }.clothingType.name)
-            .isEqualTo(type.name)
-        assertThat(response.body?.first { it.clothingItem.barcode == barcode }.location?.id)
-            .isEqualTo(location.id)
+        val resolved = response.body!!.first { it.clothingItem.barcode == barcode }
+        assertThat(resolved.clothingType.name).isEqualTo(type.name)
+        assertThat(resolved.location?.id).isEqualTo(location.id)
     }
 
     @Test
@@ -227,7 +225,11 @@ class ClothingItemLookupIT : IntegrationTest() {
             createLocation(LocationType.PERSONAL, onlyVisibleForKleiderwart = true)
         val regularUserCookie = createRegularUserCookie()
 
-        val response = locationCalls.getItems(restrictedLocation.id, authCookie = regularUserCookie)
+        val response =
+            locationCalls.getItemsExpectingError(
+                restrictedLocation.id,
+                authCookie = regularUserCookie,
+            )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }

@@ -7,6 +7,7 @@ import org.springframework.boot.resttestclient.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
@@ -34,6 +35,17 @@ class ClothingLocationControllerCalls(private val testRestTemplate: TestRestTemp
         authCookie: String? = null,
     ): ResponseEntity<Array<ResolvedClothingItem>> {
         return testRestTemplate.exchange<Array<ResolvedClothingItem>>(
+            "/api/clothing/locations/$id/items",
+            HttpMethod.GET,
+            HttpEntity<Unit>(headersWithCookie(authCookie)),
+        )
+    }
+
+    fun getItemsExpectingError(
+        id: Long,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
+        return testRestTemplate.exchange<ProblemDetail>(
             "/api/clothing/locations/$id/items",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),
