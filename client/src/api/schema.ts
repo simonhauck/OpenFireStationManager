@@ -142,6 +142,38 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/members": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List every member
+     * @description Returns the whole roster of people in the brigade (*Mitglied*), in the order they were added. The list is unpaginated.
+     *
+     *     A member is a **person**, not a login. User accounts are managed separately under `/api/admin/users`, and the two are not linked — someone can be on the roster without ever signing in. Use this endpoint when you need people; use `listUsers` when you need credentials.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listMembers"]
+    put?: never
+    /**
+     * Add a person to the roster
+     * @description Creates a new member. Names are not required to be unique, so check the existing roster first if you want to avoid a duplicate entry for the same person.
+     *
+     *     This creates a person, not a login. If they also need to sign in, create a user account separately with `createUser`.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["createMember"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/types": {
     parameters: {
       query?: never
@@ -460,6 +492,40 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  "/api/members/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get one member by their numeric id
+     * @description Looks up a single person on the roster by their database id.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getMember"]
+    put?: never
+    post?: never
+    /**
+     * Remove a person from the roster
+     * @description Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location, and no user account is touched.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deleteMember"]
+    options?: never
+    head?: never
+    /**
+     * Rename a member
+     * @description Changes a member's name. The name is the only editable field, so despite the `PATCH` verb this replaces the whole record.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    patch: operations["updateMember"]
     trace?: never
   }
   "/api/clothing/types/{id}": {
@@ -1069,6 +1135,29 @@ export interface components {
        * @example false
        */
       rememberMe: boolean
+    }
+    /** @description The details of a member. Used for both creation and update. */
+    CreateOrUpdateMemberRequest: {
+      /**
+       * @description Full name of the person, as it should appear on the roster. Not required to be unique, so two people with the same name are allowed.
+       * @example Hans Müller
+       */
+      name: string
+    }
+    /** @description A person in the brigade (*Mitglied*). Deliberately distinct from a user account: a member is a person on the roster, an account is a set of login credentials, and the two are not linked. */
+    Member: {
+      /**
+       * @description Full name of the person.
+       * @example Hans Müller
+       */
+      name: string
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 5
+       */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
     }
     /** @description The name of a clothing type. Used for both creation and update. */
     CreateOrUpdateClothingTypeRequest: {
@@ -1879,6 +1968,104 @@ export interface operations {
       }
       /** @description The username does not exist, or the password is wrong. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  listMembers: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Every member on the roster. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["Member"][]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  createMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateMemberRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created member. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["Member"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -2882,6 +3069,212 @@ export interface operations {
       }
       /** @description Authenticated, but the account lacks the required role. */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  getMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the member.
+         * @example 5
+         */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The member. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["Member"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No member exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  deleteMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the member to remove.
+         * @example 5
+         */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The member was removed. */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No member exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  updateMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the member to rename.
+         * @example 5
+         */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateMemberRequest"]
+      }
+    }
+    responses: {
+      /** @description The updated member. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["Member"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No member exists with this id. */
+      404: {
         headers: {
           [name: string]: unknown
         }

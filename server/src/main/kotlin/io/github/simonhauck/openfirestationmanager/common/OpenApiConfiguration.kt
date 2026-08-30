@@ -41,6 +41,7 @@ object ApiTags {
     const val CLOTHING_RELOCATION = "Clothing Relocation"
     const val CLOTHING_INVENTORY = "Clothing Inventory"
     const val CLOTHING_OVERVIEW = "Clothing Overview"
+    const val MEMBERS = "Members"
     const val AUTHENTICATION = "Authentication"
     const val SETUP = "Setup"
     const val ADMIN_USERS = "Admin - Users"
@@ -228,6 +229,14 @@ class OpenApiConfiguration(
                         .name(ApiTags.CLOTHING_OVERVIEW)
                         .description(
                             "Read-only aggregated counts of garments by type and by location, for dashboards."
+                        ),
+                    Tag()
+                        .name(ApiTags.MEMBERS)
+                        .description(
+                            "People in the organisation (*Mitglied*) — the roster of who is in the " +
+                                "brigade. Deliberately separate from user accounts: a member is a " +
+                                "person, an account is a login, and the two are not linked. " +
+                                "Requires the KLEIDERWART role to modify."
                         ),
                     Tag()
                         .name(ApiTags.LEGAL)
