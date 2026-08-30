@@ -71,6 +71,7 @@ export function VerticalStepper({
             {/* Right column: label + description */}
             <button
               type="button"
+              aria-label={`Schritt ${stepNumber}`}
               disabled={!isClickable}
               className={cn(
                 "block w-full pb-6 text-left",
