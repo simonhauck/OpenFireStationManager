@@ -83,6 +83,10 @@ class ClothingItemResolver(private val jdbcTemplate: JdbcTemplate) {
             comment = rs.getString("location_comment"),
             onlyVisibleForKleiderwart = rs.getBoolean("location_only_visible_for_kleiderwart"),
             type = LocationType.valueOf(rs.getString("location_type")),
+            memberId =
+                rs.getNullableLong("location_member_id")?.let {
+                    AggregateReference.to(it)
+                },
             metaData = buildMetaData(rs, "location"),
         )
     }

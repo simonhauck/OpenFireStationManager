@@ -141,9 +141,24 @@ class ClothingLocationController(
         description =
             "Registers a new place where garments can be kept. Choose the `type` carefully: it " +
                 "determines whether the location behaves as shared stock (`POOL`), as a laundry " +
-                "staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`).",
+                "staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`). " +
+                "Only `PERSONAL` locations may carry a `memberId`; leave it null for an unassigned " +
+                "personal location.",
     )
-    @ApiResponses(ApiResponse(responseCode = "200", description = "The newly created location."))
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "The newly created location."),
+        ApiResponse(
+            responseCode = "400",
+            description = "A `memberId` was supplied for a location type other than `PERSONAL`.",
+            content =
+                [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    )
+                ],
+        ),
+    )
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     fun createLocation(
         @Valid @RequestBody request: CreateClothingLocationRequest
@@ -155,9 +170,23 @@ class ClothingLocationController(
         summary = "Create many clothing locations in one request",
         description =
             "Creates several locations at once — the usual way to set up a whole row of lockers " +
-                "in a single call.",
+                "in a single call. Only `PERSONAL` locations may carry a `memberId`.",
     )
-    @ApiResponses(ApiResponse(responseCode = "200", description = "The newly created locations."))
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "The newly created locations."),
+        ApiResponse(
+            responseCode = "400",
+            description =
+                "At least one location supplied a `memberId` for a type other than `PERSONAL`.",
+            content =
+                [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    )
+                ],
+        ),
+    )
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     fun createBatchLocations(
         @Valid @RequestBody request: BatchCreateClothingLocationsRequest
@@ -169,12 +198,28 @@ class ClothingLocationController(
         summary = "Replace the details of a clothing location",
         description =
             "Despite the `PATCH` verb this is a **full replacement**: `name`, `comment`, `type`, " +
-                "and `onlyVisibleForKleiderwart` are all applied from the request body. Read the " +
-                "location first and resend the fields you want to keep.\n\n" +
+                "`onlyVisibleForKleiderwart`, and `memberId` are all applied from the request body. " +
+                "Read the location first and resend the fields you want to keep. Set `memberId` to " +
+                "null to unassign a personal location.\n\n" +
+                "Only `PERSONAL` locations may carry a member. Changing an owned location away from " +
+                "`PERSONAL` is rejected; unassign the member first.\n\n" +
                 "Garments stored here are unaffected and stay where they are.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "The updated location."),
+        ApiResponse(
+            responseCode = "400",
+            description =
+                "A `memberId` was supplied for a non-`PERSONAL` location, or an owned location " +
+                    "was changed away from `PERSONAL` without being unassigned first.",
+            content =
+                [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    )
+                ],
+        ),
         ApiResponse(
             responseCode = "404",
             description = "No clothing location exists with this id.",

@@ -251,7 +251,7 @@ export interface paths {
     put?: never
     /**
      * Create a new clothing location
-     * @description Registers a new place where garments can be kept. Choose the `type` carefully: it determines whether the location behaves as shared stock (`POOL`), as a laundry staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`).
+     * @description Registers a new place where garments can be kept. Choose the `type` carefully: it determines whether the location behaves as shared stock (`POOL`), as a laundry staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`). Only `PERSONAL` locations may carry a `memberId`; leave it null for an unassigned personal location.
      *
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
@@ -273,7 +273,7 @@ export interface paths {
     put?: never
     /**
      * Create many clothing locations in one request
-     * @description Creates several locations at once — the usual way to set up a whole row of lockers in a single call.
+     * @description Creates several locations at once — the usual way to set up a whole row of lockers in a single call. Only `PERSONAL` locations may carry a `memberId`.
      *
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
@@ -512,7 +512,7 @@ export interface paths {
     post?: never
     /**
      * Remove a person from the roster
-     * @description Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location, and no user account is touched.
+     * @description Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location beyond clearing their ownership from linked `PERSONAL` locations. Those locations remain present, and no user account is touched.
      *
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
@@ -589,7 +589,9 @@ export interface paths {
     head?: never
     /**
      * Replace the details of a clothing location
-     * @description Despite the `PATCH` verb this is a **full replacement**: `name`, `comment`, `type`, and `onlyVisibleForKleiderwart` are all applied from the request body. Read the location first and resend the fields you want to keep.
+     * @description Despite the `PATCH` verb this is a **full replacement**: `name`, `comment`, `type`, `onlyVisibleForKleiderwart`, and `memberId` are all applied from the request body. Read the location first and resend the fields you want to keep. Set `memberId` to null to unassign a personal location.
+     *
+     *     Only `PERSONAL` locations may carry a member. Changing an owned location away from `PERSONAL` is rejected; unassign the member first.
      *
      *     Garments stored here are unaffected and stay where they are.
      *
@@ -1254,6 +1256,12 @@ export interface components {
        * @enum {string}
        */
       type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+      /**
+       * Format: int64
+       * @description Id of the member who owns this location. Only `PERSONAL` locations may have an owner.
+       * @example 5
+       */
+      memberId?: number
     }
     /** @description A place where garments are kept (`Standort`) — the shared pool, the laundry, a member's personal locker, or anywhere else. */
     ClothingLocation: {
@@ -1274,6 +1282,12 @@ export interface components {
        * @enum {string}
        */
       type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
+      /**
+       * Format: int64
+       * @description Id of the member who owns this location. Only `PERSONAL` locations may have an owner.
+       * @example 5
+       */
+      memberId?: number
       /**
        * Format: int64
        * @description Server-assigned identifier.
@@ -2311,13 +2325,13 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"]
         }
       }
-      /** @description The request failed validation. The `errors` array names each offending field. */
+      /** @description A `memberId` was supplied for a location type other than `PERSONAL`. */
       400: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
@@ -2371,13 +2385,13 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"][]
         }
       }
-      /** @description The request failed validation. The `errors` array names each offending field. */
+      /** @description At least one location supplied a `memberId` for a type other than `PERSONAL`. */
       400: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
@@ -3667,13 +3681,13 @@ export interface operations {
           "*/*": components["schemas"]["ClothingLocation"]
         }
       }
-      /** @description The request failed validation. The `errors` array names each offending field. */
+      /** @description A `memberId` was supplied for a non-`PERSONAL` location, or an owned location was changed away from `PERSONAL` without being unassigned first. */
       400: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
