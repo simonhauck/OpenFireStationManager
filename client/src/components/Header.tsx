@@ -35,6 +35,11 @@ const MENU_ITEMS: MenuItem[] = [
     allowedRoles: ["KLEIDERWART"],
   },
   {
+    label: "Mitglieder",
+    href: "/members",
+    allowedRoles: ["KLEIDERWART"],
+  },
+  {
     label: "Nutzer Management",
     href: "/user-management",
     allowedRoles: ["ADMIN"],
