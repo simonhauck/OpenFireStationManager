@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 @Service
 class MemberService(private val repository: MemberRepository) {
 
-    fun getAllMembers(): List<Member> = repository.findAll().sortedBy { it.id }
+    fun getAllMembers(): List<Member> = repository.findAll()
 
     fun getMemberById(id: Long): Member = findOrThrow(id)
 
