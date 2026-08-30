@@ -1,6 +1,10 @@
 package io.github.simonhauck.openfirestationmanager.clothing.location
 
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemResolver
+import io.github.simonhauck.openfirestationmanager.clothing.item.ResolvedClothingItem
 import io.github.simonhauck.openfirestationmanager.common.ApiTags
+import io.github.simonhauck.openfirestationmanager.common.NotFoundException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -13,6 +17,7 @@ import jakarta.validation.constraints.Positive
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -28,7 +33,11 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/clothing/locations")
 @Validated
 @Tag(name = ApiTags.CLOTHING_LOCATIONS)
-class ClothingLocationController(private val service: ClothingLocationService) {
+class ClothingLocationController(
+    private val service: ClothingLocationService,
+    private val itemResolver: ClothingItemResolver,
+) {
+    private val log = KotlinLogging.logger {}
 
     @GetMapping
     @Operation(
@@ -72,6 +81,58 @@ class ClothingLocationController(private val service: ClothingLocationService) {
         @Positive
         id: Long
     ): ClothingLocation = service.getLocationById(id)
+
+    @GetMapping("/{id}/items")
+    @Operation(
+        operationId = "listItemsAtClothingLocation",
+        summary = "List the garments currently held at a location",
+        description =
+            "Returns everything the system records as being at this location — the answer to " +
+                "\"what is in this locker?\".\n\n" +
+                "Results are in **resolved** form, each embedding its full clothing type and " +
+                "location, so no follow-up lookups are needed. An empty list means the location " +
+                "exists but is empty.\n\n" +
+                "Locations flagged `onlyVisibleForKleiderwart` are hidden from callers without " +
+                "that role: they receive `404` rather than `403`, so the existence of a " +
+                "restricted location is not revealed.",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "The garments held at this location."),
+        ApiResponse(
+            responseCode = "404",
+            description =
+                "No location exists with this id, or it is restricted to `KLEIDERWART` and the " +
+                    "caller does not hold that role.",
+            content =
+                [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    )
+                ],
+        ),
+    )
+    fun getItemsAtLocation(
+        @Parameter(
+            description = "Numeric id of the clothing location to list the contents of.",
+            example = "7",
+        )
+        @PathVariable
+        @Positive
+        id: Long,
+        authentication: Authentication,
+    ): List<ResolvedClothingItem> {
+        val location = service.getLocationById(id)
+        if (location.onlyVisibleForKleiderwart && !authentication.isKleiderwart()) {
+            log.warn {
+                "Clothing location $id is restricted to Kleiderwart; hiding it from ${authentication.name}"
+            }
+
+            throw NotFoundException("Clothing location not found for id: $id")
+        }
+
+        return itemResolver.resolveByLocation(id)
+    }
 
     @PostMapping
     @Operation(
@@ -168,4 +229,8 @@ class ClothingLocationController(private val service: ClothingLocationService) {
     ) {
         service.deleteLocation(id)
     }
+}
+
+private fun Authentication.isKleiderwart(): Boolean = authorities.any {
+    it.authority == "ROLE_KLEIDERWART"
 }

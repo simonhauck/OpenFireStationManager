@@ -2775,6 +2775,81 @@
         }
       }
     },
+    "/api/clothing/locations/{id}/items": {
+      "get": {
+        "tags": [ "Clothing Locations" ],
+        "summary": "List the garments currently held at a location",
+        "description": "Returns everything the system records as being at this location — the answer to \"what is in this locker?\".\n\nResults are in **resolved** form, each embedding its full clothing type and location, so no follow-up lookups are needed. An empty list means the location exists but is empty.\n\nLocations flagged `onlyVisibleForKleiderwart` are hidden from callers without that role: they receive `404` rather than `403`, so the existence of a restricted location is not revealed.\n\n**Authorisation:** any signed-in user.",
+        "operationId": "listItemsAtClothingLocation",
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "Numeric id of the clothing location to list the contents of.",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "example": 7
+        } ],
+        "responses": {
+          "200": {
+            "description": "The garments held at this location.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedClothingItem"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No location exists with this id, or it is restricted to `KLEIDERWART` and the caller does not hold that role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clothing/items/search": {
       "get": {
         "tags": [ "Clothing Items" ],

@@ -46,6 +46,14 @@ class ClothingItemResolver(private val jdbcTemplate: JdbcTemplate) {
         return results.firstOrNull()
     }
 
+    fun resolveByLocation(locationId: Long): List<ResolvedClothingItem> {
+        return jdbcTemplate.query(
+            "SELECT * FROM resolved_clothing_item_view WHERE location_id = ?",
+            rowMapper,
+            locationId,
+        )
+    }
+
     private val rowMapper = RowMapper { rs, _ ->
         val item = buildClothingItem(rs)
         val location = buildClothingLocation(rs)

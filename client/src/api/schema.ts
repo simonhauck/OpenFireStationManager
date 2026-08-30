@@ -764,6 +764,32 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/locations/{id}/items": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List the garments currently held at a location
+     * @description Returns everything the system records as being at this location — the answer to "what is in this locker?".
+     *
+     *     Results are in **resolved** form, each embedding its full clothing type and location, so no follow-up lookups are needed. An empty list means the location exists but is empty.
+     *
+     *     Locations flagged `onlyVisibleForKleiderwart` are hidden from callers without that role: they receive `404` rather than `403`, so the existence of a restricted location is not revealed.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listItemsAtClothingLocation"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/items/search": {
     parameters: {
       query?: never
@@ -3877,6 +3903,68 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  listItemsAtClothingLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the clothing location to list the contents of.
+         * @example 7
+         */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The garments held at this location. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ResolvedClothingItem"][]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No location exists with this id, or it is restricted to `KLEIDERWART` and the caller does not hold that role. */
+      404: {
         headers: {
           [name: string]: unknown
         }
