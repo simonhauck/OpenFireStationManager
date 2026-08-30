@@ -40,6 +40,9 @@
     "name": "Clothing Overview",
     "description": "Read-only aggregated counts of garments by type and by location, for dashboards."
   }, {
+    "name": "Members",
+    "description": "People in the organisation (*Mitglied*) — the roster of who is in the brigade. Deliberately separate from user accounts: a member is a person, an account is a login, and the two are not linked. Requires the KLEIDERWART role to modify."
+  }, {
     "name": "Legal",
     "description": "Publicly readable legal documents: Impressum and privacy policy."
   }, {
@@ -460,6 +463,117 @@
           }
         },
         "security": [ ]
+      }
+    },
+    "/api/members": {
+      "get": {
+        "tags": [ "Members" ],
+        "summary": "List every member",
+        "description": "Returns the whole roster of people in the brigade (*Mitglied*), in the order they were added. The list is unpaginated.\n\nA member is a **person**, not a login. User accounts are managed separately under `/api/admin/users`, and the two are not linked — someone can be on the roster without ever signing in. Use this endpoint when you need people; use `listUsers` when you need credentials.\n\n**Authorisation:** any signed-in user.",
+        "operationId": "listMembers",
+        "responses": {
+          "200": {
+            "description": "Every member on the roster.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [ "Members" ],
+        "summary": "Add a person to the roster",
+        "description": "Creates a new member. Names are not required to be unique, so check the existing roster first if you want to avoid a duplicate entry for the same person.\n\nThis creates a person, not a login. If they also need to sign in, create a user account separately with `createUser`.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "operationId": "createMember",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The newly created member.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/clothing/types": {
@@ -1608,6 +1722,241 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/members/{id}": {
+      "get": {
+        "tags": [ "Members" ],
+        "summary": "Get one member by their numeric id",
+        "description": "Looks up a single person on the roster by their database id.\n\n**Authorisation:** any signed-in user.",
+        "operationId": "getMember",
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "Numeric id of the member.",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "example": 5
+        } ],
+        "responses": {
+          "200": {
+            "description": "The member.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No member exists with this id.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [ "Members" ],
+        "summary": "Remove a person from the roster",
+        "description": "Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location, and no user account is touched.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "operationId": "deleteMember",
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "Numeric id of the member to remove.",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "example": 5
+        } ],
+        "responses": {
+          "204": {
+            "description": "The member was removed."
+          },
+          "404": {
+            "description": "No member exists with this id.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [ "Members" ],
+        "summary": "Rename a member",
+        "description": "Changes a member's name. The name is the only editable field, so despite the `PATCH` verb this replaces the whole record.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "operationId": "updateMember",
+        "parameters": [ {
+          "name": "id",
+          "in": "path",
+          "description": "Numeric id of the member to rename.",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "example": 5
+        } ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The updated member.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No member exists with this id.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
                 }
               }
             }
@@ -3356,6 +3705,41 @@
           }
         },
         "required": [ "password", "rememberMe", "username" ]
+      },
+      "CreateOrUpdateMemberRequest": {
+        "type": "object",
+        "description": "The details of a member. Used for both creation and update.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the person, as it should appear on the roster. Not required to be unique, so two people with the same name are allowed.",
+            "example": "Hans Müller",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [ "name" ]
+      },
+      "Member": {
+        "type": "object",
+        "description": "A person in the brigade (*Mitglied*). Deliberately distinct from a user account: a member is a person on the roster, an account is a set of login credentials, and the two are not linked.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the person.",
+            "example": "Hans Müller"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Server-assigned identifier.",
+            "example": 5
+          },
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
+          }
+        },
+        "required": [ "id", "metaData", "name" ]
       },
       "CreateOrUpdateClothingTypeRequest": {
         "type": "object",
