@@ -843,7 +843,11 @@
             "content": {
               "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
+                  "oneOf": [ {
+                    "$ref": "#/components/schemas/ProblemDetail"
+                  }, {
+                    "$ref": "#/components/schemas/ValidationProblemDetail"
+                  } ]
                 }
               }
             }
@@ -916,7 +920,11 @@
             "content": {
               "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
+                  "oneOf": [ {
+                    "$ref": "#/components/schemas/ProblemDetail"
+                  }, {
+                    "$ref": "#/components/schemas/ValidationProblemDetail"
+                  } ]
                 }
               }
             }
@@ -2396,7 +2404,11 @@
             "content": {
               "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
+                  "oneOf": [ {
+                    "$ref": "#/components/schemas/ProblemDetail"
+                  }, {
+                    "$ref": "#/components/schemas/ValidationProblemDetail"
+                  } ]
                 }
               }
             }
@@ -3474,6 +3486,7 @@
         }
       },
       "ValidationError": {
+        "type": "object",
         "description": "A single field-level validation failure.",
         "properties": {
           "field": {
@@ -3487,12 +3500,13 @@
             "example": "must not be blank"
           },
           "rejectedValue": {
-            "type": "object",
             "description": "The value that was submitted and rejected. May be null."
           }
-        }
+        },
+        "required": [ "field", "message" ]
       },
       "ValidationProblemDetail": {
+        "type": "object",
         "description": "RFC 9457 problem document describing a request that failed validation, extended with an `errors` array naming each offending field.",
         "properties": {
           "type": {
@@ -3523,7 +3537,8 @@
               "$ref": "#/components/schemas/ValidationError"
             }
           }
-        }
+        },
+        "required": [ "detail", "errors", "status", "title", "type" ]
       },
       "ChangePasswordRequest": {
         "type": "object",
@@ -3866,7 +3881,7 @@
             "enum": [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
           },
           "memberId": {
-            "type": "integer",
+            "type": [ "integer", "null" ],
             "format": "int64",
             "description": "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
             "example": 5
@@ -3898,7 +3913,7 @@
             "enum": [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
           },
           "memberId": {
-            "type": "integer",
+            "type": [ "integer", "null" ],
             "format": "int64",
             "description": "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
             "example": 5

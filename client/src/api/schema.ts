@@ -977,32 +977,32 @@ export interface components {
        * @description Path of the offending field within the request body, e.g. `size`. Empty when the rule applies to the request as a whole rather than one field.
        * @example size
        */
-      field?: string
+      field: string
       /**
        * @description Human-readable reason the value was rejected.
        * @example must not be blank
        */
-      message?: string
+      message: string
       /** @description The value that was submitted and rejected. May be null. */
-      rejectedValue?: Record<string, never>
+      rejectedValue?: unknown
     }
     /** @description RFC 9457 problem document describing a request that failed validation, extended with an `errors` array naming each offending field. */
     ValidationProblemDetail: {
       /** @example about:blank */
-      type?: string
+      type: string
       /** @example Invalid request */
-      title?: string
+      title: string
       /**
        * Format: int32
        * @example 400
        */
-      status?: number
+      status: number
       /** @example Validation failed for request body */
-      detail?: string
+      detail: string
       /** @description URI of the request that failed, when available. */
       instance?: string
       /** @description Every field-level failure detected in this request. */
-      errors?: components["schemas"]["ValidationError"][]
+      errors: components["schemas"]["ValidationError"][]
     }
     /** @description A new password for an existing account. */
     ChangePasswordRequest: {
@@ -1261,7 +1261,7 @@ export interface components {
        * @description Id of the member who owns this location. Only `PERSONAL` locations may have an owner.
        * @example 5
        */
-      memberId?: number
+      memberId?: number | null
     }
     /** @description A place where garments are kept (`Standort`) — the shared pool, the laundry, a member's personal locker, or anywhere else. */
     ClothingLocation: {
@@ -1287,7 +1287,7 @@ export interface components {
        * @description Id of the member who owns this location. Only `PERSONAL` locations may have an owner.
        * @example 5
        */
-      memberId?: number
+      memberId?: number | null
       /**
        * Format: int64
        * @description Server-assigned identifier.
@@ -2331,7 +2331,9 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
+          "application/problem+json":
+            | components["schemas"]["ProblemDetail"]
+            | components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
@@ -2391,7 +2393,9 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
+          "application/problem+json":
+            | components["schemas"]["ProblemDetail"]
+            | components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
@@ -3687,7 +3691,9 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
+          "application/problem+json":
+            | components["schemas"]["ProblemDetail"]
+            | components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */

@@ -5,6 +5,7 @@ import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemRes
 import io.github.simonhauck.openfirestationmanager.clothing.item.ResolvedClothingItem
 import io.github.simonhauck.openfirestationmanager.common.ApiTags
 import io.github.simonhauck.openfirestationmanager.common.NotFoundException
+import io.github.simonhauck.openfirestationmanager.common.ValidationProblemDetail
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -154,7 +155,8 @@ class ClothingLocationController(
                 [
                     Content(
                         mediaType = "application/problem+json",
-                        schema = Schema(implementation = ProblemDetail::class),
+                        schema =
+                            Schema(oneOf = [ProblemDetail::class, ValidationProblemDetail::class]),
                     )
                 ],
         ),
@@ -182,7 +184,8 @@ class ClothingLocationController(
                 [
                     Content(
                         mediaType = "application/problem+json",
-                        schema = Schema(implementation = ProblemDetail::class),
+                        schema =
+                            Schema(oneOf = [ProblemDetail::class, ValidationProblemDetail::class]),
                     )
                 ],
         ),
@@ -216,7 +219,8 @@ class ClothingLocationController(
                 [
                     Content(
                         mediaType = "application/problem+json",
-                        schema = Schema(implementation = ProblemDetail::class),
+                        schema =
+                            Schema(oneOf = [ProblemDetail::class, ValidationProblemDetail::class]),
                     )
                 ],
         ),
