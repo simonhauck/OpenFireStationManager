@@ -177,8 +177,15 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 - Follow RESTful conventions:
   - Resource-oriented URLs: `/api/stations`, `/api/stations/{id}`
   - Use appropriate HTTP verbs: `GET` (read), `POST` (create), `PUT`/`PATCH` (update), `DELETE`
-  - Return `201 Created` with `Location` header on successful creation.
+  - Creation endpoints return `200 OK` with the created entity as the response body. `201 Created`
+    and the `Location` header are deliberately **not** used for CRUD resources — every client is the
+    generated TypeScript binding, which reads the id from the body. Follow the existing CRUD
+    controllers (`ClothingLocationController`, `ClothingTypeController`, `ClothingItemController`,
+    `AdminUserController`) rather than generic REST advice here. The one exception is
+    `PrivacyPolicyAdminController`'s multipart upload, which returns `201` because it replaces a
+    stored document rather than creating an addressable resource.
   - Return `404 Not Found` for missing resources; `422 Unprocessable Entity` for validation errors.
+  - Return `204 No Content` from `DELETE` via `@ResponseStatus(HttpStatus.NO_CONTENT)`.
 - Public endpoints should be namespaced under `/api/public/**`.
 - Validate all request bodies and path variables with Spring Validation annotations; rely on
   the `@ControllerAdvice` to translate `MethodArgumentNotValidException` into 422 responses.
@@ -194,7 +201,7 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 - Repositories should expose only the concrete operations needed by the feature (for example `findByUsername`,
   `existsByUsername`, `save`, `count`) to keep behavior obvious.
 - Schema migrations use a **custom Kotlin migration runner** (not Flyway or Liquibase). Each migration is a `@Component` implementing the `DatabaseMigration` interface (`val id: String`, `fun execute(jdbcTemplate: JdbcTemplate)`). The runner fires automatically on startup, sorts migrations by `id`, and skips already-applied ones (tracked in the `schema_migrations` table).
-- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). The next available version number is **V017**.
+- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). **Check the highest number actually present in `migration/` before picking one** — this line has gone stale before, and V009 and V017 each ended up used by two different migrations as a result. The runner tolerates it (it sorts by `id`, which stays unique), but the ordering between same-numbered migrations is then alphabetical and not what you intended. The next available version number is **V020**.
 - The `compose.yml` spins up `postgres:latest` on a random host port; `application.yml` uses
   Docker Compose lifecycle `start_only` so the container persists across restarts.
 - Database credentials for local dev: `POSTGRES_USER=myuser`, `POSTGRES_PASSWORD=secret`,

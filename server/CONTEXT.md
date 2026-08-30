@@ -24,7 +24,9 @@ The clothing officer role (`UserRole.KLEIDERWART`). Manages clothing types, item
 
 ### ClothingItemResolver
 
-Owns all read access to `resolved_clothing_item_view`, a PostgreSQL view that left-joins `clothing_items`, `clothing_locations`, and `clothing_types` into a single denormalised row per item. Queried via `JdbcTemplate` + custom `RowMapper` that hydrates the nested `ResolvedClothingItem` DTO. Three methods: `resolveOne(id)`, `resolveAll()`, `resolveByBarcode(barcode)`. See ADR-0006.
+Owns all read access to `resolved_clothing_item_view`, a PostgreSQL view that left-joins `clothing_items`, `clothing_locations`, and `clothing_types` into a single denormalised row per item. Queried via `JdbcTemplate` + custom `RowMapper` that hydrates the nested `ResolvedClothingItem` DTO. Four methods: `resolveOne(id)`, `resolveAll()`, `resolveByBarcode(barcode)`, `resolveByLocation(locationId)`. See ADR-0006.
+
+Note that `ClothingLocation` is hydrated in two places — from its own table by Spring Data JDBC, and from this view by the resolver's row mapper. Any field added to the entity must be added to both, or locations embedded in a `ResolvedClothingItem` silently come back with that field null.
 
 ### ClothingMovement
 
@@ -52,6 +54,7 @@ Two purpose-built endpoints serve the Checkout flow's item picker:
 
 - `GET /api/clothing/items/by-barcode/{barcode}` — strict-equality lookup for the HID barcode scanner. Returns a `ResolvedClothingItem` DTO carrying the item plus its current location's name and type. 404 when the barcode is unknown **or** when the requesting user is not Kleiderwart and the item is at an `onlyVisibleForKleiderwart` location (the two cases are intentionally indistinguishable to clients; logs record the real reason).
 - `GET /api/clothing/items/search?q=<text>&limit=<n>` — fuzzy typeahead for the Combobox backup. Matches type name, size, and barcode (case-insensitive contains, any field). Hard-capped result count, no pagination. Items at `onlyVisibleForKleiderwart` locations are filtered out for non-Kleiderwart callers.
+- `GET /api/clothing/locations/{id}/items` — every `ResolvedClothingItem` currently at a location. Any authenticated user; returns 404 when the location is `onlyVisibleForKleiderwart` and the caller is not Kleiderwart, indistinguishable from a missing location. Returns resolved rather than raw items so callers never have to join type names client-side.
 
 ### Umlagerung (Relocation)
 
@@ -88,4 +91,28 @@ The upload/delete admin API lives under `/api/admin/privacy-policy` (ADMIN-only,
 
 ### UserAccount
 
-A login. Roles: `USER`, `ADMIN`, `KLEIDERWART`. There is no separate "Firefighter" entity — every user is a potential firefighter. Note: tablets in the station may run a shared account, so the logged-in user is *not* a reliable identifier of who is physically performing an action.
+A login. Roles: `USER`, `ADMIN`, `KLEIDERWART`. Every row in the `users` table is a credential that can authenticate — this invariant is load-bearing for Spring Security and must not be relaxed.
+
+A `UserAccount` is *not* a person. Tablets in the station run shared accounts that belong to nobody, and most people in the organisation never get a login at all — so the logged-in user is *not* a reliable identifier of who is physically performing an action. The person is modelled separately as a `Member`, and the two are currently **not linked** (see `Member`).
+
+### Member
+
+A person in the fire station's organisation — the human who wears the clothing. Not a login: most members have no `UserAccount` at all, and some `UserAccount`s (shared tablet logins) have no person behind them.
+
+Named `Member` rather than `Firefighter` because the set is the whole organisation, not just operational personnel — Jugendfeuerwehr, Alterskameraden, and administrative staff can all be issued clothing. German UI label: "Mitglied".
+
+A `Member` has a single free-text `name` ("Hans Müller"), not separate first/last name fields. The split was rejected deliberately: the existing locker comments are already written as "Vorname Nachname", so a single field migrates verbatim with no parsing and no risk of mangling an entry. The cost is that the member list sorts by first name; substring search covers surname lookup.
+
+`name` is the only field besides `id` and `metaData`. It is **not unique** — two people in one organisation genuinely can share a name, and a constraint would make the second unrepresentable. Duplicate prevention, if wanted, is a client-side warning.
+
+`Member` is the natural home for person-specific attributes (e.g. a desired clothing size) that cannot live on a shared login. None are modelled yet.
+
+**No link to `UserAccount`.** A `member.userId` FK was designed and then deliberately deferred — it offers no behaviour today, and it stays cheap to add later: a nullable column plus a one-off name match against `users.first_name || ' ' || users.last_name`. Until then, `Member` and `UserAccount` are unrelated tables that happen to describe overlapping humans.
+
+**Link to `ClothingLocation`:** one member owns many locations; a location has at most one member. The FK sits on `clothing_locations.member_id` (nullable), modelled as `AggregateReference<Member, Long>?` and serialised as a bare number. Only `PERSONAL` locations may carry a member — the service rejects a `memberId` on any other type, and rejects changing a location's type away from `PERSONAL` while a member is still attached (rather than silently clearing the owner).
+
+Deleting a member sets `member_id` to null on their locations rather than blocking; the client warns beforehand that the clothing in those lockers needs relocating.
+
+The association is written from the location side only. `Member` views list a member's locations read-only. Only the `memberId` crosses the wire — member names are resolved client-side from the members list, which the client needs anyway for the location form's member picker.
+
+**API:** `/api/members`. Reads are open to any authenticated user, because the tablet checkout flow runs as `USER` and needs member names to render location labels. Create, update, and delete require `KLEIDERWART`. Any later self-service capability (a member editing their own desired size) gets its own endpoint rather than relaxing these.

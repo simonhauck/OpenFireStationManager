@@ -16,11 +16,12 @@ User-facing label for `ClothingLocation`.
 Location pickers (combobox dropdowns) display a formatted label built from the location's fields:
 
 - Name only: `Spind 5`
-- Name + comment: `Spind 5 – Müller, Hans`
-- Name + type: `Spind 5 (Persönlicher Standort)`
-- Name + comment + type: `Spind 5 – Müller, Hans (Persönlicher Standort)`
+- Name + member: `Spind 5 – Hans Müller`
+- Name + comment: `Spind 5 – defekt`
+- Name + member + comment: `Spind 5 – Hans Müller – defekt`
+- Name + member + type: `Spind 5 – Hans Müller (Persönlicher Standort)`
 
-The `comment` field is used to hold supplementary context (e.g. the assigned person's name). Whether the type is shown depends on the picker context — checkout hides the type (all options are PERSONAL), relocation shows it (any type may appear).
+A `PERSONAL` location's owner is the linked `Mitglied`; the `comment` field is generic free text alongside it ("defekt", "hinten links"). Both are shown when both are present. Before the member migration, `comment` was where the owner's name was written by hand — hence the fallback. Whether the type is shown depends on the picker context — checkout hides the type (all options are PERSONAL), relocation shows it (any type may appear).
 
 ### Klamotten / Kleidung
 
@@ -81,3 +82,15 @@ The `/admin/settings` route (ADMIN-only via `RoleGuard`, reached from the "Admin
 ### Datenschutzerklärung (Privacy Policy Document)
 
 The admin-uploadable privacy policy document, managed under `/admin/settings`. Accepted formats: PDF, HTML, plain text. At most one document is active at a time. Uploading replaces the current document; explicit deletion is also available. When no document is uploaded the admin UI shows a clear "no document uploaded yet" state. The document itself is served directly by the backend at `/privacy-policy` (not via the frontend); the admin UI links to that URL for preview purposes.
+
+### Mitglied
+
+User-facing label for `Member` — a person in the organisation. Deliberately distinct from **Nutzer Management** (`/user-management`), which manages `UserAccount` logins: Mitglieder are people, Nutzer are credentials, and the two are not linked. Because both now appear in the top nav, the labels carry the whole distinction; retitling "Nutzer Management" to something like "Logins" would sharpen it.
+
+Top-level route `/members`, `KLEIDERWART`-guarded, with entries in `MENU_ITEMS` (`Header.tsx`), `DASHBOARD_ITEMS` (`dashboard.tsx`), and `SEGMENT_LABELS` (`Breadcrumb.tsx`) — all three lists are duplicated and must be kept in step. Four routes: list, `/new`, `/$memberId` (detail), `/$memberId/edit`.
+
+The **detail page** is the "what gear does this person have?" screen and is the reason a detail view exists at all. Three sections: Kopf (name, audit metadata, Bearbeiten/Löschen actions); Standorte (the member's locations, each linking to the location edit page — assignment is only ever written from the location side); Kleidung (every item currently in those locations, from `GET /api/clothing/locations/{id}/items`, one call per locker).
+
+Deleting a member unassigns their locations rather than blocking. The delete dialog states how many locations and clothing items are affected and warns that the clothing needs relocating.
+
+No batch import — the one-off bulk load happens in the backend migration from locker comments; afterwards members arrive one at a time.
