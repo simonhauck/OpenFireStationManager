@@ -39,17 +39,34 @@ testing, TypeScript rules, code style, routing, and PWA notes.
 Spring Boot 4 + Kotlin backend. See **`server/AGENTS.md`** for the full guide: commands,
 testing, code style, API design, and database conventions.
 
-**Quick reference:**
+**Quick reference** (the Gradle wrapper lives at the repo root, not in `server/`):
 
-|      Purpose       |                                Command (from `server/`)                                |
-|--------------------|----------------------------------------------------------------------------------------|
-| Build              | `./gradlew build`                                                                      |
-| Run                | `./gradlew bootRun`                                                                    |
-| Test all           | `./gradlew test`                                                                       |
-| Single test class  | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
-| Single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
+|      Purpose       |                                    Command (from repo root)                                    |
+|--------------------|------------------------------------------------------------------------------------------------|
+| Build              | `./gradlew :server:build`                                                                      |
+| Run                | `./gradlew :server:bootRun`                                                                    |
+| Test all           | `./gradlew :server:test`                                                                       |
+| Single test class  | `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
+| Single test method | `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
 
 > **Docker must be running** before executing integration tests.
+
+---
+
+## The OpenAPI contract
+
+`server/src/main/resources/open-api-contract.json` is generated from the SpringDoc annotations and
+committed. It has three consumers, so an API change is never finished at the controller:
+
+1. **The contract snapshot** — regenerate with `./update-api-definition.sh` from the repo root.
+   CI fails if it is stale.
+2. **The TypeScript bindings** — regenerate with `npm run prepareEnv` from `client/`.
+   **Nothing in CI checks this**, so a stale binding passes unnoticed.
+3. **The MCP tool surface** — the `ofsm-api` server in `opencode.jsonc` reads the same file, so
+   `@Operation` and `@Schema` annotations directly determine how usable the API is to an agent.
+
+Because of consumer 3, the SpringDoc annotation rules in `server/AGENTS.md` ("API Design") are
+strict and include a worked example. Follow it rather than improvising a new style.
 
 ---
 

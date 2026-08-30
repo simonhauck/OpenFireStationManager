@@ -31,7 +31,7 @@ class CheckoutRequestValidator : ConstraintValidator<ValidCheckout, CheckoutRequ
         if (request.takeItemIds.isNotEmpty() && request.targetLocationId == null) {
             context
                 .buildConstraintViolationWithTemplate(
-                    "targetLocationId must be provided if returnItemIds is not empty"
+                    "targetLocationId must be provided if takeItemIds is not empty"
                 )
                 .addConstraintViolation()
 

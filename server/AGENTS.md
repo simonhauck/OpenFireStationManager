@@ -31,7 +31,8 @@ JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API 
 - Keep protected API routes outside `/api/public/**` unless there is an explicit exception.
 - Authentication uses server-side session + remember-me cookies; frontend should use cookie credentials, not browser token storage.
 
-All commands below are run from the `server/` directory using the Gradle wrapper.
+All commands below are run from the repository root using the Gradle wrapper — there is no
+`gradlew` inside `server/`. Prefix tasks with `:server:` to scope them to this component.
 
 ---
 
@@ -44,14 +45,18 @@ All commands below are run from the `server/` directory using the Gradle wrapper
 > **After any API change**, run `./update-api-definition.sh` from the repo root. It regenerates
 > the OpenAPI schema (`schema.json`) by running `HttpApiContractIT` with `UPDATE_SNAPSHOT=true`,
 > then applies Spotless formatting in a separate step to avoid a race condition.
+>
+> Then regenerate the frontend bindings with `npm run prepareEnv` from `client/`. CI checks the
+> contract against the running server, but **nothing** checks `client/src/api/schema.ts` against
+> the contract, so a stale binding will pass CI unnoticed.
 
-| Build (compile + test + JAR) | `./gradlew build` |
-| Run application | `./gradlew bootRun` |
-| Run all tests | `./gradlew test` |
-| Run a single test class | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
-| Run a single test method | `./gradlew test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
-| Run tests with verbose output | `./gradlew test --info` |
-| Clean build artifacts | `./gradlew clean` |
+| Build (compile + test + JAR) | `./gradlew :server:build` |
+| Run application | `./gradlew :server:bootRun` |
+| Run all tests | `./gradlew :server:test` |
+| Run a single test class | `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` |
+| Run a single test method | `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
+| Run tests with verbose output | `./gradlew :server:test --info` |
+| Clean build artifacts | `./gradlew :server:clean` |
 
 ---
 
@@ -172,8 +177,86 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
 
 ## API Design
 
-- All REST endpoints **must** be documented with SpringDoc annotations (`@Operation`,
-  `@ApiResponse`, `@Parameter`, etc.) so they appear correctly in `/schema.json`.
+- All REST endpoints **must** be documented with SpringDoc annotations so they appear correctly in
+  `/schema.json`. Every operation needs:
+  - `@Tag(name = ApiTags.X)` on the controller class, using a constant from
+    `common/OpenApiConfiguration.kt` — never a bare string, and never the SpringDoc default
+    (which is the kebab-cased class name). Introducing a new feature area means **two** edits in
+    that file: add the `ApiTags` constant *and* register a `Tag()` with a description in the
+    `.tags(...)` list. A constant without a registered description yields an undescribed tag.
+  - `@Operation(operationId = …, summary = …, description = …)`. **All three are required.**
+    The `operationId` becomes the tool name in MCP clients and must be unique across the whole
+    API; use `verb + Resource` in camelCase (`listClothingItems`, `changeUserPassword`). The
+    `description` is what an LLM reads to decide whether to call the endpoint, so state what it
+    does, when to prefer a sibling endpoint, and any non-obvious consequence.
+  - `@ApiResponse` for the success status and for every **domain-specific** failure (`404`,
+    `409`, `422`, and any `400` with a meaning beyond schema validation).
+  - `@Parameter(description = …, example = …)` on every path variable and request parameter.
+- Treat `operationId` as **public API**. Renaming one silently renames a tool in every MCP client,
+  and because the TypeScript bindings key off paths rather than ids, nothing in this repo will
+  fail to warn you. Rename only deliberately.
+- Do **not** hand-write `401`, `403`, `500`, or generic `400` responses, and do not hand-write the
+  required-role prose. `OpenApiConfiguration.commonResponsesCustomizer` derives all of them from
+  the URL namespace and the `@PreAuthorize` expression, so they cannot drift from what is
+  actually enforced. Adding them by hand produces duplicates.
+- Annotate DTO and entity properties with `@field:Schema(description = …, example = …)`. These
+  descriptions become the tool input schema for MCP clients, so an undocumented field is an
+  unusable one. Use `@get:Schema` instead for computed properties declared in the class body
+  (for example the `totalCount` values in `ClothingOverview.kt`), where there is no constructor
+  parameter to annotate.
+- Prefer interpolating a configured value over restating it. `OpenApiConfiguration` injects the
+  cookie names and remember-me validity rather than hardcoding them, so the documentation cannot
+  contradict `application.yml`. Apply the same instinct to any other configurable fact.
+
+### Worked example
+
+Copy this shape rather than inventing a new one. Note that `401`, `403`, and `500` are absent
+deliberately — the customizer adds them.
+
+```kotlin
+@RestController
+@RequestMapping("/api/clothing/types")
+@Validated
+@Tag(name = ApiTags.CLOTHING_TYPES)
+class ClothingTypeController(private val service: ClothingTypeService) {
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        operationId = "deleteClothingType",
+        summary = "Delete a clothing type",
+        description =
+            "Removes a garment category. This is only possible once no clothing item references " +
+                "the type any more — the request is refused with `409 Conflict` otherwise, rather " +
+                "than cascading. Delete or re-type the remaining items first.",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "204", description = "The type was deleted."),
+        ApiResponse(
+            responseCode = "409",
+            description = "Clothing items still reference this type. Nothing was deleted.",
+            content = [
+                Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                )
+            ],
+        ),
+    )
+    @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
+    fun deleteType(
+        @Parameter(description = "Numeric id of the clothing type to delete.", example = "3")
+        @PathVariable
+        @Positive
+        id: Long,
+    ) {
+        service.deleteType(id)
+    }
+}
+```
+
+### Conventions
+
 - Follow RESTful conventions:
   - Resource-oriented URLs: `/api/stations`, `/api/stations/{id}`
   - Use appropriate HTTP verbs: `GET` (read), `POST` (create), `PUT`/`PATCH` (update), `DELETE`
@@ -184,12 +267,77 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
     `AdminUserController`) rather than generic REST advice here. The one exception is
     `PrivacyPolicyAdminController`'s multipart upload, which returns `201` because it replaces a
     stored document rather than creating an addressable resource.
-  - Return `404 Not Found` for missing resources; `422 Unprocessable Entity` for validation errors.
+  - Return `404 Not Found` for missing resources. Where a resource is optional and may legitimately
+    be absent (Impressum, privacy policy), still return `404` and provide a companion
+    `/exists` endpoint — do **not** return `200` with a null body, which makes the response schema
+    nullable and awkward for every generated client.
+  - Return `400 Bad Request` for validation errors. `422 Unprocessable Entity` is reserved for
+    semantically valid requests the server refuses on content grounds, and is currently used only
+    for an unsupported privacy-policy file type.
   - Return `204 No Content` from `DELETE` via `@ResponseStatus(HttpStatus.NO_CONTENT)`.
 - Public endpoints should be namespaced under `/api/public/**`.
-- Validate all request bodies and path variables with Spring Validation annotations; rely on
-  the `@ControllerAdvice` to translate `MethodArgumentNotValidException` into 422 responses.
+- Validate all request bodies and path variables with Spring Validation annotations; the
+  `@ControllerAdvice` translates `MethodArgumentNotValidException` (body),
+  `ConstraintViolationException` (params on `@Validated` classes), and
+  `HandlerMethodValidationException` into `400` responses carrying an `errors` array.
+- Annotate nested collections with `@field:Valid` (and usually `@field:NotEmpty`). Without
+  `@field:Valid`, per-element constraints on a `List<SomeDto>` are silently **not** enforced.
 - Use Kotlin data classes as request/response DTOs; keep them separate from domain/entity classes.
+
+---
+
+## Consuming the API over MCP
+
+The checked-in contract doubles as the tool definition for
+[`@ivotoby/openapi-mcp-server`](https://github.com/ivo-toby/mcp-openapi-server), configured as
+`ofsm-api` in the repo-root `opencode.jsonc`. Each operation becomes one MCP tool: the tool name
+comes from `operationId`, its description from the `@Operation` description, and its input schema
+from the `@Parameter` and `@field:Schema` annotations. Poor annotations therefore degrade the tool
+surface directly — that is the main reason the rules above are strict.
+
+**Authenticating.** The API uses cookies, and the MCP server can only send static headers. Rather
+than a session cookie, use the **remember-me** cookie: it authenticates on its own, is stateless
+and signed, survives server restarts, and is valid for 30 days by default
+(`app.remember-me.token-validity`, `P30D`). That turns re-authentication into a monthly chore
+instead of a per-session one.
+
+Start the backend, log in **with `rememberMe: true`**, and export the cookie before starting
+OpenCode:
+
+```sh
+export OFSM_AUTH_COOKIE=$(curl -s -i -X POST http://localhost:8080/api/public/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"chief","password":"secret","rememberMe":true}' \
+  | grep -i '^set-cookie: OFSM_AUTH_REMEMBER_ME=' \
+  | sed 's/.*OFSM_AUTH_REMEMBER_ME=\([^;]*\).*/\1/')
+```
+
+Note the cookie name is `OFSM_AUTH_REMEMBER_ME` — it is derived in `application.yml` as
+`${server.servlet.session.cookie.name}_REMEMBER_ME`, so it tracks the session cookie name. If you
+rename either, `OpenApiConfiguration` picks the new names up automatically, but the `curl` above
+and `opencode.jsonc` must be updated by hand.
+
+Re-export and restart OpenCode when calls start returning `401`. The agent inherits the full
+rights of whichever account you use, and because `ADMIN` implicitly holds every role, an admin
+cookie grants reach over user management and legal-document deletion. Pick the account
+accordingly.
+
+**Browser-based login.** There is no built-in flow that opens a login page. The package's
+`AuthProvider` interface is the extension point, but it is library-only and not reachable through
+the `npx` CLI. Implementing one means wrapping `OpenAPIServer` in a small local package — the
+Playwright login in `client/tests/global-setup.ts` is a working precedent for extracting the
+`httpOnly` cookie from a real browser session.
+
+**Narrowing the surface.** All 46 operations load by default, which is a lot of context. Two ways
+to trim it, both set via `environment` in `opencode.jsonc`:
+
+- `"TOOLS_MODE": "dynamic"` replaces the 46 tools with three meta-tools
+  (`list-api-endpoints`, `get-api-endpoint-schema`, `invoke-api-endpoint`). Much cheaper, at the
+  cost of an extra round trip before each call.
+- Tag filters keep administration out of reach entirely. The tags exist for exactly this:
+  `Admin - Users` and `Admin - Legal` cover every destructive administrative operation.
+
+Tag filtering is a tool-surface control, **not** authorisation — the server still enforces roles.
 
 ---
 

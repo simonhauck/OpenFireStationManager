@@ -1,5 +1,6 @@
 package io.github.simonhauck.openfirestationmanager.clothing.relocation
 
+import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItem
 import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.resttestclient.postForEntity
 import org.springframework.http.HttpEntity
@@ -11,8 +12,11 @@ import org.springframework.stereotype.Component
 @Component
 class RelocationControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
-    fun relocate(request: RelocationRequest, authCookie: String? = null): ResponseEntity<Unit> {
-        return testRestTemplate.postForEntity<Unit>(
+    fun relocate(
+        request: RelocationRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<List<ClothingItem>> {
+        return testRestTemplate.postForEntity<List<ClothingItem>>(
             "/api/clothing/relocation",
             HttpEntity(request, headersWithCookie(authCookie)),
         )
