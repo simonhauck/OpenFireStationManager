@@ -2,12 +2,14 @@ package io.github.simonhauck.openfirestationmanager.clothing.location
 
 import io.github.simonhauck.openfirestationmanager.db.BaseEntity
 import io.github.simonhauck.openfirestationmanager.db.EntityMetaData
+import io.github.simonhauck.openfirestationmanager.member.Member
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
 import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 
@@ -59,6 +61,14 @@ data class CreateClothingLocationRequest(
     )
     val onlyVisibleForKleiderwart: Boolean,
     @field:Schema(description = "What kind of place this is.") val type: LocationType,
+    @field:Schema(
+        implementation = Long::class,
+        types = ["integer", "null"],
+        description =
+            "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
+        example = "5",
+    )
+    val memberId: AggregateReference<Member, Long>? = null,
 )
 
 @Schema(description = "A set of clothing locations to create together in a single request.")
@@ -89,6 +99,14 @@ data class ClothingLocation(
     )
     val onlyVisibleForKleiderwart: Boolean,
     @field:Schema(description = "What kind of place this is.") val type: LocationType,
+    @field:Schema(
+        implementation = Long::class,
+        types = ["integer", "null"],
+        description =
+            "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
+        example = "5",
+    )
+    val memberId: AggregateReference<Member, Long>? = null,
     @field:Schema(description = "Server-assigned identifier.", example = "7")
     @Id
     override val id: Long = 0,

@@ -62,6 +62,16 @@ class ClothingLocationControllerCalls(private val testRestTemplate: TestRestTemp
         )
     }
 
+    fun createLocationExpectingError(
+        request: CreateClothingLocationRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
+        return testRestTemplate.postForEntity<ProblemDetail>(
+            "/api/clothing/locations",
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
     fun createBatchLocations(
         request: BatchCreateClothingLocationsRequest,
         authCookie: String? = null,
@@ -78,6 +88,18 @@ class ClothingLocationControllerCalls(private val testRestTemplate: TestRestTemp
         authCookie: String? = null,
     ): ResponseEntity<ClothingLocation> {
         return testRestTemplate.exchange<ClothingLocation>(
+            "/api/clothing/locations/$id",
+            HttpMethod.PATCH,
+            HttpEntity(request, headersWithCookie(authCookie)),
+        )
+    }
+
+    fun updateLocationExpectingError(
+        id: Long,
+        request: CreateClothingLocationRequest,
+        authCookie: String? = null,
+    ): ResponseEntity<ProblemDetail> {
+        return testRestTemplate.exchange<ProblemDetail>(
             "/api/clothing/locations/$id",
             HttpMethod.PATCH,
             HttpEntity(request, headersWithCookie(authCookie)),

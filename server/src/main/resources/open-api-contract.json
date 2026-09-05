@@ -815,7 +815,7 @@
       "post": {
         "tags": [ "Clothing Locations" ],
         "summary": "Create a new clothing location",
-        "description": "Registers a new place where garments can be kept. Choose the `type` carefully: it determines whether the location behaves as shared stock (`POOL`), as a laundry staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`).\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "description": "Registers a new place where garments can be kept. Choose the `type` carefully: it determines whether the location behaves as shared stock (`POOL`), as a laundry staging area (`WAESCHE`), or as one member's personal storage (`PERSONAL`). Only `PERSONAL` locations may carry a `memberId`; leave it null for an unassigned personal location.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
         "operationId": "createClothingLocation",
         "requestBody": {
           "content": {
@@ -834,6 +834,20 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A `memberId` was supplied for a location type other than `PERSONAL`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "oneOf": [ {
+                    "$ref": "#/components/schemas/ProblemDetail"
+                  }, {
+                    "$ref": "#/components/schemas/ValidationProblemDetail"
+                  } ]
                 }
               }
             }
@@ -867,16 +881,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "The request failed validation. The `errors` array names each offending field.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetail"
-                }
-              }
-            }
           }
         }
       }
@@ -885,7 +889,7 @@
       "post": {
         "tags": [ "Clothing Locations" ],
         "summary": "Create many clothing locations in one request",
-        "description": "Creates several locations at once — the usual way to set up a whole row of lockers in a single call.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "description": "Creates several locations at once — the usual way to set up a whole row of lockers in a single call. Only `PERSONAL` locations may carry a `memberId`.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
         "operationId": "createClothingLocationsBatch",
         "requestBody": {
           "content": {
@@ -911,6 +915,20 @@
               }
             }
           },
+          "400": {
+            "description": "At least one location supplied a `memberId` for a type other than `PERSONAL`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "oneOf": [ {
+                    "$ref": "#/components/schemas/ProblemDetail"
+                  }, {
+                    "$ref": "#/components/schemas/ValidationProblemDetail"
+                  } ]
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
             "content": {
@@ -937,16 +955,6 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetail"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The request failed validation. The `errors` array names each offending field.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetail"
                 }
               }
             }
@@ -1803,7 +1811,7 @@
       "delete": {
         "tags": [ "Members" ],
         "summary": "Remove a person from the roster",
-        "description": "Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location, and no user account is touched.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "description": "Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location beyond clearing their ownership from linked `PERSONAL` locations. Those locations remain present, and no user account is touched.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
         "operationId": "deleteMember",
         "parameters": [ {
           "name": "id",
@@ -2356,7 +2364,7 @@
       "patch": {
         "tags": [ "Clothing Locations" ],
         "summary": "Replace the details of a clothing location",
-        "description": "Despite the `PATCH` verb this is a **full replacement**: `name`, `comment`, `type`, and `onlyVisibleForKleiderwart` are all applied from the request body. Read the location first and resend the fields you want to keep.\n\nGarments stored here are unaffected and stay where they are.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
+        "description": "Despite the `PATCH` verb this is a **full replacement**: `name`, `comment`, `type`, `onlyVisibleForKleiderwart`, and `memberId` are all applied from the request body. Read the location first and resend the fields you want to keep. Set `memberId` to null to unassign a personal location.\n\nOnly `PERSONAL` locations may carry a member. Changing an owned location away from `PERSONAL` is rejected; unassign the member first.\n\nGarments stored here are unaffected and stay where they are.\n\n**Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.",
         "operationId": "updateClothingLocation",
         "parameters": [ {
           "name": "id",
@@ -2387,6 +2395,20 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A `memberId` was supplied for a non-`PERSONAL` location, or an owned location was changed away from `PERSONAL` without being unassigned first.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "oneOf": [ {
+                    "$ref": "#/components/schemas/ProblemDetail"
+                  }, {
+                    "$ref": "#/components/schemas/ValidationProblemDetail"
+                  } ]
                 }
               }
             }
@@ -2427,16 +2449,6 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetail"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The request failed validation. The `errors` array names each offending field.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetail"
                 }
               }
             }
@@ -3474,6 +3486,7 @@
         }
       },
       "ValidationError": {
+        "type": "object",
         "description": "A single field-level validation failure.",
         "properties": {
           "field": {
@@ -3487,12 +3500,13 @@
             "example": "must not be blank"
           },
           "rejectedValue": {
-            "type": "object",
             "description": "The value that was submitted and rejected. May be null."
           }
-        }
+        },
+        "required": [ "field", "message" ]
       },
       "ValidationProblemDetail": {
+        "type": "object",
         "description": "RFC 9457 problem document describing a request that failed validation, extended with an `errors` array naming each offending field.",
         "properties": {
           "type": {
@@ -3523,7 +3537,8 @@
               "$ref": "#/components/schemas/ValidationError"
             }
           }
-        }
+        },
+        "required": [ "detail", "errors", "status", "title", "type" ]
       },
       "ChangePasswordRequest": {
         "type": "object",
@@ -3864,6 +3879,12 @@
             "type": "string",
             "description": "What kind of place this is.",
             "enum": [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
+          },
+          "memberId": {
+            "type": [ "integer", "null" ],
+            "format": "int64",
+            "description": "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
+            "example": 5
           }
         },
         "required": [ "comment", "name", "onlyVisibleForKleiderwart", "type" ]
@@ -3890,6 +3911,12 @@
             "type": "string",
             "description": "What kind of place this is.",
             "enum": [ "POOL", "WAESCHE", "PERSONAL", "OTHER" ]
+          },
+          "memberId": {
+            "type": [ "integer", "null" ],
+            "format": "int64",
+            "description": "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
+            "example": 5
           },
           "id": {
             "type": "integer",
