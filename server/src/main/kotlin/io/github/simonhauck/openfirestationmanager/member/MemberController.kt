@@ -125,7 +125,8 @@ class MemberController(private val service: MemberService) {
         summary = "Remove a person from the roster",
         description =
             "Deletes a member. This removes the person from the roster only — it has no effect " +
-                "on any clothing or storage location, and no user account is touched.",
+                "on any clothing or storage location beyond clearing their ownership from linked " +
+                "`PERSONAL` locations. Those locations remain present, and no user account is touched.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "The member was removed."),

@@ -204,6 +204,16 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   unusable one. Use `@get:Schema` instead for computed properties declared in the class body
   (for example the `totalCount` values in `ClothingOverview.kt`), where there is no constructor
   parameter to annotate.
+- Model an absent value as **optional**, never as nullable-and-optional. Declare a nullable Kotlin
+  property with a default (e.g. `val memberId: AggregateReference<Member, Long>? = null`), annotate
+  it with `@field:Schema(implementation = Long::class, …)` **only**, and leave it out of the
+  OpenAPI `required` list (SpringDoc does this automatically for a property with a default). Do
+  **not** add `types = ["integer", "null"]` or any equivalent null type: that makes the generated
+  TypeScript both optional and nullable, forcing every caller to handle two spellings of "absent".
+  The generated type must be optional-only (`memberId?: number`), matching
+  `ClothingItem.locationId` and `.barcode`. Omitting the field and sending `null` are equivalent
+  on the wire, which is what the full-replacement `PATCH` endpoints rely on. See
+  `server/docs/adr/0009-nullable-field-representation-in-openapi.md`.
 - Prefer interpolating a configured value over restating it. `OpenApiConfiguration` injects the
   cookie names and remember-me validity rather than hardcoding them, so the documentation cannot
   contradict `application.yml`. Apply the same instinct to any other configurable fact.
