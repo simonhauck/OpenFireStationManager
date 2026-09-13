@@ -1,4 +1,3 @@
-
 # When to Mock
 
 Mock at **system boundaries** only:
