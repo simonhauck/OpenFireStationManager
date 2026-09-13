@@ -1,3 +1,4 @@
+
 # Phase boundaries
 
 A **phase** is a chunk of work inside a session: the grilling, the implementation, the QA. The definition is fuzzy on purpose: a phase ends when you think *"ok, we're done with that"*.
@@ -6,13 +7,13 @@ The **phase boundary** is the gap between two phases, and it is the only place t
 
 ## The five options
 
-| Option       | What it does                                                    |
-| ------------ | --------------------------------------------------------------- |
-| **Continue** | Stay in the session. No context switch at all.                    |
-| **`/clear`** | Empty the context window and start from nothing.                  |
+|     Option     |                            What it does                             |
+|----------------|---------------------------------------------------------------------|
+| **Continue**   | Stay in the session. No context switch at all.                      |
+| **`/clear`**   | Empty the context window and start from nothing.                    |
 | **`/handoff`** | Write a portable markdown file and seed a session anywhere with it. |
-| **Subagent** | Send the task to its own context window and get a report back.     |
-| **`/compact`** | Compress this context and seed a fresh session with the summary.  |
+| **Subagent**   | Send the task to its own context window and get a report back.      |
+| **`/compact`** | Compress this context and seed a fresh session with the summary.    |
 
 ## The tree
 
@@ -43,9 +44,9 @@ That list is the whole clause. What `/handoff` buys is **portability**: a file t
 
 Every move except **Continue** turns a **primary source** into a **secondary source**: the session as it happened, replaced by a summary of it. The trade is always the same shape:
 
-| Source                            | Information | Noise | Room to move |
-| --------------------------------- | ----------- | ----- | ------------ |
-| Primary (Continue)                | Full        | Lots  | Little       |
+|               Source               | Information | Noise | Room to move |
+|------------------------------------|-------------|-------|--------------|
+| Primary (Continue)                 | Full        | Lots  | Little       |
 | Secondary (`/compact`, `/handoff`) | Lossy       | Less  | Lots         |
 
 This is why question 1 comes first. You only pay the lossiness when staying costs more than it saves.
