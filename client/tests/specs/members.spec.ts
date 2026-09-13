@@ -79,6 +79,7 @@ test.describe("Members", () => {
         .getByText("Mitglieder"),
     ).toBeVisible()
 
+    await membersPage.goto()
     await membersPage.clickEditForMember(name)
     await expect(
       page

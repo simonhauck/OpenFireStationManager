@@ -12,7 +12,7 @@ export class MembersPage {
   }
 
   async clickCreate() {
-    await this.page.getByRole("button", { name: "Mitglied erstellen" }).click()
+    await this.page.getByRole("link", { name: "Mitglied erstellen" }).click()
   }
 
   async fillName(name: string) {

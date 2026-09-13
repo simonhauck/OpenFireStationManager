@@ -8,7 +8,7 @@
 		"ofsm-api": {
 			"type": "local",
 			"command": ["npx", "-y", "@ivotoby/openapi-mcp-server"],
-			"enabled": true,
+			"enabled": false,
 			"environment": {
 				"API_BASE_URL": "http://localhost:8080",
 				"OPENAPI_SPEC_PATH": "server/src/main/resources/open-api-contract.json",
