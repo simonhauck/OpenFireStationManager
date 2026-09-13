@@ -26,6 +26,7 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   items: "Kleidungsstücke",
   locations: "Standorte",
   login: "Anmelden",
+  members: "Mitglieder",
   new: "Neu",
   "pool-clothing": "Pool Klamotten",
   relocation: "Umlagerung",

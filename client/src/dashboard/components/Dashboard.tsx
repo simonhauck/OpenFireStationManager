@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { Settings, ShieldCheck, Shirt, Users } from "lucide-react"
+import { Settings, ShieldCheck, Shirt, UserRound, Users } from "lucide-react"
 import type React from "react"
 
 import { meQuery } from "#/api/auth.queries"
@@ -35,6 +35,13 @@ const DASHBOARD_ITEMS: DashboardItem[] = [
     description: "Schutzkleidungstypen, Standorte und Bestände verwalten.",
     href: "/clothing-management",
     icon: ShieldCheck,
+    allowedRoles: ["KLEIDERWART"],
+  },
+  {
+    title: "Mitglieder",
+    description: "Personen der Feuerwehr verwalten.",
+    href: "/members",
+    icon: UserRound,
     allowedRoles: ["KLEIDERWART"],
   },
   {
