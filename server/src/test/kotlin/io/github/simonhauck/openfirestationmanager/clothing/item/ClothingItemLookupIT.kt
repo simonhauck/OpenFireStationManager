@@ -8,6 +8,8 @@ import io.github.simonhauck.openfirestationmanager.clothing.location.LocationTyp
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.clothing.type.CreateOrUpdateClothingTypeRequest
 import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveClothingTypeControllerCalls
+import io.github.simonhauck.openfirestationmanager.member.CreateOrUpdateMemberRequest
+import io.github.simonhauck.openfirestationmanager.member.MemberControllerCalls
 import io.github.simonhauck.openfirestationmanager.security.auth.AuthControllerCalls
 import io.github.simonhauck.openfirestationmanager.usermanagement.AdminUserControllerCalls
 import io.github.simonhauck.openfirestationmanager.usermanagement.CreateUserRequest
@@ -30,6 +32,7 @@ class ClothingItemLookupIT : IntegrationTest() {
     @Autowired private lateinit var itemCalls: ClothingItemControllerCalls
     @Autowired private lateinit var typeCalls: ProtectiveClothingTypeControllerCalls
     @Autowired private lateinit var locationCalls: ClothingLocationControllerCalls
+    @Autowired private lateinit var memberCalls: MemberControllerCalls
     @Autowired private lateinit var adminUserCalls: AdminUserControllerCalls
     @Autowired private lateinit var testRestTemplate: TestRestTemplate
 
@@ -207,6 +210,47 @@ class ClothingItemLookupIT : IntegrationTest() {
         val resolved = response.body!!.first { it.clothingItem.barcode == barcode }
         assertThat(resolved.clothingType.name).isEqualTo(type.name)
         assertThat(resolved.location?.id).isEqualTo(location.id)
+    }
+
+    @Test
+    fun `location items include the member on the resolved location`() {
+        val member =
+            memberCalls
+                .createMember(
+                    CreateOrUpdateMemberRequest("Member-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+        val location =
+            locationCalls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        name = "Owned-${System.nanoTime()}",
+                        comment = "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.PERSONAL,
+                        memberId = AggregateReference.to(member.id),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+        val type = createType()
+        val barcode = "MEMBER-${System.nanoTime()}"
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(
+                typeId = type.id,
+                size = "L",
+                barcode = barcode,
+                locationId = AggregateReference.to(location.id),
+            ),
+            authCookie = validCookieHeader,
+        )
+
+        val response = locationCalls.getItems(location.id, authCookie = validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        val resolved = response.body!!.first { it.clothingItem.barcode == barcode }
+        assertThat(resolved.location?.memberId?.id).isEqualTo(member.id)
     }
 
     @Test

@@ -2,15 +2,19 @@ package io.github.simonhauck.openfirestationmanager.clothing.location
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
 import io.github.simonhauck.openfirestationmanager.clothing.overview.ClothingOverviewControllerCalls
+import io.github.simonhauck.openfirestationmanager.member.CreateOrUpdateMemberRequest
+import io.github.simonhauck.openfirestationmanager.member.MemberControllerCalls
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.jdbc.core.mapping.AggregateReference
 import org.springframework.http.HttpStatus
 
 class ClothingLocationControllerIT : IntegrationTest() {
 
     @Autowired private lateinit var calls: ClothingLocationControllerCalls
     @Autowired private lateinit var overviewCalls: ClothingOverviewControllerCalls
+    @Autowired private lateinit var memberCalls: MemberControllerCalls
 
     @Test
     fun `should create and read clothing locations`() {
@@ -115,6 +119,156 @@ class ClothingLocationControllerIT : IntegrationTest() {
         assertThat(updated.comment).isEqualTo("New comment")
         assertThat(updated.onlyVisibleForKleiderwart).isTrue()
         assertThat(updated.type).isEqualTo(LocationType.WAESCHE)
+    }
+
+    @Test
+    fun `should assign and clear a member on a personal clothing location`() {
+        val member =
+            memberCalls
+                .createMember(
+                    CreateOrUpdateMemberRequest("Member-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val created =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        name = "Personal-${System.nanoTime()}",
+                        comment = "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.PERSONAL,
+                        memberId = AggregateReference.to(member.id),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        assertThat(created.memberId?.id).isEqualTo(member.id)
+        assertThat(
+                calls.getLocationById(created.id, authCookie = validCookieHeader).body?.memberId?.id
+            )
+            .isEqualTo(member.id)
+
+        val cleared =
+            calls
+                .updateLocation(
+                    created.id,
+                    CreateClothingLocationRequest(
+                        name = created.name,
+                        comment = created.comment,
+                        onlyVisibleForKleiderwart = created.onlyVisibleForKleiderwart,
+                        type = LocationType.PERSONAL,
+                        memberId = null,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        assertThat(cleared.memberId).isNull()
+    }
+
+    @Test
+    fun `should reject assigning a member to a non-personal clothing location`() {
+        val member =
+            memberCalls
+                .createMember(
+                    CreateOrUpdateMemberRequest("Member-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        LocationType.entries
+            .filterNot { it == LocationType.PERSONAL }
+            .forEach { type ->
+                val response =
+                    calls.createLocationExpectingError(
+                        CreateClothingLocationRequest(
+                            name = "Invalid-$type-${System.nanoTime()}",
+                            comment = "",
+                            onlyVisibleForKleiderwart = false,
+                            type = type,
+                            memberId = AggregateReference.to(member.id),
+                        ),
+                        authCookie = validCookieHeader,
+                    )
+
+                assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+            }
+    }
+
+    @Test
+    fun `should reject changing an owned personal location to another type`() {
+        val member =
+            memberCalls
+                .createMember(
+                    CreateOrUpdateMemberRequest("Member-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+        val location =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        name = "Owned-${System.nanoTime()}",
+                        comment = "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.PERSONAL,
+                        memberId = AggregateReference.to(member.id),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        val response =
+            calls.updateLocationExpectingError(
+                location.id,
+                CreateClothingLocationRequest(
+                    name = location.name,
+                    comment = location.comment,
+                    onlyVisibleForKleiderwart = location.onlyVisibleForKleiderwart,
+                    type = LocationType.POOL,
+                    memberId = null,
+                ),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        val unchanged = calls.getLocationById(location.id, authCookie = validCookieHeader).body!!
+        assertThat(unchanged.type).isEqualTo(LocationType.PERSONAL)
+        assertThat(unchanged.memberId?.id).isEqualTo(member.id)
+    }
+
+    @Test
+    fun `deleting a member clears ownership from their clothing locations`() {
+        val member =
+            memberCalls
+                .createMember(
+                    CreateOrUpdateMemberRequest("Member-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+        val location =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        name = "Owned-${System.nanoTime()}",
+                        comment = "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.PERSONAL,
+                        memberId = AggregateReference.to(member.id),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        assertThat(memberCalls.deleteMember(member.id, authCookie = validCookieHeader).statusCode)
+            .isEqualTo(HttpStatus.NO_CONTENT)
+
+        val remaining = calls.getLocationById(location.id, authCookie = validCookieHeader)
+        assertThat(remaining.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(remaining.body?.memberId).isNull()
     }
 
     @Test
