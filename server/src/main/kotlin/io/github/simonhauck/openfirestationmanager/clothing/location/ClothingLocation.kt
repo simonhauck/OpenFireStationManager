@@ -63,7 +63,6 @@ data class CreateClothingLocationRequest(
     @field:Schema(description = "What kind of place this is.") val type: LocationType,
     @field:Schema(
         implementation = Long::class,
-        types = ["integer", "null"],
         description =
             "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
         example = "5",
@@ -101,7 +100,6 @@ data class ClothingLocation(
     @field:Schema(description = "What kind of place this is.") val type: LocationType,
     @field:Schema(
         implementation = Long::class,
-        types = ["integer", "null"],
         description =
             "Id of the member who owns this location. Only `PERSONAL` locations may have an owner.",
         example = "5",

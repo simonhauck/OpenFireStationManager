@@ -1261,7 +1261,7 @@ export interface components {
        * @description Id of the member who owns this location. Only `PERSONAL` locations may have an owner.
        * @example 5
        */
-      memberId?: number | null
+      memberId?: number
     }
     /** @description A place where garments are kept (`Standort`) — the shared pool, the laundry, a member's personal locker, or anywhere else. */
     ClothingLocation: {
@@ -1287,7 +1287,7 @@ export interface components {
        * @description Id of the member who owns this location. Only `PERSONAL` locations may have an owner.
        * @example 5
        */
-      memberId?: number | null
+      memberId?: number
       /**
        * Format: int64
        * @description Server-assigned identifier.

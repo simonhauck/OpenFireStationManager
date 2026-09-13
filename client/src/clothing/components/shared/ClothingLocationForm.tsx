@@ -76,7 +76,7 @@ export default function ClothingLocationForm({
       comment,
       onlyVisibleForKleiderwart,
       type,
-      memberId: existingLocation?.memberId ?? null,
+      memberId: existingLocation?.memberId,
     }
 
     if (isEditing) {
