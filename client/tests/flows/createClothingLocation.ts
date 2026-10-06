@@ -5,6 +5,7 @@ export interface CreateLocationOptions {
   type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
   name: string
   comment?: string
+  memberName?: string
 }
 
 /**
@@ -20,6 +21,9 @@ export async function createClothingLocation(
   await locationsPage.fillName(options.name)
   if (options.comment) {
     await locationsPage.fillComment(options.comment)
+  }
+  if (options.memberName) {
+    await locationsPage.selectMember(options.memberName)
   }
   await locationsPage.submitForm()
   await page.waitForURL("**/clothing-management/locations")

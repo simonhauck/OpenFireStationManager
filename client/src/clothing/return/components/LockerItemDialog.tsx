@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "#/components/ui/dialog"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 interface LockerItemDialogProps {
   open: boolean
@@ -38,6 +39,7 @@ export function LockerItemDialog({
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const { data: allItems } = useQuery(getAllClothingItemsQuery())
   const { data: allTypes } = useQuery(getAllClothingTypesQuery())
+  const memberName = useMemberNameLookup()
 
   const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
     null,
@@ -57,7 +59,7 @@ export function LockerItemDialog({
     .filter((l) => l.type === "PERSONAL")
     .map((l) => ({
       value: String(l.id),
-      label: formatClothingLocationLabel(l),
+      label: formatClothingLocationLabel(l, memberName(l.memberId)),
     }))
 
   // Items at selected PERSONAL location

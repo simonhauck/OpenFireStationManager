@@ -73,6 +73,16 @@ export function useMembers() {
   return useQuery(getAllMembersQuery())
 }
 
+export function useMemberNameLookup() {
+  const { data: members } = useMembers()
+  const namesById = new Map(
+    (members ?? []).map((member) => [member.id, member.name]),
+  )
+
+  return (memberId: number | undefined): string | undefined =>
+    memberId === undefined ? undefined : namesById.get(memberId)
+}
+
 export function useMemberById(id: number) {
   return useQuery({
     ...getMemberByIdQuery(id),

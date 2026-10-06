@@ -38,6 +38,7 @@ import {
 } from "#/components/ui/alert-dialog"
 import { Badge } from "#/components/ui/badge"
 import { Checkbox } from "#/components/ui/checkbox"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
@@ -149,6 +150,7 @@ interface StepTargetPickerContentProps {
 
 function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const memberName = useMemberNameLookup()
   const [search] = useState("")
 
   const personalLocations = (allLocations ?? []).filter(
@@ -157,7 +159,7 @@ function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
 
   const options: ComboboxOption[] = personalLocations.map((l) => ({
     value: String(l.id),
-    label: formatClothingLocationLabel(l),
+    label: formatClothingLocationLabel(l, memberName(l.memberId)),
   }))
 
   const filteredOptions = options.filter((o) =>
@@ -205,6 +207,7 @@ function StepItemScannerContent({
 }: StepItemScannerContentProps) {
   const [pendingConfirmation, setPendingConfirmation] =
     useState<PendingConfirmation | null>(null)
+  const memberName = useMemberNameLookup()
 
   function handleItemResolved(item: ResolvedClothingItem) {
     const location = item.location
@@ -219,7 +222,10 @@ function StepItemScannerContent({
     if (!isAtPool) {
       setPendingConfirmation({
         item,
-        actualLocationName: formatClothingLocationLabel(location),
+        actualLocationName: formatClothingLocationLabel(
+          location,
+          memberName(location.memberId),
+        ),
       })
       return
     }
@@ -243,7 +249,7 @@ function StepItemScannerContent({
             if (!loc || loc.type === "POOL") return null
             return (
               <Badge variant="outline">
-                {formatClothingLocationLabel(loc)}
+                {formatClothingLocationLabel(loc, memberName(loc.memberId))}
               </Badge>
             )
           }}
@@ -402,6 +408,7 @@ function StepWashLocationPickerContent({
   onSelect,
 }: StepWashLocationPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const memberName = useMemberNameLookup()
 
   const washLocations: ClothingLocation[] = (allLocations ?? []).filter(
     (l) => l.type === "WAESCHE",
@@ -429,7 +436,7 @@ function StepWashLocationPickerContent({
               onClick={() => onSelect(loc.id)}
             >
               <span className="text-base font-medium">
-                {formatClothingLocationLabel(loc)}
+                {formatClothingLocationLabel(loc, memberName(loc.memberId))}
               </span>
             </TouchButton>
           ))}
@@ -459,13 +466,17 @@ function StepReviewContent({
 
   const queryClient = useQueryClient()
   const checkout = useMutation(checkoutMutation(queryClient))
+  const memberName = useMemberNameLookup()
 
   const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
-  const targetLocationName = formatClothingLocationLabelOrDefault(
+  const targetLocation =
     state.targetLocationId !== null
       ? locationMap.get(state.targetLocationId)
-      : undefined,
+      : undefined
+  const targetLocationName = formatClothingLocationLabelOrDefault(
+    targetLocation,
+    memberName(targetLocation?.memberId),
   )
 
   const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
@@ -482,7 +493,10 @@ function StepReviewContent({
     state.returnLocationId !== null
       ? locationMap.get(state.returnLocationId)
       : undefined
-  const washLocationName = formatClothingLocationLabelOrDefault(location)
+  const washLocationName = formatClothingLocationLabelOrDefault(
+    location,
+    memberName(location?.memberId),
+  )
 
   async function handleSubmit() {
     if (state.targetLocationId === null) return

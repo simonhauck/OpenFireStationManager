@@ -1,6 +1,8 @@
+import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
 import ClearableSelect from "#/components/base/ClearableSelect"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 type ClothingLocationSelectProps = {
   selectedLocationId: number | undefined
@@ -12,6 +14,7 @@ export default function ClothingLocationSelect({
   onLocationChange,
 }: ClothingLocationSelectProps) {
   const { data: clothingLocations } = useClothingLocations()
+  const memberName = useMemberNameLookup()
 
   const locations: ClothingLocation[] = clothingLocations ?? []
   const selectedLocation: ClothingLocation | undefined = locations.find(
@@ -27,7 +30,9 @@ export default function ClothingLocationSelect({
       options={locations}
       selectedValue={selectedLocation}
       onValueChange={(location) => onLocationChange(location?.id)}
-      toDisplayString={(location) => location.name}
+      toDisplayString={(location) =>
+        formatClothingLocationLabel(location, memberName(location.memberId))
+      }
       toKey={(location) => String(location.id)}
     />
   )

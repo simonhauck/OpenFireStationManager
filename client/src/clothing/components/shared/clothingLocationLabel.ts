@@ -15,9 +15,14 @@ interface FormatClothingLocationLabelOptions {
 
 export function formatClothingLocationLabel(
   location: Pick<ClothingLocation, "name" | "comment" | "type">,
+  memberName: string | undefined,
   { showType = false }: FormatClothingLocationLabelOptions = {},
 ): string {
   let label = location.name
+
+  if (memberName) {
+    label += ` – ${memberName}`
+  }
 
   if (location.comment) {
     label += ` – ${location.comment}`
@@ -32,10 +37,11 @@ export function formatClothingLocationLabel(
 
 export function formatClothingLocationLabelOrDefault(
   location: Pick<ClothingLocation, "name" | "comment" | "type"> | undefined,
+  memberName: string | undefined,
   options: FormatClothingLocationLabelOptions = {},
   defaultValue = "–",
 ): string {
   return location
-    ? formatClothingLocationLabel(location, options)
+    ? formatClothingLocationLabel(location, memberName, options)
     : defaultValue
 }

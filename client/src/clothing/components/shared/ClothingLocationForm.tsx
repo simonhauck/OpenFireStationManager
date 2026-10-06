@@ -15,6 +15,7 @@ import { Card, CardContent } from "#/components/ui/card"
 import { Checkbox } from "#/components/ui/checkbox"
 import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
+import MemberSelect from "#/members/components/shared/MemberSelect"
 
 type LocationType = "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
 
@@ -45,6 +46,12 @@ export default function ClothingLocationForm({
   const [type, setType] = useState<LocationType | "">(
     existingLocation?.type ?? "",
   )
+  const [memberId, setMemberId] = useState<number | undefined>(
+    existingLocation?.memberId ?? undefined,
+  )
+
+  const isOwnedTypeChange =
+    memberId !== undefined && type !== "" && type !== "PERSONAL"
 
   const {
     mutate: createLocation,
@@ -76,7 +83,7 @@ export default function ClothingLocationForm({
       comment,
       onlyVisibleForKleiderwart,
       type,
-      memberId: existingLocation?.memberId,
+      memberId,
     }
 
     if (isEditing) {
@@ -135,6 +142,13 @@ export default function ClothingLocationForm({
               />
             </div>
 
+            <RenderIf when={type === "PERSONAL"}>
+              <MemberSelect
+                selectedMemberId={memberId}
+                onMemberChange={setMemberId}
+              />
+            </RenderIf>
+
             <div className="space-y-1.5">
               <Label htmlFor="comment">Kommentar</Label>
               <Input
@@ -161,11 +175,18 @@ export default function ClothingLocationForm({
               <ErrorState message="Der Standort konnte nicht gespeichert werden." />
             </RenderIf>
 
+            <RenderIf when={isOwnedTypeChange}>
+              <ErrorState message="Dieser Standort ist einem Mitglied zugewiesen. Wechseln Sie zurück zu 'Persönlicher Standort' und entfernen Sie das Mitglied, bevor Sie den Typ ändern." />
+            </RenderIf>
+
             <div className="flex flex-wrap justify-end gap-2 pt-2">
               <Button type="button" variant="outline" asChild>
                 <Link to="/clothing-management/locations">Abbrechen</Link>
               </Button>
-              <Button type="submit" disabled={isPending || !type}>
+              <Button
+                type="submit"
+                disabled={isPending || !type || isOwnedTypeChange}
+              >
                 {isPending ? "Wird gespeichert..." : "Speichern"}
               </Button>
             </div>

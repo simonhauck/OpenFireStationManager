@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test"
 import { createClothingItem } from "../flows/createClothingItem"
 import { createClothingLocation } from "../flows/createClothingLocation"
 import { createClothingType } from "../flows/createClothingType"
+import { createMember } from "../flows/createMember"
 import { CheckoutPage } from "../pages/CheckoutPage"
 import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
 
@@ -97,6 +98,44 @@ test.describe("Checkout", () => {
     await expect(typePanelHeader.getByText("(0)")).toBeVisible({
       timeout: 10000,
     })
+  })
+})
+
+test.describe("Checkout – owner names", () => {
+  let memberName: string
+  let personalLocationName: string
+
+  test.beforeAll(async ({ browser }) => {
+    const suffix = randomUUID().slice(0, 8)
+    memberName = `Mitglied-${suffix}`
+    personalLocationName = `Spind-Owner-${suffix}`
+
+    const page = await browser.newPage({
+      storageState: "playwright/.auth/kleiderwart.json",
+    })
+
+    await createMember(page, memberName)
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: personalLocationName,
+      memberName,
+    })
+
+    await page.close()
+  })
+
+  test("shows the owner's name in the Spind picker", async ({ page }) => {
+    const checkoutPage = new CheckoutPage(page)
+
+    await checkoutPage.goto()
+    await page.getByRole("combobox").click()
+    await page.getByPlaceholder("Spind suchen...").fill(personalLocationName)
+
+    await expect(
+      page.getByRole("option", {
+        name: `${personalLocationName} – ${memberName}`,
+      }),
+    ).toBeVisible()
   })
 })
 

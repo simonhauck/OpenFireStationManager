@@ -20,6 +20,7 @@ import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 const SUCCESS_REDIRECT_SECONDS = 15
 
@@ -113,10 +114,13 @@ interface StepTargetPickerContentProps {
 
 function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const memberName = useMemberNameLookup()
 
   const options: ComboboxOption[] = (allLocations ?? []).map((l) => ({
     value: String(l.id),
-    label: formatClothingLocationLabel(l, { showType: true }),
+    label: formatClothingLocationLabel(l, memberName(l.memberId), {
+      showType: true,
+    }),
   }))
 
   return (
@@ -193,15 +197,18 @@ function StepReviewContent({
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const queryClient = useQueryClient()
   const relocate = useMutation(relocationMutation(queryClient))
+  const memberName = useMemberNameLookup()
 
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
   const location =
     state.targetLocationId !== null
       ? locationMap.get(state.targetLocationId)
       : undefined
-  const targetLocationName = formatClothingLocationLabelOrDefault(location, {
-    showType: true,
-  })
+  const targetLocationName = formatClothingLocationLabelOrDefault(
+    location,
+    memberName(location?.memberId),
+    { showType: true },
+  )
 
   async function handleSubmit() {
     if (state.targetLocationId === null) return
@@ -283,13 +290,17 @@ function StepSuccessContent({
   onNavigateToOverview,
 }: StepSuccessContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const memberName = useMemberNameLookup()
   const [secondsLeft, setSecondsLeft] = useState(SUCCESS_REDIRECT_SECONDS)
 
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
-  const targetLocationName = formatClothingLocationLabelOrDefault(
+  const targetLocation =
     state.targetLocationId !== null
       ? locationMap.get(state.targetLocationId)
-      : undefined,
+      : undefined
+  const targetLocationName = formatClothingLocationLabelOrDefault(
+    targetLocation,
+    memberName(targetLocation?.memberId),
     { showType: true },
   )
 
