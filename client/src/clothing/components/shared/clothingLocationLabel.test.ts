@@ -41,6 +41,14 @@ describe("formatClothingLocationLabel", () => {
     ).toBe("Spind 5 – Hans Müller – defekt")
   })
 
+  it("appends the type suffix to the name alone when requested", () => {
+    expect(
+      formatClothingLocationLabel(personalLocation, undefined, {
+        showType: true,
+      }),
+    ).toBe("Spind 5 (Persönlicher Standort)")
+  })
+
   it("appends the type suffix when requested", () => {
     expect(
       formatClothingLocationLabel(

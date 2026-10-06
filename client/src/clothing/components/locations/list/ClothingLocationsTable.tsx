@@ -44,8 +44,11 @@ export default function ClothingLocationsTable({
     {
       id: "member",
       header: "Mitglied",
-      getValue: (location: ClothingLocation) =>
-        memberName(location.memberId) ?? "-",
+      getValue: (location: ClothingLocation) => {
+        const owner = memberName(location.memberId)
+        if (owner) return owner
+        return location.type === "PERSONAL" ? location.comment || "-" : "-"
+      },
     },
     {
       id: "type",
