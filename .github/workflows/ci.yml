@@ -29,6 +29,10 @@ jobs:
         working-directory: client
         run: npm run build && npm run build:check
 
+      - name: Run client unit tests
+        working-directory: client
+        run: npm run test
+
       - name: Check client formatting and linting
         working-directory: client
         run: npm run format:check
