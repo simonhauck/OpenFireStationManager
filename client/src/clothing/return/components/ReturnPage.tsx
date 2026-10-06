@@ -21,6 +21,7 @@ import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 export default function ReturnPage({
   returnTarget,
@@ -218,6 +219,7 @@ function StepReturnTargetPickerContent({
   targets,
   onSelect,
 }: StepReturnTargetPickerContentProps) {
+  const memberName = useMemberNameLookup()
   const description =
     locationType === "POOL"
       ? "Wähle den Pool-Standort aus, in den die Kleidung zurückgegeben wird."
@@ -236,7 +238,7 @@ function StepReturnTargetPickerContent({
             onClick={() => onSelect(loc.id)}
           >
             <span className="text-base font-medium">
-              {formatClothingLocationLabel(loc)}
+              {formatClothingLocationLabel(loc, memberName(loc.memberId))}
             </span>
           </TouchButton>
         ))}
@@ -262,11 +264,15 @@ function StepReviewContent({
 }: StepReviewContentProps) {
   const queryClient = useQueryClient()
   const mutation = useMutation(returnMutation(queryClient))
+  const memberName = useMemberNameLookup()
 
   const locationMap = new Map(allLocations.map((l) => [l.id, l]))
   const returnLocationId = state.returnLocationId
+  const returnLocation =
+    returnLocationId != null ? locationMap.get(returnLocationId) : undefined
   const targetName = formatClothingLocationLabelOrDefault(
-    returnLocationId != null ? locationMap.get(returnLocationId) : undefined,
+    returnLocation,
+    memberName(returnLocation?.memberId),
   )
 
   async function handleSubmit() {

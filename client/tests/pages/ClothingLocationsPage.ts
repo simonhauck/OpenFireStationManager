@@ -41,6 +41,22 @@ export class ClothingLocationsPage {
     await this.page.locator("#comment").fill(comment)
   }
 
+  async selectMember(name: string) {
+    await this.page.locator("#member").click()
+    await this.page.getByPlaceholder("Mitglied suchen...").fill(name)
+    await this.page.getByRole("option", { name }).click()
+  }
+
+  async clearMember() {
+    await this.page
+      .getByRole("button", { name: "Auswahl zurücksetzen" })
+      .click()
+  }
+
+  memberPicker() {
+    return this.page.locator("#member")
+  }
+
   async submitForm() {
     await this.page.getByRole("button", { name: "Speichern" }).click()
   }

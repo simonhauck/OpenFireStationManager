@@ -8,6 +8,7 @@ import DataTable from "#/components/base/DataTable"
 import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 const LOCATION_TYPE_LABELS: Record<ClothingLocation["type"], string> = {
   POOL: "Pool",
@@ -27,6 +28,7 @@ export default function ClothingLocationsTable({
   const { mutate: deleteLocation } = useMutation(
     deleteClothingLocationMutation(queryClient),
   )
+  const memberName = useMemberNameLookup()
 
   const columns: DataTableColumn<ClothingLocation>[] = [
     {
@@ -38,6 +40,12 @@ export default function ClothingLocationsTable({
       id: "name",
       header: "Ort",
       getValue: (location: ClothingLocation) => location.name,
+    },
+    {
+      id: "member",
+      header: "Mitglied",
+      getValue: (location: ClothingLocation) =>
+        memberName(location.memberId) ?? "-",
     },
     {
       id: "type",

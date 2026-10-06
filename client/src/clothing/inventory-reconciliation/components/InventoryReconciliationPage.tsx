@@ -23,6 +23,7 @@ import RenderIf from "#/components/base/RenderIf"
 import type { StepperWizardStep } from "#/components/base/StepperWizard"
 import StepperWizard from "#/components/base/StepperWizard"
 import { Badge } from "#/components/ui/badge"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 const SUCCESS_REDIRECT_SECONDS = 15
 
@@ -112,10 +113,13 @@ function StepLocationPickerContent({
   onSelect,
 }: StepLocationPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const memberName = useMemberNameLookup()
 
   const options: ComboboxOption[] = (allLocations ?? []).map((l) => ({
     value: String(l.id),
-    label: formatClothingLocationLabel(l, { showType: true }),
+    label: formatClothingLocationLabel(l, memberName(l.memberId), {
+      showType: true,
+    }),
   }))
 
   return (
@@ -152,6 +156,8 @@ function StepScannerContent({
   onBack,
   onNext,
 }: StepScannerContentProps) {
+  const memberName = useMemberNameLookup()
+
   return (
     <div className="space-y-4">
       <p className="text-muted-foreground text-sm">
@@ -166,7 +172,10 @@ function StepScannerContent({
         renderItemBadge={(item) =>
           item.location ? (
             <Badge variant="outline">
-              {formatClothingLocationLabel(item.location)}
+              {formatClothingLocationLabel(
+                item.location,
+                memberName(item.location.memberId),
+              )}
             </Badge>
           ) : null
         }
