@@ -26,8 +26,7 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
             migration.execute(jdbcTemplate)
 
             val memberId = memberIdByName(ownerName) ?: error("Expected a member for '$ownerName'")
-            assertThat(locationMemberId(locationId)).isEqualTo(memberId)
-            assertThat(locationComment(locationId)).isEmpty()
+            assertMigratedTo(listOf(locationId), memberId)
         } finally {
             cleanUp(listOf(locationName), listOf(ownerName))
         }
@@ -47,10 +46,7 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
             migration.execute(jdbcTemplate)
 
             val memberId = memberIdByName(ownerName) ?: error("Expected a member for '$ownerName'")
-            assertThat(locationMemberId(firstId)).isEqualTo(memberId)
-            assertThat(locationMemberId(secondId)).isEqualTo(memberId)
-            assertThat(locationComment(firstId)).isEmpty()
-            assertThat(locationComment(secondId)).isEmpty()
+            assertMigratedTo(listOf(firstId, secondId), memberId)
         } finally {
             cleanUp(listOf(firstLocation, secondLocation), listOf(ownerName))
         }
@@ -78,14 +74,11 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
                     )
                     .filterNotNull()
             assertThat(memberNames).hasSize(1)
-            val memberName = memberNames.single()
+            val memberName = memberNames.first()
             assertThat(memberName).isIn(firstComment, secondComment)
 
             val memberId = memberIdByName(memberName) ?: error("Expected a member")
-            assertThat(locationMemberId(firstId)).isEqualTo(memberId)
-            assertThat(locationMemberId(secondId)).isEqualTo(memberId)
-            assertThat(locationComment(firstId)).isEmpty()
-            assertThat(locationComment(secondId)).isEmpty()
+            assertMigratedTo(listOf(firstId, secondId), memberId)
         } finally {
             cleanUp(listOf(firstLocation, secondLocation), listOf(firstComment, secondComment))
         }
@@ -157,9 +150,13 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
 
             migration.execute(jdbcTemplate)
             val memberId = memberIdByName(ownerName) ?: error("Expected a member for '$ownerName'")
+            val memberCountBeforeSecondRun = memberCount()
+            val ownedLocationCountBeforeSecondRun = ownedLocationCount()
 
             migration.execute(jdbcTemplate)
 
+            assertThat(memberCount()).isEqualTo(memberCountBeforeSecondRun)
+            assertThat(ownedLocationCount()).isEqualTo(ownedLocationCountBeforeSecondRun)
             assertThat(
                     jdbcTemplate.queryForList<Long>(
                         "SELECT id FROM members WHERE name = ?",
@@ -167,8 +164,7 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
                     )
                 )
                 .containsExactly(memberId)
-            assertThat(locationMemberId(migratedId)).isEqualTo(memberId)
-            assertThat(locationComment(migratedId)).isEmpty()
+            assertMigratedTo(listOf(migratedId), memberId)
             assertThat(locationMemberId(skippedId)).isNull()
             assertThat(locationComment(skippedId)).isEqualTo(skippedComment)
         } finally {
@@ -186,6 +182,21 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
 
     private fun memberIdByName(name: String): Long? =
         jdbcTemplate.queryForList<Long>("SELECT id FROM members WHERE name = ?", name).firstOrNull()
+
+    private fun assertMigratedTo(locationIds: List<Long>, memberId: Long) {
+        locationIds.forEach { locationId ->
+            assertThat(locationMemberId(locationId)).isEqualTo(memberId)
+            assertThat(locationComment(locationId)).isEmpty()
+        }
+    }
+
+    private fun memberCount(): Long? =
+        jdbcTemplate.queryForObject<Long>("SELECT COUNT(*) FROM members")
+
+    private fun ownedLocationCount(): Long? =
+        jdbcTemplate.queryForObject<Long>(
+            "SELECT COUNT(*) FROM clothing_locations WHERE member_id IS NOT NULL"
+        )
 
     private fun locationMemberId(locationId: Long): Long? =
         jdbcTemplate.queryForObject<Long>(
