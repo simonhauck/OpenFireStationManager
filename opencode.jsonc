@@ -25,9 +25,12 @@
 			"type": "local",
 			"command": ["npx", "-y", "@playwright/mcp"]
 		},
-		"shadcn": {
-			"type": "local",
-			"command": ["npx", "shadcn@latest", "mcp"]
+		// Component docs, templates, and design tokens for the Astryx design system.
+		// Two tools: search(query) and get(name, section). See client/AGENTS.md.
+		"astryx": {
+			"type": "remote",
+			"url": "https://astryx.atmeta.com/mcp",
+			"enabled": true
 		},
 		"terraform": {
 			"type": "local",

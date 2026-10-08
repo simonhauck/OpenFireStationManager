@@ -25,9 +25,9 @@
 			},
 			"mcp": {
 				"servers": {
-					"playwright": {
-						"command": "/bin/bash",
-						"args": ["-c", "npx shadcn@latest mcp"]
+					"astryx": {
+						"type": "http",
+						"url": "https://astryx.atmeta.com/mcp"
 					}
 				}
 			}

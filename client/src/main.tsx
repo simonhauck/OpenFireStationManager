@@ -1,8 +1,8 @@
 import { QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider } from "@tanstack/react-router"
 import ReactDOM from "react-dom/client"
-import { Toaster } from "sonner"
 import { getRouter } from "./router"
+import { AppThemeProvider } from "./theme/AppThemeProvider"
 
 const { router, queryClient } = getRouter()
 
@@ -16,8 +16,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <Toaster richColors position="top-right" />
+      <AppThemeProvider>
+        <RouterProvider router={router} />
+      </AppThemeProvider>
     </QueryClientProvider>,
   )
 }
