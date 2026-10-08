@@ -1,19 +1,20 @@
+import { AlertDialog } from "@astryxdesign/core/AlertDialog"
+import { Button } from "@astryxdesign/core/Button"
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query"
-import { Link, useNavigate, useParams } from "@tanstack/react-router"
+import { useNavigate, useParams } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
+import { useState } from "react"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import {
   getClothingLocationItemsQuery,
   useClothingLocations,
 } from "#/clothing/service/clothingLocationsQueries"
-import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
 import FormattedDate from "#/components/base/FormattedDate"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 import type { MemberClothingGroupData } from "#/members/components/detail/MemberClothingSection"
 import MemberClothingSection from "#/members/components/detail/MemberClothingSection"
 import MemberLocationsSection from "#/members/components/detail/MemberLocationsSection"
@@ -63,6 +64,7 @@ interface MemberDetailContentProps {
 function MemberDetailContent({ member, locations }: MemberDetailContentProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const memberLocations = locations.filter(
     (location) => location.memberId === member.id,
@@ -111,58 +113,69 @@ function MemberDetailContent({ member, locations }: MemberDetailContentProps) {
   }
 
   return (
-    <PageSection
-      title={member.name}
-      subtitle="Mitglied"
-      buttons={
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline">
-            <Link
-              to="/members/$memberId/edit"
-              params={{ memberId: String(member.id) }}
-            >
-              <Pencil className="size-4" />
-              Bearbeiten
-            </Link>
-          </Button>
+    <>
+      <PageSection
+        title={member.name}
+        subtitle="Mitglied"
+        buttons={
+          <div className="flex flex-wrap gap-2">
+            <Button
+              label="Bearbeiten"
+              icon={<Pencil className="size-4" />}
+              variant="secondary"
+              onClick={() => {
+                void navigate({
+                  to: "/members/$memberId/edit",
+                  params: { memberId: String(member.id) },
+                })
+              }}
+            />
 
-          <DeleteDialogComponent
-            onDelete={handleDelete}
-            headline="Mitglied löschen"
-            bodyText={deleteBodyText}
-            confirmText="Löschen"
-          >
-            <Button variant="destructive" disabled={areItemsLoading}>
-              <Trash2 className="size-4" />
-              Löschen
-            </Button>
-          </DeleteDialogComponent>
-        </div>
-      }
-    >
-      <div
-        data-testid="member-metadata"
-        className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-1 text-sm"
+            <Button
+              label="Löschen"
+              icon={<Trash2 className="size-4" />}
+              variant="destructive"
+              isDisabled={areItemsLoading}
+              onClick={() => setIsDeleteDialogOpen(true)}
+            />
+          </div>
+        }
       >
-        <span>
-          Erstellt am <FormattedDate value={member.metaData.createdAt} /> von{" "}
-          {member.metaData.createdBy}
-        </span>
-        <span>
-          Zuletzt geändert am{" "}
-          <FormattedDate value={member.metaData.lastModifiedAt} /> von{" "}
-          {member.metaData.lastModifiedBy}
-        </span>
-      </div>
+        <div
+          data-testid="member-metadata"
+          className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-1 text-sm"
+        >
+          <span>
+            Erstellt am <FormattedDate value={member.metaData.createdAt} /> von{" "}
+            {member.metaData.createdBy}
+          </span>
+          <span>
+            Zuletzt geändert am{" "}
+            <FormattedDate value={member.metaData.lastModifiedAt} /> von{" "}
+            {member.metaData.lastModifiedBy}
+          </span>
+        </div>
 
-      <RenderIf when={deleteError != null}>
-        <ErrorState message="Mitglied konnte nicht gelöscht werden." />
-      </RenderIf>
+        <RenderIf when={deleteError != null}>
+          <ErrorState message="Mitglied konnte nicht gelöscht werden." />
+        </RenderIf>
 
-      <MemberLocationsSection locations={memberLocations} />
+        <MemberLocationsSection locations={memberLocations} />
 
-      <MemberClothingSection groups={clothingGroups} />
-    </PageSection>
+        <MemberClothingSection groups={clothingGroups} />
+      </PageSection>
+
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Mitglied löschen"
+        description={deleteBodyText}
+        actionLabel="Löschen"
+        onAction={handleDelete}
+        cancelLabel="Abbrechen"
+        actionVariant="destructive"
+      />
+    </>
   )
 }
 

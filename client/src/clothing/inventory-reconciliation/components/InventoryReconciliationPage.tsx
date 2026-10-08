@@ -1,12 +1,18 @@
+import { Badge } from "@astryxdesign/core/Badge"
+import { Banner } from "@astryxdesign/core/Banner"
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { Heading } from "@astryxdesign/core/Heading"
+import { Selector } from "@astryxdesign/core/Selector"
+import { Step, Stepper } from "@astryxdesign/core/Stepper"
+import { Text } from "@astryxdesign/core/Text"
+import { useToast } from "@astryxdesign/core/Toast"
+import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import {
-  TouchButton,
-  TouchCombobox,
-} from "#/clothing/checkout/components/TouchComponents"
+
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
@@ -20,12 +26,15 @@ import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
-import type { StepperWizardStep } from "#/components/base/StepperWizard"
-import StepperWizard from "#/components/base/StepperWizard"
-import { Badge } from "#/components/ui/badge"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 const SUCCESS_REDIRECT_SECONDS = 15
+
+interface WizardStep {
+  label: string
+  description: string
+  content: ReactNode
+}
 
 export default function InventoryReconciliationPage() {
   const navigate = useNavigate()
@@ -41,7 +50,7 @@ export default function InventoryReconciliationPage() {
     reset,
   } = useInventoryReconciliationWizard()
 
-  const steps: StepperWizardStep[] = [
+  const steps: WizardStep[] = [
     {
       label: "Standort wählen",
       description: "Standort für die Inventarisierung auswählen",
@@ -83,22 +92,62 @@ export default function InventoryReconciliationPage() {
   return (
     <PageSection
       title="Inventarisierung"
+      className="tablet-controls"
       buttons={
-        <TouchButton
-          variant="outline"
-          onClick={async () => {
-            await navigate({ to: "/pool-clothing" })
+        <Button
+          label="Abbrechen"
+          variant="secondary"
+          size="lg"
+          onClick={() => {
+            void navigate({ to: "/pool-clothing" })
           }}
-        >
-          Abbrechen
-        </TouchButton>
+        />
       }
     >
-      <StepperWizard
-        steps={steps}
-        currentStep={state.step}
-        onStepClick={(step) => goToStep(step as InventoryReconciliationStep)}
-      />
+      <div className="flex items-stretch">
+        <aside className="hidden shrink-0 sm:block">
+          <div className="pr-6 pb-2">
+            <Stepper
+              orientation="vertical"
+              activeStep={state.step - 1}
+              onStepClick={(index) => {
+                if (state.step >= steps.length) return
+                if (index + 1 < state.step) {
+                  goToStep((index + 1) as InventoryReconciliationStep)
+                }
+              }}
+            >
+              {steps.map((step, index) => (
+                <Step
+                  key={step.label}
+                  step={index}
+                  label={step.label}
+                  description={step.description}
+                  isDisabled={index + 1 > state.step}
+                />
+              ))}
+            </Stepper>
+          </div>
+        </aside>
+
+        <div className="min-w-0 flex-1 space-y-4">
+          {steps.map((step, index) => {
+            const stepNumber = index + 1
+            return (
+              <RenderIf key={stepNumber} when={state.step === stepNumber}>
+                <Card>
+                  <VStack gap={4}>
+                    <Heading level={2}>
+                      Schritt {stepNumber}: {step.label}
+                    </Heading>
+                    {step.content}
+                  </VStack>
+                </Card>
+              </RenderIf>
+            )
+          })}
+        </div>
+      </div>
     </PageSection>
   )
 }
@@ -115,7 +164,7 @@ function StepLocationPickerContent({
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const memberName = useMemberNameLookup()
 
-  const options: ComboboxOption[] = (allLocations ?? []).map((l) => ({
+  const options = (allLocations ?? []).map((l) => ({
     value: String(l.id),
     label: formatClothingLocationLabel(l, memberName(l.memberId), {
       showType: true,
@@ -124,16 +173,20 @@ function StepLocationPickerContent({
 
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Wähle den Standort aus, dessen Bestand überprüft werden soll.
-      </p>
-      <TouchCombobox
+      </Text>
+      <Selector
+        label="Standort"
+        isLabelHidden
         options={options}
-        value={null}
-        onSelect={(value) => onSelect(Number(value))}
+        onChange={(value: string) => onSelect(Number(value))}
+        hasSearch
+        size="lg"
+        width="100%"
         placeholder="Standort auswählen..."
         searchPlaceholder="Standort suchen..."
-        emptyMessage="Kein Standort gefunden."
+        emptySearchText="Kein Standort gefunden."
       />
     </div>
   )
@@ -160,10 +213,10 @@ function StepScannerContent({
 
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Scanne alle Kleidungsstücke, die sich physisch an diesem Standort
         befinden.
-      </p>
+      </Text>
 
       <ClothingItemScanner
         items={state.scannedItems}
@@ -171,21 +224,25 @@ function StepScannerContent({
         onRemoveItem={onRemoveItem}
         renderItemBadge={(item) =>
           item.location ? (
-            <Badge variant="outline">
-              {formatClothingLocationLabel(
+            <Badge
+              variant="neutral"
+              label={formatClothingLocationLabel(
                 item.location,
                 memberName(item.location.memberId),
               )}
-            </Badge>
+            />
           ) : null
         }
       />
 
       <div className="flex justify-end gap-3 pt-2">
-        <TouchButton variant="outline" onClick={onBack}>
-          ← Zurück
-        </TouchButton>
-        <TouchButton onClick={onNext}>Weiter →</TouchButton>
+        <Button
+          label="← Zurück"
+          variant="secondary"
+          size="lg"
+          onClick={onBack}
+        />
+        <Button label="Weiter →" variant="primary" size="lg" onClick={onNext} />
       </div>
     </div>
   )
@@ -201,6 +258,7 @@ interface StepDiffContentProps {
 
 function StepDiffContent({ state, onSubmitOk, onBack }: StepDiffContentProps) {
   const queryClient = useQueryClient()
+  const showToast = useToast()
   const executeMutation = useMutation(
     inventoryReconciliationExecuteMutation(queryClient),
   )
@@ -225,18 +283,20 @@ function StepDiffContent({ state, onSubmitOk, onBack }: StepDiffContentProps) {
       })
       onSubmitOk()
     } catch {
-      toast.error(
-        "Fehler beim Abschließen der Inventarisierung. Bitte erneut versuchen.",
-      )
+      showToast({
+        body: "Fehler beim Abschließen der Inventarisierung. Bitte erneut versuchen.",
+        type: "error",
+        isAutoHide: true,
+      })
     }
   }
 
   if (isLoading || !diff) {
     return (
       <div className="space-y-4">
-        <p className="text-muted-foreground text-sm">
+        <Text type="supporting" as="p">
           Differenzen werden berechnet…
-        </p>
+        </Text>
       </div>
     )
   }
@@ -265,30 +325,33 @@ function StepDiffContent({ state, onSubmitOk, onBack }: StepDiffContentProps) {
       />
 
       <RenderIf when={diff.missingItems.length > 0}>
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
-          <p className="text-destructive text-sm font-medium">
-            Fehlende Kleidung wird auf &bdquo;Kein Standort&ldquo; gesetzt und
-            ist keinem Standort mehr zugeordnet.
-          </p>
-        </div>
+        <Banner
+          status="warning"
+          title={
+            "Fehlende Kleidung wird auf \u201eKein Standort\u201c gesetzt und ist keinem Standort mehr zugeordnet."
+          }
+        />
       </RenderIf>
 
       <div className="flex justify-end gap-3 pt-2">
-        <TouchButton
-          variant="outline"
+        <Button
+          label="← Zurück"
+          variant="secondary"
+          size="lg"
           onClick={onBack}
-          disabled={executeMutation.isPending}
-        >
-          ← Zurück
-        </TouchButton>
-        <TouchButton
-          disabled={executeMutation.isPending}
+          isDisabled={executeMutation.isPending}
+        />
+        <Button
+          label={
+            executeMutation.isPending
+              ? "Wird gesendet…"
+              : "Inventarisierung abschließen"
+          }
+          variant="primary"
+          size="lg"
+          isDisabled={executeMutation.isPending}
           onClick={() => void handleConfirm()}
-        >
-          {executeMutation.isPending
-            ? "Wird gesendet…"
-            : "Inventarisierung abschließen"}
-        </TouchButton>
+        />
       </div>
     </div>
   )
@@ -310,12 +373,20 @@ function DiffSection({
   return (
     <div className="space-y-2">
       <div className="flex items-baseline gap-2">
-        <p className="text-sm font-semibold">{title}</p>
-        <span className="text-muted-foreground text-xs">({items.length})</span>
+        <Text as="p" type="label">
+          {title}
+        </Text>
+        <Text as="span" type="supporting">
+          ({items.length})
+        </Text>
       </div>
-      <p className="text-muted-foreground text-xs">{subtitle}</p>
+      <Text as="p" type="supporting">
+        {subtitle}
+      </Text>
       <RenderIf when={items.length === 0}>
-        <p className="text-muted-foreground text-sm italic">{emptyMessage}</p>
+        <Text type="supporting" as="p" className="italic">
+          {emptyMessage}
+        </Text>
       </RenderIf>
       <RenderIf when={items.length > 0}>
         <div className="space-y-1">
@@ -355,24 +426,32 @@ function StepSuccessContent({
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-lg font-semibold">Inventarisierung abgeschlossen</p>
-        <p className="text-muted-foreground text-sm">
+        <Text as="p" type="large" weight="semibold">
+          Inventarisierung abgeschlossen
+        </Text>
+        <Text type="supporting" as="p">
           {state.scannedItems.length} Kleidungsstück
           {state.scannedItems.length !== 1 ? "e" : ""} wurden gescannt. Die
           Änderungen wurden übernommen.
-        </p>
+        </Text>
       </div>
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Weiterleitung zur Übersicht in {secondsLeft} Sekunde
         {secondsLeft !== 1 ? "n" : ""}…
-      </p>
+      </Text>
       <div className="flex gap-3">
-        <TouchButton onClick={onReset}>
-          Neue Inventarisierung starten
-        </TouchButton>
-        <TouchButton variant="outline" onClick={onNavigateToOverview}>
-          Zur Übersicht
-        </TouchButton>
+        <Button
+          label="Neue Inventarisierung starten"
+          variant="primary"
+          size="lg"
+          onClick={onReset}
+        />
+        <Button
+          label="Zur Übersicht"
+          variant="secondary"
+          size="lg"
+          onClick={onNavigateToOverview}
+        />
       </div>
     </div>
   )

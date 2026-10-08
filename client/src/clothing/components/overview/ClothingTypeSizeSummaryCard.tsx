@@ -1,18 +1,21 @@
-import type { ClothingTypeSizeSummary } from "#/clothing/model/overview.ts"
+import { Badge } from "@astryxdesign/core/Badge"
+import {
+  pixel,
+  proportional,
+  Table,
+  type TableColumn,
+} from "@astryxdesign/core/Table"
+import { Text } from "@astryxdesign/core/Text"
+
+import type {
+  ClothingTypeSizeSummary,
+  SizeGroupSummary,
+} from "#/clothing/model/overview.ts"
 import ErrorState from "#/components/base/ErrorState"
 import LabelWithCount from "#/components/base/LabelWithCount"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
-import { Badge } from "#/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "#/components/ui/table"
 
 interface ClothingTypeSizeSummaryCardProps {
   summary: ClothingTypeSizeSummary[] | undefined
@@ -28,7 +31,7 @@ export default function ClothingTypeSizeSummaryCard({
   const summaryData = summary ?? []
 
   return (
-    <PageSubSection title="Bestandsübersicht nach Größe">
+    <>
       <RenderIf when={isLoading}>
         <LoadingIndicator label="Übersicht wird geladen..." />
       </RenderIf>
@@ -37,67 +40,83 @@ export default function ClothingTypeSizeSummaryCard({
         <ErrorState message="Bestandsübersicht konnte nicht geladen werden." />
       </RenderIf>
 
-      <RenderIf when={summaryData.length > 0}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Kleidungstyp</TableHead>
-              <TableHead>Größe</TableHead>
-              <TableHead>Verfügbarkeit</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {summaryData.flatMap((clothingTypeSummary) =>
-              renderClothingTypeSummary(clothingTypeSummary),
-            )}
-          </TableBody>
-        </Table>
+      <RenderIf when={summary !== undefined && summaryData.length === 0}>
+        <Text type="supporting" as="p">
+          Es sind noch keine Kleidungstypen vorhanden.
+        </Text>
       </RenderIf>
 
-      <RenderIf when={summary !== undefined && summaryData.length === 0}>
-        <p className="text-muted-foreground text-sm">
-          Es sind noch keine Kleidungstypen vorhanden.
-        </p>
-      </RenderIf>
-    </PageSubSection>
+      {summaryData.map((typeSummary) => (
+        <ClothingTypeSection key={typeSummary.typeId} summary={typeSummary} />
+      ))}
+    </>
   )
 }
 
-function renderClothingTypeSummary(
-  clothingTypeSummary: ClothingTypeSizeSummary,
-) {
-  return clothingTypeSummary.sizeGroupSummary.map((sizeGroup, index) => (
-    <TableRow key={`${clothingTypeSummary.typeId}-${sizeGroup.name}`}>
-      <RenderIf when={index === 0}>
-        <TableCell rowSpan={clothingTypeSummary.sizeGroupSummary.length}>
-          <LabelWithCount
-            label={clothingTypeSummary.typeName}
-            count={clothingTypeSummary.totalCount}
-            format="braces"
-          />
-        </TableCell>
-      </RenderIf>
+interface ClothingTypeSectionProps {
+  summary: ClothingTypeSizeSummary
+}
 
-      <TableCell>
+function ClothingTypeSection({ summary }: ClothingTypeSectionProps) {
+  const columns: TableColumn<SizeGroupSummary>[] = [
+    {
+      key: "name",
+      header: "Größe",
+      width: pixel(140),
+      renderCell: (sizeGroup) => (
         <LabelWithCount
           label={sizeGroup.name}
           count={sizeGroup.totalCount}
           format="braces"
         />
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-wrap gap-1">
+      ),
+    },
+    {
+      key: "availability",
+      header: "Verfügbarkeit",
+      width: proportional(1),
+      renderCell: (sizeGroup) => (
+        <div className="flex flex-wrap gap-2">
           {sizeGroup.sizes.map((sizeSummary) => (
-            <Badge key={sizeSummary.size} variant="outline" className="text-sm">
-              <LabelWithCount
-                label={sizeSummary.size}
-                count={sizeSummary.count}
-                format="colon"
-              />
-            </Badge>
+            <Badge
+              key={sizeSummary.size}
+              variant="neutral"
+              className="size-chip"
+              label={
+                <LabelWithCount
+                  label={sizeSummary.size}
+                  count={sizeSummary.count}
+                  format="colon"
+                />
+              }
+            />
           ))}
         </div>
-      </TableCell>
-    </TableRow>
-  ))
+      ),
+    },
+  ]
+
+  return (
+    <PageSubSection
+      title={summary.typeName}
+      right={
+        <div className="text-right">
+          <Text as="p" type="supporting" className="uppercase tracking-wide">
+            Gesamt
+          </Text>
+          <Text as="p" size="2xl" weight="bold" className="text-success">
+            {summary.totalCount}
+          </Text>
+        </div>
+      }
+    >
+      <Table
+        density="spacious"
+        className="overview-table"
+        data={[...summary.sizeGroupSummary]}
+        columns={columns}
+        idKey="name"
+      />
+    </PageSubSection>
+  )
 }

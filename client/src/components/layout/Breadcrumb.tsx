@@ -1,5 +1,7 @@
+import { BreadcrumbItem, Breadcrumbs } from "@astryxdesign/core/Breadcrumbs"
+import { VisuallyHidden } from "@astryxdesign/core/VisuallyHidden"
 import type { FileRoutesByPath } from "@tanstack/react-router"
-import { Link, useLocation, useRouter } from "@tanstack/react-router"
+import { useLocation, useRouter } from "@tanstack/react-router"
 import { ChevronRight, Home } from "lucide-react"
 
 // ─── Derive StaticSegment from the generated route tree ───────────────────────
@@ -103,49 +105,36 @@ export default function Breadcrumb() {
   if (crumbs.length === 0) return null
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className="border-border bg-background hidden border-b px-4 py-2 sm:block"
+    <Breadcrumbs
+      label="Breadcrumb"
+      variant="supporting"
+      separator={<ChevronRight className="size-3.5" aria-hidden="true" />}
+      className="border-border bg-background hidden border-b px-4 pt-1 pb-2 sm:block"
     >
-      <ol className="flex items-center gap-1 text-sm">
-        {/* Home */}
-        <li>
-          <Link
-            to="/"
-            className="text-muted-foreground hover:text-foreground flex items-center transition-colors"
-            aria-label="Startseite"
-          >
-            <Home className="size-3.5" />
-          </Link>
-        </li>
+      <BreadcrumbItem
+        href="/"
+        startIcon={<Home className="size-3.5" aria-hidden="true" />}
+      >
+        <VisuallyHidden>Startseite</VisuallyHidden>
+      </BreadcrumbItem>
 
-        {crumbs.map((crumb, index) => {
-          const isLast = index === crumbs.length - 1
+      {crumbs.map((crumb, index) => {
+        const isLast = index === crumbs.length - 1
+
+        if (isLast || !crumb.isLinked) {
           return (
-            <li key={crumb.href} className="flex items-center gap-1">
-              <ChevronRight className="text-muted-foreground size-3.5 shrink-0" />
-              {isLast || !crumb.isLinked ? (
-                <span
-                  className={
-                    isLast
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground"
-                  }
-                >
-                  {crumb.label}
-                </span>
-              ) : (
-                <Link
-                  to={crumb.href}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {crumb.label}
-                </Link>
-              )}
-            </li>
+            <BreadcrumbItem key={crumb.href} isCurrent={isLast}>
+              {crumb.label}
+            </BreadcrumbItem>
           )
-        })}
-      </ol>
-    </nav>
+        }
+
+        return (
+          <BreadcrumbItem key={crumb.href} href={crumb.href}>
+            {crumb.label}
+          </BreadcrumbItem>
+        )
+      })}
+    </Breadcrumbs>
   )
 }

@@ -1,15 +1,12 @@
+import { Badge } from "@astryxdesign/core/Badge"
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { Heading } from "@astryxdesign/core/Heading"
+import { Text } from "@astryxdesign/core/Text"
 import { createFileRoute, redirect } from "@tanstack/react-router"
 import { Building2, Flame, ShieldCheck, Users } from "lucide-react"
 
 import { meQuery } from "#/api/auth.queries"
-import { Badge } from "#/components/ui/badge"
-import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
 
 export const Route = createFileRoute("/")({
   beforeLoad: async ({ context }) => {
@@ -42,55 +39,48 @@ function App() {
 
   return (
     <>
-      <section className="island-shell rise-in relative overflow-hidden rounded-4xl px-6 py-10 sm:px-10 sm:py-14">
-        <Badge variant="secondary" className="mb-4 uppercase tracking-wider">
-          Öffentliche Projektübersicht
-        </Badge>
-        <h1 className="display-title mb-4 max-w-3xl text-4xl leading-[1.02] font-bold tracking-tight text-(--sea-ink) sm:text-6xl">
-          OpenFireStationManager
-        </h1>
-        <p className="mb-8 max-w-2xl text-base leading-relaxed text-(--sea-ink-soft) sm:text-lg">
-          OpenFireStationManager hilft Feuerwehrstationen dabei, Nutzer,
-          Aufgaben und die tägliche Verwaltung sicher und zentral in einer
-          browserbasierten Plattform zu koordinieren.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button asChild size="lg" variant="outline">
-            <a
+      <Card padding={6} className="relative overflow-hidden">
+        <div className="flex flex-col items-start gap-4">
+          <Badge label="Öffentliche Projektübersicht" variant="neutral" />
+          <Heading level={1}>OpenFireStationManager</Heading>
+          <Text type="large" as="p">
+            OpenFireStationManager hilft Feuerwehrstationen dabei, Nutzer,
+            Aufgaben und die tägliche Verwaltung sicher und zentral in einer
+            browserbasierten Plattform zu koordinieren.
+          </Text>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              label="Quellcode ansehen"
+              variant="secondary"
               href="https://github.com/simonhauck/OpenFireStationManager"
               target="_blank"
               rel="noopener noreferrer"
-            >
-              Quellcode ansehen
-            </a>
-          </Button>
-          <span className="inline-flex items-center gap-2 pl-1 text-sm text-(--sea-ink-soft)">
-            <Flame className="size-4 text-(--palm)" />
-            Für transparentes, praktisches Stationsmanagement.
-          </span>
+            />
+            <span className="inline-flex items-center gap-2 pl-1">
+              <Flame className="size-4" aria-hidden="true" />
+              <Text type="supporting">
+                Für transparentes, praktisches Stationsmanagement.
+              </Text>
+            </span>
+          </div>
         </div>
-      </section>
+      </Card>
 
-      <section className="mt-8 grid gap-4 md:grid-cols-3">
-        {highlights.map((item, index) => (
-          <Card
-            key={item.title}
-            className="rise-in border-(--line) bg-[linear-gradient(165deg,var(--surface-strong),var(--surface))]"
-            style={{ animationDelay: `${index * 110 + 70}ms` }}
-          >
-            <CardHeader>
-              <Badge variant="outline" className="w-fit">
-                <item.icon className="size-3.5" />
-                Funktion
-              </Badge>
-              <CardTitle>{item.title}</CardTitle>
-              <CardDescription className="leading-relaxed text-(--sea-ink-soft)">
-                {item.text}
-              </CardDescription>
-            </CardHeader>
+      <div className="mt-8 grid gap-4 md:grid-cols-3">
+        {highlights.map((item) => (
+          <Card key={item.title}>
+            <div className="flex flex-col gap-2">
+              <Badge
+                label="Funktion"
+                variant="neutral"
+                icon={<item.icon className="size-3.5" aria-hidden="true" />}
+              />
+              <Heading level={2}>{item.title}</Heading>
+              <Text type="supporting">{item.text}</Text>
+            </div>
           </Card>
         ))}
-      </section>
+      </div>
     </>
   )
 }

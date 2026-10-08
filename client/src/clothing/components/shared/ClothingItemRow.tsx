@@ -1,3 +1,6 @@
+import { HStack } from "@astryxdesign/core/HStack"
+import { StackItem, VStack } from "@astryxdesign/core/Stack"
+import { Text } from "@astryxdesign/core/Text"
 import type { ReactNode } from "react"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import RenderIf from "#/components/base/RenderIf"
@@ -18,41 +21,44 @@ export default function ClothingItemRow({
   asLabel = false,
   labelFor,
 }: ClothingItemRowProps) {
-  const inner = (
-    <>
+  const content = (
+    <HStack
+      gap={3}
+      vAlign="center"
+      padding={3}
+      width="100%"
+      className="min-h-12 rounded-lg border"
+    >
       <RenderIf when={leading !== undefined}>
-        <div className="shrink-0">{leading}</div>
+        <StackItem size="static">{leading}</StackItem>
       </RenderIf>
 
-      <div className="min-w-0 flex-1">
-        <p className="text-base">
-          {item.clothingType.name} – {item.clothingItem.size}
-        </p>
-        <RenderIf when={!!item.clothingItem.barcode}>
-          <p className="text-muted-foreground text-xs">
-            {item.clothingItem.barcode}
-          </p>
-        </RenderIf>
-      </div>
+      <StackItem size="fill">
+        <VStack gap={0}>
+          <Text as="p">
+            {item.clothingType.name} – {item.clothingItem.size}
+          </Text>
+          <RenderIf when={!!item.clothingItem.barcode}>
+            <Text as="p" type="supporting">
+              {item.clothingItem.barcode}
+            </Text>
+          </RenderIf>
+        </VStack>
+      </StackItem>
 
       <RenderIf when={trailing !== undefined}>
-        <div className="shrink-0">{trailing}</div>
+        <StackItem size="static">{trailing}</StackItem>
       </RenderIf>
-    </>
+    </HStack>
   )
-
-  const className = "flex min-h-12 items-center gap-3 rounded-lg border p-3"
 
   if (asLabel) {
     return (
-      <label
-        htmlFor={labelFor}
-        className={`${className} cursor-pointer hover:bg-muted/50`}
-      >
-        {inner}
+      <label htmlFor={labelFor} className="block cursor-pointer">
+        {content}
       </label>
     )
   }
 
-  return <div className={className}>{inner}</div>
+  return content
 }

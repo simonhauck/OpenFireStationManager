@@ -1,3 +1,4 @@
+import { AppShell } from "@astryxdesign/core/AppShell"
 import type { ReactNode } from "react"
 import ErrorBoundary from "#/components/ErrorBoundary"
 import Footer from "#/components/Footer"
@@ -10,15 +11,19 @@ interface DefaultLayoutProps {
 
 export default function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Header />
-      <Breadcrumb />
-      <main className="flex-1">
-        <ErrorBoundary>
-          <div className="min-h-full w-full p-2">{children}</div>
-        </ErrorBoundary>
-      </main>
-      <Footer />
-    </div>
+    <AppShell
+      variant="wash"
+      contentPadding={0}
+      topNav={<Header />}
+      mobileNav={{ hasToggle: false }}
+    >
+      <div className="flex min-h-[calc(100dvh-3rem)] flex-col">
+        <Breadcrumb />
+        <div className="flex-1 p-2">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </div>
+        <Footer />
+      </div>
+    </AppShell>
   )
 }

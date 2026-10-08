@@ -1,3 +1,6 @@
+import { Heading } from "@astryxdesign/core/Heading"
+import { Section } from "@astryxdesign/core/Section"
+import { Text } from "@astryxdesign/core/Text"
 import type { ReactNode } from "react"
 
 interface PageSectionProps {
@@ -5,6 +8,7 @@ interface PageSectionProps {
   subtitle?: string
   buttons?: ReactNode
   buttonPosition?: "right" | "center"
+  className?: string
   children?: ReactNode
 }
 
@@ -13,10 +17,15 @@ export default function PageSection({
   subtitle,
   buttons,
   buttonPosition = "right",
+  className,
   children,
 }: PageSectionProps) {
   return (
-    <div className="bg-muted min-h-full overflow-hidden rounded-lg">
+    <Section
+      variant="muted"
+      padding={0}
+      className={["min-h-full overflow-hidden", className].join(" ")}
+    >
       {/* Header */}
       <div
         className={[
@@ -28,9 +37,11 @@ export default function PageSection({
       >
         {/* Title + subtitle */}
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <Heading level={1}>{title}</Heading>
           {subtitle && (
-            <p className="text-muted-foreground mt-0.5 text-sm">{subtitle}</p>
+            <Text type="supporting" as="p" className="mt-0.5">
+              {subtitle}
+            </Text>
           )}
         </div>
 
@@ -51,6 +62,6 @@ export default function PageSection({
 
       {/* Page body */}
       {children && <div className="p-4 sm:p-6">{children}</div>}
-    </div>
+    </Section>
   )
 }

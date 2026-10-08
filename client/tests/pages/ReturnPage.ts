@@ -34,10 +34,7 @@ export class ReturnPage {
   }
 
   tileGridItem(name: string) {
-    return this.page
-      .getByRole("button", { name })
-      .filter({ has: this.page.locator("span") })
-      .first()
+    return this.page.getByText(name, { exact: true }).first()
   }
 
   submitButton() {

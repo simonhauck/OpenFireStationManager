@@ -1,11 +1,23 @@
-import { Link } from "@tanstack/react-router"
+import { Badge } from "@astryxdesign/core/Badge"
+import { HStack } from "@astryxdesign/core/HStack"
+import { IconButton } from "@astryxdesign/core/IconButton"
+import {
+  pixel,
+  proportional,
+  Table,
+  type TableColumn,
+  useTableColumnSettings,
+  useTableColumnSettingsState,
+  useTableSortable,
+  useTableSortableState,
+} from "@astryxdesign/core/Table"
+import { Text } from "@astryxdesign/core/Text"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { Pencil } from "lucide-react"
+import { useMemo, useState } from "react"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
-import type { DataTableColumn } from "#/components/base/DataTable"
-import DataTable from "#/components/base/DataTable"
-import RenderIf from "#/components/base/RenderIf"
-import { Badge } from "#/components/ui/badge"
-import { Button } from "#/components/ui/button"
+import TableToolbar from "#/components/base/TableToolbar"
+import { formatDate } from "#/lib/date"
 import type { Member } from "#/members/model/member.ts"
 
 interface MembersTableProps {
@@ -13,15 +25,79 @@ interface MembersTableProps {
   locationsByMember: Map<number, ClothingLocation[]>
 }
 
+const MEMBER_COLUMN_OPTIONS = [
+  { key: "name", label: "Name", isAlwaysVisible: true },
+  { key: "locations", label: "Standorte" },
+  { key: "createdAt", label: "Erstellt am" },
+  { key: "actions", label: "Aktionen", isAlwaysVisible: true },
+]
+
+const MEMBER_COLUMN_KEYS = MEMBER_COLUMN_OPTIONS.map((option) => option.key)
+
 export default function MembersTable({
   members,
   locationsByMember,
 }: MembersTableProps) {
-  const columns: DataTableColumn<Member>[] = [
+  const navigate = useNavigate()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
+    ...MEMBER_COLUMN_KEYS,
+  ])
+
+  const columnSettings = useTableColumnSettingsState({
+    columns: MEMBER_COLUMN_OPTIONS,
+    activeColumnKeys,
+    onChangeActiveColumnKeys: (keys) => setActiveColumnKeys([...keys]),
+  })
+  const columnSettingsPlugin = useTableColumnSettings<Member>(
+    columnSettings.columnSettingsConfig,
+  )
+
+  const filteredMembers = useMemo(() => {
+    const terms = searchTerm
+      .toLowerCase()
+      .split(",")
+      .map((term) => term.trim())
+      .filter((term) => term.length > 0)
+
+    if (terms.length === 0) {
+      return members
+    }
+
+    return members.filter((member) => {
+      const memberLocations = locationsByMember.get(member.id) ?? []
+      const haystack = [
+        member.name,
+        ...memberLocations.map((location) => location.name),
+        formatDate(member.metaData.createdAt) ?? "",
+      ]
+        .join(" ")
+        .toLowerCase()
+
+      return terms.every((term) => haystack.includes(term))
+    })
+  }, [locationsByMember, members, searchTerm])
+
+  const { sortedData, sortConfig } = useTableSortableState<Member>({
+    data: filteredMembers,
+    defaultSort: [{ sortKey: "name", direction: "ascending" }],
+    allowUnsortedState: false,
+    comparators: {
+      createdAt: (a, b) =>
+        new Date(a.metaData.createdAt).getTime() -
+        new Date(b.metaData.createdAt).getTime(),
+    },
+  })
+  const sortPlugin = useTableSortable<Member>(sortConfig)
+
+  const columns: TableColumn<Member>[] = [
     {
-      id: "name",
+      key: "name",
       header: "Name",
-      renderCell: (member: Member) => (
+      width: proportional(2),
+      sortable: true,
+      resizable: false,
+      renderCell: (member) => (
         <Link
           to="/members/$memberId"
           params={{ memberId: String(member.id) }}
@@ -30,69 +106,86 @@ export default function MembersTable({
           {member.name}
         </Link>
       ),
-      getValue: (member: Member) => member.name,
     },
     {
-      id: "locations",
+      key: "locations",
       header: "Standorte",
-      renderCell: (member: Member) => {
+      width: proportional(2),
+      sortable: true,
+      resizable: false,
+      renderCell: (member) => {
         const memberLocations = locationsByMember.get(member.id) ?? []
 
-        return (
-          <>
-            <RenderIf when={memberLocations.length === 0}>
-              <span className="text-muted-foreground">–</span>
-            </RenderIf>
+        if (memberLocations.length === 0) {
+          return <Text type="supporting">–</Text>
+        }
 
-            <RenderIf when={memberLocations.length > 0}>
-              <div className="flex flex-wrap gap-1">
-                {memberLocations.map((location) => (
-                  <Link
-                    key={location.id}
-                    to="/clothing-management/locations/$clothingLocationId/edit"
-                    params={{ clothingLocationId: String(location.id) }}
-                  >
-                    <Badge variant="outline">{location.name}</Badge>
-                  </Link>
-                ))}
-              </div>
-            </RenderIf>
-          </>
+        return (
+          <HStack gap={1} wrap="wrap" vAlign="center">
+            {memberLocations.map((location) => (
+              <Link
+                key={location.id}
+                to="/clothing-management/locations/$clothingLocationId/edit"
+                params={{ clothingLocationId: String(location.id) }}
+              >
+                <Badge label={location.name} variant="neutral" />
+              </Link>
+            ))}
+          </HStack>
         )
       },
-      getValue: (member: Member) =>
-        (locationsByMember.get(member.id) ?? []).map(
-          (location: ClothingLocation) => location.name,
-        ),
     },
     {
-      id: "createdAt",
+      key: "createdAt",
       header: "Erstellt am",
-      getValue: (member: Member) => new Date(member.metaData.createdAt),
+      width: pixel(130),
+      sortable: true,
+      resizable: false,
+      renderCell: (member) => formatDate(member.metaData.createdAt) ?? "-",
+    },
+    {
+      key: "actions",
+      header: "Aktionen",
+      width: pixel(64),
+      align: "end",
+      resizable: false,
+      renderCell: (member) => (
+        <HStack gap={1} hAlign="end">
+          <IconButton
+            label={`Mitglied ${member.name} bearbeiten`}
+            tooltip="Bearbeiten"
+            icon={<Pencil className="size-4" />}
+            variant="secondary"
+            size="lg"
+            onClick={() => {
+              void navigate({
+                to: "/members/$memberId/edit",
+                params: { memberId: String(member.id) },
+              })
+            }}
+          />
+        </HStack>
+      ),
     },
   ]
 
   return (
-    <DataTable
-      columns={columns}
-      rows={members}
-      showSearch={true}
-      searchPlaceholder="Mitglieder suchen..."
-      emptyMessage="Keine Mitglieder gefunden."
-      actionColumn={({ row: member }) => (
-        <div className="flex justify-end gap-1">
-          <Button asChild size="icon" variant="outline">
-            <Link
-              to="/members/$memberId/edit"
-              params={{ memberId: String(member.id) }}
-              aria-label={`Mitglied ${member.name} bearbeiten`}
-              title="Bearbeiten"
-            >
-              <Pencil className="size-4" />
-            </Link>
-          </Button>
-        </div>
-      )}
-    />
+    <div className="space-y-3">
+      <TableToolbar
+        searchLabel="Mitglieder suchen"
+        searchPlaceholder="Mitglieder suchen..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        columnOptions={MEMBER_COLUMN_OPTIONS}
+        activeColumnKeys={columnSettings.activeColumnKeys}
+        onChangeActiveColumnKeys={columnSettings.setActiveColumnKeys}
+      />
+      <Table
+        data={sortedData}
+        columns={columns}
+        idKey="id"
+        plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
+      />
+    </div>
   )
 }

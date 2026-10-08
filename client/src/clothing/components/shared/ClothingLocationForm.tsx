@@ -1,5 +1,10 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { CheckboxInput } from "@astryxdesign/core/CheckboxInput"
+import { RadioList, RadioListItem } from "@astryxdesign/core/RadioList"
+import { TextInput } from "@astryxdesign/core/TextInput"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
@@ -10,11 +15,6 @@ import {
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Checkbox } from "#/components/ui/checkbox"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
 import MemberSelect from "#/members/components/shared/MemberSelect"
 
 type LocationType = "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
@@ -106,92 +106,68 @@ export default function ClothingLocationForm({
 
   return (
     <PageSection title={title} subtitle={description}>
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Typ</Label>
-              <div className="flex flex-col gap-2">
-                {LOCATION_TYPE_OPTIONS.map((option) => (
-                  <div key={option.value} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      id={`type-${option.value}`}
-                      name="type"
-                      value={option.value}
-                      checked={type === option.value}
-                      onChange={() => setType(option.value)}
-                      required
-                      className="h-4 w-4"
-                    />
-                    <Label htmlFor={`type-${option.value}`}>
-                      {option.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="name">Bezeichnung</Label>
-              <Input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+      <Card maxWidth={672} className="mx-auto w-full">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <RadioList
+            label="Typ"
+            isRequired
+            value={type}
+            onChange={(value) => setType(value as LocationType)}
+          >
+            {LOCATION_TYPE_OPTIONS.map((option) => (
+              <RadioListItem
+                key={option.value}
+                value={option.value}
+                label={option.label}
               />
-            </div>
+            ))}
+          </RadioList>
 
-            <RenderIf when={type === "PERSONAL"}>
-              <MemberSelect
-                selectedMemberId={memberId}
-                onMemberChange={setMemberId}
-              />
-            </RenderIf>
+          <TextInput
+            label="Bezeichnung"
+            isRequired
+            value={name}
+            onChange={setName}
+          />
 
-            <div className="space-y-1.5">
-              <Label htmlFor="comment">Kommentar</Label>
-              <Input
-                id="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-            </div>
+          <RenderIf when={type === "PERSONAL"}>
+            <MemberSelect
+              selectedMemberId={memberId}
+              onMemberChange={setMemberId}
+            />
+          </RenderIf>
 
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="onlyVisibleForKleiderwart"
-                checked={onlyVisibleForKleiderwart}
-                onCheckedChange={(checked) =>
-                  setOnlyVisibleForKleiderwart(checked === true)
-                }
-              />
-              <Label htmlFor="onlyVisibleForKleiderwart">
-                Nur sichtbar für Kleiderwart
-              </Label>
-            </div>
+          <TextInput label="Kommentar" value={comment} onChange={setComment} />
 
-            <RenderIf when={!!error}>
-              <ErrorState message="Der Standort konnte nicht gespeichert werden." />
-            </RenderIf>
+          <CheckboxInput
+            label="Nur sichtbar für Kleiderwart"
+            value={onlyVisibleForKleiderwart}
+            onChange={setOnlyVisibleForKleiderwart}
+          />
 
-            <RenderIf when={isOwnedTypeChange}>
-              <ErrorState message="Dieser Standort ist einem Mitglied zugewiesen. Wechseln Sie zurück zu 'Persönlicher Standort' und entfernen Sie das Mitglied, bevor Sie den Typ ändern." />
-            </RenderIf>
+          <RenderIf when={!!error}>
+            <ErrorState message="Der Standort konnte nicht gespeichert werden." />
+          </RenderIf>
 
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/clothing-management/locations">Abbrechen</Link>
-              </Button>
-              <Button
-                type="submit"
-                disabled={isPending || !type || isOwnedTypeChange}
-              >
-                {isPending ? "Wird gespeichert..." : "Speichern"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          <RenderIf when={isOwnedTypeChange}>
+            <ErrorState message="Dieser Standort ist einem Mitglied zugewiesen. Wechseln Sie zurück zu 'Persönlicher Standort' und entfernen Sie das Mitglied, bevor Sie den Typ ändern." />
+          </RenderIf>
+
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <Button
+              label="Abbrechen"
+              variant="secondary"
+              href="/clothing-management/locations"
+            />
+            <Button
+              type="submit"
+              label={isPending ? "Wird gespeichert..." : "Speichern"}
+              variant="primary"
+              isLoading={isPending}
+              isDisabled={!type || isOwnedTypeChange}
+            />
+          </div>
+        </form>
       </Card>
     </PageSection>
   )

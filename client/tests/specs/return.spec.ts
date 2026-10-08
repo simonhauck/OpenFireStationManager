@@ -153,11 +153,11 @@ test("location dialog: select item from locker, add, proceed to review", async (
   const dialog = page.getByRole("dialog")
   await expect(dialog).toBeVisible()
 
-  // Select the personal location via combobox
-  const combobox = dialog.locator('[role="combobox"]')
+  // Select the personal location via the Spind selector
+  const combobox = dialog.getByRole("button", { name: "Spind", exact: true })
   await combobox.click()
-  await page.keyboard.type(personalLocationName)
-  await page.keyboard.press("Enter")
+  await page.getByPlaceholder("Spind suchen...").fill(personalLocationName)
+  await dialog.getByRole("option", { name: personalLocationName }).click()
 
   // Check the item
   const checkbox = dialog.getByRole("checkbox")

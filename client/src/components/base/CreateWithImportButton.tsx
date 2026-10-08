@@ -1,13 +1,6 @@
+import { DropdownMenu } from "@astryxdesign/core/DropdownMenu"
 import { useNavigate } from "@tanstack/react-router"
-import { ChevronDown, Plus } from "lucide-react"
-
-import { Button } from "#/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu"
+import { Plus } from "lucide-react"
 
 type CreateWithImportButtonProps = {
   label: string
@@ -23,22 +16,23 @@ export default function CreateWithImportButton({
   const navigate = useNavigate()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button>
-          <Plus className="size-4" />
-          {label}
-          <ChevronDown className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => void navigate({ to: createTo })}>
-          Einzeln erstellen
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => void navigate({ to: importTo })}>
-          Massenimport
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <DropdownMenu
+      button={{
+        label,
+        icon: <Plus className="size-4" />,
+        variant: "primary",
+      }}
+      alignment="end"
+      items={[
+        {
+          label: "Einzeln erstellen",
+          onClick: () => void navigate({ to: createTo }),
+        },
+        {
+          label: "Massenimport",
+          onClick: () => void navigate({ to: importTo }),
+        },
+      ]}
+    />
   )
 }

@@ -1,3 +1,5 @@
+import { Heading } from "@astryxdesign/core/Heading"
+import { Text } from "@astryxdesign/core/Text"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
@@ -26,9 +28,9 @@ export default function MemberClothingSection({
       subtitle="Kleidungsstücke in den Standorten dieses Mitglieds"
     >
       <RenderIf when={groups.length === 0}>
-        <p className="text-muted-foreground text-sm">
+        <Text type="supporting" as="p">
           Keine Kleidung, da keine Standorte zugewiesen sind.
-        </p>
+        </Text>
       </RenderIf>
 
       <div className="space-y-6">
@@ -49,7 +51,7 @@ function MemberClothingGroup({ group }: MemberClothingGroupProps) {
 
   return (
     <div data-testid="clothing-group" className="space-y-2">
-      <h3 className="text-base font-medium">{location.name}</h3>
+      <Heading level={3}>{location.name}</Heading>
 
       <RenderIf when={isLoading}>
         <LoadingIndicator label="Kleidung wird geladen..." />
@@ -60,9 +62,9 @@ function MemberClothingGroup({ group }: MemberClothingGroupProps) {
       </RenderIf>
 
       <RenderIf when={items !== undefined && items.length === 0}>
-        <p className="text-muted-foreground text-sm">
+        <Text type="supporting" as="p">
           Keine Kleidung an diesem Standort.
-        </p>
+        </Text>
       </RenderIf>
 
       {(items ?? []).map((item) => (

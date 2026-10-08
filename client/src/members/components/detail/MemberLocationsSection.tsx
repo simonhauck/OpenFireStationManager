@@ -1,8 +1,9 @@
+import { Table, type TableColumn } from "@astryxdesign/core/Table"
+import { Text } from "@astryxdesign/core/Text"
 import { Link } from "@tanstack/react-router"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
-import type { DataTableColumn } from "#/components/base/DataTable"
-import DataTable from "#/components/base/DataTable"
 import PageSubSection from "#/components/base/PageSubSection"
+import RenderIf from "#/components/base/RenderIf"
 
 interface MemberLocationsSectionProps {
   locations: ClothingLocation[]
@@ -11,11 +12,11 @@ interface MemberLocationsSectionProps {
 export default function MemberLocationsSection({
   locations,
 }: MemberLocationsSectionProps) {
-  const columns: DataTableColumn<ClothingLocation>[] = [
+  const columns: TableColumn<ClothingLocation>[] = [
     {
-      id: "name",
+      key: "name",
       header: "Standort",
-      renderCell: (location: ClothingLocation) => (
+      renderCell: (location) => (
         <Link
           to="/clothing-management/locations/$clothingLocationId/edit"
           params={{ clothingLocationId: String(location.id) }}
@@ -24,12 +25,11 @@ export default function MemberLocationsSection({
           {location.name}
         </Link>
       ),
-      getValue: (location: ClothingLocation) => location.name,
     },
     {
-      id: "comment",
+      key: "comment",
       header: "Kommentar",
-      getValue: (location: ClothingLocation) => location.comment || "-",
+      renderCell: (location) => location.comment || "-",
     },
   ]
 
@@ -38,12 +38,15 @@ export default function MemberLocationsSection({
       title="Standorte"
       subtitle="Standorte, die diesem Mitglied zugewiesen sind"
     >
-      <DataTable
-        columns={columns}
-        rows={locations}
-        showSearch={false}
-        emptyMessage="Keine Standorte zugewiesen."
-      />
+      <RenderIf when={locations.length === 0}>
+        <Text type="supporting" as="p">
+          Keine Standorte zugewiesen.
+        </Text>
+      </RenderIf>
+
+      <RenderIf when={locations.length > 0}>
+        <Table data={locations} columns={columns} idKey="id" />
+      </RenderIf>
     </PageSubSection>
   )
 }

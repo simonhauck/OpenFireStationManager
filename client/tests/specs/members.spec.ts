@@ -96,7 +96,9 @@ test.describe("Members", () => {
 
     await membersPage.locationChip(memberName, secondLocation).click()
     await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
-    await expect(page.locator("#name")).toHaveValue(secondLocation)
+    await expect(
+      page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
+    ).toHaveValue(secondLocation)
   })
 
   test("shows a dash for a member without Standorte", async ({ page }) => {
@@ -146,7 +148,9 @@ test.describe("Members", () => {
     await expect(detailPage.locationLink(locationName)).toBeVisible()
     await detailPage.locationLink(locationName).click()
     await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
-    await expect(page.locator("#name")).toHaveValue(locationName)
+    await expect(
+      page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
+    ).toHaveValue(locationName)
   })
 
   test("shows an empty state when the member has no Standorte", async ({

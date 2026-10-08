@@ -9,9 +9,11 @@ export class RelocationPage {
 
   // ─── Step 1: Ziel wählen ────────────────────────────────────────────────────
 
-  /** Opens the location combobox and picks the option matching `name`. */
+  /** Opens the location selector and picks the option matching `name`. */
   async selectTargetLocation(name: string) {
-    await this.page.getByRole("combobox").click()
+    await this.page
+      .getByRole("button", { name: "Standort", exact: true })
+      .click()
     await this.page.getByPlaceholder("Standort suchen...").fill(name)
     await this.page.getByRole("option", { name, exact: false }).first().click()
   }

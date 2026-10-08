@@ -1,18 +1,11 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog"
+import { TextArea } from "@astryxdesign/core/TextArea"
+import { TextInput } from "@astryxdesign/core/TextInput"
+import { useToast } from "@astryxdesign/core/Toast"
+import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { toast } from "sonner"
-import RenderIf from "#/components/base/RenderIf"
-import { Button } from "#/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "#/components/ui/dialog"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
-import { Textarea } from "#/components/ui/textarea"
 import { upsertImpressumMutation } from "#/legal/impressum/service/impressumQueries"
 import type { ImpressumDto } from "#/legal/model/legal.ts"
 
@@ -28,6 +21,7 @@ export default function ImpressumDialog({
   initialValues,
 }: ImpressumDialogProps) {
   const queryClient = useQueryClient()
+  const showToast = useToast()
   const [name, setName] = useState(initialValues?.name ?? "")
   const [address, setAddress] = useState(initialValues?.address ?? "")
   const [contactEmail, setContactEmail] = useState(
@@ -59,88 +53,83 @@ export default function ImpressumDialog({
       },
       {
         onSuccess: () => {
-          toast.success("Impressum wurde gespeichert.")
+          showToast({ body: "Impressum wurde gespeichert.", type: "info" })
           onOpenChange(false)
         },
         onError: (error) => {
-          toast.error(error.message)
+          showToast({
+            body: error.message,
+            type: "error",
+            isAutoHide: true,
+          })
         },
       },
     )
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            <RenderIf when={initialValues !== null}>
-              Impressum bearbeiten
-            </RenderIf>
-            <RenderIf when={initialValues === null}>
-              Impressum erstellen
-            </RenderIf>
-          </DialogTitle>
-        </DialogHeader>
+    <Dialog
+      isOpen={open}
+      onOpenChange={handleOpenChange}
+      width={512}
+      purpose="form"
+    >
+      <VStack gap={4}>
+        <DialogHeader
+          title={
+            initialValues !== null
+              ? "Impressum bearbeiten"
+              : "Impressum erstellen"
+          }
+          onOpenChange={handleOpenChange}
+        />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-name">Name *</Label>
-            <Input
-              id="impressum-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="z. B. Freiwillige Feuerwehr Musterstadt"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-address">Adresse *</Label>
-            <Textarea
-              id="impressum-address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder={"Musterstraße 1\n12345 Musterstadt"}
-              rows={3}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-email">Kontakt-E-Mail *</Label>
-            <Input
-              id="impressum-email"
-              type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-              placeholder="info@feuerwehr-musterstadt.de"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="impressum-phone">Telefonnummer (optional)</Label>
-            <Input
-              id="impressum-phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+49 123 456789"
-            />
-          </div>
-        </div>
+        <TextInput
+          label="Name"
+          isRequired
+          value={name}
+          onChange={setName}
+          placeholder="z. B. Freiwillige Feuerwehr Musterstadt"
+        />
+        <TextArea
+          label="Adresse"
+          isRequired
+          value={address}
+          onChange={setAddress}
+          placeholder={"Musterstraße 1\n12345 Musterstadt"}
+          rows={3}
+        />
+        <TextInput
+          label="Kontakt-E-Mail"
+          type="email"
+          isRequired
+          value={contactEmail}
+          onChange={setContactEmail}
+          placeholder="info@feuerwehr-musterstadt.de"
+        />
+        <TextInput
+          label="Telefonnummer (optional)"
+          value={phone}
+          onChange={setPhone}
+          placeholder="+49 123 456789"
+        />
 
-        <DialogFooter>
+        <div className="flex flex-wrap justify-end gap-2">
           <Button
-            variant="outline"
+            label="Abbrechen"
+            variant="secondary"
             onClick={() => onOpenChange(false)}
-            disabled={isSaving}
-          >
-            Abbrechen
-          </Button>
+            isDisabled={isSaving}
+          />
           <Button
+            label="Speichern"
+            variant="primary"
             onClick={handleSave}
-            disabled={!name || !address || !contactEmail || isSaving}
-          >
-            Speichern
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+            isDisabled={!name || !address || !contactEmail || isSaving}
+            isLoading={isSaving}
+          />
+        </div>
+      </VStack>
     </Dialog>
   )
 }

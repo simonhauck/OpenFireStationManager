@@ -1,12 +1,17 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { Heading } from "@astryxdesign/core/Heading"
+import { Selector } from "@astryxdesign/core/Selector"
+import { Step, Stepper } from "@astryxdesign/core/Stepper"
+import { Text } from "@astryxdesign/core/Text"
+import { useToast } from "@astryxdesign/core/Toast"
+import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import {
-  TouchButton,
-  TouchCombobox,
-} from "#/clothing/checkout/components/TouchComponents"
+
+import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import {
   formatClothingLocationLabel,
@@ -18,11 +23,15 @@ import { useRelocationWizard } from "#/clothing/relocation/useRelocationWizard"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
-import type { StepperWizardStep } from "#/components/base/StepperWizard"
-import StepperWizard from "#/components/base/StepperWizard"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 const SUCCESS_REDIRECT_SECONDS = 15
+
+interface WizardStep {
+  label: string
+  description: string
+  content: ReactNode
+}
 
 export default function RelocationPage() {
   const navigate = useNavigate()
@@ -37,7 +46,7 @@ export default function RelocationPage() {
     reset,
   } = useRelocationWizard()
 
-  const steps: StepperWizardStep[] = [
+  const steps: WizardStep[] = [
     {
       label: "Ziel wählen",
       description: "Ziel-Standort auswählen",
@@ -83,25 +92,52 @@ export default function RelocationPage() {
   return (
     <PageSection
       title="Umlagerung"
+      className="tablet-controls"
       buttons={
-        <TouchButton
-          variant="outline"
-          onClick={async () => {
-            await navigate({ to: "/pool-clothing" })
+        <Button
+          label="Abbrechen"
+          variant="secondary"
+          size="lg"
+          onClick={() => {
+            void navigate({ to: "/pool-clothing" })
           }}
-        >
-          Abbrechen
-        </TouchButton>
+        />
       }
     >
-      <StepperWizard
-        steps={steps}
-        currentStep={state.step}
-        onStepClick={() => {
-          /* wizard is linear */
-        }}
-        disableStepClickOnLastStep={false}
-      />
+      <div className="flex items-stretch">
+        <aside className="hidden shrink-0 sm:block">
+          <div className="pr-6 pb-2">
+            <Stepper orientation="vertical" activeStep={state.step - 1}>
+              {steps.map((step, index) => (
+                <Step
+                  key={step.label}
+                  step={index}
+                  label={step.label}
+                  description={step.description}
+                />
+              ))}
+            </Stepper>
+          </div>
+        </aside>
+
+        <div className="min-w-0 flex-1 space-y-4">
+          {steps.map((step, index) => {
+            const stepNumber = index + 1
+            return (
+              <RenderIf key={stepNumber} when={state.step === stepNumber}>
+                <Card>
+                  <VStack gap={4}>
+                    <Heading level={2}>
+                      Schritt {stepNumber}: {step.label}
+                    </Heading>
+                    {step.content}
+                  </VStack>
+                </Card>
+              </RenderIf>
+            )
+          })}
+        </div>
+      </div>
     </PageSection>
   )
 }
@@ -116,7 +152,7 @@ function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const memberName = useMemberNameLookup()
 
-  const options: ComboboxOption[] = (allLocations ?? []).map((l) => ({
+  const options = (allLocations ?? []).map((l) => ({
     value: String(l.id),
     label: formatClothingLocationLabel(l, memberName(l.memberId), {
       showType: true,
@@ -125,16 +161,20 @@ function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
 
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Wähle den Ziel-Standort aus, an den die Kleidung umgelagert werden soll.
-      </p>
-      <TouchCombobox
+      </Text>
+      <Selector
+        label="Standort"
+        isLabelHidden
         options={options}
-        value={null}
-        onSelect={(value) => onSelect(Number(value))}
+        onChange={(value: string) => onSelect(Number(value))}
+        hasSearch
+        size="lg"
+        width="100%"
         placeholder="Standort auswählen..."
         searchPlaceholder="Standort suchen..."
-        emptyMessage="Kein Standort gefunden."
+        emptySearchText="Kein Standort gefunden."
       />
     </div>
   )
@@ -159,9 +199,9 @@ function StepItemScannerContent({
 }: StepItemScannerContentProps) {
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Scanne einen Barcode oder suche manuell nach einem Kleidungsstück.
-      </p>
+      </Text>
 
       <ClothingItemScanner
         items={state.items}
@@ -170,12 +210,19 @@ function StepItemScannerContent({
       />
 
       <div className="flex justify-end gap-3 pt-2">
-        <TouchButton variant="outline" onClick={onBack}>
-          ← Zurück
-        </TouchButton>
-        <TouchButton disabled={state.items.length === 0} onClick={onNext}>
-          Weiter →
-        </TouchButton>
+        <Button
+          label="← Zurück"
+          variant="secondary"
+          size="lg"
+          onClick={onBack}
+        />
+        <Button
+          label="Weiter →"
+          variant="primary"
+          size="lg"
+          isDisabled={state.items.length === 0}
+          onClick={onNext}
+        />
       </div>
     </div>
   )
@@ -198,6 +245,7 @@ function StepReviewContent({
   const queryClient = useQueryClient()
   const relocate = useMutation(relocationMutation(queryClient))
   const memberName = useMemberNameLookup()
+  const showToast = useToast()
 
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
   const location =
@@ -219,58 +267,58 @@ function StepReviewContent({
       })
       onSubmitOk()
     } catch {
-      toast.error(
-        "Fehler beim Abschließen der Umlagerung. Bitte erneut versuchen.",
-      )
+      showToast({
+        body: "Fehler beim Abschließen der Umlagerung. Bitte erneut versuchen.",
+        type: "error",
+        isAutoHide: true,
+      })
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <p className="text-sm font-semibold">
+        <Text as="p" type="label">
           Ziel-Standort:{" "}
-          <span className="font-normal">{targetLocationName}</span>
-        </p>
+          <Text as="span" type="inherit">
+            {targetLocationName}
+          </Text>
+        </Text>
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-semibold">Kleidung ({state.items.length})</p>
+        <Text as="p" type="label">
+          Kleidung ({state.items.length})
+        </Text>
         <RenderIf when={state.items.length === 0}>
-          <p className="text-muted-foreground text-sm italic">
+          <Text type="supporting" as="p" className="italic">
             Keine Kleidung ausgewählt.
-          </p>
+          </Text>
         </RenderIf>
         <RenderIf when={state.items.length > 0}>
           <div className="space-y-1">
             {state.items.map((item) => (
-              <div
-                key={item.clothingItem.id}
-                className="flex items-center justify-between rounded border px-3 py-2"
-              >
-                <span>
-                  {item.clothingType.name} – {item.clothingItem.size}
-                </span>
-              </div>
+              <ClothingItemRow key={item.clothingItem.id} item={item} />
             ))}
           </div>
         </RenderIf>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
-        <TouchButton
-          variant="outline"
+        <Button
+          label="← Zurück"
+          variant="secondary"
+          size="lg"
           onClick={onBack}
-          disabled={relocate.isPending}
-        >
-          ← Zurück
-        </TouchButton>
-        <TouchButton
-          disabled={relocate.isPending || state.items.length === 0}
+          isDisabled={relocate.isPending}
+        />
+        <Button
+          label={relocate.isPending ? "Wird gesendet…" : "Bestätigen"}
+          variant="primary"
+          size="lg"
+          isDisabled={relocate.isPending || state.items.length === 0}
           onClick={() => void handleSubmit()}
-        >
-          {relocate.isPending ? "Wird gesendet…" : "Bestätigen"}
-        </TouchButton>
+        />
       </div>
     </div>
   )
@@ -316,23 +364,33 @@ function StepSuccessContent({
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-lg font-semibold">Umlagerung abgeschlossen</p>
-        <p className="text-muted-foreground text-sm">
+        <Text as="p" type="large" weight="semibold">
+          Umlagerung abgeschlossen
+        </Text>
+        <Text type="supporting" as="p">
           {state.items.length} Kleidungsstück
           {state.items.length !== 1 ? "e" : ""} wurde
           {state.items.length !== 1 ? "n" : ""} erfolgreich nach{" "}
           <strong>{targetLocationName}</strong> umgelagert.
-        </p>
+        </Text>
       </div>
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Weiterleitung zur Übersicht in {secondsLeft} Sekunde
         {secondsLeft !== 1 ? "n" : ""}…
-      </p>
+      </Text>
       <div className="flex gap-3">
-        <TouchButton onClick={onReset}>Neue Umlagerung starten</TouchButton>
-        <TouchButton variant="outline" onClick={onNavigateToOverview}>
-          Zur Übersicht
-        </TouchButton>
+        <Button
+          label="Neue Umlagerung starten"
+          variant="primary"
+          size="lg"
+          onClick={onReset}
+        />
+        <Button
+          label="Zur Übersicht"
+          variant="secondary"
+          size="lg"
+          onClick={onNavigateToOverview}
+        />
       </div>
     </div>
   )

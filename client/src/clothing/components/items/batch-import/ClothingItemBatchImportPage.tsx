@@ -1,3 +1,14 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { EmptyState } from "@astryxdesign/core/EmptyState"
+import { RadioList, RadioListItem } from "@astryxdesign/core/RadioList"
+import {
+  pixel,
+  proportional,
+  Table,
+  type TableColumn,
+} from "@astryxdesign/core/Table"
+import { TextArea } from "@astryxdesign/core/TextArea"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
@@ -6,17 +17,10 @@ import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { createBatchClothingItemsMutation } from "#/clothing/service/clothingItemsQueries"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
-import type { DataTableColumn } from "#/components/base/DataTable"
-import DataTable from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Label } from "#/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group"
-import { Textarea } from "#/components/ui/textarea"
 
 interface ParsedRow {
   size: string
@@ -54,44 +58,46 @@ function parseCsv(csv: string): ParseResult {
   return { rows, errors }
 }
 
-const previewColumns: DataTableColumn<CreateOrUpdateClothingItemRequest>[] = [
+const previewColumns: TableColumn<CreateOrUpdateClothingItemRequest>[] = [
   {
-    id: "typeId",
+    key: "typeId",
     header: "Typ-ID",
-    getValue: (item) => item.typeId,
+    width: pixel(96),
   },
   {
-    id: "size",
+    key: "size",
     header: "Größe",
-    getValue: (item) => item.size,
+    width: proportional(1),
   },
   {
-    id: "barcode",
+    key: "barcode",
     header: "Barcode",
-    getValue: (item) => item.barcode || "—",
+    width: proportional(1),
+    renderCell: (item) => item.barcode || "—",
   },
 ]
 
-const resultColumns: DataTableColumn<ClothingItem>[] = [
+const resultColumns: TableColumn<ClothingItem>[] = [
   {
-    id: "id",
+    key: "id",
     header: "ID",
-    getValue: (item) => item.id,
+    width: pixel(96),
   },
   {
-    id: "typeId",
+    key: "typeId",
     header: "Typ-ID",
-    getValue: (item) => item.typeId,
+    width: pixel(96),
   },
   {
-    id: "size",
+    key: "size",
     header: "Größe",
-    getValue: (item) => item.size,
+    width: proportional(1),
   },
   {
-    id: "barcode",
+    key: "barcode",
     header: "Barcode",
-    getValue: (item) => item.barcode || "—",
+    width: proportional(1),
+    renderCell: (item) => item.barcode || "—",
   },
 ]
 
@@ -159,8 +165,8 @@ function ClothingItemBatchImportPageContent() {
       title="Massenimport von Kleidungsstücken"
       subtitle="Importiere mehrere Kleidungsstücke auf einmal. Wähle zuerst einen Kleidungstyp, dann gib die CSV-Daten ein."
     >
-      <Card className="mx-auto w-full max-w-3xl">
-        <CardContent className="space-y-6 pt-6">
+      <Card maxWidth={768} className="mx-auto w-full">
+        <div className="space-y-6">
           <RenderIf when={createdItems === null}>
             <TypeSelectionSection
               clothingTypes={clothingTypes ?? []}
@@ -210,7 +216,7 @@ function ClothingItemBatchImportPageContent() {
               onDone={() => void navigate({ to: "/clothing-management/items" })}
             />
           </RenderIf>
-        </CardContent>
+        </div>
       </Card>
     </PageSection>
   )
@@ -236,18 +242,20 @@ function TypeSelectionSection({
         </p>
       </RenderIf>
       <RenderIf when={clothingTypes.length > 0}>
-        <RadioGroup
+        <RadioList
+          label="Kleidungstyp"
+          isRequired
           value={selectedTypeId !== null ? String(selectedTypeId) : ""}
-          onValueChange={(val) => onSelect(Number(val))}
-          className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+          onChange={(value) => onSelect(Number(value))}
         >
           {clothingTypes.map((type) => (
-            <div key={type.id} className="flex items-center gap-2">
-              <RadioGroupItem value={String(type.id)} id={`type-${type.id}`} />
-              <Label htmlFor={`type-${type.id}`}>{type.name}</Label>
-            </div>
+            <RadioListItem
+              key={type.id}
+              value={String(type.id)}
+              label={type.name}
+            />
           ))}
-        </RadioGroup>
+        </RadioList>
       </RenderIf>
     </div>
   )
@@ -276,31 +284,31 @@ function CsvInputSection({
             <sup>*</sup>
           </code>{" "}
           sind Pflichtfelder.
-          <br></br>
+          <br />
           Format:{" "}
           <code>
             Größe<sup>*</sup>,Barcode
           </code>
-          <br></br>
+          <br />
         </p>
         <p className="text-sm italic">Beispiel: L,ExampleBarcode1</p>
-        <Textarea
+        <TextArea
+          label="CSV-Daten"
           placeholder={"L,BARCODE001\nM\nXL,BARCODE003"}
           rows={8}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
         />
       </div>
 
       <div className="flex justify-end">
         <Button
           type="button"
-          variant="outline"
+          label="Vorschau"
+          variant="secondary"
           onClick={onPreview}
-          disabled={disabled}
-        >
-          Vorschau
-        </Button>
+          isDisabled={disabled}
+        />
       </div>
     </>
   )
@@ -324,11 +332,10 @@ function BatchPreviewSection({
   return (
     <>
       <p className="text-sm font-medium">Vorschau ({items.length} Einträge)</p>
-      <DataTable
+      <Table
+        data={items}
         columns={previewColumns}
-        rows={items}
-        showSearch={false}
-        emptyMessage="Keine Einträge vorhanden."
+        emptyState={<EmptyState title="Keine Einträge vorhanden." isCompact />}
       />
 
       <RenderIf when={hasError}>
@@ -336,12 +343,19 @@ function BatchPreviewSection({
       </RenderIf>
 
       <div className="flex flex-wrap justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Abbrechen
-        </Button>
-        <Button type="button" onClick={onSubmit} disabled={isPending}>
-          {isPending ? "Wird importiert..." : "Importieren"}
-        </Button>
+        <Button
+          type="button"
+          label="Abbrechen"
+          variant="secondary"
+          onClick={onCancel}
+        />
+        <Button
+          type="button"
+          label={isPending ? "Wird importiert..." : "Importieren"}
+          variant="primary"
+          onClick={onSubmit}
+          isLoading={isPending}
+        />
       </div>
     </>
   )
@@ -358,16 +372,21 @@ function ImportSuccessResult({ items, onDone }: ImportSuccessResultProps) {
       <p className="text-sm font-medium text-green-600">
         {items.length} Kleidungsstück(e) erfolgreich erstellt.
       </p>
-      <DataTable
+      <Table
+        data={items}
         columns={resultColumns}
-        rows={items}
-        showSearch={false}
-        emptyMessage="Keine Kleidungsstücke erstellt."
+        idKey="id"
+        emptyState={
+          <EmptyState title="Keine Kleidungsstücke erstellt." isCompact />
+        }
       />
       <div className="flex justify-end">
-        <Button type="button" onClick={onDone}>
-          Zur Übersicht
-        </Button>
+        <Button
+          type="button"
+          label="Zur Übersicht"
+          variant="primary"
+          onClick={onDone}
+        />
       </div>
     </div>
   )

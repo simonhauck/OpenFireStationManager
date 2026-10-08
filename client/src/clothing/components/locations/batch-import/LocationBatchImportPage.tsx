@@ -1,3 +1,14 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { EmptyState } from "@astryxdesign/core/EmptyState"
+import { Selector } from "@astryxdesign/core/Selector"
+import {
+  pixel,
+  proportional,
+  Table,
+  type TableColumn,
+} from "@astryxdesign/core/Table"
+import { TextArea } from "@astryxdesign/core/TextArea"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
@@ -6,18 +17,12 @@ import type {
   ClothingLocation,
   CreateClothingLocationRequest,
   LocationType,
-} from "#/clothing/service/clothingLocationsQueries"
+} from "#/clothing/model/clothingLocations"
 import { batchCreateClothingLocationsMutation } from "#/clothing/service/clothingLocationsQueries"
-import ClearableSelect from "#/components/base/ClearableSelect"
-import type { DataTableColumn } from "#/components/base/DataTable"
-import DataTable from "#/components/base/DataTable"
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Textarea } from "#/components/ui/textarea"
 
 const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
   POOL: "Pool",
@@ -62,44 +67,48 @@ function parseCsv(csv: string): ParseResult {
   return { rows, errors }
 }
 
-const previewColumns: DataTableColumn<CreateClothingLocationRequest>[] = [
+const previewColumns: TableColumn<CreateClothingLocationRequest>[] = [
   {
-    id: "name",
+    key: "name",
     header: "Bezeichnung",
-    getValue: (item) => item.name,
+    width: proportional(1),
   },
   {
-    id: "comment",
+    key: "comment",
     header: "Kommentar",
-    getValue: (item) => item.comment || "—",
+    width: proportional(1),
+    renderCell: (item) => item.comment || "—",
   },
   {
-    id: "type",
+    key: "type",
     header: "Typ",
-    getValue: (item) => LOCATION_TYPE_LABELS[item.type],
+    width: pixel(160),
+    renderCell: (item) => LOCATION_TYPE_LABELS[item.type],
   },
 ]
 
-const resultColumns: DataTableColumn<ClothingLocation>[] = [
+const resultColumns: TableColumn<ClothingLocation>[] = [
   {
-    id: "id",
+    key: "id",
     header: "ID",
-    getValue: (location) => location.id,
+    width: pixel(96),
   },
   {
-    id: "name",
+    key: "name",
     header: "Bezeichnung",
-    getValue: (location) => location.name,
+    width: proportional(1),
   },
   {
-    id: "comment",
+    key: "comment",
     header: "Kommentar",
-    getValue: (location) => location.comment || "—",
+    width: proportional(1),
+    renderCell: (location) => location.comment || "—",
   },
   {
-    id: "type",
+    key: "type",
     header: "Typ",
-    getValue: (location) => LOCATION_TYPE_LABELS[location.type],
+    width: pixel(160),
+    renderCell: (location) => LOCATION_TYPE_LABELS[location.type],
   },
 ]
 
@@ -167,8 +176,8 @@ function LocationBatchImportPageContent() {
       title="Massenimport von Standorten"
       subtitle="Erstelle mehrere Standorte in einem Schritt. Die Daten werden im CSV-Format angegeben."
     >
-      <Card className="mx-auto w-full max-w-3xl">
-        <CardContent className="space-y-6 pt-6">
+      <Card maxWidth={768} className="mx-auto w-full">
+        <div className="space-y-6">
           <RenderIf when={createdLocations === null}>
             <CsvInputSection
               value={csvInput}
@@ -216,7 +225,7 @@ function LocationBatchImportPageContent() {
               }
             />
           </RenderIf>
-        </CardContent>
+        </div>
       </Card>
     </PageSection>
   )
@@ -241,17 +250,15 @@ function CsvInputSection({
 }: CsvInputSectionProps) {
   return (
     <>
-      <ClearableSelect<LocationType>
-        id="location-type"
+      <Selector
         label="Standorttyp"
-        noItemSelectedLabel="Typ auswählen"
-        canClear={false}
-        options={Object.keys(LOCATION_TYPE_LABELS) as LocationType[]}
-        selectedValue={locationType}
-        onValueChange={(v) => {
-          if (v) onLocationTypeChange(v)
-        }}
-        toDisplayString={(type) => LOCATION_TYPE_LABELS[type]}
+        options={Object.entries(LOCATION_TYPE_LABELS).map(([type, label]) => ({
+          value: type,
+          label,
+        }))}
+        value={locationType}
+        onChange={(type) => onLocationTypeChange(type as LocationType)}
+        width="100%"
       />
 
       <div className="space-y-1.5">
@@ -261,31 +268,31 @@ function CsvInputSection({
           <code>
             <sup>*</sup>
           </code>{" "}
-          sind Pflichtfelder. <br></br>
+          sind Pflichtfelder. <br />
           Format:{" "}
           <code>
             Bezeichnung<sup>*</sup>,Kommentar
           </code>
-          <br></br>
+          <br />
         </p>
         <p className="text-sm italic">Beispiel: Schrank A,Hauptgebäude EG</p>
-        <Textarea
+        <TextArea
+          label="CSV-Daten"
           placeholder={"Schrank A,Hauptgebaeude EG\nRegal B\nSpind 3,Umkleide"}
           rows={8}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
         />
       </div>
 
       <div className="flex justify-end">
         <Button
           type="button"
-          variant="outline"
+          label="Vorschau"
+          variant="secondary"
           onClick={onPreview}
-          disabled={disabled}
-        >
-          Vorschau
-        </Button>
+          isDisabled={disabled}
+        />
       </div>
     </>
   )
@@ -309,11 +316,10 @@ function BatchPreviewSection({
   return (
     <>
       <p className="text-sm font-medium">Vorschau ({items.length} Einträge)</p>
-      <DataTable
+      <Table
+        data={items}
         columns={previewColumns}
-        rows={items}
-        showSearch={false}
-        emptyMessage="Keine Einträge vorhanden."
+        emptyState={<EmptyState title="Keine Einträge vorhanden." isCompact />}
       />
 
       <RenderIf when={hasError}>
@@ -321,12 +327,19 @@ function BatchPreviewSection({
       </RenderIf>
 
       <div className="flex flex-wrap justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Abbrechen
-        </Button>
-        <Button type="button" onClick={onSubmit} disabled={isPending}>
-          {isPending ? "Wird importiert..." : "Importieren"}
-        </Button>
+        <Button
+          type="button"
+          label="Abbrechen"
+          variant="secondary"
+          onClick={onCancel}
+        />
+        <Button
+          type="button"
+          label={isPending ? "Wird importiert..." : "Importieren"}
+          variant="primary"
+          onClick={onSubmit}
+          isLoading={isPending}
+        />
       </div>
     </>
   )
@@ -343,16 +356,19 @@ function ImportSuccessResult({ locations, onDone }: ImportSuccessResultProps) {
       <p className="text-sm font-medium text-green-600">
         {locations.length} Standort(e) erfolgreich erstellt.
       </p>
-      <DataTable
+      <Table
+        data={locations}
         columns={resultColumns}
-        rows={locations}
-        showSearch={false}
-        emptyMessage="Keine Standorte erstellt."
+        idKey="id"
+        emptyState={<EmptyState title="Keine Standorte erstellt." isCompact />}
       />
       <div className="flex justify-end">
-        <Button type="button" onClick={onDone}>
-          Zur Übersicht
-        </Button>
+        <Button
+          type="button"
+          label="Zur Übersicht"
+          variant="primary"
+          onClick={onDone}
+        />
       </div>
     </div>
   )

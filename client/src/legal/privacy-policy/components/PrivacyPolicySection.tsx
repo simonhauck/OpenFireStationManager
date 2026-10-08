@@ -1,15 +1,16 @@
+import { AlertDialog } from "@astryxdesign/core/AlertDialog"
+import { Button } from "@astryxdesign/core/Button"
+import { FileInput } from "@astryxdesign/core/FileInput"
+import { Text } from "@astryxdesign/core/Text"
+import { useToast } from "@astryxdesign/core/Toast"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ExternalLink, Trash2, Upload } from "lucide-react"
-import { useRef, useState } from "react"
-import { toast } from "sonner"
-import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
+import { useState } from "react"
 import ErrorState from "#/components/base/ErrorState"
 import FormattedDate from "#/components/base/FormattedDate"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
-import { Button } from "#/components/ui/button"
-import { Input } from "#/components/ui/input"
 import {
   deletePrivacyPolicyMutation,
   privacyPolicyQuery,
@@ -21,8 +22,9 @@ const ACCEPTED_TYPES =
 
 export default function PrivacyPolicySection() {
   const queryClient = useQueryClient()
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const showToast = useToast()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { data, isLoading, isError } = useQuery(privacyPolicyQuery())
 
@@ -35,13 +37,6 @@ export default function PrivacyPolicySection() {
     deletePrivacyPolicyMutation(queryClient),
   )
 
-  function resetFileInput() {
-    setSelectedFile(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
-  }
-
   function handleUpload() {
     if (!selectedFile) {
       return
@@ -49,11 +44,14 @@ export default function PrivacyPolicySection() {
 
     uploadDocument(selectedFile, {
       onSuccess: () => {
-        toast.success("Datenschutzerklärung wurde hochgeladen.")
-        resetFileInput()
+        showToast({
+          body: "Datenschutzerklärung wurde hochgeladen.",
+          type: "info",
+        })
+        setSelectedFile(null)
       },
       onError: (error) => {
-        toast.error(error.message)
+        showToast({ body: error.message, type: "error", isAutoHide: true })
       },
     })
   }
@@ -61,11 +59,15 @@ export default function PrivacyPolicySection() {
   function handleDelete() {
     deleteDocument(undefined, {
       onSuccess: () => {
-        toast.success("Datenschutzerklärung wurde gelöscht.")
-        resetFileInput()
+        setIsDeleteDialogOpen(false)
+        setSelectedFile(null)
+        showToast({
+          body: "Datenschutzerklärung wurde gelöscht.",
+          type: "info",
+        })
       },
       onError: (error) => {
-        toast.error(error.message)
+        showToast({ body: error.message, type: "error", isAutoHide: true })
       },
     })
   }
@@ -75,12 +77,15 @@ export default function PrivacyPolicySection() {
       title="Datenschutzerklärung"
       subtitle="Lade die öffentlich verfügbare Datenschutzerklärung hoch (PDF, HTML oder Text, max. 10 MB)."
       right={
-        <Button asChild variant="outline" size="sm">
-          <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="size-4" />
-            Datenschutzerklärung aufrufen
-          </a>
-        </Button>
+        <Button
+          label="Datenschutzerklärung aufrufen"
+          icon={<ExternalLink className="size-4" />}
+          variant="secondary"
+          size="sm"
+          href="/privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer"
+        />
       }
     >
       <RenderIf when={isLoading}>
@@ -96,60 +101,67 @@ export default function PrivacyPolicySection() {
           <RenderIf when={!!metadata}>
             <div
               data-testid="privacy-policy-current"
-              className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2 text-sm"
+              className="border-border bg-card flex flex-wrap items-center justify-between gap-3 rounded-md border px-3 py-2"
             >
               <div>
-                <p className="font-medium">{metadata?.fileName}</p>
-                <p className="text-muted-foreground">
+                <Text weight="medium">{metadata?.fileName}</Text>
+                <Text type="supporting">
                   Hochgeladen am{" "}
                   <RenderIf when={data?.exists === true}>
                     <FormattedDate value={metadata?.uploadedAt ?? ""} />
                   </RenderIf>
-                </p>
+                </Text>
               </div>
-              <DeleteDialogComponent
-                onDelete={handleDelete}
-                headline="Datenschutzerklärung löschen"
-                bodyText="Soll die aktuelle Datenschutzerklärung wirklich gelöscht werden? Danach ist sie unter /privacy-policy nicht mehr erreichbar."
-              >
-                <Button variant="destructive" size="sm" disabled={isDeleting}>
-                  <Trash2 className="size-4" />
-                  Löschen
-                </Button>
-              </DeleteDialogComponent>
+              <Button
+                label="Löschen"
+                icon={<Trash2 className="size-4" />}
+                variant="destructive"
+                size="sm"
+                isDisabled={isDeleting}
+                onClick={() => setIsDeleteDialogOpen(true)}
+              />
             </div>
           </RenderIf>
 
           <RenderIf when={data?.exists === false}>
-            <p
-              data-testid="privacy-policy-empty"
-              className="text-sm text-muted-foreground"
-            >
+            <Text type="supporting" data-testid="privacy-policy-empty">
               Es wurde noch keine Datenschutzerklärung hochgeladen.
-            </p>
+            </Text>
           </RenderIf>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept={ACCEPTED_TYPES}
-              className="max-w-sm"
-              aria-label="Datei auswählen"
-              onChange={(event) =>
-                setSelectedFile(event.target.files?.[0] ?? null)
+          <div className="flex flex-wrap items-end gap-3">
+            <FileInput
+              label="Datei auswählen"
+              value={selectedFile}
+              onChange={(files) =>
+                setSelectedFile(
+                  Array.isArray(files) ? (files[0] ?? null) : files,
+                )
               }
+              accept={ACCEPTED_TYPES}
             />
             <Button
+              label="Hochladen"
+              icon={<Upload className="size-4" />}
+              variant="primary"
+              isDisabled={!selectedFile || isUploading}
+              isLoading={isUploading}
               onClick={handleUpload}
-              disabled={!selectedFile || isUploading}
-            >
-              <Upload className="size-4" />
-              Hochladen
-            </Button>
+            />
           </div>
         </div>
       </RenderIf>
+
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Datenschutzerklärung löschen"
+        description="Soll die aktuelle Datenschutzerklärung wirklich gelöscht werden? Danach ist sie unter /privacy-policy nicht mehr erreichbar."
+        actionLabel="Löschen"
+        onAction={handleDelete}
+        cancelLabel="Abbrechen"
+        actionVariant="destructive"
+      />
     </PageSubSection>
   )
 }

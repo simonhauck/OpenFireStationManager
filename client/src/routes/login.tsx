@@ -1,19 +1,14 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { CheckboxInput } from "@astryxdesign/core/CheckboxInput"
+import { Heading } from "@astryxdesign/core/Heading"
+import { Text } from "@astryxdesign/core/Text"
+import { TextInput } from "@astryxdesign/core/TextInput"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
 import { loginMutation, meQuery } from "#/api/auth.queries"
-import { Button } from "#/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
-import { Checkbox } from "#/components/ui/checkbox"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -61,62 +56,58 @@ function Login() {
 
   return (
     <div className="flex items-center">
-      <Card className="mx-auto w-full max-w-lg">
-        <CardHeader>
-          <CardTitle>Anmelden</CardTitle>
-          <CardDescription>
-            Geben Sie Ihre Zugangsdaten ein, um fortzufahren.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card maxWidth={512} className="mx-auto w-full">
+        <div className="flex flex-col gap-4">
+          <div>
+            <Heading level={1}>Anmelden</Heading>
+            <Text type="supporting" as="p" className="mt-1">
+              Geben Sie Ihre Zugangsdaten ein, um fortzufahren.
+            </Text>
+          </div>
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="username">Benutzername</Label>
-              <Input
-                id="username"
-                type="text"
-                autoComplete="username"
-                placeholder="benutzername"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
+            <TextInput
+              label="Benutzername"
+              type="text"
+              autoComplete="username"
+              placeholder="benutzername"
+              isRequired
+              value={username}
+              onChange={setUsername}
+            />
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">Passwort</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+            <TextInput
+              label="Passwort"
+              type="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              isRequired
+              value={password}
+              onChange={setPassword}
+            />
 
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="remember-me"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked === true)}
-              />
-              <Label htmlFor="remember-me">Angemeldet bleiben</Label>
-            </div>
+            <CheckboxInput
+              label="Angemeldet bleiben"
+              value={rememberMe}
+              onChange={setRememberMe}
+            />
 
             {error && (
-              <p className="text-sm text-destructive">
+              <p className="text-destructive text-sm">
                 Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre
                 Zugangsdaten.
               </p>
             )}
 
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Anmelden …" : "Anmelden"}
-            </Button>
+            <Button
+              type="submit"
+              label="Anmelden"
+              variant="primary"
+              width="100%"
+              isLoading={isPending}
+            />
           </form>
-        </CardContent>
+        </div>
       </Card>
     </div>
   )

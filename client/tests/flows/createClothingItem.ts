@@ -18,7 +18,7 @@ export async function createClothingItem(
 ): Promise<void> {
   const itemsPage = new ClothingItemsPage(page)
   await itemsPage.gotoNew()
-  await itemsPage.selectType(options.typeName)
+  await selectType(page, options.typeName)
   await itemsPage.fillSize(options.size)
   if (options.barcode) {
     await itemsPage.fillBarcode(options.barcode)
@@ -28,4 +28,14 @@ export async function createClothingItem(
   }
   await itemsPage.submitForm()
   await page.waitForURL("**/clothing-management/items")
+}
+
+async function selectType(page: Page, typeName: string): Promise<void> {
+  const radio = page.getByRole("radio", { name: typeName })
+  await radio.click()
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (await radio.isChecked()) return
+    await radio.click()
+  }
+  throw new Error(`Kleidungstyp ${typeName} konnte nicht ausgewählt werden.`)
 }

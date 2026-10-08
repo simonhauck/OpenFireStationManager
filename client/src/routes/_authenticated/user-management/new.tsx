@@ -1,5 +1,9 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { CheckboxList, CheckboxListItem } from "@astryxdesign/core/CheckboxList"
+import { TextInput } from "@astryxdesign/core/TextInput"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import type React from "react"
 import { useState } from "react"
 
@@ -7,11 +11,6 @@ import { createUserMutation } from "#/api/users.queries"
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Checkbox } from "#/components/ui/checkbox"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
 import type { UserRole } from "#/users/model/user.ts"
 import { ROLE_OPTIONS } from "#/users/roleMetadata"
 
@@ -45,20 +44,6 @@ function CreateUserPageContent() {
     isPending,
     error,
   } = useMutation(createUserMutation(queryClient))
-
-  function toggleRole(role: UserRole, checked: boolean) {
-    setRolesError(null)
-    setRoles((prevRoles) => {
-      if (checked) {
-        if (prevRoles.includes(role)) {
-          return prevRoles
-        }
-        return [...prevRoles, role]
-      }
-
-      return prevRoles.filter((existingRole) => existingRole !== role)
-    })
-  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -97,121 +82,96 @@ function CreateUserPageContent() {
       title="Nutzer erstellen"
       subtitle="Erfassen Sie die Daten für ein neues Nutzerkonto."
     >
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="username">Benutzername</Label>
-              <Input
-                id="username"
-                autoComplete="username"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+      <Card maxWidth={672} className="mx-auto w-full">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <TextInput
+            label="Benutzername"
+            autoComplete="username"
+            isRequired
+            value={username}
+            onChange={setUsername}
+          />
+
+          <TextInput
+            label="Passwort"
+            type="password"
+            autoComplete="new-password"
+            isRequired
+            value={password}
+            onChange={(value) => {
+              setPassword(value)
+              setPasswordError(null)
+            }}
+          />
+
+          <TextInput
+            label="Passwort bestätigen"
+            type="password"
+            autoComplete="new-password"
+            isRequired
+            value={confirmPassword}
+            onChange={(value) => {
+              setConfirmPassword(value)
+              setPasswordError(null)
+            }}
+          />
+
+          <TextInput
+            label="Vorname"
+            isRequired
+            value={firstName}
+            onChange={setFirstName}
+          />
+
+          <TextInput
+            label="Nachname"
+            isRequired
+            value={lastName}
+            onChange={setLastName}
+          />
+
+          <CheckboxList
+            label="Rollen"
+            value={roles}
+            onChange={(values) => {
+              setRolesError(null)
+              setRoles(values as UserRole[])
+            }}
+            hasDividers
+            status={
+              rolesError ? { type: "error", message: rolesError } : undefined
+            }
+          >
+            {ROLE_OPTIONS.map((roleOption) => (
+              <CheckboxListItem
+                key={roleOption.value}
+                value={roleOption.value}
+                label={roleOption.label}
+                description={roleOption.description}
               />
-            </div>
+            ))}
+          </CheckboxList>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Passwort</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  setPasswordError(null)
-                }}
-              />
-            </div>
+          {passwordError && <ErrorState message={passwordError} />}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="confirm-password">Passwort bestätigen</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value)
-                  setPasswordError(null)
-                }}
-              />
-            </div>
+          {error && (
+            <ErrorState message="Der Nutzer konnte nicht erstellt werden." />
+          )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="first-name">Vorname</Label>
-              <Input
-                id="first-name"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="last-name">Nachname</Label>
-              <Input
-                id="last-name"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Rollen</Label>
-              <div className="space-y-2 rounded-md border p-3">
-                {ROLE_OPTIONS.map((roleOption) => {
-                  const checkboxId = `role-${roleOption.value.toLowerCase()}`
-                  const checked = roles.includes(roleOption.value)
-
-                  return (
-                    <div
-                      key={roleOption.value}
-                      className="flex items-start gap-3"
-                    >
-                      <Checkbox
-                        id={checkboxId}
-                        checked={checked}
-                        onCheckedChange={(nextChecked) =>
-                          toggleRole(roleOption.value, nextChecked === true)
-                        }
-                      />
-                      <div className="space-y-0.5">
-                        <Label htmlFor={checkboxId} className="cursor-pointer">
-                          {roleOption.label}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {roleOption.description}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {passwordError && <ErrorState message={passwordError} />}
-
-            {rolesError && <ErrorState message={rolesError} />}
-
-            {error && (
-              <ErrorState message="Der Nutzer konnte nicht erstellt werden." />
-            )}
-
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/user-management">Abbrechen</Link>
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Wird erstellt..." : "Nutzer erstellen"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <Button
+              label="Abbrechen"
+              variant="secondary"
+              href="/user-management"
+            />
+            <Button
+              type="submit"
+              label="Nutzer erstellen"
+              variant="primary"
+              isLoading={isPending}
+            />
+          </div>
+        </form>
       </Card>
     </PageSection>
   )

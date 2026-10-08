@@ -1,5 +1,6 @@
+import { Link } from "@astryxdesign/core/Link"
+import { Text } from "@astryxdesign/core/Text"
 import { useQuery } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
 import RenderIf from "#/components/base/RenderIf"
 import { impressumPublicQuery } from "#/legal/impressum/service/impressumQueries"
 import { privacyPolicyPublicQuery } from "#/legal/privacy-policy/service/privacyPolicyQueries"
@@ -14,38 +15,37 @@ export default function Footer() {
   const privacyPolicyExists = privacyPolicyData?.exists ?? false
 
   return (
-    <footer className="border-t border-(--line) p-4 text-(--sea-ink-soft)">
-      <div className="page-wrap flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-sm">
-        <span>&copy; {year} Simon Hauck</span>
+    <footer className="border-border border-t p-4">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center">
+        <Text type="supporting">&copy; {year} Simon Hauck</Text>
         <RenderIf when={impressumExists}>
-          <span aria-hidden="true">·</span>
-          <Link
-            to="/impressum"
-            className="hover:text-(--sea-ink) transition-colors"
-          >
-            Impressum
-          </Link>
+          <Text type="supporting" aria-hidden="true">
+            ·
+          </Text>
+          <Link href="/impressum">Impressum</Link>
         </RenderIf>
         <RenderIf when={privacyPolicyExists}>
-          <span aria-hidden="true">·</span>
-          <a
+          <Text type="supporting" aria-hidden="true">
+            ·
+          </Text>
+          <Link
             href="/privacy-policy"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-(--sea-ink) transition-colors"
           >
             Datenschutz
-          </a>
+          </Link>
         </RenderIf>
-        <span aria-hidden="true">·</span>
-        <a
+        <Text type="supporting" aria-hidden="true">
+          ·
+        </Text>
+        <Link
           href="https://github.com/simonhauck/OpenFireStationManager"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-(--sea-ink) transition-colors"
         >
           GitHub
-        </a>
+        </Link>
       </div>
     </footer>
   )

@@ -1,16 +1,10 @@
+import { Avatar } from "@astryxdesign/core/Avatar"
+import { Button } from "@astryxdesign/core/Button"
+import { DropdownMenu } from "@astryxdesign/core/DropdownMenu"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { LogOut } from "lucide-react"
 import { logoutMutation, meQuery } from "#/api/auth.queries"
-import { Button } from "#/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu"
 
 export default function AuthButton() {
   const queryClient = useQueryClient()
@@ -28,45 +22,39 @@ export default function AuthButton() {
   }
 
   if (!isAuthenticated) {
-    return (
-      <Button asChild size="sm">
-        <Link to="/login" search={{ redirect: undefined }}>
-          Anmelden
-        </Link>
-      </Button>
-    )
+    return <Button label="Anmelden" variant="primary" size="sm" href="/login" />
   }
 
-  const initials =
-    `${user?.firstName[0] ?? ""}${user?.lastName[0] ?? ""}`.toUpperCase() || "?"
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ")
+  const menuTitle = user?.username ? `${fullName} (${user.username})` : fullName
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground ring-offset-background transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label={`Benutzermenü für ${fullName}`}
-        >
-          {initials}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-44">
-        <DropdownMenuLabel className="flex flex-col gap-0.5">
-          <span>{fullName}</span>
-          {user?.username && (
-            <span className="text-xs font-normal text-muted-foreground">
-              {user.username}
-            </span>
-          )}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
-          <LogOut />
-          Abmelden
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <DropdownMenu
+      alignment="end"
+      hasChevron={false}
+      renderTrigger={(triggerProps) => (
+        <Avatar
+          {...triggerProps}
+          name={fullName}
+          alt={`Benutzermenü für ${fullName}`}
+          size={32}
+          tooltip={false}
+        />
+      )}
+      items={[
+        {
+          type: "section",
+          title: menuTitle,
+          items: [
+            {
+              label: "Abmelden",
+              icon: <LogOut className="size-4" />,
+              variant: "destructive",
+              onClick: handleLogout,
+            },
+          ],
+        },
+      ]}
+    />
   )
 }

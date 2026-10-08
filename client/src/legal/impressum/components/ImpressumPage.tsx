@@ -1,3 +1,5 @@
+import { Heading } from "@astryxdesign/core/Heading"
+import { Text } from "@astryxdesign/core/Text"
 import { useQuery } from "@tanstack/react-query"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
@@ -19,22 +21,20 @@ export default function ImpressumPage() {
   return (
     <PageSection title="Impressum">
       <RenderIf when={data?.exists === false}>
-        <p className="text-sm text-muted-foreground">
+        <Text type="supporting" as="p">
           Kein Impressum vorhanden.
-        </p>
+        </Text>
       </RenderIf>
 
       <RenderIf when={data?.exists === true}>
-        <div className="flex flex-col gap-2 text-sm">
-          <p className="text-lg font-semibold">{data?.impressum?.name}</p>
-          <p className="whitespace-pre-line text-muted-foreground">
+        <div className="flex flex-col gap-2">
+          <Heading level={2}>{data?.impressum?.name}</Heading>
+          <Text type="supporting" className="whitespace-pre-line">
             {data?.impressum?.address}
-          </p>
-          <p className="text-muted-foreground">
-            {data?.impressum?.contactEmail}
-          </p>
+          </Text>
+          <Text type="supporting">{data?.impressum?.contactEmail}</Text>
           <RenderIf when={!!data?.impressum?.phone}>
-            <p className="text-muted-foreground">{data?.impressum?.phone}</p>
+            <Text type="supporting">{data?.impressum?.phone}</Text>
           </RenderIf>
         </div>
       </RenderIf>

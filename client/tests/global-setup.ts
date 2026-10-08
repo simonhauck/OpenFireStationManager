@@ -42,8 +42,12 @@ async function loginAndSave(persona: Persona) {
   const page = await context.newPage()
 
   await page.goto(`${CLIENT_URL}/login`)
-  await page.locator("#username").fill(persona.username)
-  await page.locator("#password").fill(persona.password)
+  await page
+    .getByRole("textbox", { name: /^Benutzername( Erforderlich)?$/ })
+    .fill(persona.username)
+  await page
+    .getByRole("textbox", { name: /^Passwort( Erforderlich)?$/ })
+    .fill(persona.password)
   await page.getByRole("button", { name: "Anmelden" }).click()
   await page.waitForURL((url) => !url.pathname.includes("/login"))
 

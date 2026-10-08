@@ -128,7 +128,7 @@ test.describe("Checkout – owner names", () => {
     const checkoutPage = new CheckoutPage(page)
 
     await checkoutPage.goto()
-    await page.getByRole("combobox").click()
+    await page.getByRole("button", { name: "Spind", exact: true }).click()
     await page.getByPlaceholder("Spind suchen...").fill(personalLocationName)
 
     await expect(
