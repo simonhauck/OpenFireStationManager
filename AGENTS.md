@@ -8,7 +8,7 @@ Guidance for agentic coding assistants working in this repository.
 **OpenFireStationManager** is an open-source platform for managing firefighting stations. It is a
 monorepo with two independent components:
 
-- `client/` — React 19 + TypeScript frontend (Vite, TanStack Router, TanStack Query, shadcn/ui, Tailwind CSS)
+- `client/` — React 19 + TypeScript frontend (Vite, TanStack Router, TanStack Query, Astryx, Tailwind CSS)
 - `server/` — Spring Boot 4 + Kotlin backend (Spring Data JDBC, PostgreSQL, SpringDoc OpenAPI)
 
 There is no root-level build orchestrator. Each component is built and run independently.
