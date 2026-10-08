@@ -33,6 +33,10 @@ export class MembersPage {
       .click()
   }
 
+  async clickMemberName(name: string) {
+    await this.page.getByRole("link", { name, exact: true }).click()
+  }
+
   async fillSearch(searchTerm: string) {
     await this.page.getByPlaceholder("Mitglieder suchen...").fill(searchTerm)
   }
@@ -43,5 +47,16 @@ export class MembersPage {
 
   memberRow(name: string) {
     return this.page.getByRole("row").filter({ hasText: name })
+  }
+
+  locationChip(memberName: string, locationName: string) {
+    return this.memberRow(memberName).getByRole("link", {
+      name: locationName,
+      exact: true,
+    })
+  }
+
+  locationsCell(memberName: string) {
+    return this.memberRow(memberName).getByRole("cell").nth(1)
   }
 }

@@ -3,6 +3,7 @@ import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query"
 
 import { client, ensureData } from "#/api/client"
 import { queryKeys } from "#/api/queryKeys"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import type {
   BatchCreateClothingLocationsRequest,
   ClothingLocation,
@@ -33,6 +34,18 @@ export const getClothingLocationByIdQuery = (id: number) =>
         params: { path: { id } },
       })
       return ensureData(data, error, "GET /api/clothing/locations/{id}")
+    },
+  })
+
+export const getClothingLocationItemsQuery = (id: number) =>
+  queryOptions({
+    queryKey: queryKeys.clothingLocationItems(id),
+    queryFn: async (): Promise<ResolvedClothingItem[]> => {
+      const { data, error } = await client.GET(
+        "/api/clothing/locations/{id}/items",
+        { params: { path: { id } } },
+      )
+      return ensureData(data, error, "GET /api/clothing/locations/{id}/items")
     },
   })
 

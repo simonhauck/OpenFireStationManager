@@ -11,6 +11,8 @@ export const queryKeys = {
   clothingTypeSizeSummary: () => ["clothing", "items", "summary"] as const,
   clothingLocations: () => ["clothing", "locations"] as const,
   clothingLocation: (id: number) => ["clothing", "locations", id] as const,
+  clothingLocationItems: (id: number) =>
+    ["clothing", "locations", id, "items"] as const,
   me: () => ["auth", "me"] as const,
   privacyPolicy: () => ["admin", "privacy-policy"] as const,
   impressum: () => ["legal", "impressum"] as const,

@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router"
+import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
+import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
@@ -18,7 +20,23 @@ export default function MembersPage() {
 
 function MembersPageContent() {
   const { data: members, isLoading, isError } = useMembers()
-  const canRenderTable = members !== undefined
+  const {
+    data: locations,
+    isLoading: areLocationsLoading,
+    isError: isLocationsError,
+  } = useClothingLocations()
+
+  const locationsByMember = new Map<number, ClothingLocation[]>()
+  for (const location of locations ?? []) {
+    if (location.memberId === undefined) continue
+    const memberLocations = locationsByMember.get(location.memberId) ?? []
+    memberLocations.push(location)
+    locationsByMember.set(location.memberId, memberLocations)
+  }
+
+  const isPageLoading = isLoading || areLocationsLoading
+  const hasError = isError || isLocationsError
+  const canRenderTable = members !== undefined && locations !== undefined
 
   return (
     <PageSection
@@ -30,16 +48,19 @@ function MembersPageContent() {
         </Button>
       }
     >
-      <RenderIf when={isLoading}>
+      <RenderIf when={isPageLoading}>
         <LoadingIndicator label="Mitglieder werden geladen..." />
       </RenderIf>
 
-      <RenderIf when={isError}>
+      <RenderIf when={hasError}>
         <ErrorState message="Mitglieder konnten nicht geladen werden." />
       </RenderIf>
 
       <RenderIf when={canRenderTable}>
-        <MembersTable members={members ?? []} />
+        <MembersTable
+          members={members ?? []}
+          locationsByMember={locationsByMember}
+        />
       </RenderIf>
     </PageSection>
   )

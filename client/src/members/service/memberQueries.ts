@@ -69,6 +69,31 @@ export const updateMemberMutation = (queryClient: QueryClient) =>
     },
   })
 
+export const deleteMemberMutation = (queryClient: QueryClient) =>
+  mutationOptions({
+    mutationKey: [...queryKeys.members(), "delete"] as const,
+    mutationFn: async (id: number): Promise<void> => {
+      await client.DELETE("/api/members/{id}", {
+        params: { path: { id } },
+      })
+    },
+    onSuccess: async (_, id) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.members(),
+          exact: true,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.member(id),
+          refetchType: "none",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.clothingLocations(),
+        }),
+      ])
+    },
+  })
+
 export function useMembers() {
   return useQuery(getAllMembersQuery())
 }
