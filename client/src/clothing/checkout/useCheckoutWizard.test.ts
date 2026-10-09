@@ -93,14 +93,69 @@ describe("useCheckoutWizard", () => {
 
   // ── Step 3: Return Toggles ────────────────────────────────────────────────
 
-  it("sets return item IDs in bulk (for auto-toggle on entry)", () => {
+  it("reconciles suggested returns into the selection", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
     act(() => {
-      result.current.setReturnItemIds(new Set([10, 20, 30]))
+      result.current.reconcileSuggestedReturns(new Set([10, 20, 30]))
     })
 
     expect(result.current.state.returnItemIds).toEqual(new Set([10, 20, 30]))
+  })
+
+  it("keeps a manually unchecked suggestion out when suggestions are reconciled (#323)", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.reconcileSuggestedReturns(new Set([10, 20]))
+      result.current.toggleReturnItem(20) // user unchecks 20
+      result.current.reconcileSuggestedReturns(new Set([10, 20]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([10]))
+  })
+
+  it("keeps a manually checked non-suggested item in when suggestions are reconciled", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.reconcileSuggestedReturns(new Set([10]))
+      result.current.toggleReturnItem(30) // user checks 30 additionally
+      result.current.reconcileSuggestedReturns(new Set([10]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([10, 30]))
+  })
+
+  it("drops suggestions that no longer apply but keeps manual choices", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.reconcileSuggestedReturns(new Set([10, 20]))
+      result.current.toggleReturnItem(30) // user checks 30 additionally
+      result.current.reconcileSuggestedReturns(new Set([10]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([10, 30]))
+  })
+
+  it("clears selections and overrides when a new target is selected", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.selectTarget(1)
+      result.current.reconcileSuggestedReturns(new Set([10]))
+      result.current.toggleReturnItem(20)
+      result.current.selectTarget(2)
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set())
+
+    act(() => {
+      result.current.reconcileSuggestedReturns(new Set([30]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([30]))
   })
 
   it("toggles a return item on and off", () => {
@@ -122,7 +177,7 @@ describe("useCheckoutWizard", () => {
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.setReturnItemIds(new Set([5]))
+      result.current.toggleReturnItem(5)
       result.current.confirmReturns()
     })
 
@@ -147,7 +202,7 @@ describe("useCheckoutWizard", () => {
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.setReturnItemIds(new Set([5]))
+      result.current.toggleReturnItem(5)
       result.current.confirmReturns()
       result.current.selectWashLocation(99)
     })
@@ -188,7 +243,7 @@ describe("useCheckoutWizard", () => {
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.setReturnItemIds(new Set([5]))
+      result.current.toggleReturnItem(5)
       result.current.confirmReturns() // → step 4
       result.current.selectWashLocation(99) // → step 5
       result.current.goBack()
