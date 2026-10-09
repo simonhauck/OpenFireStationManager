@@ -5,6 +5,9 @@ export const queryKeys = {
   member: (id: number) => ["members", id] as const,
   clothingTypes: () => ["clothing", "types"] as const,
   clothingType: (id: number) => ["clothing", "types", id] as const,
+  clothingTypeImages: (typeId: number) =>
+    ["clothing", "types", typeId, "images"] as const,
+  barcodeImages: () => ["clothing", "barcode-images"] as const,
   clothingItems: () => ["clothing", "items"] as const,
   clothingItem: (id: number) => ["clothing", "items", id] as const,
   clothingOverview: () => ["clothing", "items", "overview"] as const,

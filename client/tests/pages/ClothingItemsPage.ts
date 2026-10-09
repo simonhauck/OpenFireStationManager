@@ -32,7 +32,13 @@ export class ClothingItemsPage {
   }
 
   async selectType(typeName: string) {
-    await this.page.getByRole("radio", { name: typeName }).click()
+    const radio = this.page.getByRole("radio", { name: typeName })
+    await radio.click()
+    for (let attempt = 0; attempt < 4; attempt++) {
+      if (await radio.isChecked()) return
+      await radio.click()
+    }
+    throw new Error(`Kleidungstyp ${typeName} konnte nicht ausgewählt werden.`)
   }
 
   async fillSize(size: string) {

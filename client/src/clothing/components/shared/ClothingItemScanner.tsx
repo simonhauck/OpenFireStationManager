@@ -12,6 +12,7 @@ import {
   getItemByBarcode,
   searchClothingItems,
 } from "#/clothing/checkout/service/checkoutQueries"
+import BarcodeImagesGallery from "#/clothing/components/shared/BarcodeImagesGallery"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import RenderIf from "#/components/base/RenderIf"
@@ -244,6 +245,9 @@ export default function ClothingItemScanner({
           </div>
         </div>
       </RenderIf>
+
+      {/* Always-visible barcode location gallery */}
+      <BarcodeImagesGallery />
     </div>
   )
 }

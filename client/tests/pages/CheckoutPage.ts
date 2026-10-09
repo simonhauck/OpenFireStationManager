@@ -28,6 +28,11 @@ export class CheckoutPage {
     return this.page.locator(".rounded-lg.border").filter({ hasText: label })
   }
 
+  /** Always-visible "where do I find the barcode?" gallery on the scanner step. */
+  barcodeGallery() {
+    return this.page.getByTestId("barcode-images-gallery")
+  }
+
   async clickWeiter() {
     await this.page.getByRole("button", { name: "Weiter →" }).click()
   }

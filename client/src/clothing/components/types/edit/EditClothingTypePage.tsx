@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 
 import ClothingTypeForm from "#/clothing/components/shared/ClothingTypeForm"
+import ClothingTypeImagesSection from "#/clothing/components/shared/ClothingTypeImagesSection"
 import {
   updateClothingTypeMutation,
   useClothingTypeById,
@@ -90,6 +91,7 @@ function EditClothingTypePageContent() {
       errorMessage={
         error ? "Der Kleidungstyp konnte nicht aktualisiert werden." : null
       }
+      images={<ClothingTypeImagesSection typeId={numericClothingTypeId} />}
     />
   )
 }
