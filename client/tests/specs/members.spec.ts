@@ -276,6 +276,75 @@ test.describe("Members", () => {
     )
   })
 
+  test("warns about multiple affected Standorte and clothing items before deleting", async ({
+    page,
+  }) => {
+    const suffix = randomUUID().slice(0, 8)
+    const memberName = `Mitglied-${suffix}`
+    const firstLocation = `Spind-A-${suffix}`
+    const secondLocation = `Spind-B-${suffix}`
+    const typeName = `Jacke-${suffix}`
+    const membersPage = new MembersPage(page)
+    const detailPage = new MemberDetailPage(page)
+
+    await createMember(page, memberName)
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: firstLocation,
+      memberName,
+    })
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: secondLocation,
+      memberName,
+    })
+    await createClothingType(page, typeName)
+    await createClothingItem(page, {
+      typeName,
+      size: "XXL",
+      barcode: `BC-${suffix}-1`,
+      locationName: firstLocation,
+    })
+    await createClothingItem(page, {
+      typeName,
+      size: "XXL",
+      barcode: `BC-${suffix}-2`,
+      locationName: secondLocation,
+    })
+
+    await membersPage.goto()
+    await membersPage.clickMemberName(memberName)
+    await detailPage.clickDelete()
+
+    await expect(detailPage.deleteDialog()).toContainText("2 Standorte")
+    await expect(detailPage.deleteDialog()).toContainText("2 Kleidungsstücke")
+    await expect(detailPage.deleteDialog()).toContainText("umgelagert")
+  })
+
+  test("shows an empty state for a Standort without clothing", async ({
+    page,
+  }) => {
+    const suffix = randomUUID().slice(0, 8)
+    const memberName = `Mitglied-${suffix}`
+    const locationName = `Spind-${suffix}`
+    const membersPage = new MembersPage(page)
+    const detailPage = new MemberDetailPage(page)
+
+    await createMember(page, memberName)
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: locationName,
+      memberName,
+    })
+
+    await membersPage.goto()
+    await membersPage.clickMemberName(memberName)
+
+    await expect(detailPage.clothingGroup(locationName)).toContainText(
+      "Keine Kleidung an diesem Standort.",
+    )
+  })
+
   test("renders breadcrumbs on member pages", async ({ page }) => {
     const name = `Test-Mitglied-${randomUUID().slice(0, 8)}`
     const membersPage = new MembersPage(page)
