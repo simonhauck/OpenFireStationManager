@@ -1,7 +1,7 @@
 import { useReducer } from "react"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 
-export type CheckoutStep = 1 | 2 | 3 | 4 | 5 | 6
+export type CheckoutStep = 1 | 2 | 3 | 4 | 5
 
 export interface CheckoutWizardState {
   step: CheckoutStep
@@ -10,9 +10,9 @@ export interface CheckoutWizardState {
   /** Effective return selection: type-based suggestions adjusted by overrides. */
   returnItemIds: Set<number>
   /**
-   * Explicit user choices for the return step, keyed by item id (`true` forces
-   * an item in, `false` keeps a suggested item out). Suggestions can therefore
-   * be re-derived at any time without discarding manual edits.
+   * Explicit user choices, keyed by item id (`true` forces an item in,
+   * `false` keeps a suggested item out). Suggestions can therefore be
+   * re-derived at any time without discarding manual edits.
    */
   returnOverrides: Map<number, boolean>
   /** WAESCHE location ID chosen for dirty returns (null = no returns or not yet chosen). */
@@ -23,10 +23,11 @@ type Action =
   | { type: "SELECT_TARGET"; locationId: number }
   | { type: "ADD_ITEM"; item: ResolvedClothingItem }
   | { type: "REMOVE_ITEM"; itemId: number }
-  | { type: "ADVANCE_TO_RETURNS" }
+  | { type: "MOVE_ITEM_TO_RETURN"; item: ResolvedClothingItem }
+  | { type: "MOVE_ITEM_TO_TAKE"; item: ResolvedClothingItem }
   | { type: "RECONCILE_SUGGESTED_RETURNS"; suggestedIds: Set<number> }
   | { type: "TOGGLE_RETURN_ITEM"; itemId: number }
-  | { type: "CONFIRM_RETURNS" }
+  | { type: "ADVANCE_FROM_SWAP" }
   | { type: "SELECT_WASH_LOCATION"; locationId: number }
   | { type: "SUBMIT_OK" }
   | { type: "GO_BACK" }
@@ -55,14 +56,14 @@ function reducer(
         returnOverrides: new Map(),
       }
 
-    case "ADVANCE_TO_RETURNS":
-      return { ...state, step: 3 }
-
     case "ADD_ITEM": {
+      const itemId = action.item.clothingItem.id
       const alreadyAdded = state.takeItems.some(
-        (i) => i.clothingItem.id === action.item.clothingItem.id,
+        (i) => i.clothingItem.id === itemId,
       )
-      if (alreadyAdded) return state // silent no-op on duplicate
+      // An item selected for return must never also be a take — the server
+      // rejects an item that appears in both lists.
+      if (alreadyAdded || state.returnItemIds.has(itemId)) return state
 
       return {
         ...state,
@@ -78,10 +79,48 @@ function reducer(
         ),
       }
 
+    case "MOVE_ITEM_TO_RETURN": {
+      // Left → right: force the item into the return selection. Used by the
+      // "Zurückgeben" action on take rows and when a scanned item already sits
+      // at the target location.
+      const itemId = action.item.clothingItem.id
+      const returnItemIds = new Set(state.returnItemIds)
+      returnItemIds.add(itemId)
+      const overrides = new Map(state.returnOverrides)
+      overrides.set(itemId, true)
+      return {
+        ...state,
+        takeItems: state.takeItems.filter((i) => i.clothingItem.id !== itemId),
+        returnItemIds,
+        returnOverrides: overrides,
+      }
+    }
+
+    case "MOVE_ITEM_TO_TAKE": {
+      // Right → left: an item that was forced to return (recorded somewhere
+      // other than the target locker) goes back to the take list.
+      const itemId = action.item.clothingItem.id
+      const returnItemIds = new Set(state.returnItemIds)
+      returnItemIds.delete(itemId)
+      const overrides = new Map(state.returnOverrides)
+      overrides.delete(itemId)
+      const alreadyTake = state.takeItems.some(
+        (i) => i.clothingItem.id === itemId,
+      )
+      return {
+        ...state,
+        takeItems: alreadyTake
+          ? state.takeItems
+          : [...state.takeItems, action.item],
+        returnItemIds,
+        returnOverrides: overrides,
+      }
+    }
+
     case "RECONCILE_SUGGESTED_RETURNS": {
       // Suggestions are a live default: they follow the current takes and
       // locker contents, while explicit overrides always win. Idempotent, so
-      // remounting the return step can never clobber manual edits.
+      // remounting the swap step can never clobber manual edits.
       const next = new Set(action.suggestedIds)
       for (const [itemId, isChecked] of state.returnOverrides) {
         if (isChecked) {
@@ -107,26 +146,31 @@ function reducer(
       return { ...state, returnItemIds: next, returnOverrides: overrides }
     }
 
-    case "CONFIRM_RETURNS": {
-      // If any returns selected → go to step 4 (pick wash location)
-      // Otherwise skip to step 5 (review)
-      const nextStep: CheckoutStep = state.returnItemIds.size > 0 ? 4 : 5
+    case "ADVANCE_FROM_SWAP": {
+      // If any returns are selected → pick a wash location first;
+      // otherwise skip straight to the review.
+      const nextStep: CheckoutStep = state.returnItemIds.size > 0 ? 3 : 4
       return { ...state, step: nextStep }
     }
 
     case "SELECT_WASH_LOCATION":
       return {
         ...state,
-        step: 5,
+        step: 4,
         returnLocationId: action.locationId,
       }
 
     case "SUBMIT_OK":
-      return { ...state, step: 6 }
+      return { ...state, step: 5 }
 
     case "GO_BACK": {
-      if (state.step <= 1) return state
-      const prevStep = (state.step - 1) as CheckoutStep
+      if (state.step <= 1 || state.step === 5) return state
+      // The wash step is skipped when nothing is returned, so going back from
+      // the review lands on the swap step instead.
+      const prevStep: CheckoutStep =
+        state.step === 4 && state.returnItemIds.size === 0
+          ? 2
+          : ((state.step - 1) as CheckoutStep)
       return { ...state, step: prevStep }
     }
 
@@ -152,10 +196,11 @@ export interface UseCheckoutWizardReturn {
   selectTarget: (locationId: number) => void
   addItem: (item: ResolvedClothingItem) => void
   removeItem: (itemId: number) => void
-  advanceToReturns: () => void
+  moveItemToReturn: (item: ResolvedClothingItem) => void
+  moveItemToTake: (item: ResolvedClothingItem) => void
   reconcileSuggestedReturns: (suggestedIds: Set<number>) => void
   toggleReturnItem: (itemId: number) => void
-  confirmReturns: () => void
+  advanceFromSwap: () => void
   selectWashLocation: (locationId: number) => void
   submitOk: () => void
   goBack: () => void
@@ -173,12 +218,15 @@ export function useCheckoutWizard(): UseCheckoutWizardReturn {
     addItem: (item: ResolvedClothingItem) =>
       dispatch({ type: "ADD_ITEM", item }),
     removeItem: (itemId: number) => dispatch({ type: "REMOVE_ITEM", itemId }),
-    advanceToReturns: () => dispatch({ type: "ADVANCE_TO_RETURNS" }),
+    moveItemToReturn: (item: ResolvedClothingItem) =>
+      dispatch({ type: "MOVE_ITEM_TO_RETURN", item }),
+    moveItemToTake: (item: ResolvedClothingItem) =>
+      dispatch({ type: "MOVE_ITEM_TO_TAKE", item }),
     reconcileSuggestedReturns: (suggestedIds: Set<number>) =>
       dispatch({ type: "RECONCILE_SUGGESTED_RETURNS", suggestedIds }),
     toggleReturnItem: (itemId: number) =>
       dispatch({ type: "TOGGLE_RETURN_ITEM", itemId }),
-    confirmReturns: () => dispatch({ type: "CONFIRM_RETURNS" }),
+    advanceFromSwap: () => dispatch({ type: "ADVANCE_FROM_SWAP" }),
     selectWashLocation: (locationId: number) =>
       dispatch({ type: "SELECT_WASH_LOCATION", locationId }),
     submitOk: () => dispatch({ type: "SUBMIT_OK" }),

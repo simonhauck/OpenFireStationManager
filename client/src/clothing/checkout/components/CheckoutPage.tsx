@@ -1,4 +1,3 @@
-import { AlertDialog } from "@astryxdesign/core/AlertDialog"
 import { Badge } from "@astryxdesign/core/Badge"
 import { Button } from "@astryxdesign/core/Button"
 import { Card } from "@astryxdesign/core/Card"
@@ -6,6 +5,7 @@ import { CheckboxListItem } from "@astryxdesign/core/CheckboxList"
 import { ClickableCard } from "@astryxdesign/core/ClickableCard"
 import { Grid } from "@astryxdesign/core/Grid"
 import { Heading } from "@astryxdesign/core/Heading"
+import { IconButton } from "@astryxdesign/core/IconButton"
 import { List } from "@astryxdesign/core/List"
 import { Selector } from "@astryxdesign/core/Selector"
 import { Step, Stepper } from "@astryxdesign/core/Stepper"
@@ -14,6 +14,7 @@ import { useToast } from "@astryxdesign/core/Toast"
 import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import { Trash2Icon } from "lucide-react"
 import type { ReactNode } from "react"
 import { useEffect, useMemo, useState } from "react"
 
@@ -21,6 +22,7 @@ import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsBy
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
 import type { CheckoutStep } from "#/clothing/checkout/useCheckoutWizard"
 import { useCheckoutWizard } from "#/clothing/checkout/useCheckoutWizard"
+import { useResolvedClothingItems } from "#/clothing/checkout/useResolvedClothingItems"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import {
@@ -49,10 +51,11 @@ export default function CheckoutPage() {
     selectTarget,
     addItem,
     removeItem,
-    advanceToReturns,
+    moveItemToReturn,
+    moveItemToTake,
     reconcileSuggestedReturns,
     toggleReturnItem,
-    confirmReturns,
+    advanceFromSwap,
     selectWashLocation,
     submitOk,
     goBack,
@@ -68,27 +71,18 @@ export default function CheckoutPage() {
     },
     {
       label: "Kleidung scannen",
-      description: "Barcode scannen oder manuell suchen",
+      description: "Ausgabe und Rückgabe – die App sortiert automatisch",
       content: (
-        <StepItemScannerContent
+        <StepSwapContent
           state={state}
           onAddItem={addItem}
           onRemoveItem={removeItem}
-          onBack={goBack}
-          onNext={advanceToReturns}
-        />
-      ),
-    },
-    {
-      label: "Rückgabe wählen",
-      description: "Kleidung aus dem Spind zurückgeben",
-      content: (
-        <StepReturnTogglesContent
-          state={state}
+          onMoveItemToReturn={moveItemToReturn}
+          onMoveItemToTake={moveItemToTake}
           onReconcileSuggestedReturns={reconcileSuggestedReturns}
           onToggleReturnItem={toggleReturnItem}
           onBack={goBack}
-          onConfirm={confirmReturns}
+          onNext={advanceFromSwap}
         />
       ),
     },
@@ -224,159 +218,69 @@ function StepTargetPickerContent({ onSelect }: StepTargetPickerContentProps) {
   )
 }
 
-// ─── Step 2: Item Scanner ─────────────────────────────────────────────────────
+// ─── Step 2: Combined Ausgabe / Rückgabe ─────────────────────────────────────
 
-interface StepItemScannerContentProps {
+interface StepSwapContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
   onAddItem: (item: ResolvedClothingItem) => void
   onRemoveItem: (itemId: number) => void
+  onMoveItemToReturn: (item: ResolvedClothingItem) => void
+  onMoveItemToTake: (item: ResolvedClothingItem) => void
+  onReconcileSuggestedReturns: (suggestedIds: Set<number>) => void
+  onToggleReturnItem: (itemId: number) => void
   onBack: () => void
   onNext: () => void
 }
 
-interface PendingConfirmation {
-  item: ResolvedClothingItem
-  actualLocationName: string
-}
-
-function StepItemScannerContent({
+function StepSwapContent({
   state,
   onAddItem,
   onRemoveItem,
-  onBack,
-  onNext,
-}: StepItemScannerContentProps) {
-  const [pendingConfirmation, setPendingConfirmation] =
-    useState<PendingConfirmation | null>(null)
-  const memberName = useMemberNameLookup()
-
-  function handleItemResolved(item: ResolvedClothingItem) {
-    const location = item.location
-
-    if (!location) {
-      onAddItem(item)
-      return
-    }
-
-    const isAtPool = location.type === "POOL"
-
-    if (!isAtPool) {
-      setPendingConfirmation({
-        item,
-        actualLocationName: formatClothingLocationLabel(
-          location,
-          memberName(location.memberId),
-        ),
-      })
-      return
-    }
-
-    onAddItem(item)
-  }
-
-  return (
-    <>
-      <div className="space-y-4">
-        <Text type="supporting" as="p">
-          Scanne einen Barcode oder suche manuell nach einem Kleidungsstück.
-        </Text>
-
-        <ClothingItemScanner
-          items={state.takeItems}
-          onItemResolved={handleItemResolved}
-          onRemoveItem={onRemoveItem}
-          renderItemBadge={(item) => {
-            const loc = item.location
-            if (!loc || loc.type === "POOL") return null
-            return (
-              <Badge
-                variant="neutral"
-                label={formatClothingLocationLabel(
-                  loc,
-                  memberName(loc.memberId),
-                )}
-              />
-            )
-          }}
-        />
-
-        <div className="flex justify-end gap-3 pt-2">
-          <Button
-            label="← Zurück"
-            variant="secondary"
-            size="lg"
-            onClick={onBack}
-          />
-          <Button
-            label="Weiter →"
-            variant="primary"
-            size="lg"
-            isDisabled={state.takeItems.length === 0}
-            onClick={onNext}
-          />
-        </div>
-      </div>
-
-      <AlertDialog
-        isOpen={pendingConfirmation !== null}
-        onOpenChange={(open) => {
-          if (!open) setPendingConfirmation(null)
-        }}
-        title="Kleidungsstück nicht im Pool"
-        description={
-          pendingConfirmation
-            ? `Dieses Kleidungsstück befindet sich laut System bei ${pendingConfirmation.actualLocationName}, nicht in einem Pool. Trotzdem hinzufügen?`
-            : ""
-        }
-        actionLabel="Trotzdem hinzufügen"
-        actionVariant="primary"
-        onAction={() => {
-          if (pendingConfirmation) {
-            onAddItem(pendingConfirmation.item)
-            setPendingConfirmation(null)
-          }
-        }}
-        cancelLabel="Abbrechen"
-      />
-    </>
-  )
-}
-
-// ─── Step 3: Return Toggles ───────────────────────────────────────────────────
-
-function useLockerItems(targetLocationId: number | null) {
-  const { data: allItems } = useQuery(getAllClothingItemsQuery())
-  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
-
-  return useMemo((): ResolvedClothingItem[] => {
-    if (!allItems || !allTypes || targetLocationId === null) return []
-    const typeMap = new Map(allTypes.map((t) => [t.id, t]))
-    return allItems
-      .filter((i) => i.locationId === targetLocationId)
-      .flatMap((i) => {
-        const type = typeMap.get(i.typeId)
-        if (!type) return []
-        return [{ clothingItem: i, clothingType: type }]
-      })
-  }, [allItems, allTypes, targetLocationId])
-}
-
-interface StepReturnTogglesContentProps {
-  state: ReturnType<typeof useCheckoutWizard>["state"]
-  onReconcileSuggestedReturns: (suggestedIds: Set<number>) => void
-  onToggleReturnItem: (itemId: number) => void
-  onBack: () => void
-  onConfirm: () => void
-}
-
-function StepReturnTogglesContent({
-  state,
+  onMoveItemToReturn,
+  onMoveItemToTake,
   onReconcileSuggestedReturns,
   onToggleReturnItem,
   onBack,
-  onConfirm,
-}: StepReturnTogglesContentProps) {
-  const lockerItems = useLockerItems(state.targetLocationId)
+  onNext,
+}: StepSwapContentProps) {
+  const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const memberName = useMemberNameLookup()
+  const resolvedItems = useResolvedClothingItems()
+
+  const targetLocation = (allLocations ?? []).find(
+    (l) => l.id === state.targetLocationId,
+  )
+  const targetLocationName = formatClothingLocationLabelOrDefault(
+    targetLocation,
+    memberName(targetLocation?.memberId),
+  )
+
+  const lockerItems = useMemo(
+    () =>
+      resolvedItems.filter(
+        (i) => i.clothingItem.locationId === state.targetLocationId,
+      ),
+    [resolvedItems, state.targetLocationId],
+  )
+
+  const selectedReturnItems = useMemo(
+    () =>
+      [...state.returnItemIds].flatMap((id) => {
+        const resolved = resolvedItems.find((i) => i.clothingItem.id === id)
+        return resolved ? [resolved] : []
+      }),
+    [resolvedItems, state.returnItemIds],
+  )
+
+  // Returns that are not recorded at the target locker: items whose current
+  // location disagrees with the target, forced to return via "Zurückgeben".
+  const foreignReturnItems = useMemo(
+    () =>
+      selectedReturnItems.filter(
+        (i) => i.clothingItem.locationId !== state.targetLocationId,
+      ),
+    [selectedReturnItems, state.targetLocationId],
+  )
 
   const suggestedReturnIds = useMemo(
     () => autoToggleReturnsByType(state.takeItems, lockerItems),
@@ -387,32 +291,117 @@ function StepReturnTogglesContent({
     onReconcileSuggestedReturns(suggestedReturnIds)
   }, [onReconcileSuggestedReturns, suggestedReturnIds])
 
+  function handleItemResolved(item: ResolvedClothingItem) {
+    const isAtTarget = item.clothingItem.locationId === state.targetLocationId
+    if (isAtTarget) {
+      // Items already recorded at the target locker are return candidates.
+      onMoveItemToReturn(item)
+      return
+    }
+    onAddItem(item)
+  }
+
+  const canAdvance = state.takeItems.length > 0 || state.returnItemIds.size > 0
+
   return (
-    <div className="space-y-4">
-      <Text type="supporting" as="p">
-        Wähle die Kleidungsstücke aus dem Spind aus, die zurückgegeben werden
-        sollen. Passende Typen wurden bereits vorausgewählt.
-      </Text>
-
-      <RenderIf when={lockerItems.length === 0}>
-        <Text type="supporting" as="p" className="italic">
-          Keine Kleidung im Spind gefunden.
+    <>
+      <div className="space-y-4">
+        <Text type="supporting" as="p">
+          Einfach scannen – die App sortiert automatisch: neue Kleidung links
+          unter Ausgabe, Kleidung aus dem Spind rechts unter Rückgabe. Jedes
+          Teil lässt sich per Knopf verschieben.
         </Text>
-      </RenderIf>
 
-      <RenderIf when={lockerItems.length > 0}>
-        <List hasDividers>
-          {lockerItems.map((item) => (
-            <CheckboxListItem
-              key={item.clothingItem.id}
-              label={`${item.clothingType.name} – ${item.clothingItem.size}`}
-              description={item.clothingItem.barcode ?? undefined}
-              isChecked={state.returnItemIds.has(item.clothingItem.id)}
-              onCheck={() => onToggleReturnItem(item.clothingItem.id)}
-            />
-          ))}
-        </List>
-      </RenderIf>
+        <ClothingItemScanner
+          items={state.takeItems}
+          onItemResolved={handleItemResolved}
+          onRemoveItem={onRemoveItem}
+          showItemList={false}
+        />
+      </div>
+
+      <Grid columns={{ minWidth: 320, max: 2 }} gap={4}>
+        <div className="space-y-2" data-testid="checkout-ausgabe">
+          <Text as="p" type="label">
+            Ausgabe ({state.takeItems.length})
+          </Text>
+          <RenderIf when={state.takeItems.length === 0}>
+            <Text type="supporting" as="p" className="italic">
+              Noch nichts erfasst – scanne Kleidung zum Mitnehmen.
+            </Text>
+          </RenderIf>
+          <RenderIf when={state.takeItems.length > 0}>
+            <div className="space-y-2">
+              {state.takeItems.map((item) => (
+                <ClothingItemRow
+                  key={item.clothingItem.id}
+                  item={item}
+                  trailing={
+                    <div className="flex items-center gap-2">
+                      <ItemOriginBadge item={item} />
+                      <Button
+                        label="Zurückgeben"
+                        variant="secondary"
+                        size="lg"
+                        onClick={() => onMoveItemToReturn(item)}
+                      />
+                      <IconButton
+                        variant="ghost"
+                        size="lg"
+                        label={`${item.clothingType.name} entfernen`}
+                        tooltip="Entfernen"
+                        icon={<Trash2Icon className="size-4" />}
+                        onClick={() => onRemoveItem(item.clothingItem.id)}
+                      />
+                    </div>
+                  }
+                />
+              ))}
+            </div>
+          </RenderIf>
+        </div>
+
+        <div className="space-y-2" data-testid="checkout-rueckgabe">
+          <Text as="p" type="label">
+            Rückgabe ({state.returnItemIds.size})
+          </Text>
+          <Text type="supporting" as="p">
+            Alle Kleidungsstücke in {targetLocationName}
+          </Text>
+          <RenderIf
+            when={lockerItems.length === 0 && foreignReturnItems.length === 0}
+          >
+            <Text type="supporting" as="p" className="italic">
+              Keine Kleidung im Spind.
+            </Text>
+          </RenderIf>
+          <RenderIf
+            when={lockerItems.length > 0 || foreignReturnItems.length > 0}
+          >
+            <List hasDividers>
+              {lockerItems.map((item) => (
+                <CheckboxListItem
+                  key={item.clothingItem.id}
+                  label={`${item.clothingType.name} – ${item.clothingItem.size}`}
+                  description={item.clothingItem.barcode ?? undefined}
+                  isChecked={state.returnItemIds.has(item.clothingItem.id)}
+                  onCheck={() => onToggleReturnItem(item.clothingItem.id)}
+                />
+              ))}
+              {foreignReturnItems.map((item) => (
+                <CheckboxListItem
+                  key={item.clothingItem.id}
+                  label={`${item.clothingType.name} – ${item.clothingItem.size}`}
+                  description={item.clothingItem.barcode ?? undefined}
+                  isChecked={true}
+                  onCheck={() => onMoveItemToTake(item)}
+                  endContent={<ItemOriginBadge item={item} />}
+                />
+              ))}
+            </List>
+          </RenderIf>
+        </div>
+      </Grid>
 
       <div className="flex justify-end gap-3 pt-2">
         <Button
@@ -425,14 +414,32 @@ function StepReturnTogglesContent({
           label="Weiter →"
           variant="primary"
           size="lg"
-          onClick={onConfirm}
+          isDisabled={!canAdvance}
+          onClick={onNext}
         />
       </div>
-    </div>
+    </>
   )
 }
 
-// ─── Step 4: Wash Location Picker ─────────────────────────────────────────────
+/**
+ * Badge for a non-POOL origin ("Standort: Wäsche 2" / "Kein Standort"), so the
+ * recorded location is visible inline instead of in a modal.
+ */
+function ItemOriginBadge({ item }: { item: ResolvedClothingItem }) {
+  const memberName = useMemberNameLookup()
+  const location = item.location
+
+  if (location && location.type === "POOL") return null
+
+  const label = location
+    ? `Standort: ${formatClothingLocationLabel(location, memberName(location.memberId))}`
+    : "Kein Standort"
+
+  return <Badge variant="warning" label={label} />
+}
+
+// ─── Step 3: Wash Location Picker ─────────────────────────────────────────────
 
 interface StepWashLocationPickerContentProps {
   onSelect: (locationId: number) => void
@@ -484,7 +491,7 @@ function StepWashLocationPickerContent({
   )
 }
 
-// ─── Step 5: Review + Submit ──────────────────────────────────────────────────
+// ─── Step 4: Review + Submit ──────────────────────────────────────────────────
 
 interface StepReviewContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
@@ -621,7 +628,7 @@ function StepReviewContent({
   )
 }
 
-// ─── Step 6: Success ──────────────────────────────────────────────────────────
+// ─── Step 5: Success ──────────────────────────────────────────────────────────
 
 const SUCCESS_REDIRECT_SECONDS = 15
 

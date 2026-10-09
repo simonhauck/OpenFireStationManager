@@ -64,24 +64,20 @@ test.describe("Checkout", () => {
 
     // ── Step 2: Scan the clothing item by barcode ─────────────────────────────
     await checkoutPage.scanBarcode(barcode)
-    // Verify the item appears in the list before proceeding
-    await expect(checkoutPage.scannedItem(`${typeName} – M`)).toBeVisible()
+    // The pool item is auto-sorted into the Ausgabe column
+    await expect(checkoutPage.ausgabeRow(`${typeName} – M`)).toBeVisible()
+
+    // No returns → the wash step is skipped and the wizard lands on review
+    // (step 4).
     await checkoutPage.clickWeiter()
 
-    // ── Step 3: Return selection — locker is empty, just continue ─────────────
-    await expect(page.getByText("Schritt 3: Rückgabe wählen")).toBeVisible()
-    await checkoutPage.confirmReturns()
-
-    // Step 4 (Wäsche-Ziel) is skipped when no returns are selected; we land
-    // directly on step 5.
-
-    // ── Step 5: Review and submit ─────────────────────────────────────────────
-    await expect(page.getByText("Schritt 5: Überprüfen")).toBeVisible()
+    // ── Step 4: Review and submit ─────────────────────────────────────────────
+    await expect(page.getByText("Schritt 4: Überprüfen")).toBeVisible()
     // The item under test should appear in the "Ausgabe" section
     await expect(page.getByText(`${typeName} – M`)).toBeVisible()
     await checkoutPage.submitCheckout()
 
-    // ── Step 6: Success screen ────────────────────────────────────────────────
+    // ── Step 5: Success screen ────────────────────────────────────────────────
     await expect(checkoutPage.successHeading()).toBeVisible()
 
     // Navigate to pool overview
@@ -139,18 +135,18 @@ test.describe("Checkout – owner names", () => {
   })
 })
 
-test.describe("Checkout – discrepancy dialog", () => {
+test.describe("Checkout – items not recorded at the target location", () => {
   let typeName: string
   let barcode: string
   let personalLocationName: string
-  let nonPoolLocationName: string
+  let washLocationName: string
 
   test.beforeAll(async ({ browser }) => {
     const suffix = randomUUID().slice(0, 8)
     typeName = `Typ-Disc-${suffix}`
     barcode = `BC-DC-${suffix}`
     personalLocationName = `Spind-Disc-${suffix}`
-    nonPoolLocationName = `Waesche-Disc-${suffix}`
+    washLocationName = `Waesche-Disc-${suffix}`
 
     const page = await browser.newPage({
       storageState: "playwright/.auth/kleiderwart.json",
@@ -161,13 +157,13 @@ test.describe("Checkout – discrepancy dialog", () => {
     // Item lives at a WAESCHE location — deliberately not a POOL location
     await createClothingLocation(page, {
       type: "WAESCHE",
-      name: nonPoolLocationName,
+      name: washLocationName,
     })
     await createClothingItem(page, {
       typeName,
       size: "L",
       barcode,
-      locationName: nonPoolLocationName,
+      locationName: washLocationName,
     })
 
     await createClothingLocation(page, {
@@ -178,7 +174,7 @@ test.describe("Checkout – discrepancy dialog", () => {
     await page.close()
   })
 
-  test("shows discrepancy dialog when scanned item is not at a POOL location", async ({
+  test("scanned item is put into Ausgabe with its recorded location shown inline", async ({
     page,
   }) => {
     const checkoutPage = new CheckoutPage(page)
@@ -188,14 +184,12 @@ test.describe("Checkout – discrepancy dialog", () => {
 
     await checkoutPage.scanBarcode(barcode)
 
-    // Dialog must appear and mention the actual location name
-    await expect(checkoutPage.discrepancyDialog()).toBeVisible()
-    await expect(checkoutPage.discrepancyDialog()).toContainText(
-      nonPoolLocationName,
-    )
+    const row = checkoutPage.ausgabeRow(`${typeName} – L`)
+    await expect(row).toBeVisible()
+    await expect(row).toContainText(washLocationName)
   })
 
-  test("discrepancy dialog – cancel does not add the item", async ({
+  test("Zurückgeben moves the item into the Rückgabe selection", async ({
     page,
   }) => {
     const checkoutPage = new CheckoutPage(page)
@@ -204,16 +198,16 @@ test.describe("Checkout – discrepancy dialog", () => {
     await checkoutPage.selectPersonalLocation(personalLocationName)
 
     await checkoutPage.scanBarcode(barcode)
-    await expect(checkoutPage.discrepancyDialog()).toBeVisible()
+    await checkoutPage.moveToReturn(`${typeName} – L`)
 
-    await checkoutPage.dismissDiscrepancyDialog()
-
-    // Dialog closed and item list remains empty
-    await expect(checkoutPage.discrepancyDialog()).not.toBeVisible()
-    await expect(checkoutPage.scannedItem(`${typeName} – L`)).not.toBeVisible()
+    await expect(checkoutPage.ausgabeRow(`${typeName} – L`)).not.toBeVisible()
+    await expect(
+      checkoutPage.rueckgabeCheckbox(`${typeName} – L`),
+    ).toBeChecked()
+    await expect(checkoutPage.rueckgabeColumn()).toContainText(washLocationName)
   })
 
-  test("discrepancy dialog – confirm adds the item to the list", async ({
+  test("unchecking a forced return puts the item back into Ausgabe", async ({
     page,
   }) => {
     const checkoutPage = new CheckoutPage(page)
@@ -222,15 +216,12 @@ test.describe("Checkout – discrepancy dialog", () => {
     await checkoutPage.selectPersonalLocation(personalLocationName)
 
     await checkoutPage.scanBarcode(barcode)
-    await expect(checkoutPage.discrepancyDialog()).toBeVisible()
+    await checkoutPage.moveToReturn(`${typeName} – L`)
+    await checkoutPage.rueckgabeCheckbox(`${typeName} – L`).click()
 
-    await checkoutPage.confirmDiscrepancyDialog()
-
-    // Dialog closed and item is now in the scanned list with the non-POOL location badge
-    await expect(checkoutPage.discrepancyDialog()).not.toBeVisible()
-    await expect(checkoutPage.scannedItem(`${typeName} – L`)).toBeVisible()
-    await expect(checkoutPage.scannedItem(`${typeName} – L`)).toContainText(
-      nonPoolLocationName,
-    )
+    await expect(checkoutPage.ausgabeRow(`${typeName} – L`)).toBeVisible()
+    await expect(
+      checkoutPage.rueckgabeCheckbox(`${typeName} – L`),
+    ).not.toBeVisible()
   })
 })

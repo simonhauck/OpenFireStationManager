@@ -28,6 +28,11 @@ export interface ClothingItemScannerProps {
   onRemoveItem: (itemId: number) => void
   /** Optional render prop for workflow-specific badges/annotations per item row. */
   renderItemBadge?: (item: ResolvedClothingItem) => ReactNode
+  /**
+   * Whether to render the built-in list of resolved items. Set to false when
+   * the parent renders the batch itself (e.g. the combined swap screen).
+   */
+  showItemList?: boolean
 }
 
 /** Barcode scanners typically send all chars within this window (ms). */
@@ -42,6 +47,7 @@ export default function ClothingItemScanner({
   onItemResolved,
   onRemoveItem,
   renderItemBadge,
+  showItemList = true,
 }: ClothingItemScannerProps) {
   const [inputMode, setInputMode] = useState<InputMode>("scanner")
   const [isScanning, setIsScanning] = useState(false)
@@ -215,7 +221,7 @@ export default function ClothingItemScanner({
       />
 
       {/* Item list */}
-      <RenderIf when={items.length > 0}>
+      <RenderIf when={showItemList && items.length > 0}>
         <div className="space-y-2">
           <Text as="p" type="label">
             Ausgewählte Kleidung ({items.length})

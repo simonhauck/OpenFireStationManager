@@ -16,16 +16,47 @@ export class CheckoutPage {
     await this.page.getByRole("option", { name }).click()
   }
 
-  // ─── Step 2: Kleidung scannen ───────────────────────────────────────────────
+  // ─── Step 2: Kleidung scannen (Ausgabe / Rückgabe) ──────────────────────────
 
   async scanBarcode(barcode: string) {
     await this.page.keyboard.type(barcode)
     await this.page.keyboard.press("Enter")
   }
 
-  /** The list entry for a scanned item (matched by type+size label). */
-  scannedItem(label: string) {
-    return this.page.locator(".rounded-lg.border").filter({ hasText: label })
+  /** The left column: items that will be issued (taken). */
+  ausgabeColumn() {
+    return this.page.getByTestId("checkout-ausgabe")
+  }
+
+  /** The right column: locker contents and selected returns. */
+  rueckgabeColumn() {
+    return this.page.getByTestId("checkout-rueckgabe")
+  }
+
+  /** The row for a take item in the Ausgabe column, matched by type+size label. */
+  ausgabeRow(label: string) {
+    return this.ausgabeColumn()
+      .locator(".rounded-lg.border")
+      .filter({ hasText: label })
+  }
+
+  /** The checkbox for a row in the Rückgabe column, matched by type+size label. */
+  rueckgabeCheckbox(label: string) {
+    return this.rueckgabeColumn().getByRole("checkbox", { name: label })
+  }
+
+  /** Forces the given Ausgabe row into the Rückgabe selection. */
+  async moveToReturn(label: string) {
+    await this.ausgabeRow(label)
+      .getByRole("button", { name: "Zurückgeben" })
+      .click()
+  }
+
+  /** Removes a taken item of `typeName` from the Ausgabe column. */
+  async removeTake(typeName: string) {
+    await this.ausgabeColumn()
+      .getByRole("button", { name: `${typeName} entfernen` })
+      .click()
   }
 
   /** Always-visible "where do I find the barcode?" gallery on the scanner step. */
@@ -37,40 +68,13 @@ export class CheckoutPage {
     await this.page.getByRole("button", { name: "Weiter →" }).click()
   }
 
-  // ─── Step 2: Discrepancy dialog ─────────────────────────────────────────────
-
-  discrepancyDialog() {
-    return this.page.getByRole("alertdialog")
-  }
-
-  async dismissDiscrepancyDialog() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Abbrechen" })
-      .click()
-  }
-
-  async confirmDiscrepancyDialog() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Trotzdem hinzufügen" })
-      .click()
-  }
-
-  // ─── Step 3: Rückgabe wählen ────────────────────────────────────────────────
-
-  /** Proceeds past the return step without selecting any returns. */
-  async confirmReturns() {
-    await this.page.getByRole("button", { name: "Weiter →" }).click()
-  }
-
-  // ─── Step 5: Überprüfen ─────────────────────────────────────────────────────
+  // ─── Step 4: Überprüfen ─────────────────────────────────────────────────────
 
   async submitCheckout() {
     await this.page.getByRole("button", { name: "Bestätigen" }).click()
   }
 
-  // ─── Step 6: Success ────────────────────────────────────────────────────────
+  // ─── Step 5: Success ────────────────────────────────────────────────────────
 
   successHeading() {
     return this.page.getByText("Vorgang abgeschlossen")
