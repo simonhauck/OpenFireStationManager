@@ -2,12 +2,12 @@ import { AlertDialog } from "@astryxdesign/core/AlertDialog"
 import { Button } from "@astryxdesign/core/Button"
 import { FileInput } from "@astryxdesign/core/FileInput"
 import { useLightbox } from "@astryxdesign/core/Lightbox"
-import { Thumbnail } from "@astryxdesign/core/Thumbnail"
 import { useToast } from "@astryxdesign/core/Toast"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Upload } from "lucide-react"
 import { useState } from "react"
 
+import BarcodeImageTile from "#/clothing/components/shared/BarcodeImageTile"
 import type { ClothingTypeImageMetadata } from "#/clothing/model/clothingType"
 import {
   ACCEPTED_IMAGE_TYPES,
@@ -104,13 +104,11 @@ export default function ClothingTypeImagesSection({
             <RenderIf when={(images?.length ?? 0) > 0}>
               <div className="flex flex-wrap gap-3">
                 {images?.map((image, index) => (
-                  <Thumbnail
+                  <BarcodeImageTile
                     key={image.id}
-                    src={clothingTypeImageUrl(typeId, image.id)}
+                    imageUrl={clothingTypeImageUrl(typeId, image.id)}
                     alt={`Barcode-Bild ${index + 1}`}
-                    label={`Barcode-Bild ${index + 1}`}
-                    showRemoveOn="always"
-                    onClick={() => lightbox.open(index)}
+                    onOpen={() => lightbox.open(index)}
                     onRemove={() => setImageToDelete(image)}
                   />
                 ))}

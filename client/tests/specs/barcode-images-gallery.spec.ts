@@ -58,5 +58,8 @@ test.describe("Barcode images gallery", () => {
     await expect(
       gallery.getByText(typeWithoutImage, { exact: true }),
     ).not.toBeVisible()
+
+    const imageBox = await gallery.locator("img").first().boundingBox()
+    expect(imageBox?.height ?? 0).toBeGreaterThanOrEqual(150)
   })
 })

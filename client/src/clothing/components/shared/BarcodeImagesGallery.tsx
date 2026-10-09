@@ -1,8 +1,8 @@
 import { useLightbox } from "@astryxdesign/core/Lightbox"
 import { Text } from "@astryxdesign/core/Text"
-import { Thumbnail } from "@astryxdesign/core/Thumbnail"
 import { useQuery } from "@tanstack/react-query"
 
+import BarcodeImageTile from "#/clothing/components/shared/BarcodeImageTile"
 import {
   barcodeImagesQuery,
   clothingTypeImageUrl,
@@ -48,14 +48,13 @@ export default function BarcodeImagesGallery() {
                 <Text as="p" type="supporting">
                   {type.typeName}
                 </Text>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {type.images.map((image, imageIndex) => (
-                    <Thumbnail
+                    <BarcodeImageTile
                       key={image.id}
-                      src={clothingTypeImageUrl(type.typeId, image.id)}
+                      imageUrl={clothingTypeImageUrl(type.typeId, image.id)}
                       alt={`Barcode-Bild ${type.typeName}`}
-                      label={`Barcode-Bild ${type.typeName}`}
-                      onClick={() =>
+                      onOpen={() =>
                         lightbox.open(
                           (groupStartIndices[typeIndex] ?? 0) + imageIndex,
                         )
