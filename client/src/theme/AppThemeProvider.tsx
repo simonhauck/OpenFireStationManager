@@ -12,7 +12,7 @@ import {
   useMemo,
   useState,
 } from "react"
-import { appTheme } from "./appTheme"
+import { openFireStationTheme } from "./built/open-fire-station"
 
 type ThemeMode = "light" | "dark"
 
@@ -93,7 +93,7 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
 
   return (
     <ThemeModeContext.Provider value={value}>
-      <Theme theme={appTheme} mode={mode}>
+      <Theme theme={openFireStationTheme} mode={mode}>
         <InternationalizationProvider
           locale="de-DE"
           messages={{ "de-DE": deDE }}

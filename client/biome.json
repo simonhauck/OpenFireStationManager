@@ -5,6 +5,9 @@
   "vcs": {
     "root": "../"
   },
+  "files": {
+    "includes": ["**", "!src/theme/built"]
+  },
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2
