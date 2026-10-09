@@ -15,7 +15,7 @@ import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import type { ReactNode } from "react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
@@ -50,7 +50,7 @@ export default function CheckoutPage() {
     addItem,
     removeItem,
     advanceToReturns,
-    setReturnItemIds,
+    applyAutoReturnToggles,
     toggleReturnItem,
     confirmReturns,
     selectWashLocation,
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
       content: (
         <StepReturnTogglesContent
           state={state}
-          onSetReturnItemIds={setReturnItemIds}
+          onApplyAutoReturnToggles={applyAutoReturnToggles}
           onToggleReturnItem={toggleReturnItem}
           onBack={goBack}
           onConfirm={confirmReturns}
@@ -346,7 +346,7 @@ function StepItemScannerContent({
 
 interface StepReturnTogglesContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
-  onSetReturnItemIds: (ids: Set<number>) => void
+  onApplyAutoReturnToggles: (ids: Set<number>) => void
   onToggleReturnItem: (itemId: number) => void
   onBack: () => void
   onConfirm: () => void
@@ -354,7 +354,7 @@ interface StepReturnTogglesContentProps {
 
 function StepReturnTogglesContent({
   state,
-  onSetReturnItemIds,
+  onApplyAutoReturnToggles,
   onToggleReturnItem,
   onBack,
   onConfirm,
@@ -374,13 +374,16 @@ function StepReturnTogglesContent({
       })
   })()
 
-  const didAutoToggle = useRef(false)
   useEffect(() => {
-    if (didAutoToggle.current || lockerItems.length === 0) return
-    didAutoToggle.current = true
+    if (state.hasAppliedAutoReturnToggles || lockerItems.length === 0) return
     const autoToggled = autoToggleReturnsByType(state.takeItems, lockerItems)
-    onSetReturnItemIds(autoToggled)
-  }, [lockerItems, onSetReturnItemIds, state.takeItems])
+    onApplyAutoReturnToggles(autoToggled)
+  }, [
+    lockerItems,
+    onApplyAutoReturnToggles,
+    state.hasAppliedAutoReturnToggles,
+    state.takeItems,
+  ])
 
   return (
     <div className="space-y-4">

@@ -93,14 +93,58 @@ describe("useCheckoutWizard", () => {
 
   // ── Step 3: Return Toggles ────────────────────────────────────────────────
 
-  it("sets return item IDs in bulk (for auto-toggle on entry)", () => {
+  it("applies auto return toggles in bulk once", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
     act(() => {
-      result.current.setReturnItemIds(new Set([10, 20, 30]))
+      result.current.applyAutoReturnToggles(new Set([10, 20, 30]))
     })
 
     expect(result.current.state.returnItemIds).toEqual(new Set([10, 20, 30]))
+    expect(result.current.state.hasAppliedAutoReturnToggles).toBe(true)
+  })
+
+  it("ignores auto return toggles after they were applied once", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.applyAutoReturnToggles(new Set([10]))
+      result.current.applyAutoReturnToggles(new Set([99]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([10]))
+  })
+
+  it("does not overwrite manual toggles when auto toggles are re-applied (#323)", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.applyAutoReturnToggles(new Set([10, 20]))
+      result.current.toggleReturnItem(20) // user unchecks 20
+      result.current.toggleReturnItem(30) // user checks 30 additionally
+      result.current.applyAutoReturnToggles(new Set([10, 20]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([10, 30]))
+  })
+
+  it("re-arms auto return toggles when a new target is selected", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.selectTarget(1)
+      result.current.applyAutoReturnToggles(new Set([10]))
+      result.current.selectTarget(2)
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set())
+    expect(result.current.state.hasAppliedAutoReturnToggles).toBe(false)
+
+    act(() => {
+      result.current.applyAutoReturnToggles(new Set([20]))
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([20]))
   })
 
   it("toggles a return item on and off", () => {
@@ -122,7 +166,7 @@ describe("useCheckoutWizard", () => {
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.setReturnItemIds(new Set([5]))
+      result.current.toggleReturnItem(5)
       result.current.confirmReturns()
     })
 
@@ -147,7 +191,7 @@ describe("useCheckoutWizard", () => {
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.setReturnItemIds(new Set([5]))
+      result.current.toggleReturnItem(5)
       result.current.confirmReturns()
       result.current.selectWashLocation(99)
     })
@@ -188,7 +232,7 @@ describe("useCheckoutWizard", () => {
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.setReturnItemIds(new Set([5]))
+      result.current.toggleReturnItem(5)
       result.current.confirmReturns() // → step 4
       result.current.selectWashLocation(99) // → step 5
       result.current.goBack()

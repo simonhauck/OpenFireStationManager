@@ -11,6 +11,12 @@ export interface CheckoutWizardState {
   returnItemIds: Set<number>
   /** WAESCHE location ID chosen for dirty returns (null = no returns or not yet chosen). */
   returnLocationId: number | null
+  /**
+   * True once the type-based auto-selection has been applied for the current
+   * target. Kept in wizard state so it survives step remounts and never
+   * overwrites manual (de)selections.
+   */
+  hasAppliedAutoReturnToggles: boolean
 }
 
 type Action =
@@ -18,7 +24,7 @@ type Action =
   | { type: "ADD_ITEM"; item: ResolvedClothingItem }
   | { type: "REMOVE_ITEM"; itemId: number }
   | { type: "ADVANCE_TO_RETURNS" }
-  | { type: "SET_RETURN_ITEM_IDS"; ids: Set<number> }
+  | { type: "APPLY_AUTO_RETURN_TOGGLES"; ids: Set<number> }
   | { type: "TOGGLE_RETURN_ITEM"; itemId: number }
   | { type: "CONFIRM_RETURNS" }
   | { type: "SELECT_WASH_LOCATION"; locationId: number }
@@ -33,7 +39,13 @@ function reducer(
 ): CheckoutWizardState {
   switch (action.type) {
     case "SELECT_TARGET":
-      return { ...state, step: 2, targetLocationId: action.locationId }
+      return {
+        ...state,
+        step: 2,
+        targetLocationId: action.locationId,
+        returnItemIds: new Set(),
+        hasAppliedAutoReturnToggles: false,
+      }
 
     case "ADVANCE_TO_RETURNS":
       return { ...state, step: 3 }
@@ -58,8 +70,15 @@ function reducer(
         ),
       }
 
-    case "SET_RETURN_ITEM_IDS":
-      return { ...state, returnItemIds: new Set(action.ids) }
+    case "APPLY_AUTO_RETURN_TOGGLES":
+      // Apply once per target; later mounts of the return step must not
+      // overwrite selections the user made manually.
+      if (state.hasAppliedAutoReturnToggles) return state
+      return {
+        ...state,
+        returnItemIds: new Set(action.ids),
+        hasAppliedAutoReturnToggles: true,
+      }
 
     case "TOGGLE_RETURN_ITEM": {
       const next = new Set(state.returnItemIds)
@@ -108,6 +127,7 @@ const initialState: CheckoutWizardState = {
   takeItems: [],
   returnItemIds: new Set(),
   returnLocationId: null,
+  hasAppliedAutoReturnToggles: false,
 }
 
 export interface UseCheckoutWizardReturn {
@@ -116,7 +136,7 @@ export interface UseCheckoutWizardReturn {
   addItem: (item: ResolvedClothingItem) => void
   removeItem: (itemId: number) => void
   advanceToReturns: () => void
-  setReturnItemIds: (ids: Set<number>) => void
+  applyAutoReturnToggles: (ids: Set<number>) => void
   toggleReturnItem: (itemId: number) => void
   confirmReturns: () => void
   selectWashLocation: (locationId: number) => void
@@ -137,8 +157,8 @@ export function useCheckoutWizard(): UseCheckoutWizardReturn {
       dispatch({ type: "ADD_ITEM", item }),
     removeItem: (itemId: number) => dispatch({ type: "REMOVE_ITEM", itemId }),
     advanceToReturns: () => dispatch({ type: "ADVANCE_TO_RETURNS" }),
-    setReturnItemIds: (ids: Set<number>) =>
-      dispatch({ type: "SET_RETURN_ITEM_IDS", ids }),
+    applyAutoReturnToggles: (ids: Set<number>) =>
+      dispatch({ type: "APPLY_AUTO_RETURN_TOGGLES", ids }),
     toggleReturnItem: (itemId: number) =>
       dispatch({ type: "TOGGLE_RETURN_ITEM", itemId }),
     confirmReturns: () => dispatch({ type: "CONFIRM_RETURNS" }),
