@@ -7,6 +7,8 @@
   },
   "scripts": {
     "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs",
+    "theme:build": "npm run astryx -- theme build src/theme/appTheme.ts --out src/theme/built/open-fire-station.css",
+    "theme:check": "npm run astryx -- theme build src/theme/appTheme.ts --out src/theme/built/open-fire-station.css --check",
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",

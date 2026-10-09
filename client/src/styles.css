@@ -5,6 +5,7 @@
 @import "@astryxdesign/core/reset.css";
 @import "@astryxdesign/core/astryx.css";
 @import "@astryxdesign/core/tailwind-theme.css";
+@import "./theme/built/open-fire-station.css";
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @custom-variant dark (&:is(.dark *));

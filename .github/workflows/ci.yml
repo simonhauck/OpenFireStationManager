@@ -37,6 +37,10 @@ jobs:
         working-directory: client
         run: npm run format:check
 
+      - name: Check built theme is up to date
+        working-directory: client
+        run: npm run theme:check
+
   e2e:
     runs-on: ubuntu-latest
     permissions:
