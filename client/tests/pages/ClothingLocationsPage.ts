@@ -1,5 +1,12 @@
 import type { Page } from "@playwright/test"
 
+const LOCATION_TYPE_LABELS = {
+  POOL: "Pool",
+  WAESCHE: "Wäsche",
+  PERSONAL: "Persönlicher Standort",
+  OTHER: "Sonstiges",
+} as const
+
 export class ClothingLocationsPage {
   constructor(private readonly page: Page) {}
 
@@ -29,32 +36,34 @@ export class ClothingLocationsPage {
     await this.page.getByRole("menuitem", { name: "Massenimport" }).click()
   }
 
-  async selectType(type: "POOL" | "WAESCHE" | "PERSONAL" | "OTHER") {
-    await this.page.locator(`#type-${type}`).click()
+  async selectType(type: keyof typeof LOCATION_TYPE_LABELS) {
+    await this.page
+      .getByRole("radio", { name: LOCATION_TYPE_LABELS[type] })
+      .click()
   }
 
   async fillName(name: string) {
-    await this.page.locator("#name").fill(name)
+    await this.page
+      .getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ })
+      .fill(name)
   }
 
   async fillComment(comment: string) {
-    await this.page.locator("#comment").fill(comment)
+    await this.page.getByRole("textbox", { name: "Kommentar" }).fill(comment)
   }
 
   async selectMember(name: string) {
-    await this.page.locator("#member").click()
+    await this.page.getByRole("button", { name: "Mitglied" }).click()
     await this.page.getByPlaceholder("Mitglied suchen...").fill(name)
     await this.page.getByRole("option", { name }).click()
   }
 
   async clearMember() {
-    await this.page
-      .getByRole("button", { name: "Auswahl zurücksetzen" })
-      .click()
+    await this.page.getByRole("button", { name: "Mitglied löschen" }).click()
   }
 
   memberPicker() {
-    return this.page.locator("#member")
+    return this.page.getByRole("button", { name: "Mitglied" })
   }
 
   async submitForm() {
@@ -63,7 +72,7 @@ export class ClothingLocationsPage {
 
   async clickEditForLocation(name: string) {
     await this.page
-      .getByRole("link", { name: `Standort ${name} bearbeiten` })
+      .getByRole("button", { name: `Standort ${name} bearbeiten` })
       .click()
   }
 
@@ -74,7 +83,10 @@ export class ClothingLocationsPage {
   }
 
   async confirmDelete() {
-    await this.page.getByRole("button", { name: "Löschen" }).click()
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Löschen" })
+      .click()
   }
 
   locationRow(name: string) {

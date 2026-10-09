@@ -1,4 +1,4 @@
-import ClearableCombobox from "#/components/base/ClearableCombobox"
+import { Selector } from "@astryxdesign/core/Selector"
 import type { Member } from "#/members/model/member.ts"
 import { useMembers } from "#/members/service/memberQueries"
 
@@ -14,23 +14,24 @@ export default function MemberSelect({
   const { data: members } = useMembers()
 
   const allMembers: Member[] = members ?? []
-  const selectedMember = allMembers.find(
-    (member) => member.id === selectedMemberId,
-  )
 
   return (
-    <ClearableCombobox<Member>
-      id="member"
+    <Selector
       label="Mitglied"
-      noItemSelectedLabel="--- Kein Mitglied ---"
-      canClear={true}
-      options={allMembers}
-      selectedValue={selectedMember}
-      onValueChange={(member) => onMemberChange(member?.id)}
-      toDisplayString={(member) => member.name}
-      toKey={(member) => String(member.id)}
+      options={allMembers.map((member) => ({
+        value: String(member.id),
+        label: member.name,
+      }))}
+      value={selectedMemberId === undefined ? null : String(selectedMemberId)}
+      onChange={(value) =>
+        onMemberChange(value === null ? undefined : Number(value))
+      }
+      hasClear
+      hasSearch
       searchPlaceholder="Mitglied suchen..."
-      emptyMessage="Kein Mitglied gefunden."
+      emptySearchText="Kein Mitglied gefunden."
+      placeholder="--- Kein Mitglied ---"
+      width="100%"
     />
   )
 }

@@ -1,12 +1,13 @@
+import { Button } from "@astryxdesign/core/Button"
+import { IconButton } from "@astryxdesign/core/IconButton"
+import { Text } from "@astryxdesign/core/Text"
+import { useToast } from "@astryxdesign/core/Toast"
+import type { SearchableItem, SearchSource } from "@astryxdesign/core/Typeahead"
+import { Typeahead } from "@astryxdesign/core/Typeahead"
 import { Trash2Icon } from "lucide-react"
 import type { ReactNode } from "react"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { toast } from "sonner"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import {
-  TouchButton,
-  TouchCombobox,
-} from "#/clothing/checkout/components/TouchComponents"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+
 import {
   getItemByBarcode,
   searchClothingItems,
@@ -31,6 +32,10 @@ export interface ClothingItemScannerProps {
 /** Barcode scanners typically send all chars within this window (ms). */
 const SCANNER_TIMEOUT_MS = 50
 
+interface ScannerSearchItem extends SearchableItem {
+  auxiliaryData: ResolvedClothingItem
+}
+
 export default function ClothingItemScanner({
   items,
   onItemResolved,
@@ -40,7 +45,7 @@ export default function ClothingItemScanner({
   const [inputMode, setInputMode] = useState<InputMode>("scanner")
   const [isScanning, setIsScanning] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<ResolvedClothingItem[]>([])
+  const showToast = useToast()
 
   // Global barcode capture
   const bufferRef = useRef("")
@@ -74,13 +79,17 @@ export default function ClothingItemScanner({
         const item = await getItemByBarcode(barcode)
         handleResolved(item)
       } catch {
-        toast.error(`Unbekannter Barcode: ${barcode}`)
+        showToast({
+          body: `Unbekannter Barcode: ${barcode}`,
+          type: "error",
+          isAutoHide: true,
+        })
       } finally {
         isScanningRef.current = false
         setIsScanning(false)
       }
     },
-    [handleResolved],
+    [handleResolved, showToast],
   )
 
   useEffect(() => {
@@ -130,29 +139,25 @@ export default function ClothingItemScanner({
     }
   }, [processBarcode])
 
-  async function handleSearchSelect(value: string) {
-    const found = searchResults.find((r) => String(r.clothingItem.id) === value)
-    if (found) handleResolved(found)
-  }
-
-  async function handleSearchChange(q: string) {
-    setSearchQuery(q)
-    if (q.length < 2) {
-      setSearchResults([])
-      return
-    }
-    try {
-      const results = await searchClothingItems(q)
-      setSearchResults(results)
-    } catch {
-      // silent — search is a backup, not critical
-    }
-  }
-
-  const searchOptions: ComboboxOption[] = searchResults.map((r) => ({
-    value: String(r.clothingItem.id),
-    label: `${r.clothingType.name} ${r.clothingItem.size}${r.clothingItem.barcode ? ` (${r.clothingItem.barcode})` : ""}`,
-  }))
+  const searchSource: SearchSource<ScannerSearchItem> = useMemo(
+    () => ({
+      search: async (query: string) => {
+        try {
+          const results = await searchClothingItems(query)
+          return results.map((result) => ({
+            id: String(result.clothingItem.id),
+            label: `${result.clothingType.name} ${result.clothingItem.size}${result.clothingItem.barcode ? ` (${result.clothingItem.barcode})` : ""}`,
+            auxiliaryData: result,
+          }))
+        } catch {
+          // silent — search is a backup, not critical
+          return []
+        }
+      },
+      bootstrap: () => [],
+    }),
+    [],
+  )
 
   return (
     <div className="space-y-4">
@@ -160,26 +165,33 @@ export default function ClothingItemScanner({
       <RenderIf when={inputMode === "scanner"}>
         <div className="flex items-center gap-2 rounded-lg border p-3 text-sm">
           <span
-            className={`size-2 shrink-0 rounded-full ${isScanning ? "animate-pulse bg-yellow-500" : "bg-green-500"}`}
+            className={`size-2 shrink-0 rounded-full ${isScanning ? "animate-pulse bg-warning" : "bg-success"}`}
           />
-          <span className="text-muted-foreground">
+          <Text type="supporting" as="span">
             {isScanning
               ? "Barcode wird verarbeitet…"
               : "Scanner bereit – einfach scannen"}
-          </span>
+          </Text>
         </div>
       </RenderIf>
 
-      {/* Manual search combobox */}
+      {/* Manual search */}
       <RenderIf when={inputMode === "manual"}>
-        <TouchCombobox
-          options={searchOptions}
-          value={null}
-          onSelect={handleSearchSelect}
-          onSearchChange={(q) => void handleSearchChange(q)}
+        <Typeahead<ScannerSearchItem>
+          label="Kleidungsstück"
+          isLabelHidden
           placeholder="Kleidungsstück suchen..."
-          searchPlaceholder="Typ, Größe oder Barcode..."
-          emptyMessage={
+          searchSource={searchSource}
+          value={null}
+          onChange={(item) => {
+            if (item) handleResolved(item.auxiliaryData)
+          }}
+          onChangeQuery={setSearchQuery}
+          minQueryLength={2}
+          size="lg"
+          width="100%"
+          hasClear={false}
+          emptySearchText={
             searchQuery.length < 2
               ? "Mindestens 2 Zeichen eingeben..."
               : "Keine Ergebnisse."
@@ -187,28 +199,26 @@ export default function ClothingItemScanner({
         />
       </RenderIf>
 
-      {/* Mode switch link */}
-      <button
-        type="button"
+      {/* Mode switch */}
+      <Button
+        variant="ghost"
+        size="lg"
+        label={
+          inputMode === "scanner"
+            ? "Stattdessen manuell suchen"
+            : "Stattdessen Scanner verwenden"
+        }
         onClick={() =>
           setInputMode(inputMode === "scanner" ? "manual" : "scanner")
         }
-        className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
-      >
-        <RenderIf when={inputMode === "scanner"}>
-          Stattdessen manuell suchen
-        </RenderIf>
-        <RenderIf when={inputMode === "manual"}>
-          Stattdessen Scanner verwenden
-        </RenderIf>
-      </button>
+      />
 
       {/* Item list */}
       <RenderIf when={items.length > 0}>
         <div className="space-y-2">
-          <p className="text-sm font-medium">
+          <Text as="p" type="label">
             Ausgewählte Kleidung ({items.length})
-          </p>
+          </Text>
           <div className="space-y-2">
             {items.map((item) => (
               <ClothingItemRow
@@ -219,15 +229,14 @@ export default function ClothingItemScanner({
                     <RenderIf when={renderItemBadge !== undefined}>
                       {renderItemBadge?.(item)}
                     </RenderIf>
-                    <TouchButton
+                    <IconButton
                       variant="ghost"
-                      size="icon"
-                      aria-label={`${item.clothingType.name} entfernen`}
+                      size="lg"
+                      label={`${item.clothingType.name} entfernen`}
+                      tooltip="Entfernen"
+                      icon={<Trash2Icon className="size-4" />}
                       onClick={() => onRemoveItem(item.clothingItem.id)}
-                      className="text-destructive hover:text-destructive size-10 shrink-0"
-                    >
-                      <Trash2Icon className="size-4" />
-                    </TouchButton>
+                    />
                   </div>
                 }
               />

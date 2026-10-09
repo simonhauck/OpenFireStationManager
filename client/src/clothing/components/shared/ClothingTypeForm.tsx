@@ -1,11 +1,10 @@
-import { Link } from "@tanstack/react-router"
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { TextInput } from "@astryxdesign/core/TextInput"
 
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
+import RenderIf from "#/components/base/RenderIf"
 
 type ClothingTypeFormProps = {
   title: string
@@ -32,31 +31,33 @@ export default function ClothingTypeForm({
 }: ClothingTypeFormProps) {
   return (
     <PageSection title={title} subtitle={description}>
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardContent className="pt-6">
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="name">Bezeichnung</Label>
-              <Input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => onNameChange(e.target.value)}
-              />
-            </div>
+      <Card maxWidth={672} className="mx-auto w-full">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <TextInput
+            label="Bezeichnung"
+            isRequired
+            value={name}
+            onChange={onNameChange}
+          />
 
-            {errorMessage && <ErrorState message={errorMessage} />}
+          <RenderIf when={errorMessage !== null}>
+            <ErrorState message={errorMessage ?? "Unbekannter Fehler."} />
+          </RenderIf>
 
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/clothing-management/types">Abbrechen</Link>
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? pendingLabel : submitLabel}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <Button
+              label="Abbrechen"
+              variant="secondary"
+              href="/clothing-management/types"
+            />
+            <Button
+              type="submit"
+              label={isPending ? pendingLabel : submitLabel}
+              variant="primary"
+              isLoading={isPending}
+            />
+          </div>
+        </form>
       </Card>
     </PageSection>
   )

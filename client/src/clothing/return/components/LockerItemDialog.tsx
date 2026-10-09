@@ -1,24 +1,18 @@
+import { Button } from "@astryxdesign/core/Button"
+import { CheckboxListItem } from "@astryxdesign/core/CheckboxList"
+import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog"
+import { List } from "@astryxdesign/core/List"
+import { Selector } from "@astryxdesign/core/Selector"
+import { Text } from "@astryxdesign/core/Text"
+import { VStack } from "@astryxdesign/core/VStack"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
-import type { ComboboxOption } from "#/clothing/checkout/components/TouchComponents"
-import {
-  TouchButton,
-  TouchCombobox,
-} from "#/clothing/checkout/components/TouchComponents"
-import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import RenderIf from "#/components/base/RenderIf"
-import { Checkbox } from "#/components/ui/checkbox"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "#/components/ui/dialog"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 interface LockerItemDialogProps {
@@ -55,7 +49,7 @@ export function LockerItemDialog({
     onOpenChange(nextOpen)
   }
 
-  const personalLocations: ComboboxOption[] = (allLocations ?? [])
+  const personalLocations = (allLocations ?? [])
     .filter((l) => l.type === "PERSONAL")
     .map((l) => ({
       value: String(l.id),
@@ -94,80 +88,81 @@ export function LockerItemDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Aus Spind auswählen</DialogTitle>
-        </DialogHeader>
+    <Dialog
+      isOpen={open}
+      onOpenChange={handleOpenChange}
+      width={512}
+      purpose="form"
+    >
+      <VStack gap={4}>
+        <DialogHeader
+          title="Aus Spind auswählen"
+          onOpenChange={handleOpenChange}
+        />
 
-        <div className="space-y-4">
-          <TouchCombobox
-            options={personalLocations}
-            value={
-              selectedLocationId !== null ? String(selectedLocationId) : null
-            }
-            onSelect={(value) => {
-              setSelectedLocationId(Number(value))
-              setCheckedIds(new Set())
-            }}
-            placeholder="Spind auswählen..."
-            searchPlaceholder="Spind suchen..."
-            emptyMessage="Kein Spind gefunden."
+        <Selector
+          label="Spind"
+          isLabelHidden
+          options={personalLocations}
+          value={
+            selectedLocationId !== null ? String(selectedLocationId) : undefined
+          }
+          onChange={(value: string) => {
+            setSelectedLocationId(Number(value))
+            setCheckedIds(new Set())
+          }}
+          hasSearch
+          size="lg"
+          width="100%"
+          placeholder="Spind auswählen..."
+          searchPlaceholder="Spind suchen..."
+          emptySearchText="Kein Spind gefunden."
+        />
+
+        <RenderIf
+          when={selectedLocationId !== null && lockerItems.length === 0}
+        >
+          <Text type="supporting" as="p" className="italic">
+            Keine Kleidung in diesem Spind.
+          </Text>
+        </RenderIf>
+
+        <RenderIf when={lockerItems.length > 0}>
+          <List hasDividers>
+            {lockerItems.map((item) => {
+              const alreadyAdded = existingItemIds.has(item.clothingItem.id)
+              return (
+                <CheckboxListItem
+                  key={item.clothingItem.id}
+                  label={`${item.clothingType.name} – ${item.clothingItem.size}`}
+                  description={item.clothingItem.barcode ?? undefined}
+                  isChecked={
+                    alreadyAdded || checkedIds.has(item.clothingItem.id)
+                  }
+                  isDisabled={alreadyAdded}
+                  onCheck={() => toggleCheck(item.clothingItem.id)}
+                />
+              )
+            })}
+          </List>
+        </RenderIf>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <Button
+            label="Abbrechen"
+            variant="secondary"
+            size="lg"
+            onClick={() => handleOpenChange(false)}
           />
-
-          <RenderIf
-            when={selectedLocationId !== null && lockerItems.length === 0}
-          >
-            <p className="text-muted-foreground text-sm italic">
-              Keine Kleidung in diesem Spind.
-            </p>
-          </RenderIf>
-
-          <RenderIf when={lockerItems.length > 0}>
-            <div className="space-y-2">
-              {lockerItems.map((item) => {
-                const alreadyAdded = existingItemIds.has(item.clothingItem.id)
-                return (
-                  <ClothingItemRow
-                    key={item.clothingItem.id}
-                    item={item}
-                    asLabel
-                    labelFor={`locker-item-${item.clothingItem.id}`}
-                    leading={
-                      <Checkbox
-                        id={`locker-item-${item.clothingItem.id}`}
-                        checked={
-                          alreadyAdded || checkedIds.has(item.clothingItem.id)
-                        }
-                        disabled={alreadyAdded}
-                        onCheckedChange={() =>
-                          toggleCheck(item.clothingItem.id)
-                        }
-                        className="size-5"
-                      />
-                    }
-                  />
-                )
-              })}
-            </div>
-          </RenderIf>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <TouchButton
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-            >
-              Abbrechen
-            </TouchButton>
-            <TouchButton
-              disabled={checkedIds.size === 0}
-              onClick={handleConfirm}
-            >
-              Hinzufügen
-            </TouchButton>
-          </div>
+          <Button
+            label="Hinzufügen"
+            variant="primary"
+            size="lg"
+            isDisabled={checkedIds.size === 0}
+            onClick={handleConfirm}
+          />
         </div>
-      </DialogContent>
+      </VStack>
     </Dialog>
   )
 }

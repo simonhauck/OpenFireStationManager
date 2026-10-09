@@ -34,25 +34,35 @@ export class ImpressumAdminPage {
   }
 
   confirmDeleteButton() {
-    return this.page.getByRole("button", { name: "Löschen" })
+    return this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Löschen" })
   }
 
   // --- Dialog form locators ---
 
   nameInput() {
-    return this.page.locator("#impressum-name")
+    return this.page.getByRole("textbox", {
+      name: /^Name( Erforderlich)?$/,
+    })
   }
 
   addressInput() {
-    return this.page.locator("#impressum-address")
+    return this.page.getByRole("textbox", {
+      name: /^Adresse( Erforderlich)?$/,
+    })
   }
 
   emailInput() {
-    return this.page.locator("#impressum-email")
+    return this.page.getByRole("textbox", {
+      name: /^Kontakt-E-Mail( Erforderlich)?$/,
+    })
   }
 
   phoneInput() {
-    return this.page.locator("#impressum-phone")
+    return this.page.getByRole("textbox", {
+      name: /^Telefonnummer \(optional\)$/,
+    })
   }
 
   saveButton() {

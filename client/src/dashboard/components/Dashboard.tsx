@@ -1,3 +1,8 @@
+import { Card } from "@astryxdesign/core/Card"
+import { Heading } from "@astryxdesign/core/Heading"
+import { HStack } from "@astryxdesign/core/HStack"
+import { Text } from "@astryxdesign/core/Text"
+import { VStack } from "@astryxdesign/core/VStack"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { Settings, ShieldCheck, Shirt, UserRound, Users } from "lucide-react"
@@ -6,12 +11,6 @@ import type React from "react"
 import { meQuery } from "#/api/auth.queries"
 import { hasRequiredRole } from "#/api/auth.utils"
 import PageSection from "#/components/base/PageSection"
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card"
 import type { UserRole } from "#/users/model/user.ts"
 
 type DashboardItem = {
@@ -74,29 +73,29 @@ export default function Dashboard() {
 
   return (
     <PageSection title={title} subtitle="Wähle einen Bereich, um fortzufahren.">
-      <p className="mb-6 text-center text-2xl font-semnpmibold tracking-tight">
-        Was möchtest du tun?
-      </p>
+      <div className="mb-6 flex justify-center">
+        <Text size="2xl" weight="semibold">
+          Was möchtest du tun?
+        </Text>
+      </div>
       <div className="mx-auto grid max-w-3xl gap-4 md:grid-cols-2">
-        {visibleItems.map((item, index) => (
+        {visibleItems.map((item) => (
           <Link
             key={item.href}
             to={item.href}
             className="group block cursor-pointer no-underline"
           >
-            <Card
-              className="rise-in h-full border-(--line) bg-[linear-gradient(165deg,var(--surface-strong),var(--surface))] transition-all duration-200 group-hover:-translate-y-1 group-hover:border-primary group-hover:shadow-lg"
-              style={{ animationDelay: `${index * 80 + 50}ms` }}
-            >
-              <CardHeader className="flex flex-row items-start gap-4">
-                <item.icon className="mt-1 size-8 shrink-0 text-(--sea-ink-soft)" />
-                <div className="flex flex-col gap-1">
-                  <CardTitle>{item.title}</CardTitle>
-                  <CardDescription className="leading-relaxed text-(--sea-ink-soft)">
-                    {item.description}
-                  </CardDescription>
-                </div>
-              </CardHeader>
+            <Card className="h-full transition-transform duration-200 group-hover:-translate-y-1">
+              <HStack gap={4} vAlign="start">
+                <item.icon
+                  className="mt-1 size-8 shrink-0"
+                  aria-hidden="true"
+                />
+                <VStack gap={1}>
+                  <Heading level={3}>{item.title}</Heading>
+                  <Text type="supporting">{item.description}</Text>
+                </VStack>
+              </HStack>
             </Card>
           </Link>
         ))}

@@ -8,8 +8,12 @@ export class LoginPage {
   }
 
   async login(username: string, password: string) {
-    await this.page.locator("#username").fill(username)
-    await this.page.locator("#password").fill(password)
+    await this.page
+      .getByRole("textbox", { name: /^Benutzername( Erforderlich)?$/ })
+      .fill(username)
+    await this.page
+      .getByRole("textbox", { name: /^Passwort( Erforderlich)?$/ })
+      .fill(password)
     await this.page.getByRole("button", { name: "Anmelden" }).click()
   }
 

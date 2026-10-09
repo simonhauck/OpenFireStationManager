@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router"
+import { Button } from "@astryxdesign/core/Button"
 import ClothingTypesTable from "#/clothing/components/types/list/ClothingTypesTable"
 import { useClothingTypes } from "#/clothing/service/clothingTypesQueries"
 import ErrorState from "#/components/base/ErrorState"
@@ -6,7 +6,6 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 
 export default function ClothingTypesPage() {
   return (
@@ -25,11 +24,11 @@ function ClothingTypesPageContent() {
       title="Kleidungstypen"
       subtitle="Alle vorhandenen Kleidungstypen"
       buttons={
-        <Button asChild>
-          <Link to="/clothing-management/types/new">
-            Kleidungstyp erstellen
-          </Link>
-        </Button>
+        <Button
+          label="Kleidungstyp erstellen"
+          variant="primary"
+          href="/clothing-management/types/new"
+        />
       }
     >
       <RenderIf when={isLoading}>

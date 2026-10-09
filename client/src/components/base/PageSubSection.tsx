@@ -1,3 +1,6 @@
+import { Heading } from "@astryxdesign/core/Heading"
+import { Section } from "@astryxdesign/core/Section"
+import { Text } from "@astryxdesign/core/Text"
 import type { ReactNode } from "react"
 
 interface PageSubSectionProps {
@@ -14,16 +17,20 @@ export default function PageSubSection({
   children,
 }: PageSubSectionProps) {
   return (
-    <div
+    <Section
+      variant="transparent"
+      padding={0}
       data-testid={`section-${title}`}
-      className="border-border [&:not(:first-child)]:border-t [&:not(:first-child)]:pt-6 pb-6 last:pb-0"
+      className="border-border pb-6 last:pb-0 [&:not(:first-child)]:border-t [&:not(:first-child)]:pt-6"
     >
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3 mb-4">
+      <div className="border-border mb-4 flex flex-wrap items-start justify-between gap-3 border-b pb-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+          <Heading level={2}>{title}</Heading>
           {subtitle && (
-            <p className="text-muted-foreground mt-0.5 text-sm">{subtitle}</p>
+            <Text type="supporting" as="p" className="mt-0.5">
+              {subtitle}
+            </Text>
           )}
         </div>
 
@@ -32,6 +39,6 @@ export default function PageSubSection({
 
       {/* Body */}
       {children}
-    </div>
+    </Section>
   )
 }

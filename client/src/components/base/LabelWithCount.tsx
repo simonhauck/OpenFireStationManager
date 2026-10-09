@@ -1,3 +1,4 @@
+import { Text } from "@astryxdesign/core/Text"
 import type { ReactNode } from "react"
 
 import { cn } from "#/lib/utils"
@@ -25,24 +26,34 @@ export default function LabelWithCount({
 }: LabelWithCountProps) {
   return (
     <span className={cn("inline-flex items-center", className)}>
-      <span className={labelClassName}>{label}</span>
+      <Text as="span" type="inherit" className={labelClassName}>
+        {label}
+      </Text>
 
-      <span className={cn("whitespace-pre", delimiterClassName)}>
+      <Text
+        as="span"
+        type="inherit"
+        className={cn("whitespace-pre", delimiterClassName)}
+      >
         {format === "braces" ? " (" : ": "}
-      </span>
+      </Text>
 
-      <span
-        className={cn(
-          "text-emerald-600 dark:text-emerald-400 font-bold",
-          countClassName,
-        )}
+      <Text
+        as="span"
+        type="inherit"
+        weight="bold"
+        className={cn("text-success", countClassName)}
       >
         {count}
-      </span>
+      </Text>
 
-      <span className={cn("whitespace-pre", delimiterClassName)}>
+      <Text
+        as="span"
+        type="inherit"
+        className={cn("whitespace-pre", delimiterClassName)}
+      >
         {format === "braces" ? ")" : null}
-      </span>
+      </Text>
     </span>
   )
 }

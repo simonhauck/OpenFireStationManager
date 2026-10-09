@@ -1,5 +1,9 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { CheckboxList, CheckboxListItem } from "@astryxdesign/core/CheckboxList"
+import { TextInput } from "@astryxdesign/core/TextInput"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import type React from "react"
 import { useEffect, useState } from "react"
 
@@ -8,11 +12,6 @@ import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Checkbox } from "#/components/ui/checkbox"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
 import type { UserRole } from "#/users/model/user.ts"
 import { ROLE_OPTIONS } from "#/users/roleMetadata"
 
@@ -66,20 +65,6 @@ function EditUserPageContent() {
     setRoles(user.roles)
   }, [user])
 
-  function toggleRole(role: UserRole, checked: boolean) {
-    setRolesError(null)
-    setRoles((prevRoles) => {
-      if (checked) {
-        if (prevRoles.includes(role)) {
-          return prevRoles
-        }
-        return [...prevRoles, role]
-      }
-
-      return prevRoles.filter((existingRole) => existingRole !== role)
-    })
-  }
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
@@ -122,83 +107,69 @@ function EditUserPageContent() {
       title="Nutzer bearbeiten"
       subtitle={`Vorname, Nachname und Rollen von ${user.username} bearbeiten.`}
     >
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="username">Benutzername</Label>
-              <Input id="username" value={user.username} disabled readOnly />
-            </div>
+      <Card maxWidth={672} className="mx-auto w-full">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <TextInput
+            label="Benutzername"
+            value={user.username}
+            isDisabled
+            isReadOnly
+          />
 
-            <div className="space-y-1.5">
-              <Label htmlFor="first-name">Vorname</Label>
-              <Input
-                id="first-name"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+          <TextInput
+            label="Vorname"
+            isRequired
+            value={firstName}
+            onChange={setFirstName}
+          />
+
+          <TextInput
+            label="Nachname"
+            isRequired
+            value={lastName}
+            onChange={setLastName}
+          />
+
+          <CheckboxList
+            label="Rollen"
+            value={roles}
+            onChange={(values) => {
+              setRolesError(null)
+              setRoles(values as UserRole[])
+            }}
+            hasDividers
+            status={
+              rolesError ? { type: "error", message: rolesError } : undefined
+            }
+          >
+            {ROLE_OPTIONS.map((roleOption) => (
+              <CheckboxListItem
+                key={roleOption.value}
+                value={roleOption.value}
+                label={roleOption.label}
+                description={roleOption.description}
               />
-            </div>
+            ))}
+          </CheckboxList>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="last-name">Nachname</Label>
-              <Input
-                id="last-name"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
+          {error && (
+            <ErrorState message="Der Nutzer konnte nicht aktualisiert werden." />
+          )}
 
-            <div className="space-y-2">
-              <Label>Rollen</Label>
-              <div className="space-y-2 rounded-md border p-3">
-                {ROLE_OPTIONS.map((roleOption) => {
-                  const checkboxId = `role-${roleOption.value.toLowerCase()}`
-                  const checked = roles.includes(roleOption.value)
-
-                  return (
-                    <div
-                      key={roleOption.value}
-                      className="flex items-start gap-3"
-                    >
-                      <Checkbox
-                        id={checkboxId}
-                        checked={checked}
-                        onCheckedChange={(nextChecked) =>
-                          toggleRole(roleOption.value, nextChecked === true)
-                        }
-                      />
-                      <div className="space-y-0.5">
-                        <Label htmlFor={checkboxId} className="cursor-pointer">
-                          {roleOption.label}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {roleOption.description}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {rolesError && <ErrorState message={rolesError} />}
-
-            {error && (
-              <ErrorState message="Der Nutzer konnte nicht aktualisiert werden." />
-            )}
-
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/user-management">Abbrechen</Link>
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Wird gespeichert..." : "Änderungen speichern"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <Button
+              label="Abbrechen"
+              variant="secondary"
+              href="/user-management"
+            />
+            <Button
+              type="submit"
+              label="Änderungen speichern"
+              variant="primary"
+              isLoading={isPending}
+            />
+          </div>
+        </form>
       </Card>
     </PageSection>
   )

@@ -10,7 +10,9 @@ export class InventoryReconciliationPage {
   // ─── Step 1: Standort wählen ────────────────────────────────────────────────
 
   async selectLocation(name: string) {
-    await this.page.getByRole("combobox").click()
+    await this.page
+      .getByRole("button", { name: "Standort", exact: true })
+      .click()
     await this.page.getByPlaceholder("Standort suchen...").fill(name)
     await this.page.getByRole("option", { name, exact: false }).first().click()
   }
@@ -44,7 +46,7 @@ export class InventoryReconciliationPage {
 
   warningBanner() {
     return this.page.getByText(
-      'Fehlende Kleidung wird auf "Kein Standort" gesetzt',
+      /Fehlende Kleidung wird auf .*Kein Standort.* gesetzt/,
     )
   }
 

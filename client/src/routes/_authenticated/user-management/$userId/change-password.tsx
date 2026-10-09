@@ -1,5 +1,9 @@
+import { AlertDialog } from "@astryxdesign/core/AlertDialog"
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { TextInput } from "@astryxdesign/core/TextInput"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
 import { changePasswordMutation, getUserByIdQuery } from "#/api/users.queries"
@@ -7,20 +11,6 @@ import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RoleGuard from "#/components/base/RoleGuard"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "#/components/ui/alert-dialog"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
 
 export const Route = createFileRoute(
   "/_authenticated/user-management/$userId/change-password",
@@ -108,91 +98,78 @@ function ChangePasswordPageContent() {
         title="Passwort ändern"
         subtitle={`Neues Passwort für ${user.username} festlegen.`}
       >
-        <Card className="mx-auto w-full max-w-2xl">
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="username">Benutzername</Label>
-                <Input id="username" value={user.username} disabled readOnly />
-              </div>
+        <Card maxWidth={672} className="mx-auto w-full">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <TextInput
+              label="Benutzername"
+              value={user.username}
+              isDisabled
+              isReadOnly
+            />
 
-              <div className="space-y-1.5">
-                <Label htmlFor="new-password">Neues Passwort</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => {
-                    setNewPassword(e.target.value)
-                    setPasswordError(null)
-                  }}
-                />
-              </div>
+            <TextInput
+              label="Neues Passwort"
+              type="password"
+              autoComplete="new-password"
+              isRequired
+              value={newPassword}
+              onChange={(value) => {
+                setNewPassword(value)
+                setPasswordError(null)
+              }}
+            />
 
-              <div className="space-y-1.5">
-                <Label htmlFor="confirm-password">Passwort bestätigen</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value)
-                    setPasswordError(null)
-                  }}
-                />
-              </div>
+            <TextInput
+              label="Passwort bestätigen"
+              type="password"
+              autoComplete="new-password"
+              isRequired
+              value={confirmPassword}
+              onChange={(value) => {
+                setConfirmPassword(value)
+                setPasswordError(null)
+              }}
+            />
 
-              {passwordError && <ErrorState message={passwordError} />}
+            {passwordError && <ErrorState message={passwordError} />}
 
-              {error && (
-                <ErrorState message="Das Passwort konnte nicht geändert werden." />
-              )}
+            {error && (
+              <ErrorState message="Das Passwort konnte nicht geändert werden." />
+            )}
 
-              <div className="flex flex-wrap justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" asChild>
-                  <Link to="/user-management/$userId/edit" params={{ userId }}>
-                    Abbrechen
-                  </Link>
-                </Button>
-                <Button
-                  type="submit"
-                  variant="destructive"
-                  disabled={isPending}
-                >
-                  {isPending ? "Wird gespeichert..." : "Passwort ändern"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
+            <div className="flex flex-wrap justify-end gap-2 pt-2">
+              <Button
+                label="Abbrechen"
+                variant="secondary"
+                onClick={() => {
+                  void navigate({
+                    to: "/user-management/$userId/edit",
+                    params: { userId },
+                  })
+                }}
+              />
+              <Button
+                type="submit"
+                label="Passwort ändern"
+                variant="destructive"
+                isLoading={isPending}
+              />
+            </div>
+          </form>
         </Card>
       </PageSection>
 
-      <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Passwort wirklich ändern?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Das Passwort des Nutzers{" "}
-              <span className="font-medium">{user.username}</span> wird
-              unwiderruflich geändert. Der Nutzer muss sich danach mit dem neuen
-              Passwort anmelden.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={handleConfirm}
-            >
-              Passwort ändern
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialog
+        isOpen={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        title="Passwort wirklich ändern?"
+        description={`Das Passwort des Nutzers ${user.username} wird unwiderruflich geändert. Der Nutzer muss sich danach mit dem neuen Passwort anmelden.`}
+        actionLabel="Passwort ändern"
+        onAction={handleConfirm}
+        cancelLabel="Abbrechen"
+        actionVariant="destructive"
+        isActionLoading={isPending}
+      />
     </>
   )
 }

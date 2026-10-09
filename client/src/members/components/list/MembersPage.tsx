@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router"
+import { Button } from "@astryxdesign/core/Button"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
 import ErrorState from "#/components/base/ErrorState"
@@ -6,7 +6,6 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 import MembersTable from "#/members/components/list/MembersTable"
 import { useMembers } from "#/members/service/memberQueries"
 
@@ -43,9 +42,11 @@ function MembersPageContent() {
       title="Mitglieder"
       subtitle="Alle Personen der Feuerwehr"
       buttons={
-        <Button asChild>
-          <Link to="/members/new">Mitglied erstellen</Link>
-        </Button>
+        <Button
+          label="Mitglied erstellen"
+          variant="primary"
+          href="/members/new"
+        />
       }
     >
       <RenderIf when={isPageLoading}>

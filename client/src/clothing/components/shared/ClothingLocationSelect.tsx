@@ -1,7 +1,8 @@
+import { Selector } from "@astryxdesign/core/Selector"
+
 import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 import { useClothingLocations } from "#/clothing/service/clothingLocationsQueries"
-import ClearableSelect from "#/components/base/ClearableSelect"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 type ClothingLocationSelectProps = {
@@ -17,23 +18,26 @@ export default function ClothingLocationSelect({
   const memberName = useMemberNameLookup()
 
   const locations: ClothingLocation[] = clothingLocations ?? []
-  const selectedLocation: ClothingLocation | undefined = locations.find(
-    (l) => l.id === selectedLocationId,
-  )
 
   return (
-    <ClearableSelect<ClothingLocation>
-      id="location"
+    <Selector
       label="Standort (optional)"
-      noItemSelectedLabel="--- Kein Standort / Unbekannt ---"
-      canClear={true}
-      options={locations}
-      selectedValue={selectedLocation}
-      onValueChange={(location) => onLocationChange(location?.id)}
-      toDisplayString={(location) =>
-        formatClothingLocationLabel(location, memberName(location.memberId))
+      options={locations.map((location) => ({
+        value: String(location.id),
+        label: formatClothingLocationLabel(
+          location,
+          memberName(location.memberId),
+        ),
+      }))}
+      value={
+        selectedLocationId === undefined ? null : String(selectedLocationId)
       }
-      toKey={(location) => String(location.id)}
+      onChange={(value) =>
+        onLocationChange(value === null ? undefined : Number(value))
+      }
+      hasClear
+      placeholder="--- Kein Standort / Unbekannt ---"
+      width="100%"
     />
   )
 }

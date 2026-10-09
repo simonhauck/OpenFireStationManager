@@ -1,5 +1,7 @@
-import { Link } from "@tanstack/react-router"
-import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
+import { Badge } from "@astryxdesign/core/Badge"
+import { Button } from "@astryxdesign/core/Button"
+import { Text } from "@astryxdesign/core/Text"
+import { Fragment } from "react"
 import type {
   ClothingLocationSizeSummary,
   ClothingTypeSizeSummary,
@@ -12,7 +14,6 @@ import PageSection from "#/components/base/PageSection"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard.tsx"
-import { Badge } from "#/components/ui/badge"
 
 export default function PoolKlamottenPage() {
   const { data: overview, isLoading, isError } = useClothingOverview()
@@ -21,36 +22,43 @@ export default function PoolKlamottenPage() {
     <PageSection
       title="Pool Klamotten"
       buttonPosition="right"
+      className="tablet-controls"
       buttons={
         <>
           <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
-            <TouchButton asChild variant="outline">
-              <Link to="/pool-clothing/inventory-reconciliation">
-                Inventarisierung starten
-              </Link>
-            </TouchButton>
+            <Button
+              label="Inventarisierung starten"
+              variant="secondary"
+              size="lg"
+              href="/pool-clothing/inventory-reconciliation"
+            />
           </RoleGuard>
           <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
-            <TouchButton asChild variant="outline">
-              <Link to="/pool-clothing/relocation">Umlagerung starten</Link>
-            </TouchButton>
+            <Button
+              label="Umlagerung starten"
+              variant="secondary"
+              size="lg"
+              href="/pool-clothing/relocation"
+            />
           </RoleGuard>
-          <TouchButton asChild>
-            <Link to="/pool-clothing/checkout">Klamotten tauschen</Link>
-          </TouchButton>
-          <TouchButton asChild variant="outline">
-            <Link
-              to="/pool-clothing/return"
-              search={{ returnTarget: "WAESCHE" }}
-            >
-              Klamotten in die Wäsche geben
-            </Link>
-          </TouchButton>
-          <TouchButton asChild variant="outline">
-            <Link to="/pool-clothing/return" search={{ returnTarget: "POOL" }}>
-              Klamotten zurück in den Pool geben
-            </Link>
-          </TouchButton>
+          <Button
+            label="Klamotten tauschen"
+            variant="primary"
+            size="lg"
+            href="/pool-clothing/checkout"
+          />
+          <Button
+            label="Klamotten in die Wäsche geben"
+            variant="secondary"
+            size="lg"
+            href="/pool-clothing/return?returnTarget=WAESCHE"
+          />
+          <Button
+            label="Klamotten zurück in den Pool geben"
+            variant="secondary"
+            size="lg"
+            href="/pool-clothing/return?returnTarget=POOL"
+          />
         </>
       }
     >
@@ -87,9 +95,9 @@ function PoolKlamottenOverviewCard({
       </RenderIf>
 
       <RenderIf when={!isLoading && !isError && overviewData.length === 0}>
-        <p className="text-muted-foreground text-sm">
+        <Text type="supporting" as="p">
           Es sind keine Standorte fuer die Anzeige konfiguriert.
-        </p>
+        </Text>
       </RenderIf>
 
       <RenderIf when={overviewData.length > 0}>
@@ -126,12 +134,12 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
       subtitle="Verfügbare Pool-Kleidung am Standort"
       right={
         <div className="text-right">
-          <p className="text-muted-foreground text-xs uppercase tracking-wide">
+          <Text as="p" type="supporting" className="uppercase tracking-wide">
             Gesamt
-          </p>
-          <p className="text-emerald-600 dark:text-emerald-400 text-2xl font-bold">
+          </Text>
+          <Text as="p" size="2xl" weight="bold" className="text-success">
             {totalCount}
-          </p>
+          </Text>
         </div>
       }
     >
@@ -148,9 +156,9 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
       </RenderIf>
 
       <RenderIf when={typeSummaries.length === 0}>
-        <p className="text-muted-foreground text-sm">
+        <Text type="supporting" as="p">
           Keine Kleidungstypen vorhanden.
-        </p>
+        </Text>
       </RenderIf>
     </PageSubSection>
   )
@@ -174,55 +182,51 @@ function TypeAvailabilityPanel({
     }),
   )
 
-  const groupNameColumnWidthCh = sizeGroups.reduce(
-    (maxLength, sizeGroup) => Math.max(maxLength, sizeGroup.name.length),
-    0,
-  )
-
   return (
     <div className="overflow-hidden rounded-md border">
       <div className="bg-muted/40 border-b px-3 py-2">
-        <p className="text-base font-semibold">
+        <Text as="p" weight="semibold" style={{ fontSize: 16 }}>
           <LabelWithCount
             label={typeSummary.typeName}
             count={typeSummary.totalCount}
             format="braces"
           />
-        </p>
+        </Text>
       </div>
 
       <div className="p-3">
         <RenderIf
           when={sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
         >
-          <div className="divide-y">
+          <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2">
             {sizeGroups.map((sizeGroupSummary) => (
-              <div
+              <Fragment
                 key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}`}
-                className="flex items-center gap-2 py-2 first:pt-0 last:pb-0"
               >
-                <span
-                  className="text-muted-foreground shrink-0 text-xs font-medium uppercase tracking-wide"
-                  style={{ width: `${groupNameColumnWidthCh}ch` }}
+                <Text
+                  as="span"
+                  type="supporting"
+                  className="uppercase tracking-wide"
                 >
                   {sizeGroupSummary.name}
-                </span>
+                </Text>
                 <div className="flex flex-wrap gap-1">
                   {sizeGroupSummary.sizes.map((sizeSummary) => (
                     <Badge
                       key={`${locationId}-${typeSummary.typeId}-${sizeGroupSummary.name}-${sizeSummary.size}`}
-                      variant="outline"
-                      className="gap-2 px-3 py-1.5 text-base"
-                    >
-                      <LabelWithCount
-                        label={sizeSummary.size}
-                        count={sizeSummary.count}
-                        format="colon"
-                      />
-                    </Badge>
+                      variant="neutral"
+                      className="size-chip"
+                      label={
+                        <LabelWithCount
+                          label={sizeSummary.size}
+                          count={sizeSummary.count}
+                          format="colon"
+                        />
+                      }
+                    />
                   ))}
                 </div>
-              </div>
+              </Fragment>
             ))}
           </div>
         </RenderIf>
@@ -230,9 +234,9 @@ function TypeAvailabilityPanel({
         <RenderIf
           when={!sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
         >
-          <span className="text-muted-foreground text-sm">
+          <Text type="supporting" as="span">
             Keine Kleidungsstuecke vorhanden.
-          </span>
+          </Text>
         </RenderIf>
       </div>
     </div>

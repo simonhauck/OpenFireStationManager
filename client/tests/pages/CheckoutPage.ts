@@ -9,9 +9,9 @@ export class CheckoutPage {
 
   // ─── Step 1: Spind wählen ───────────────────────────────────────────────────
 
-  /** Opens the PERSONAL location combobox and picks the option matching `name`. */
+  /** Opens the PERSONAL location selector and picks the option matching `name`. */
   async selectPersonalLocation(name: string) {
-    await this.page.getByRole("combobox").click()
+    await this.page.getByRole("button", { name: "Spind", exact: true }).click()
     await this.page.getByPlaceholder("Spind suchen...").fill(name)
     await this.page.getByRole("option", { name }).click()
   }

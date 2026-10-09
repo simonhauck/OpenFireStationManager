@@ -32,25 +32,33 @@ export class ClothingItemsPage {
   }
 
   async selectType(typeName: string) {
-    await this.page.getByLabel(typeName).click()
+    await this.page.getByRole("radio", { name: typeName }).click()
   }
 
   async fillSize(size: string) {
-    await this.page.locator("#size").fill(size)
+    await this.page
+      .getByRole("textbox", { name: /^Größe( Erforderlich)?$/ })
+      .fill(size)
   }
 
   async fillBarcode(barcode: string) {
-    await this.page.locator("#barcode").fill(barcode)
+    await this.page
+      .getByRole("textbox", { name: "Barcode (optional)" })
+      .fill(barcode)
   }
 
   async selectLocation(locationName: string) {
-    await this.page.locator("#location").click()
-    await this.page.getByRole("option", { name: locationName }).click()
+    const trigger = this.page.getByRole("combobox", {
+      name: "Standort (optional)",
+    })
+    await trigger.click()
+    await trigger.pressSequentially(locationName)
+    await trigger.press("Enter")
   }
 
   async clearLocation() {
     await this.page
-      .getByRole("button", { name: "Auswahl zurücksetzen" })
+      .getByRole("button", { name: "Standort (optional) löschen" })
       .click()
   }
 
@@ -60,7 +68,7 @@ export class ClothingItemsPage {
 
   async clickEditForItem(id: string | number) {
     await this.page
-      .getByRole("link", {
+      .getByRole("button", {
         name: `Kleidungsstueck ${id} bearbeiten`,
       })
       .click()
@@ -75,7 +83,10 @@ export class ClothingItemsPage {
   }
 
   async confirmDelete() {
-    await this.page.getByRole("button", { name: "Löschen" }).click()
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Löschen" })
+      .click()
   }
 
   itemRow(barcode: string) {
@@ -89,7 +100,7 @@ export class ClothingItemsPage {
   // --- Batch import ---
 
   async selectBatchType(typeName: string) {
-    await this.page.getByLabel(typeName).click()
+    await this.page.getByRole("radio", { name: typeName }).click()
   }
 
   async fillBatchCsv(csv: string) {

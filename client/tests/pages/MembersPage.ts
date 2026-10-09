@@ -16,7 +16,9 @@ export class MembersPage {
   }
 
   async fillName(name: string) {
-    await this.page.locator("#name").fill(name)
+    await this.page
+      .getByRole("textbox", { name: /^Name( Erforderlich)?$/ })
+      .fill(name)
   }
 
   async submitForm() {
@@ -29,7 +31,7 @@ export class MembersPage {
 
   async clickEditForMember(name: string) {
     await this.page
-      .getByRole("link", { name: `Mitglied ${name} bearbeiten` })
+      .getByRole("button", { name: `Mitglied ${name} bearbeiten` })
       .click()
   }
 

@@ -136,7 +136,7 @@ test.describe("Clothing Items", () => {
 
     // The clear button should be visible because a location is selected
     await expect(
-      page.getByRole("button", { name: "Auswahl zurücksetzen" }),
+      page.getByRole("button", { name: "Standort (optional) löschen" }),
     ).toBeVisible()
 
     await itemsPage.clearLocation()
@@ -146,7 +146,7 @@ test.describe("Clothing Items", () => {
 
     // Clear button should be gone
     await expect(
-      page.getByRole("button", { name: "Auswahl zurücksetzen" }),
+      page.getByRole("button", { name: "Standort (optional) löschen" }),
     ).not.toBeVisible()
 
     // Submit and verify save succeeds (navigates back to list)

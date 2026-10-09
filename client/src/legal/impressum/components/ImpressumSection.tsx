@@ -1,13 +1,14 @@
+import { AlertDialog } from "@astryxdesign/core/AlertDialog"
+import { Button } from "@astryxdesign/core/Button"
+import { Text } from "@astryxdesign/core/Text"
+import { useToast } from "@astryxdesign/core/Toast"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
-import DeleteDialogComponent from "#/components/base/DeleteDialogComponent"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
-import { Button } from "#/components/ui/button"
 import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
 import {
   deleteImpressumMutation,
@@ -16,11 +17,13 @@ import {
 
 export default function ImpressumSection() {
   const queryClient = useQueryClient()
+  const showToast = useToast()
   const { data, isLoading, isError } = useQuery(impressumAdminQuery())
 
   const impressum = data?.exists ? data.impressum : null
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { mutate: deleteImpressum, isPending: isDeleting } = useMutation(
     deleteImpressumMutation(queryClient),
@@ -29,10 +32,11 @@ export default function ImpressumSection() {
   function handleDelete() {
     deleteImpressum(undefined, {
       onSuccess: () => {
-        toast.success("Impressum wurde gelöscht.")
+        setIsDeleteDialogOpen(false)
+        showToast({ body: "Impressum wurde gelöscht.", type: "info" })
       },
       onError: (error) => {
-        toast.error(error.message)
+        showToast({ body: error.message, type: "error", isAutoHide: true })
       },
     })
   }
@@ -55,61 +59,52 @@ export default function ImpressumSection() {
           <RenderIf when={!!impressum}>
             <div
               data-testid="impressum-current"
-              className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-border bg-card px-3 py-2 text-sm"
+              className="border-border bg-card flex flex-wrap items-start justify-between gap-3 rounded-md border px-3 py-2"
             >
               <div className="flex flex-col gap-1">
-                <p className="font-medium">{impressum?.name}</p>
-                <p className="whitespace-pre-line text-muted-foreground">
+                <Text weight="medium">{impressum?.name}</Text>
+                <Text type="supporting" className="whitespace-pre-line">
                   {impressum?.address}
-                </p>
-                <p className="text-muted-foreground">
-                  {impressum?.contactEmail}
-                </p>
+                </Text>
+                <Text type="supporting">{impressum?.contactEmail}</Text>
                 <RenderIf when={!!impressum?.phone}>
-                  <p className="text-muted-foreground">{impressum?.phone}</p>
+                  <Text type="supporting">{impressum?.phone}</Text>
                 </RenderIf>
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
+                  label="Bearbeiten"
+                  icon={<Pencil className="size-4" />}
+                  variant="secondary"
                   size="sm"
                   onClick={() => setIsDialogOpen(true)}
-                >
-                  <Pencil className="size-4" />
-                  Bearbeiten
-                </Button>
-                <DeleteDialogComponent
-                  onDelete={handleDelete}
-                  headline="Impressum löschen"
-                  bodyText="Soll das aktuelle Impressum wirklich gelöscht werden? Danach ist es unter /impressum nicht mehr erreichbar."
-                >
-                  <Button variant="destructive" size="sm" disabled={isDeleting}>
-                    <Trash2 className="size-4" />
-                    Löschen
-                  </Button>
-                </DeleteDialogComponent>
+                />
+                <Button
+                  label="Löschen"
+                  icon={<Trash2 className="size-4" />}
+                  variant="destructive"
+                  size="sm"
+                  isDisabled={isDeleting}
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                />
               </div>
             </div>
           </RenderIf>
 
           <RenderIf when={data?.exists === false}>
-            <p
-              data-testid="impressum-empty"
-              className="text-sm text-muted-foreground"
-            >
+            <Text type="supporting" data-testid="impressum-empty">
               Es wurde noch kein Impressum konfiguriert.
-            </p>
+            </Text>
           </RenderIf>
 
           <RenderIf when={data?.exists === false}>
             <Button
-              variant="outline"
+              label="Impressum erstellen"
+              icon={<Plus className="size-4" />}
+              variant="secondary"
               className="self-start"
               onClick={() => setIsDialogOpen(true)}
-            >
-              <Plus className="size-4" />
-              Impressum erstellen
-            </Button>
+            />
           </RenderIf>
         </div>
       </RenderIf>
@@ -118,6 +113,17 @@ export default function ImpressumSection() {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         initialValues={impressum}
+      />
+
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Impressum löschen"
+        description="Soll das aktuelle Impressum wirklich gelöscht werden? Danach ist es unter /impressum nicht mehr erreichbar."
+        actionLabel="Löschen"
+        onAction={handleDelete}
+        cancelLabel="Abbrechen"
+        actionVariant="destructive"
       />
     </PageSubSection>
   )

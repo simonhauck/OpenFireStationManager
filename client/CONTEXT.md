@@ -33,7 +33,7 @@ UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creatin
 
 ### Tablet routes
 
-`/pool-clothing` and `/pool-clothing/checkout` are the tablet-facing routes. Both apply Material-standard minimum tap-target sizes (48 dp / 48 px) via thin feature-local wrappers around shadcn primitives. The rest of the app uses default shadcn sizing because it is operated on desktop by Kleiderwart and Admin users.
+`/pool-clothing` and `/pool-clothing/checkout` are the tablet-facing routes. Both enforce Material-standard minimum tap-target sizes (48 dp / 48 px) through a coarse-pointer theme adaptation that raises control sizes on touch devices. The rest of the app uses the default element sizes because it is operated on desktop by Kleiderwart and Admin users.
 
 ### Checkout flow
 
@@ -69,7 +69,7 @@ The route uses an internal step machine (separate from Checkout): select return 
 
 ### Page Section
 
-The full-page layout wrapper used on each route. Renders a `bg-muted` surface (rounded, full-height) that visually separates the page from the plain app background. Contains a header row (title, optional subtitle, optional action buttons) and a body area for page content. Inner `Card` components sit on top of the muted surface and are visually distinct from it. Accepts `buttonPosition: "right" | "center"` to control action-button alignment. Used on both tablet and desktop routes; callers are responsible for passing appropriately sized button components (`TouchButton` on tablet routes, shadcn `Button` on desktop routes).
+The full-page layout wrapper used on each route. Renders a `bg-muted` surface (rounded, full-height) that visually separates the page from the plain app background. Contains a header row (title, optional subtitle, optional action buttons) and a body area for page content. Inner `Card` components sit on top of the muted surface and are visually distinct from it. Accepts `buttonPosition: "right" | "center"` to control action-button alignment. Used on both tablet and desktop routes; callers are responsible for passing appropriately sized button components.
 
 ### Page Sub Section
 
@@ -87,7 +87,7 @@ The admin-uploadable privacy policy document, managed under `/admin/settings`. A
 
 User-facing label for `Member` — a person in the organisation. Deliberately distinct from **Nutzer Management** (`/user-management`), which manages `UserAccount` logins: Mitglieder are people, Nutzer are credentials, and the two are not linked. Because both now appear in the top nav, the labels carry the whole distinction; retitling "Nutzer Management" to something like "Logins" would sharpen it.
 
-Top-level route `/members`, `KLEIDERWART`-guarded, with entries in `MENU_ITEMS` (`Header.tsx`), `DASHBOARD_ITEMS` (`dashboard.tsx`), and `SEGMENT_LABELS` (`Breadcrumb.tsx`) — all three lists are duplicated and must be kept in step. Four routes: list, `/new`, `/$memberId` (detail), `/$memberId/edit`.
+Top-level route `/members`, `KLEIDERWART`-guarded, with entries in `MENU_ITEMS` (nav config), `DASHBOARD_ITEMS` (`dashboard.tsx`), and `SEGMENT_LABELS` (`Breadcrumb.tsx`) — all three lists are duplicated and must be kept in step. Four routes: list, `/new`, `/$memberId` (detail), `/$memberId/edit`.
 
 The **detail page** is the "what gear does this person have?" screen and is the reason a detail view exists at all. Three sections: Kopf (name, audit metadata, Bearbeiten/Löschen actions); Standorte (the member's locations, each linking to the location edit page — assignment is only ever written from the location side); Kleidung (every item currently in those locations, from `GET /api/clothing/locations/{id}/items`, one call per locker).
 

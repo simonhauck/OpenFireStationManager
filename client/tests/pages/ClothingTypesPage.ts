@@ -16,7 +16,9 @@ export class ClothingTypesPage {
   }
 
   async fillForm(name: string) {
-    await this.page.locator("#name").fill(name)
+    await this.page
+      .getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ })
+      .fill(name)
   }
 
   async submitCreate() {
@@ -33,7 +35,7 @@ export class ClothingTypesPage {
 
   async clickEditForType(name: string) {
     await this.page
-      .getByRole("link", { name: `Kleidungstyp ${name} bearbeiten` })
+      .getByRole("button", { name: `Kleidungstyp ${name} bearbeiten` })
       .click()
   }
 
@@ -44,11 +46,17 @@ export class ClothingTypesPage {
   }
 
   async confirmDelete() {
-    await this.page.getByRole("button", { name: "Löschen" }).click()
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Löschen" })
+      .click()
   }
 
   async cancelDelete() {
-    await this.page.getByRole("button", { name: "Abbrechen" }).click()
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Abbrechen" })
+      .click()
   }
 
   deleteDialogErrorMessage() {

@@ -16,23 +16,33 @@ export class UserManagementPage {
   }
 
   async fillUsername(username: string) {
-    await this.page.locator("#username").fill(username)
+    await this.page
+      .getByRole("textbox", { name: /^Benutzername( Erforderlich)?$/ })
+      .fill(username)
   }
 
   async fillFirstName(firstName: string) {
-    await this.page.locator("#first-name").fill(firstName)
+    await this.page
+      .getByRole("textbox", { name: /^Vorname( Erforderlich)?$/ })
+      .fill(firstName)
   }
 
   async fillLastName(lastName: string) {
-    await this.page.locator("#last-name").fill(lastName)
+    await this.page
+      .getByRole("textbox", { name: /^Nachname( Erforderlich)?$/ })
+      .fill(lastName)
   }
 
   async fillPassword(password: string) {
-    await this.page.locator("#password").fill(password)
+    await this.page
+      .getByRole("textbox", { name: /^Passwort( Erforderlich)?$/ })
+      .fill(password)
   }
 
   async fillConfirmPassword(password: string) {
-    await this.page.locator("#confirm-password").fill(password)
+    await this.page
+      .getByRole("textbox", { name: /^Passwort bestätigen( Erforderlich)?$/ })
+      .fill(password)
   }
 
   async submitCreate() {
@@ -47,7 +57,7 @@ export class UserManagementPage {
 
   async clickEditForUser(username: string) {
     await this.page
-      .getByRole("link", { name: `Nutzer ${username} bearbeiten` })
+      .getByRole("button", { name: `Nutzer ${username} bearbeiten` })
       .click()
   }
 

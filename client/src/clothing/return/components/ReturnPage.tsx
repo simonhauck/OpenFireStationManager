@@ -1,8 +1,17 @@
+import { Button } from "@astryxdesign/core/Button"
+import { Card } from "@astryxdesign/core/Card"
+import { ClickableCard } from "@astryxdesign/core/ClickableCard"
+import { Grid } from "@astryxdesign/core/Grid"
+import { Heading } from "@astryxdesign/core/Heading"
+import { Step, Stepper } from "@astryxdesign/core/Stepper"
+import { Text } from "@astryxdesign/core/Text"
+import { useToast } from "@astryxdesign/core/Toast"
+import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { TouchButton } from "#/clothing/checkout/components/TouchComponents"
+
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import {
@@ -19,9 +28,13 @@ import { useReturnWizard } from "#/clothing/return/useReturnWizard"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
-import type { StepperWizardStep } from "#/components/base/StepperWizard"
-import StepperWizard from "#/components/base/StepperWizard"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
+
+interface WizardStep {
+  label: string
+  description: string
+  content: ReactNode
+}
 
 export default function ReturnPage({
   returnTarget,
@@ -51,7 +64,7 @@ export default function ReturnPage({
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
   const targets = (allLocations ?? []).filter((l) => l.type === locationType)
 
-  const steps: StepperWizardStep[] = [
+  const steps: WizardStep[] = [
     {
       label: "Kleidung auswählen",
       description: "Scannen oder aus Standort wählen",
@@ -101,12 +114,12 @@ export default function ReturnPage({
 
   if (targets.length === 0) {
     return (
-      <PageSection title={title}>
-        <p className="text-muted-foreground text-sm">
+      <PageSection title={title} className="tablet-controls">
+        <Text type="supporting" as="p">
           {locationType === "WAESCHE"
             ? "Keine Wäsche-Standorte eingerichtet."
             : "Keine Pool-Standorte eingerichtet."}
-        </p>
+        </Text>
       </PageSection>
     )
   }
@@ -114,22 +127,62 @@ export default function ReturnPage({
   return (
     <PageSection
       title={title}
+      className="tablet-controls"
       buttons={
-        <TouchButton
-          variant="outline"
-          onClick={async () => {
-            await navigate({ to: "/pool-clothing" })
+        <Button
+          label="Abbrechen"
+          variant="secondary"
+          size="lg"
+          onClick={() => {
+            void navigate({ to: "/pool-clothing" })
           }}
-        >
-          Abbrechen
-        </TouchButton>
+        />
       }
     >
-      <StepperWizard
-        steps={steps}
-        currentStep={state.step}
-        onStepClick={(n) => goToStep(n as ReturnStep)}
-      />
+      <div className="flex items-stretch">
+        <aside className="hidden shrink-0 sm:block">
+          <div className="pr-6 pb-2">
+            <Stepper
+              orientation="vertical"
+              activeStep={state.step - 1}
+              onStepClick={(index) => {
+                if (state.step >= steps.length) return
+                if (index + 1 < state.step) {
+                  goToStep((index + 1) as ReturnStep)
+                }
+              }}
+            >
+              {steps.map((step, index) => (
+                <Step
+                  key={step.label}
+                  step={index}
+                  label={step.label}
+                  description={step.description}
+                  isDisabled={index + 1 > state.step}
+                />
+              ))}
+            </Stepper>
+          </div>
+        </aside>
+
+        <div className="min-w-0 flex-1 space-y-4">
+          {steps.map((step, index) => {
+            const stepNumber = index + 1
+            return (
+              <RenderIf key={stepNumber} when={state.step === stepNumber}>
+                <Card>
+                  <VStack gap={4}>
+                    <Heading level={2}>
+                      Schritt {stepNumber}: {step.label}
+                    </Heading>
+                    {step.content}
+                  </VStack>
+                </Card>
+              </RenderIf>
+            )
+          })}
+        </div>
+      </div>
     </PageSection>
   )
 }
@@ -161,20 +214,20 @@ function StepItemPickerContent({
   return (
     <div className="space-y-4">
       <div className="flex rounded-lg border p-1">
-        <TouchButton
-          variant={activeTab === "scanner" ? "default" : "ghost"}
-          className="flex-1"
+        <Button
+          variant={activeTab === "scanner" ? "primary" : "ghost"}
+          size="lg"
+          width="100%"
+          label="Scannen"
           onClick={() => setActiveTab("scanner")}
-        >
-          Scannen
-        </TouchButton>
-        <TouchButton
-          variant={activeTab === "locker" ? "default" : "ghost"}
-          className="flex-1"
+        />
+        <Button
+          variant={activeTab === "locker" ? "primary" : "ghost"}
+          size="lg"
+          width="100%"
+          label="Aus Spind auswählen"
           onClick={() => setDialogOpen(true)}
-        >
-          Aus Spind auswählen
-        </TouchButton>
+        />
       </div>
 
       <RenderIf when={activeTab === "scanner"}>
@@ -198,9 +251,13 @@ function StepItemPickerContent({
       />
 
       <div className="flex justify-end gap-3 pt-2">
-        <TouchButton disabled={state.returnItems.length === 0} onClick={onNext}>
-          Weiter →
-        </TouchButton>
+        <Button
+          label="Weiter →"
+          variant="primary"
+          size="lg"
+          isDisabled={state.returnItems.length === 0}
+          onClick={onNext}
+        />
       </div>
     </div>
   )
@@ -227,22 +284,28 @@ function StepReturnTargetPickerContent({
 
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-sm">{description}</p>
+      <Text type="supporting" as="p">
+        {description}
+      </Text>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {targets.map((loc) => (
-          <TouchButton
-            key={loc.id}
-            variant="outline"
-            className="h-auto min-h-16 flex-col gap-1 p-4 text-wrap"
-            onClick={() => onSelect(loc.id)}
-          >
-            <span className="text-base font-medium">
-              {formatClothingLocationLabel(loc, memberName(loc.memberId))}
-            </span>
-          </TouchButton>
-        ))}
-      </div>
+      <Grid columns={{ minWidth: 180, max: 3 }} gap={3}>
+        {targets.map((loc) => {
+          const label = formatClothingLocationLabel(
+            loc,
+            memberName(loc.memberId),
+          )
+          return (
+            <ClickableCard
+              key={loc.id}
+              label={label}
+              width="100%"
+              onClick={() => onSelect(loc.id)}
+            >
+              <Text weight="medium">{label}</Text>
+            </ClickableCard>
+          )
+        })}
+      </Grid>
     </div>
   )
 }
@@ -265,6 +328,7 @@ function StepReviewContent({
   const queryClient = useQueryClient()
   const mutation = useMutation(returnMutation(queryClient))
   const memberName = useMemberNameLookup()
+  const showToast = useToast()
 
   const locationMap = new Map(allLocations.map((l) => [l.id, l]))
   const returnLocationId = state.returnLocationId
@@ -286,22 +350,24 @@ function StepReviewContent({
       await mutation.mutateAsync(body)
       onSubmitOk()
     } catch {
-      toast.error(
-        "Fehler beim Abschließen des Vorgangs. Bitte erneut versuchen.",
-      )
+      showToast({
+        body: "Fehler beim Abschließen des Vorgangs. Bitte erneut versuchen.",
+        type: "error",
+        isAutoHide: true,
+      })
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <p className="text-sm font-semibold">
+        <Text as="p" type="label">
           Rückgabe ({state.returnItems.length})
-        </p>
+        </Text>
         <RenderIf when={state.returnItems.length === 0}>
-          <p className="text-muted-foreground text-sm italic">
+          <Text type="supporting" as="p" className="italic">
             Keine Kleidung ausgewählt.
-          </p>
+          </Text>
         </RenderIf>
         <RenderIf when={state.returnItems.length > 0}>
           <div className="space-y-1">
@@ -309,26 +375,27 @@ function StepReviewContent({
               <ClothingItemRow key={item.clothingItem.id} item={item} />
             ))}
           </div>
-          <p className="text-muted-foreground text-sm">
+          <Text type="supporting" as="p">
             Ziel: <strong>{targetName}</strong>
-          </p>
+          </Text>
         </RenderIf>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
-        <TouchButton
-          variant="outline"
+        <Button
+          label="← Zurück"
+          variant="secondary"
+          size="lg"
           onClick={onBack}
-          disabled={mutation.isPending}
-        >
-          ← Zurück
-        </TouchButton>
-        <TouchButton
-          disabled={mutation.isPending}
+          isDisabled={mutation.isPending}
+        />
+        <Button
+          label={mutation.isPending ? "Wird gesendet…" : "Bestätigen"}
+          variant="primary"
+          size="lg"
+          isDisabled={mutation.isPending}
           onClick={() => void handleSubmit()}
-        >
-          {mutation.isPending ? "Wird gesendet…" : "Bestätigen"}
-        </TouchButton>
+        />
       </div>
     </div>
   )
@@ -361,20 +428,30 @@ function StepSuccessContent({
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-lg font-semibold">Vorgang abgeschlossen</p>
-        <p className="text-muted-foreground text-sm">
+        <Text as="p" type="large" weight="semibold">
+          Vorgang abgeschlossen
+        </Text>
+        <Text type="supporting" as="p">
           Die Rückgabe wurde erfolgreich abgeschlossen.
-        </p>
+        </Text>
       </div>
-      <p className="text-muted-foreground text-sm">
+      <Text type="supporting" as="p">
         Weiterleitung zur Übersicht in {secondsLeft} Sekunde
         {secondsLeft !== 1 ? "n" : ""}…
-      </p>
+      </Text>
       <div className="flex gap-3">
-        <TouchButton onClick={onReset}>Neuen Vorgang starten</TouchButton>
-        <TouchButton variant="outline" onClick={onNavigateToOverview}>
-          Zur Übersicht
-        </TouchButton>
+        <Button
+          label="Neuen Vorgang starten"
+          variant="primary"
+          size="lg"
+          onClick={onReset}
+        />
+        <Button
+          label="Zur Übersicht"
+          variant="secondary"
+          size="lg"
+          onClick={onNavigateToOverview}
+        />
       </div>
     </div>
   )

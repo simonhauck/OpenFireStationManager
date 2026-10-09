@@ -1,4 +1,4 @@
-import { LoaderCircle } from "lucide-react"
+import { Spinner } from "@astryxdesign/core/Spinner"
 
 interface LoadingIndicatorProps {
   label?: string
@@ -9,14 +9,5 @@ export default function LoadingIndicator({
   label = "Wird geladen...",
   className,
 }: LoadingIndicatorProps) {
-  return (
-    <div
-      className={`flex items-center gap-2 text-sm text-muted-foreground ${className ?? ""}`.trim()}
-      role="status"
-      aria-live="polite"
-    >
-      <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-      <span>{label}</span>
-    </div>
-  )
+  return <Spinner size="sm" label={label} className={className} />
 }

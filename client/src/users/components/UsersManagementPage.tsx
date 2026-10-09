@@ -1,11 +1,10 @@
-import { Link } from "@tanstack/react-router"
+import { Button } from "@astryxdesign/core/Button"
 import { Plus } from "lucide-react"
 import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-import { Button } from "#/components/ui/button"
 import UsersTable from "#/users/components/UsersTable"
 import { useUsers } from "#/users/service/usersQueries"
 
@@ -25,12 +24,12 @@ function UsersManagementPageContent() {
       title="Nutzer Management"
       subtitle="Nutzer und Rollen"
       buttons={
-        <Button asChild>
-          <Link to="/user-management/new">
-            <Plus className="size-4" />
-            Nutzer erstellen
-          </Link>
-        </Button>
+        <Button
+          label="Nutzer erstellen"
+          icon={<Plus className="size-4" />}
+          variant="primary"
+          href="/user-management/new"
+        />
       }
     >
       <RenderIf when={isLoading}>
