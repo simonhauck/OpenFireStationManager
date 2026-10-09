@@ -1,4 +1,3 @@
-import { Badge } from "@astryxdesign/core/Badge"
 import { Button } from "@astryxdesign/core/Button"
 import { Card } from "@astryxdesign/core/Card"
 import { CheckboxListItem } from "@astryxdesign/core/CheckboxList"
@@ -11,10 +10,16 @@ import { Selector } from "@astryxdesign/core/Selector"
 import { Step, Stepper } from "@astryxdesign/core/Stepper"
 import { Text } from "@astryxdesign/core/Text"
 import { useToast } from "@astryxdesign/core/Toast"
+import { Token } from "@astryxdesign/core/Token"
 import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { Trash2Icon } from "lucide-react"
+import {
+  ArrowRightLeftIcon,
+  MapPinIcon,
+  MapPinOffIcon,
+  Trash2Icon,
+} from "lucide-react"
 import type { ReactNode } from "react"
 import { useEffect, useMemo, useState } from "react"
 
@@ -338,11 +343,13 @@ function StepSwapContent({
                   item={item}
                   trailing={
                     <div className="flex items-center gap-2">
-                      <ItemOriginBadge item={item} />
-                      <Button
-                        label="Zurückgeben"
-                        variant="secondary"
+                      <ItemOriginToken item={item} />
+                      <IconButton
+                        variant="ghost"
                         size="lg"
+                        label={`${item.clothingType.name} zur Rückgabe verschieben`}
+                        tooltip="Zur Rückgabe verschieben"
+                        icon={<ArrowRightLeftIcon className="size-4" />}
                         onClick={() => onMoveItemToReturn(item)}
                       />
                       <IconButton
@@ -395,7 +402,7 @@ function StepSwapContent({
                   description={item.clothingItem.barcode ?? undefined}
                   isChecked={true}
                   onCheck={() => onMoveItemToTake(item)}
-                  endContent={<ItemOriginBadge item={item} />}
+                  endContent={<ItemOriginToken item={item} />}
                 />
               ))}
             </List>
@@ -423,20 +430,36 @@ function StepSwapContent({
 }
 
 /**
- * Badge for a non-POOL origin ("Standort: Wäsche 2" / "Kein Standort"), so the
- * recorded location is visible inline instead of in a modal.
+ * Chip for a non-POOL origin, so the recorded location is visible inline
+ * instead of in a modal. Renders nothing for pool items, where the origin is
+ * the expected one.
  */
-function ItemOriginBadge({ item }: { item: ResolvedClothingItem }) {
+function ItemOriginToken({ item }: { item: ResolvedClothingItem }) {
   const memberName = useMemberNameLookup()
   const location = item.location
 
   if (location && location.type === "POOL") return null
 
-  const label = location
-    ? `Standort: ${formatClothingLocationLabel(location, memberName(location.memberId))}`
-    : "Kein Standort"
+  if (!location) {
+    return (
+      <Token
+        label="Kein Standort"
+        color="orange"
+        icon={<MapPinOffIcon className="size-4" />}
+      />
+    )
+  }
 
-  return <Badge variant="warning" label={label} />
+  return (
+    <Token
+      label={formatClothingLocationLabel(
+        location,
+        memberName(location.memberId),
+      )}
+      color="orange"
+      icon={<MapPinIcon className="size-4" />}
+    />
+  )
 }
 
 // ─── Step 3: Wash Location Picker ─────────────────────────────────────────────

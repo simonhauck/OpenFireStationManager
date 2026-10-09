@@ -48,7 +48,7 @@ export class CheckoutPage {
   /** Forces the given Ausgabe row into the Rückgabe selection. */
   async moveToReturn(label: string) {
     await this.ausgabeRow(label)
-      .getByRole("button", { name: "Zurückgeben" })
+      .getByRole("button", { name: /zur Rückgabe verschieben/ })
       .click()
   }
 
