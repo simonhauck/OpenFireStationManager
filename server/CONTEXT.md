@@ -22,6 +22,10 @@ The `type` replaces the older `shouldBeShownOnDashboard` boolean: dashboard visi
 
 The clothing officer role (`UserRole.KLEIDERWART`). Manages clothing types, items, and locations. Distinct from `ADMIN` and `USER`.
 
+### BarcodeImage
+
+An image attached to a `ClothingType` showing where on that garment its barcode is located, so scanning users can find it. A type has zero to many; they are upload-ordered and carry no captions. Upload and delete are part of managing a type (Kleiderwart), and every scanner flow shows all of them grouped by type. Deleting a type deletes its `BarcodeImage`s. German UI label: "Barcode-Bilder".
+
 ### ClothingItemResolver
 
 Owns all read access to `resolved_clothing_item_view`, a PostgreSQL view that left-joins `clothing_items`, `clothing_locations`, and `clothing_types` into a single denormalised row per item. Queried via `JdbcTemplate` + custom `RowMapper` that hydrates the nested `ResolvedClothingItem` DTO. Four methods: `resolveOne(id)`, `resolveAll()`, `resolveByBarcode(barcode)`, `resolveByLocation(locationId)`. See ADR-0006.

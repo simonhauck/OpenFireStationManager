@@ -195,7 +195,8 @@ class OpenApiConfiguration(
                         .name(ApiTags.CLOTHING_TYPES)
                         .description(
                             "Categories of garment (*Kleidungsart*), e.g. \"Einsatzjacke\". Reading is open to any " +
-                                "signed-in user; writing requires the KLEIDERWART role."
+                                "signed-in user; writing requires the KLEIDERWART role. Also carries the barcode " +
+                                "guide images (`Barcode-Bild`) shown on the scanner screens, uploaded per type."
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_LOCATIONS)

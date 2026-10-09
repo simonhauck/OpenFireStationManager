@@ -1,6 +1,7 @@
 import { Button } from "@astryxdesign/core/Button"
 import { Card } from "@astryxdesign/core/Card"
 import { TextInput } from "@astryxdesign/core/TextInput"
+import type { ReactNode } from "react"
 
 import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
@@ -16,6 +17,8 @@ type ClothingTypeFormProps = {
   pendingLabel: string
   submitLabel: string
   errorMessage: string | null
+  /** Optional images section rendered between the name field and the actions. */
+  images?: ReactNode
 }
 
 export default function ClothingTypeForm({
@@ -28,6 +31,7 @@ export default function ClothingTypeForm({
   pendingLabel,
   submitLabel,
   errorMessage,
+  images,
 }: ClothingTypeFormProps) {
   return (
     <PageSection title={title} subtitle={description}>
@@ -39,6 +43,8 @@ export default function ClothingTypeForm({
             value={name}
             onChange={onNameChange}
           />
+
+          <RenderIf when={images !== undefined}>{images}</RenderIf>
 
           <RenderIf when={errorMessage !== null}>
             <ErrorState message={errorMessage ?? "Unbekannter Fehler."} />

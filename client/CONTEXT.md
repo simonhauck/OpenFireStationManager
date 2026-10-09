@@ -48,6 +48,10 @@ Picker UI scales by cardinality:
 - **Few items (a handful of WAESCHE locations):** tile grid, single tap, no search.
 - **Many items (>100 PERSONAL locations, >1000 clothing items):** searchable Combobox with typeahead, primary input on tablet. For items the barcode scanner is the primary input and the Combobox is the backup.
 
+### Barcode-Bilder
+
+The always-visible gallery on every scanner screen, showing all `BarcodeImage`s grouped by clothing type under the heading "Wo finde ich den Barcode?". Tapping an image opens it full-screen. Managed by the Kleiderwart on the clothing type create and edit pages; hidden when no type has images. A deliberate trial of showing everything at once — the fallback shape is a horizontally scrollable one-tile-per-type strip.
+
 ### Inventarisierung (Inventory Reconciliation)
 
 The `/pool-clothing/inventory-reconciliation` route is a KLEIDERWART-only wizard for reconciling the system's records for a location against physical reality. Reached from an "Inventarisierung starten" button on `/pool-clothing`. The route is `RoleGuard`-ed for the `KLEIDERWART` role.

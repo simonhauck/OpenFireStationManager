@@ -206,6 +206,38 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/types/{typeId}/images": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List the barcode guide images of a clothing type
+     * @description Returns the metadata of every image (`Barcode-Bild`) stored for one clothing type, in upload order — but not the image bytes. Use this on a type's management screen to render previews; download each image from `GET /api/clothing/types/{typeId}/images/{imageId}`.
+     *
+     *     For the scanner gallery across all types, prefer `GET /api/clothing/types/barcode-images`, which answers in one call.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listClothingTypeImages"]
+    put?: never
+    /**
+     * Upload a barcode guide image for a clothing type
+     * @description Stores one image (`Barcode-Bild`) that shows where on a garment its barcode is located, so people scanning items can find it. A type may have zero or more images; upload each image as its own request — there is no batch upload.
+     *
+     *     Only `image/jpeg`, `image/png`, and `image/webp` are accepted, up to 5 MB each; HEIC is not supported. Images are stored exactly as uploaded and cannot be edited afterwards — replacing one means deleting it and uploading a new file.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    post: operations["uploadClothingTypeImage"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/relocation": {
     parameters: {
       query?: never
@@ -784,6 +816,60 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/clothing/types/{typeId}/images/{imageId}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Download one barcode guide image
+     * @description Streams the stored image bytes (`Barcode-Bild`) exactly as uploaded, with the MIME type they were stored with. The response is the raw image, not JSON.
+     *
+     *     Stored bytes never change, so responses are cacheable indefinitely; the `ETag` is derived from the image's id. Replacing an image means deleting it and uploading a new file, which produces a new id and therefore a new URL.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["getClothingTypeImage"]
+    put?: never
+    post?: never
+    /**
+     * Delete a barcode guide image
+     * @description Removes one image (`Barcode-Bild`) from a clothing type. The image disappears from every scanner screen immediately. There is no way to replace an image in place — delete it and upload a new file instead.
+     *
+     *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
+     */
+    delete: operations["deleteClothingTypeImage"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/clothing/types/barcode-images": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List every barcode guide image, grouped by clothing type
+     * @description Returns all stored images (`Barcode-Bild`) across every clothing type, grouped under the type they belong to and accompanied by the type's name. This is the one call the scanner screens need to render the "where do I find the barcode?" gallery; image bytes are still fetched per image from `GET /api/clothing/types/{typeId}/images/{imageId}`.
+     *
+     *     Types without images are omitted, so an empty response means the gallery has nothing to show.
+     *
+     *     **Authorisation:** any signed-in user.
+     */
+    get: operations["listBarcodeImages"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/overview/summary/type": {
     parameters: {
       query?: never
@@ -1184,6 +1270,26 @@ export interface components {
       id: number
       metaData: components["schemas"]["EntityMetaData"]
     }
+    /** @description Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`. */
+    ClothingTypeImageMetadata: {
+      /**
+       * Format: int64
+       * @description Server-assigned identifier of the image.
+       * @example 12
+       */
+      id: number
+      /**
+       * @description MIME type of the stored image — one of `image/jpeg`, `image/png`, or `image/webp`.
+       * @example image/jpeg
+       */
+      contentType: string
+      /**
+       * Format: int64
+       * @description Size of the image in bytes.
+       * @example 182734
+       */
+      fileSize: number
+    }
     /** @description A bulk move of garments into one destination, regardless of where each of them is now. */
     RelocationRequest: {
       /**
@@ -1544,6 +1650,22 @@ export interface components {
       authenticated: boolean
       /** @description The signed-in account, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
       user?: components["schemas"]["UserAccount"]
+    }
+    /** @description Every barcode guide image (`Barcode-Bild`) of one clothing type, with the type's name so a scanner screen can label the group without a second lookup. */
+    ClothingTypeBarcodeImages: {
+      /**
+       * Format: int64
+       * @description Id of the clothing type.
+       * @example 3
+       */
+      typeId: number
+      /**
+       * @description Display name of the clothing type.
+       * @example Einsatzjacke
+       */
+      typeName: string
+      /** @description The type's images, in upload order. */
+      images: components["schemas"]["ClothingTypeImageMetadata"][]
     }
     /** @description Stock of one clothing type, broken down by size band. */
     ClothingTypeSummary: {
@@ -2178,6 +2300,158 @@ export interface operations {
       }
       /** @description Authenticated, but the account lacks the required role. */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  listClothingTypeImages: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the clothing type.
+         * @example 3
+         */
+        typeId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Metadata of the type's images. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingTypeImageMetadata"][]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing type exists with this id. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  uploadClothingTypeImage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the clothing type.
+         * @example 3
+         */
+        typeId: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Format: binary
+           * @description The image to store. A JPEG, PNG, or WebP file of at most 5 MB, showing where the barcode is located on the garment.
+           */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description Details of the newly stored image. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingTypeImageMetadata"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No clothing type exists with this id. Nothing was stored. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description The file is not a JPEG, PNG, or WebP, or it exceeds 5 MB. Nothing was stored. */
+      422: {
         headers: {
           [name: string]: unknown
         }
@@ -4245,6 +4519,185 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["AuthStateResponse"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  getClothingTypeImage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the clothing type.
+         * @example 3
+         */
+        typeId: number
+        /**
+         * @description Numeric id of the image.
+         * @example 12
+         */
+        imageId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The image bytes, in the MIME type the image was uploaded with. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/octet-stream": string
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No image with this id exists for this clothing type. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  deleteClothingTypeImage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Numeric id of the clothing type.
+         * @example 3
+         */
+        typeId: number
+        /**
+         * @description Numeric id of the image to delete.
+         * @example 12
+         */
+        imageId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The image was deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description No image with this id exists for this clothing type. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  listBarcodeImages: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description All images, grouped by type. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingTypeBarcodeImages"][]
+        }
+      }
+      /** @description Not authenticated — no valid session cookie was supplied. */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */

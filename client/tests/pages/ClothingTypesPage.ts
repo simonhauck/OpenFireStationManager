@@ -69,6 +69,31 @@ export class ClothingTypesPage {
     return this.page.getByRole("row").filter({ hasText: name })
   }
 
+  async selectImages(files: string[]) {
+    await this.page.locator('input[type="file"]').setInputFiles(files)
+  }
+
+  async uploadSelectedImage() {
+    await this.page.getByRole("button", { name: "Bild hochladen" }).click()
+  }
+
+  typeImageThumbnails() {
+    return this.page.getByTestId("clothing-type-images").locator("img")
+  }
+
+  removeImageButton() {
+    return this.page
+      .getByTestId("clothing-type-images")
+      .getByRole("button", { name: /entfernen$/ })
+  }
+
+  async confirmRemoveImage() {
+    await this.page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Löschen" })
+      .click()
+  }
+
   emptyState() {
     return this.page.getByText("Keine Kleidungstypen gefunden.")
   }
