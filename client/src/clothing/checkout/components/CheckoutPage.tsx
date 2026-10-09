@@ -15,7 +15,7 @@ import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import type { ReactNode } from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
@@ -50,7 +50,7 @@ export default function CheckoutPage() {
     addItem,
     removeItem,
     advanceToReturns,
-    applyAutoReturnToggles,
+    reconcileSuggestedReturns,
     toggleReturnItem,
     confirmReturns,
     selectWashLocation,
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
       content: (
         <StepReturnTogglesContent
           state={state}
-          onApplyAutoReturnToggles={applyAutoReturnToggles}
+          onReconcileSuggestedReturns={reconcileSuggestedReturns}
           onToggleReturnItem={toggleReturnItem}
           onBack={goBack}
           onConfirm={confirmReturns}
@@ -344,9 +344,26 @@ function StepItemScannerContent({
 
 // ─── Step 3: Return Toggles ───────────────────────────────────────────────────
 
+function useLockerItems(targetLocationId: number | null) {
+  const { data: allItems } = useQuery(getAllClothingItemsQuery())
+  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
+
+  return useMemo((): ResolvedClothingItem[] => {
+    if (!allItems || !allTypes || targetLocationId === null) return []
+    const typeMap = new Map(allTypes.map((t) => [t.id, t]))
+    return allItems
+      .filter((i) => i.locationId === targetLocationId)
+      .flatMap((i) => {
+        const type = typeMap.get(i.typeId)
+        if (!type) return []
+        return [{ clothingItem: i, clothingType: type }]
+      })
+  }, [allItems, allTypes, targetLocationId])
+}
+
 interface StepReturnTogglesContentProps {
   state: ReturnType<typeof useCheckoutWizard>["state"]
-  onApplyAutoReturnToggles: (ids: Set<number>) => void
+  onReconcileSuggestedReturns: (suggestedIds: Set<number>) => void
   onToggleReturnItem: (itemId: number) => void
   onBack: () => void
   onConfirm: () => void
@@ -354,36 +371,21 @@ interface StepReturnTogglesContentProps {
 
 function StepReturnTogglesContent({
   state,
-  onApplyAutoReturnToggles,
+  onReconcileSuggestedReturns,
   onToggleReturnItem,
   onBack,
   onConfirm,
 }: StepReturnTogglesContentProps) {
-  const { data: allItems } = useQuery(getAllClothingItemsQuery())
-  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
+  const lockerItems = useLockerItems(state.targetLocationId)
 
-  const lockerItems: ResolvedClothingItem[] = (() => {
-    if (!allItems || !allTypes || state.targetLocationId === null) return []
-    const typeMap = new Map(allTypes.map((t) => [t.id, t]))
-    return allItems
-      .filter((i) => i.locationId === state.targetLocationId)
-      .flatMap((i) => {
-        const type = typeMap.get(i.typeId)
-        if (!type) return []
-        return [{ clothingItem: i, clothingType: type }]
-      })
-  })()
+  const suggestedReturnIds = useMemo(
+    () => autoToggleReturnsByType(state.takeItems, lockerItems),
+    [state.takeItems, lockerItems],
+  )
 
   useEffect(() => {
-    if (state.hasAppliedAutoReturnToggles || lockerItems.length === 0) return
-    const autoToggled = autoToggleReturnsByType(state.takeItems, lockerItems)
-    onApplyAutoReturnToggles(autoToggled)
-  }, [
-    lockerItems,
-    onApplyAutoReturnToggles,
-    state.hasAppliedAutoReturnToggles,
-    state.takeItems,
-  ])
+    onReconcileSuggestedReturns(suggestedReturnIds)
+  }, [onReconcileSuggestedReturns, suggestedReturnIds])
 
   return (
     <div className="space-y-4">

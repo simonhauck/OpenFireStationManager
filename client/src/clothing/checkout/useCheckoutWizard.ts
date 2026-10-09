@@ -7,16 +7,16 @@ export interface CheckoutWizardState {
   step: CheckoutStep
   targetLocationId: number | null
   takeItems: ResolvedClothingItem[]
-  /** Item IDs from the locker that the user wants to return. */
+  /** Effective return selection: type-based suggestions adjusted by overrides. */
   returnItemIds: Set<number>
+  /**
+   * Explicit user choices for the return step, keyed by item id (`true` forces
+   * an item in, `false` keeps a suggested item out). Suggestions can therefore
+   * be re-derived at any time without discarding manual edits.
+   */
+  returnOverrides: Map<number, boolean>
   /** WAESCHE location ID chosen for dirty returns (null = no returns or not yet chosen). */
   returnLocationId: number | null
-  /**
-   * True once the type-based auto-selection has been applied for the current
-   * target. Kept in wizard state so it survives step remounts and never
-   * overwrites manual (de)selections.
-   */
-  hasAppliedAutoReturnToggles: boolean
 }
 
 type Action =
@@ -24,7 +24,7 @@ type Action =
   | { type: "ADD_ITEM"; item: ResolvedClothingItem }
   | { type: "REMOVE_ITEM"; itemId: number }
   | { type: "ADVANCE_TO_RETURNS" }
-  | { type: "APPLY_AUTO_RETURN_TOGGLES"; ids: Set<number> }
+  | { type: "RECONCILE_SUGGESTED_RETURNS"; suggestedIds: Set<number> }
   | { type: "TOGGLE_RETURN_ITEM"; itemId: number }
   | { type: "CONFIRM_RETURNS" }
   | { type: "SELECT_WASH_LOCATION"; locationId: number }
@@ -32,6 +32,14 @@ type Action =
   | { type: "GO_BACK" }
   | { type: "GO_TO_STEP"; step: CheckoutStep }
   | { type: "RESET" }
+
+function areSetsEqual(a: Set<number>, b: Set<number>): boolean {
+  if (a.size !== b.size) return false
+  for (const value of a) {
+    if (!b.has(value)) return false
+  }
+  return true
+}
 
 function reducer(
   state: CheckoutWizardState,
@@ -44,7 +52,7 @@ function reducer(
         step: 2,
         targetLocationId: action.locationId,
         returnItemIds: new Set(),
-        hasAppliedAutoReturnToggles: false,
+        returnOverrides: new Map(),
       }
 
     case "ADVANCE_TO_RETURNS":
@@ -70,24 +78,33 @@ function reducer(
         ),
       }
 
-    case "APPLY_AUTO_RETURN_TOGGLES":
-      // Apply once per target; later mounts of the return step must not
-      // overwrite selections the user made manually.
-      if (state.hasAppliedAutoReturnToggles) return state
-      return {
-        ...state,
-        returnItemIds: new Set(action.ids),
-        hasAppliedAutoReturnToggles: true,
+    case "RECONCILE_SUGGESTED_RETURNS": {
+      // Suggestions are a live default: they follow the current takes and
+      // locker contents, while explicit overrides always win. Idempotent, so
+      // remounting the return step can never clobber manual edits.
+      const next = new Set(action.suggestedIds)
+      for (const [itemId, isChecked] of state.returnOverrides) {
+        if (isChecked) {
+          next.add(itemId)
+        } else {
+          next.delete(itemId)
+        }
       }
+      if (areSetsEqual(next, state.returnItemIds)) return state
+      return { ...state, returnItemIds: next }
+    }
 
     case "TOGGLE_RETURN_ITEM": {
+      const isChecked = state.returnItemIds.has(action.itemId)
       const next = new Set(state.returnItemIds)
-      if (next.has(action.itemId)) {
+      if (isChecked) {
         next.delete(action.itemId)
       } else {
         next.add(action.itemId)
       }
-      return { ...state, returnItemIds: next }
+      const overrides = new Map(state.returnOverrides)
+      overrides.set(action.itemId, !isChecked)
+      return { ...state, returnItemIds: next, returnOverrides: overrides }
     }
 
     case "CONFIRM_RETURNS": {
@@ -126,8 +143,8 @@ const initialState: CheckoutWizardState = {
   targetLocationId: null,
   takeItems: [],
   returnItemIds: new Set(),
+  returnOverrides: new Map(),
   returnLocationId: null,
-  hasAppliedAutoReturnToggles: false,
 }
 
 export interface UseCheckoutWizardReturn {
@@ -136,7 +153,7 @@ export interface UseCheckoutWizardReturn {
   addItem: (item: ResolvedClothingItem) => void
   removeItem: (itemId: number) => void
   advanceToReturns: () => void
-  applyAutoReturnToggles: (ids: Set<number>) => void
+  reconcileSuggestedReturns: (suggestedIds: Set<number>) => void
   toggleReturnItem: (itemId: number) => void
   confirmReturns: () => void
   selectWashLocation: (locationId: number) => void
@@ -157,8 +174,8 @@ export function useCheckoutWizard(): UseCheckoutWizardReturn {
       dispatch({ type: "ADD_ITEM", item }),
     removeItem: (itemId: number) => dispatch({ type: "REMOVE_ITEM", itemId }),
     advanceToReturns: () => dispatch({ type: "ADVANCE_TO_RETURNS" }),
-    applyAutoReturnToggles: (ids: Set<number>) =>
-      dispatch({ type: "APPLY_AUTO_RETURN_TOGGLES", ids }),
+    reconcileSuggestedReturns: (suggestedIds: Set<number>) =>
+      dispatch({ type: "RECONCILE_SUGGESTED_RETURNS", suggestedIds }),
     toggleReturnItem: (itemId: number) =>
       dispatch({ type: "TOGGLE_RETURN_ITEM", itemId }),
     confirmReturns: () => dispatch({ type: "CONFIRM_RETURNS" }),

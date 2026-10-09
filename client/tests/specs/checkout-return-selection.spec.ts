@@ -15,6 +15,7 @@ test.describe("Checkout – return selection (regression #323)", () => {
   let scannedTypeName: string
   let lockerOnlyTypeName: string
   let scannedBarcode: string
+  let otherTypeBarcode: string
   let lockerWithAutoItem: string
   let lockerWithoutAutoItem: string
   let washLocationName: string
@@ -24,6 +25,7 @@ test.describe("Checkout – return selection (regression #323)", () => {
     scannedTypeName = `Typ-Scan-${suffix}`
     lockerOnlyTypeName = `Typ-Locker-${suffix}`
     scannedBarcode = `BC-SCAN-${suffix}`
+    otherTypeBarcode = `BC-OTHER-${suffix}`
     lockerWithAutoItem = `Spind-Auto-${suffix}`
     lockerWithoutAutoItem = `Spind-NoAuto-${suffix}`
     washLocationName = `Waesche-Desync-${suffix}`
@@ -47,6 +49,13 @@ test.describe("Checkout – return selection (regression #323)", () => {
       typeName: scannedTypeName,
       size: "M",
       barcode: scannedBarcode,
+      locationName: poolLocationName,
+    })
+    // Second pool item of a different type, used to drop a take again.
+    await createClothingItem(page, {
+      typeName: lockerOnlyTypeName,
+      size: "S",
+      barcode: otherTypeBarcode,
       locationName: poolLocationName,
     })
 
@@ -162,5 +171,44 @@ test.describe("Checkout – return selection (regression #323)", () => {
     // Step 3 remounted: the empty auto-toggle result must not wipe the
     // manual selection.
     await expect(manuallyChecked).toBeChecked()
+  })
+
+  test("dropping a taken item also drops its return suggestion", async ({
+    page,
+  }) => {
+    const checkoutPage = new CheckoutPage(page)
+
+    await checkoutPage.goto()
+    await checkoutPage.selectPersonalLocation(lockerWithAutoItem)
+    await checkoutPage.scanBarcode(scannedBarcode)
+    await expect(
+      checkoutPage.scannedItem(`${scannedTypeName} – M`),
+    ).toBeVisible()
+    await checkoutPage.scanBarcode(otherTypeBarcode)
+    await expect(
+      checkoutPage.scannedItem(`${lockerOnlyTypeName} – S`),
+    ).toBeVisible()
+    await checkoutPage.clickWeiter()
+
+    const suggestedItem = page.getByRole("checkbox", {
+      name: `${scannedTypeName} – L`,
+    })
+    const otherSuggestedItem = page.getByRole("checkbox", {
+      name: `${lockerOnlyTypeName} – XL`,
+    })
+    await expect(suggestedItem).toBeChecked()
+    await expect(otherSuggestedItem).toBeChecked()
+
+    // User removes one of the taken items again and re-enters step 3.
+    await page.getByRole("button", { name: "← Zurück" }).click()
+    await page
+      .getByRole("button", { name: `${scannedTypeName} entfernen` })
+      .click()
+    await checkoutPage.clickWeiter()
+    await expect(page.getByText("Schritt 3: Rückgabe wählen")).toBeVisible()
+
+    // Its suggestion is gone, the other suggestion (and take) stays.
+    await expect(suggestedItem).not.toBeChecked()
+    await expect(otherSuggestedItem).toBeChecked()
   })
 })
