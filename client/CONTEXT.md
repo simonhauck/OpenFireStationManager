@@ -47,6 +47,8 @@ The combined screen (ADR-0005) sorts every scanned or selected item automaticall
 
 The route is reached from a "Klamotten tauschen" button on `/pool-clothing` (top-right of the page); it is also reachable by direct URL. The route itself is `RoleGuard`-ed for the `USER` role.
 
+During a user-feedback trial on the feature branch, the previous wizard remains reachable at `/pool-clothing/checkout-classic` ("Klamotten tauschen (klassisch)"). It runs the original 6-step flow unchanged (separate scan step, return toggles, discrepancy dialog), same `USER` guard. Both routes submit the same `POST /api/clothing/checkouts` and share no state; the classic variant is removed once the trial concludes.
+
 Picker UI scales by cardinality:
 
 - **Few items (a handful of WAESCHE locations):** tile grid, single tap, no search.

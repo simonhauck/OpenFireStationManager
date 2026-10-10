@@ -3,6 +3,7 @@
 
 **Status:** Accepted
 **Date:** 2026-10-10
+**Note (2026-10-10):** On the feature branch, the combined screen is offered alongside the classic wizard for a user-feedback trial: the previous 6-step flow stays reachable at `/pool-clothing/checkout-classic` ("Klamotten tauschen (klassisch)"). Both entry points submit the same endpoint and share no state. After the trial, delete the losing variant (folder, route, button, specs) and drop this note.
 
 ## Context
 
