@@ -3,6 +3,7 @@
 
 **Status:** Accepted
 **Date:** 2026-04-29
+**Note (2026-10-10):** Not implemented. The two-phase protocol was implemented and later removed in #134 ("Streamline checkout process + remove unnecessary checks in backend"); `POST /api/clothing/checkouts` is a single-phase write today, and the client-side warning dialog was replaced by inline origin badges (client ADR-0005). This document is kept for historical context.
 
 ## Context
 

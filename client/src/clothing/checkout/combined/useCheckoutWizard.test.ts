@@ -77,6 +77,20 @@ describe("useCheckoutWizard", () => {
     expect(result.current.state.takeItems).toHaveLength(1)
   })
 
+  it("does not add an item that is already selected for return", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+    const item = makeItem(1, 10)
+
+    act(() => {
+      result.current.selectTarget(42)
+      result.current.moveItemToReturn(item)
+      result.current.addItem(item)
+    })
+
+    expect(result.current.state.takeItems).toHaveLength(0)
+    expect(result.current.state.returnItemIds).toEqual(new Set([1]))
+  })
+
   it("resets to initial state", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
@@ -91,7 +105,52 @@ describe("useCheckoutWizard", () => {
     expect(result.current.state.takeItems).toHaveLength(0)
   })
 
-  // ── Step 3: Return Toggles ────────────────────────────────────────────────
+  // ── Move between Ausgabe and Rückgabe ────────────────────────────────────
+
+  it("moves a take to the return selection and keeps it there on reconcile", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+    const item = makeItem(1, 10)
+
+    act(() => {
+      result.current.selectTarget(42)
+      result.current.addItem(item)
+      result.current.moveItemToReturn(item)
+    })
+
+    expect(result.current.state.takeItems).toHaveLength(0)
+    expect(result.current.state.returnItemIds).toEqual(new Set([1]))
+
+    // The forced return is an override; live re-reconciliation must keep it.
+    act(() => {
+      result.current.reconcileSuggestedReturns(new Set())
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set([1]))
+  })
+
+  it("moves a forced return back to the take list and drops the override", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+    const item = makeItem(1, 10)
+
+    act(() => {
+      result.current.selectTarget(42)
+      result.current.addItem(item)
+      result.current.moveItemToReturn(item)
+      result.current.moveItemToTake(item)
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set())
+    expect(result.current.state.takeItems).toHaveLength(1)
+
+    // No stale override: reconciling empty suggestions keeps the item out.
+    act(() => {
+      result.current.reconcileSuggestedReturns(new Set())
+    })
+
+    expect(result.current.state.returnItemIds).toEqual(new Set())
+  })
+
+  // ── Suggestions and overrides ─────────────────────────────────────────────
 
   it("reconciles suggested returns into the selection", () => {
     const { result } = renderHook(() => useCheckoutWizard())
@@ -172,57 +231,55 @@ describe("useCheckoutWizard", () => {
     expect(result.current.state.returnItemIds.has(7)).toBe(false)
   })
 
-  it("advances to step 4 when confirmReturns is called with returns selected", () => {
+  // ── Step 2 → 3 → 4 → 5 ────────────────────────────────────────────────────
+
+  it("advances to the wash step when returns are selected", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
     act(() => {
       result.current.selectTarget(1)
       result.current.toggleReturnItem(5)
-      result.current.confirmReturns()
+      result.current.advanceFromSwap()
+    })
+
+    expect(result.current.state.step).toBe(3)
+  })
+
+  it("skips the wash step and goes to review when no returns are selected", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.selectTarget(1)
+      result.current.advanceFromSwap()
     })
 
     expect(result.current.state.step).toBe(4)
   })
 
-  it("skips step 4 and goes to step 5 when confirmReturns is called with no returns", () => {
-    const { result } = renderHook(() => useCheckoutWizard())
-
-    act(() => {
-      result.current.selectTarget(1)
-      result.current.confirmReturns()
-    })
-
-    expect(result.current.state.step).toBe(5)
-  })
-
-  // ── Step 4: Wash Location ─────────────────────────────────────────────────
-
-  it("advances to step 5 and stores wash location when selectWashLocation is called", () => {
+  it("advances to review and stores the wash location", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
     act(() => {
       result.current.selectTarget(1)
       result.current.toggleReturnItem(5)
-      result.current.confirmReturns()
+      result.current.advanceFromSwap()
       result.current.selectWashLocation(99)
     })
 
-    expect(result.current.state.step).toBe(5)
+    expect(result.current.state.step).toBe(4)
     expect(result.current.state.returnLocationId).toBe(99)
   })
 
-  // ── Step 5 → 6: Submit OK ─────────────────────────────────────────────────
-
-  it("advances to step 6 (success) when submitOk is called", () => {
+  it("advances to step 5 (success) when submitOk is called", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
     act(() => {
       result.current.selectTarget(1)
-      result.current.confirmReturns()
+      result.current.advanceFromSwap()
       result.current.submitOk()
     })
 
-    expect(result.current.state.step).toBe(6)
+    expect(result.current.state.step).toBe(5)
   })
 
   // ── GO_BACK ───────────────────────────────────────────────────────────────
@@ -238,18 +295,43 @@ describe("useCheckoutWizard", () => {
     expect(result.current.state.step).toBe(1)
   })
 
-  it("goBack from step 5 returns to step 4", () => {
+  it("goBack from the wash step returns to the swap step", () => {
     const { result } = renderHook(() => useCheckoutWizard())
 
     act(() => {
       result.current.selectTarget(1)
       result.current.toggleReturnItem(5)
-      result.current.confirmReturns() // → step 4
-      result.current.selectWashLocation(99) // → step 5
+      result.current.advanceFromSwap() // → step 3
       result.current.goBack()
     })
 
-    expect(result.current.state.step).toBe(4)
+    expect(result.current.state.step).toBe(2)
+  })
+
+  it("goBack from review returns to the wash step when returns exist", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.selectTarget(1)
+      result.current.toggleReturnItem(5)
+      result.current.advanceFromSwap() // → step 3
+      result.current.selectWashLocation(99) // → step 4
+      result.current.goBack()
+    })
+
+    expect(result.current.state.step).toBe(3)
+  })
+
+  it("goBack from review skips the wash step when no returns exist", () => {
+    const { result } = renderHook(() => useCheckoutWizard())
+
+    act(() => {
+      result.current.selectTarget(1)
+      result.current.advanceFromSwap() // → step 4 (no returns)
+      result.current.goBack()
+    })
+
+    expect(result.current.state.step).toBe(2)
   })
 
   it("goBack does nothing when already on step 1", () => {

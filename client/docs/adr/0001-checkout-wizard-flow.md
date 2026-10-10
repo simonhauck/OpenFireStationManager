@@ -3,6 +3,7 @@
 
 **Status:** Accepted
 **Date:** 2026-04-29
+**Note (2026-10-10):** The step order below is revised by ADR-0005 (steps 2 and 3 are merged into one combined screen). The `409` response described in step 6 has been stale since #134: the checkout endpoint is single-phase and returns `400`/`404` instead. The type-match auto-toggle rule still holds.
 
 ## Context
 

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test"
 import { createClothingItem } from "../flows/createClothingItem"
 import { createClothingLocation } from "../flows/createClothingLocation"
 import { createClothingType } from "../flows/createClothingType"
-import { CheckoutPage } from "../pages/CheckoutPage"
+import { ClassicCheckoutPage } from "../pages/ClassicCheckoutPage"
 
 // The checkout route is guarded to USER role only.
 test.use({ storageState: "playwright/.auth/user.json" })
@@ -16,7 +16,6 @@ test.describe("Checkout – return selection (regression #323)", () => {
   let lockerOnlyTypeName: string
   let scannedBarcode: string
   let otherTypeBarcode: string
-  let lockerItemBarcode: string
   let lockerWithAutoItem: string
   let lockerWithoutAutoItem: string
   let washLocationName: string
@@ -27,7 +26,6 @@ test.describe("Checkout – return selection (regression #323)", () => {
     lockerOnlyTypeName = `Typ-Locker-${suffix}`
     scannedBarcode = `BC-SCAN-${suffix}`
     otherTypeBarcode = `BC-OTHER-${suffix}`
-    lockerItemBarcode = `BC-RET-${suffix}`
     lockerWithAutoItem = `Spind-Auto-${suffix}`
     lockerWithoutAutoItem = `Spind-NoAuto-${suffix}`
     washLocationName = `Waesche-Desync-${suffix}`
@@ -74,7 +72,6 @@ test.describe("Checkout – return selection (regression #323)", () => {
     await createClothingItem(page, {
       typeName: scannedTypeName,
       size: "L",
-      barcode: lockerItemBarcode,
       locationName: lockerWithAutoItem,
     })
     await createClothingItem(page, {
@@ -96,147 +93,122 @@ test.describe("Checkout – return selection (regression #323)", () => {
   test("auto-selected return is kept when the user continues without touching it", async ({
     page,
   }) => {
-    const checkoutPage = new CheckoutPage(page)
+    const checkoutPage = new ClassicCheckoutPage(page)
 
     await checkoutPage.goto()
     await checkoutPage.selectPersonalLocation(lockerWithAutoItem)
     await checkoutPage.scanBarcode(scannedBarcode)
+    await checkoutPage.clickWeiter()
 
-    // The matching locker item is suggested live, without leaving the step.
-    const autoChecked = checkoutPage.rueckgabeCheckbox(`${scannedTypeName} – L`)
+    const autoChecked = page.getByRole("checkbox", {
+      name: `${scannedTypeName} – L`,
+    })
     await expect(autoChecked).toBeChecked()
 
-    // A return is selected → wizard goes to the wash step (step 3).
-    await checkoutPage.clickWeiter()
-    await expect(page.getByText("Schritt 3: Wäsche-Ziel wählen")).toBeVisible()
+    // A return is selected → wizard goes to step 4 (wash location).
+    await checkoutPage.confirmReturns()
+    await expect(page.getByText("Schritt 4: Wäsche-Ziel wählen")).toBeVisible()
     await page.getByText(washLocationName, { exact: true }).click()
 
-    await expect(page.getByText("Schritt 4: Überprüfen")).toBeVisible()
+    await expect(page.getByText("Schritt 5: Überprüfen")).toBeVisible()
     await expect(page.getByText(`${scannedTypeName} – L`)).toBeVisible()
   })
 
-  test("scanning a locker item selects it for return", async ({ page }) => {
-    const checkoutPage = new CheckoutPage(page)
-
-    await checkoutPage.goto()
-    await checkoutPage.selectPersonalLocation(lockerWithAutoItem)
-    await checkoutPage.scanBarcode(lockerItemBarcode)
-
-    const checkbox = checkoutPage.rueckgabeCheckbox(`${scannedTypeName} – L`)
-    await expect(checkbox).toBeChecked()
-    // It is a return, not a take.
-    await expect(checkoutPage.ausgabeColumn()).not.toContainText(
-      `${scannedTypeName} – L`,
-    )
-  })
-
-  test("manual deselection of an auto-selected item survives navigating away and back", async ({
+  test("manual deselection of an auto-selected item survives navigating back", async ({
     page,
   }) => {
-    const checkoutPage = new CheckoutPage(page)
+    const checkoutPage = new ClassicCheckoutPage(page)
 
     await checkoutPage.goto()
     await checkoutPage.selectPersonalLocation(lockerWithAutoItem)
     await checkoutPage.scanBarcode(scannedBarcode)
+    await checkoutPage.clickWeiter()
 
-    const autoChecked = checkoutPage.rueckgabeCheckbox(`${scannedTypeName} – L`)
+    const autoChecked = page.getByRole("checkbox", {
+      name: `${scannedTypeName} – L`,
+    })
     await expect(autoChecked).toBeChecked()
 
     // User does not want to return the trouser → uncheck it.
     await autoChecked.click()
     await expect(autoChecked).not.toBeChecked()
 
-    // No returns left → Weiter goes straight to review (step 4).
-    await checkoutPage.clickWeiter()
-    await expect(page.getByText("Schritt 4: Überprüfen")).toBeVisible()
-
-    // Back to the swap step: the remount must not re-check the item.
+    // User goes back to step 2 (e.g. to scan another item) and forward again.
     await page.getByRole("button", { name: "← Zurück" }).click()
     await expect(page.getByText("Schritt 2: Kleidung scannen")).toBeVisible()
+    await checkoutPage.clickWeiter()
+    await expect(page.getByText("Schritt 3: Rückgabe wählen")).toBeVisible()
+
+    // Step 3 remounted: the auto-toggle must not re-check the item.
     await expect(autoChecked).not.toBeChecked()
   })
 
-  test("manual selection of a non-auto-selected item survives navigating away and back", async ({
+  test("manual selection of a non-auto-selected item survives navigating back", async ({
     page,
   }) => {
-    const checkoutPage = new CheckoutPage(page)
+    const checkoutPage = new ClassicCheckoutPage(page)
 
     await checkoutPage.goto()
     await checkoutPage.selectPersonalLocation(lockerWithoutAutoItem)
     await checkoutPage.scanBarcode(scannedBarcode)
+    await checkoutPage.clickWeiter()
 
-    const manuallyChecked = checkoutPage.rueckgabeCheckbox(
-      `${lockerOnlyTypeName} – XXL`,
-    )
+    const manuallyChecked = page.getByRole("checkbox", {
+      name: `${lockerOnlyTypeName} – XXL`,
+    })
     await expect(manuallyChecked).not.toBeChecked()
 
     // User wants to return the item (no type match → not auto-selected).
     await manuallyChecked.click()
     await expect(manuallyChecked).toBeChecked()
 
-    // A return is selected → wash step (step 3). The wash step has no back
-    // button, so return to the swap step via the stepper.
-    await checkoutPage.clickWeiter()
-    await expect(page.getByText("Schritt 3: Wäsche-Ziel wählen")).toBeVisible()
-    await page
-      .getByRole("button", { name: /Zu Schritt 2: Kleidung scannen/ })
-      .click()
+    // User goes back to step 2 and forward again.
+    await page.getByRole("button", { name: "← Zurück" }).click()
     await expect(page.getByText("Schritt 2: Kleidung scannen")).toBeVisible()
+    await checkoutPage.clickWeiter()
+    await expect(page.getByText("Schritt 3: Rückgabe wählen")).toBeVisible()
 
-    // The empty auto-toggle result must not wipe the manual selection.
+    // Step 3 remounted: the empty auto-toggle result must not wipe the
+    // manual selection.
     await expect(manuallyChecked).toBeChecked()
   })
 
   test("dropping a taken item also drops its return suggestion", async ({
     page,
   }) => {
-    const checkoutPage = new CheckoutPage(page)
+    const checkoutPage = new ClassicCheckoutPage(page)
 
     await checkoutPage.goto()
     await checkoutPage.selectPersonalLocation(lockerWithAutoItem)
     await checkoutPage.scanBarcode(scannedBarcode)
     await expect(
-      checkoutPage.ausgabeRow(`${scannedTypeName} – M`),
+      checkoutPage.scannedItem(`${scannedTypeName} – M`),
     ).toBeVisible()
     await checkoutPage.scanBarcode(otherTypeBarcode)
     await expect(
-      checkoutPage.ausgabeRow(`${lockerOnlyTypeName} – S`),
+      checkoutPage.scannedItem(`${lockerOnlyTypeName} – S`),
     ).toBeVisible()
+    await checkoutPage.clickWeiter()
 
-    const suggestedItem = checkoutPage.rueckgabeCheckbox(
-      `${scannedTypeName} – L`,
-    )
-    const otherSuggestedItem = checkoutPage.rueckgabeCheckbox(
-      `${lockerOnlyTypeName} – XL`,
-    )
+    const suggestedItem = page.getByRole("checkbox", {
+      name: `${scannedTypeName} – L`,
+    })
+    const otherSuggestedItem = page.getByRole("checkbox", {
+      name: `${lockerOnlyTypeName} – XL`,
+    })
     await expect(suggestedItem).toBeChecked()
     await expect(otherSuggestedItem).toBeChecked()
 
-    // User removes one of the taken items again: its suggestion drops live.
-    await checkoutPage.removeTake(scannedTypeName)
-    await expect(
-      checkoutPage.ausgabeRow(`${scannedTypeName} – M`),
-    ).not.toBeVisible()
+    // User removes one of the taken items again and re-enters step 3.
+    await page.getByRole("button", { name: "← Zurück" }).click()
+    await page
+      .getByRole("button", { name: `${scannedTypeName} entfernen` })
+      .click()
+    await checkoutPage.clickWeiter()
+    await expect(page.getByText("Schritt 3: Rückgabe wählen")).toBeVisible()
+
+    // Its suggestion is gone, the other suggestion (and take) stays.
     await expect(suggestedItem).not.toBeChecked()
     await expect(otherSuggestedItem).toBeChecked()
-  })
-
-  test("a return can be selected and continued without any take", async ({
-    page,
-  }) => {
-    const checkoutPage = new CheckoutPage(page)
-
-    await checkoutPage.goto()
-    await checkoutPage.selectPersonalLocation(lockerWithoutAutoItem)
-
-    const checkbox = checkoutPage.rueckgabeCheckbox(
-      `${lockerOnlyTypeName} – XXL`,
-    )
-    await checkbox.click()
-    await expect(checkbox).toBeChecked()
-
-    // No takes, but a return → Weiter is enabled and leads to the wash step.
-    await checkoutPage.clickWeiter()
-    await expect(page.getByText("Schritt 3: Wäsche-Ziel wählen")).toBeVisible()
   })
 })

@@ -147,7 +147,7 @@ const initialState: CheckoutWizardState = {
   returnLocationId: null,
 }
 
-export interface UseCheckoutWizardReturn {
+export interface UseClassicCheckoutWizardReturn {
   state: CheckoutWizardState
   selectTarget: (locationId: number) => void
   addItem: (item: ResolvedClothingItem) => void
@@ -163,7 +163,7 @@ export interface UseCheckoutWizardReturn {
   reset: () => void
 }
 
-export function useCheckoutWizard(): UseCheckoutWizardReturn {
+export function useClassicCheckoutWizard(): UseClassicCheckoutWizardReturn {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   return {

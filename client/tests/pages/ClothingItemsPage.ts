@@ -58,6 +58,12 @@ export class ClothingItemsPage {
       name: "Standort (optional)",
     })
     await trigger.click()
+    // Wait until the option list contains the target location before using the
+    // native typeahead: a location created after the locations query was cached
+    // is otherwise silently missed.
+    await this.page
+      .getByRole("option", { name: locationName })
+      .waitFor({ state: "attached" })
     await trigger.pressSequentially(locationName)
     await trigger.press("Enter")
   }

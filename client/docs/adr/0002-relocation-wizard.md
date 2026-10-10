@@ -3,6 +3,7 @@
 
 **Status:** Accepted
 **Date:** 2026-05-05
+**Note (2026-10-10):** Written while Checkout still had its two-phase discrepancy protocol ([server ADR-0002](../../../server/docs/adr/0002-two-phase-checkout.md)); that protocol was removed in #134, and the Checkout discrepancy dialog was later replaced by inline origin badges (ADR-0005). The scanner interface described here has since gained an optional `showItemList` prop.
 
 ## Context
 

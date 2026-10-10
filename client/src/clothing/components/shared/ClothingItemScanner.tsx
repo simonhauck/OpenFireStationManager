@@ -28,6 +28,11 @@ export interface ClothingItemScannerProps {
   onRemoveItem: (itemId: number) => void
   /** Optional render prop for workflow-specific badges/annotations per item row. */
   renderItemBadge?: (item: ResolvedClothingItem) => ReactNode
+  /**
+   * Whether to render the built-in list of resolved items. Set to false when
+   * the parent renders the batch itself (e.g. the combined swap screen).
+   */
+  showItemList?: boolean
 }
 
 /** Barcode scanners typically send all chars within this window (ms). */
@@ -42,6 +47,7 @@ export default function ClothingItemScanner({
   onItemResolved,
   onRemoveItem,
   renderItemBadge,
+  showItemList = true,
 }: ClothingItemScannerProps) {
   const [inputMode, setInputMode] = useState<InputMode>("scanner")
   const [isScanning, setIsScanning] = useState(false)
@@ -200,22 +206,25 @@ export default function ClothingItemScanner({
         />
       </RenderIf>
 
-      {/* Mode switch */}
-      <Button
-        variant="ghost"
-        size="lg"
-        label={
-          inputMode === "scanner"
-            ? "Stattdessen manuell suchen"
-            : "Stattdessen Scanner verwenden"
-        }
-        onClick={() =>
-          setInputMode(inputMode === "scanner" ? "manual" : "scanner")
-        }
-      />
+      {/* Mode switch + barcode guide */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Button
+          variant="ghost"
+          size="lg"
+          label={
+            inputMode === "scanner"
+              ? "Stattdessen manuell suchen"
+              : "Stattdessen Scanner verwenden"
+          }
+          onClick={() =>
+            setInputMode(inputMode === "scanner" ? "manual" : "scanner")
+          }
+        />
+        <BarcodeImagesGallery />
+      </div>
 
       {/* Item list */}
-      <RenderIf when={items.length > 0}>
+      <RenderIf when={showItemList && items.length > 0}>
         <div className="space-y-2">
           <Text as="p" type="label">
             Ausgewählte Kleidung ({items.length})
@@ -245,9 +254,6 @@ export default function ClothingItemScanner({
           </div>
         </div>
       </RenderIf>
-
-      {/* Always-visible barcode location gallery */}
-      <BarcodeImagesGallery />
     </div>
   )
 }
