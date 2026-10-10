@@ -99,6 +99,21 @@ export class ClothingItemsPage {
     return this.page.getByRole("row").filter({ hasText: barcode })
   }
 
+  holderLink(barcode: string, memberName: string) {
+    return this.itemRow(barcode).getByRole("link", {
+      name: memberName,
+      exact: true,
+    })
+  }
+
+  holderEmptyCell(barcode: string) {
+    return this.itemRow(barcode).getByRole("cell", { name: "–", exact: true })
+  }
+
+  async fillSearch(searchTerm: string) {
+    await this.page.getByPlaceholder("Suchen...").fill(searchTerm)
+  }
+
   formErrorAlert() {
     return this.page.getByRole("alert")
   }
