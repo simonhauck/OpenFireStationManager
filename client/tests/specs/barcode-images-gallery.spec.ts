@@ -42,13 +42,19 @@ test.describe("Barcode images gallery", () => {
     await page.close()
   })
 
-  test("shows the types that have barcode images while scanning", async ({
+  test("shows the types that have barcode images in the guide dialog", async ({
     page,
   }) => {
     const checkoutPage = new CheckoutPage(page)
 
     await checkoutPage.goto()
     await checkoutPage.selectPersonalLocation(personalLocationName)
+
+    // The guide is off the main screen: only its trigger is visible.
+    await expect(checkoutPage.barcodeGalleryButton()).toBeVisible()
+    await expect(page.getByTestId("barcode-images-gallery")).not.toBeVisible()
+
+    await checkoutPage.openBarcodeGallery()
 
     const gallery = checkoutPage.barcodeGallery()
     await expect(gallery).toBeVisible()
@@ -60,6 +66,6 @@ test.describe("Barcode images gallery", () => {
     ).not.toBeVisible()
 
     const imageBox = await gallery.locator("img").first().boundingBox()
-    expect(imageBox?.height ?? 0).toBeGreaterThanOrEqual(150)
+    expect(imageBox?.height ?? 0).toBeGreaterThanOrEqual(240)
   })
 })

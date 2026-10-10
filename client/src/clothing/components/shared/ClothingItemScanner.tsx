@@ -206,19 +206,22 @@ export default function ClothingItemScanner({
         />
       </RenderIf>
 
-      {/* Mode switch */}
-      <Button
-        variant="ghost"
-        size="lg"
-        label={
-          inputMode === "scanner"
-            ? "Stattdessen manuell suchen"
-            : "Stattdessen Scanner verwenden"
-        }
-        onClick={() =>
-          setInputMode(inputMode === "scanner" ? "manual" : "scanner")
-        }
-      />
+      {/* Mode switch + barcode guide */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Button
+          variant="ghost"
+          size="lg"
+          label={
+            inputMode === "scanner"
+              ? "Stattdessen manuell suchen"
+              : "Stattdessen Scanner verwenden"
+          }
+          onClick={() =>
+            setInputMode(inputMode === "scanner" ? "manual" : "scanner")
+          }
+        />
+        <BarcodeImagesGallery />
+      </div>
 
       {/* Item list */}
       <RenderIf when={showItemList && items.length > 0}>
@@ -251,9 +254,6 @@ export default function ClothingItemScanner({
           </div>
         </div>
       </RenderIf>
-
-      {/* Always-visible barcode location gallery */}
-      <BarcodeImagesGallery />
     </div>
   )
 }

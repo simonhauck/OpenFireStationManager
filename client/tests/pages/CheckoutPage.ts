@@ -73,9 +73,18 @@ export class CheckoutPage {
       .click()
   }
 
-  /** Always-visible "where do I find the barcode?" gallery on the scanner step. */
+  /** The trigger for the "where do I find the barcode?" dialog. */
+  barcodeGalleryButton() {
+    return this.page.getByRole("button", { name: "Wo finde ich den Barcode?" })
+  }
+
+  /** The "where do I find the barcode?" dialog. */
   barcodeGallery() {
-    return this.page.getByTestId("barcode-images-gallery")
+    return this.page.getByRole("dialog")
+  }
+
+  async openBarcodeGallery() {
+    await this.barcodeGalleryButton().click()
   }
 
   async clickWeiter() {
