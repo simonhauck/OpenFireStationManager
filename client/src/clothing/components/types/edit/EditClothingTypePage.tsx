@@ -67,7 +67,7 @@ function EditClothingTypePageContent() {
   }
 
   if (!Number.isFinite(numericClothingTypeId)) {
-    return <ErrorState message="Ungueltige Kleidungstyp-ID." />
+    return <ErrorState message="Ungültige Kleidungstyp-ID." />
   }
 
   if (isLoading) {
@@ -87,7 +87,7 @@ function EditClothingTypePageContent() {
       onSubmit={handleSubmit}
       isPending={isPending}
       pendingLabel="Wird gespeichert..."
-      submitLabel="Aenderungen speichern"
+      submitLabel="Änderungen speichern"
       errorMessage={
         error ? "Der Kleidungstyp konnte nicht aktualisiert werden." : null
       }

@@ -34,7 +34,7 @@ const ITEM_COLUMN_OPTIONS = [
   { key: "id", label: "ID" },
   { key: "barcode", label: "Barcode" },
   { key: "type", label: "Typ", isAlwaysVisible: true },
-  { key: "size", label: "Groesse" },
+  { key: "size", label: "Größe" },
   { key: "location", label: "Standort" },
   { key: "createdAt", label: "Erstellt am" },
   { key: "actions", label: "Aktionen", isAlwaysVisible: true },
@@ -140,7 +140,7 @@ export default function ClothingItemsTable({
     },
     {
       key: "size",
-      header: "Groesse",
+      header: "Größe",
       width: pixel(96),
       sortable: true,
       resizable: false,
@@ -191,7 +191,7 @@ export default function ClothingItemsTable({
         idKey="id"
         plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
         emptyState={
-          <EmptyState title="Keine Kleidungsstuecke gefunden." isCompact />
+          <EmptyState title="Keine Kleidungsstücke gefunden." isCompact />
         }
       />
     </div>
@@ -219,7 +219,7 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
   return (
     <HStack gap={1} hAlign="end">
       <IconButton
-        label={`Kleidungsstueck ${item.id} bearbeiten`}
+        label={`Kleidungsstück ${item.id} bearbeiten`}
         tooltip="Bearbeiten"
         icon={<Pencil className="size-4" />}
         variant="secondary"
@@ -232,7 +232,7 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
         }}
       />
       <IconButton
-        label={`Kleidungsstueck ${item.id} löschen`}
+        label={`Kleidungsstück ${item.id} löschen`}
         tooltip="Löschen"
         icon={<Trash2 className="size-4" />}
         variant="destructive"
@@ -242,8 +242,8 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
       <AlertDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        title="Kleidungsstueck löschen"
-        description={`Moechten Sie das Kleidungsstueck mit der ID ${item.id} wirklich löschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
+        title="Kleidungsstück löschen"
+        description={`Möchten Sie das Kleidungsstück mit der ID ${item.id} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
         actionLabel="Löschen"
         onAction={handleDelete}
         cancelLabel="Abbrechen"

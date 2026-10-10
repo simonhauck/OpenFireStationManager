@@ -278,7 +278,7 @@ function CsvInputSection({
         <p className="text-sm italic">Beispiel: Schrank A,Hauptgebäude EG</p>
         <TextArea
           label="CSV-Daten"
-          placeholder={"Schrank A,Hauptgebaeude EG\nRegal B\nSpind 3,Umkleide"}
+          placeholder={"Schrank A,Hauptgebäude EG\nRegal B\nSpind 3,Umkleide"}
           rows={8}
           value={value}
           onChange={onChange}

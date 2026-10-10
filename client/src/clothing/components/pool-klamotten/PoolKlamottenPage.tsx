@@ -87,16 +87,16 @@ function PoolKlamottenOverviewCard({
   return (
     <section className="space-y-6">
       <RenderIf when={isLoading}>
-        <LoadingIndicator label="Uebersicht wird geladen..." />
+        <LoadingIndicator label="Übersicht wird geladen..." />
       </RenderIf>
 
       <RenderIf when={isError}>
-        <ErrorState message="Uebersicht konnte nicht geladen werden." />
+        <ErrorState message="Übersicht konnte nicht geladen werden." />
       </RenderIf>
 
       <RenderIf when={!isLoading && !isError && overviewData.length === 0}>
         <Text type="supporting" as="p">
-          Es sind keine Standorte fuer die Anzeige konfiguriert.
+          Es sind keine Standorte für die Anzeige konfiguriert.
         </Text>
       </RenderIf>
 
@@ -235,7 +235,7 @@ function TypeAvailabilityPanel({
           when={!sizeGroups.some((sizeGroup) => sizeGroup.sizes.length > 0)}
         >
           <Text type="supporting" as="span">
-            Keine Kleidungsstuecke vorhanden.
+            Keine Kleidungsstücke vorhanden.
           </Text>
         </RenderIf>
       </div>

@@ -71,7 +71,7 @@ function CreateClothingTypePageContent() {
   return (
     <ClothingTypeForm
       title="Kleidungstyp erstellen"
-      description="Erfassen Sie die Daten fuer einen neuen Kleidungstyp."
+      description="Erfassen Sie die Daten für einen neuen Kleidungstyp."
       name={name}
       onNameChange={setName}
       onSubmit={handleSubmit}
