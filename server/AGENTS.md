@@ -185,23 +185,23 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
     that file: add the `ApiTags` constant *and* register a `Tag()` with a description in the
     `.tags(...)` list. A constant without a registered description yields an undescribed tag.
   - `@Operation(operationId = …, summary = …, description = …)`. **All three are required.**
-    The `operationId` becomes the tool name in MCP clients and must be unique across the whole
-    API; use `verb + Resource` in camelCase (`listClothingItems`, `changeUserPassword`). The
-    `description` is what an LLM reads to decide whether to call the endpoint, so state what it
+    The `operationId` must be unique across the whole API; use `verb + Resource` in camelCase
+    (`listClothingItems`, `changeUserPassword`). The `description` should state what the endpoint
     does, when to prefer a sibling endpoint, and any non-obvious consequence.
   - `@ApiResponse` for the success status and for every **domain-specific** failure (`404`,
     `409`, `422`, and any `400` with a meaning beyond schema validation).
   - `@Parameter(description = …, example = …)` on every path variable and request parameter.
-- Treat `operationId` as **public API**. Renaming one silently renames a tool in every MCP client,
-  and because the TypeScript bindings key off paths rather than ids, nothing in this repo will
-  fail to warn you. Rename only deliberately.
+- Keep `operationId` stable when practical, but rename it deliberately when a clearer name is
+  worth it. A rename reaches MCP clients as a renamed tool (MCP is a secondary consumer — see
+  `docs/adr/0001`), and because the TypeScript bindings key off paths rather than ids, nothing in
+  this repo will fail to warn you.
 - Do **not** hand-write `401`, `403`, `500`, or generic `400` responses, and do not hand-write the
   required-role prose. `OpenApiConfiguration.commonResponsesCustomizer` derives all of them from
   the URL namespace and the `@PreAuthorize` expression, so they cannot drift from what is
   actually enforced. Adding them by hand produces duplicates.
 - Annotate DTO and entity properties with `@field:Schema(description = …, example = …)`. These
-  descriptions become the tool input schema for MCP clients, so an undocumented field is an
-  unusable one. Use `@get:Schema` instead for computed properties declared in the class body
+  descriptions are the contract's documentation (and the MCP tool input schema); an undocumented
+  field is an unusable one. Use `@get:Schema` instead for computed properties declared in the class body
   (for example the `totalCount` values in `ClothingOverview.kt`), where there is no constructor
   parameter to annotate.
 - Model an absent value as **optional**, never as nullable-and-optional. Declare a nullable Kotlin
@@ -303,7 +303,8 @@ The checked-in contract doubles as the tool definition for
 `ofsm-api` in the repo-root `opencode.jsonc`. Each operation becomes one MCP tool: the tool name
 comes from `operationId`, its description from the `@Operation` description, and its input schema
 from the `@Parameter` and `@field:Schema` annotations. Poor annotations therefore degrade the tool
-surface directly — that is the main reason the rules above are strict.
+surface, but the rules above are strict because the annotations are the API documentation shared
+by all consumers — MCP is a secondary consumer (`docs/adr/0001`), not the reason for the rules.
 
 **Authenticating.** The API uses cookies, and the MCP server can only send static headers. Rather
 than a session cookie, use the **remember-me** cookie: it authenticates on its own, is stateless
