@@ -48,6 +48,12 @@ export default function PoolKlamottenPage() {
             href="/pool-clothing/checkout"
           />
           <Button
+            label="Klamotten tauschen (klassisch)"
+            variant="secondary"
+            size="lg"
+            href="/pool-clothing/checkout-classic"
+          />
+          <Button
             label="Klamotten in die Wäsche geben"
             variant="secondary"
             size="lg"
