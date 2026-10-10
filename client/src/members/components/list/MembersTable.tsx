@@ -1,6 +1,5 @@
 import { Badge } from "@astryxdesign/core/Badge"
 import { HStack } from "@astryxdesign/core/HStack"
-import { IconButton } from "@astryxdesign/core/IconButton"
 import {
   pixel,
   proportional,
@@ -12,12 +11,12 @@ import {
   useTableSortableState,
 } from "@astryxdesign/core/Table"
 import { Text } from "@astryxdesign/core/Text"
-import { Link, useNavigate } from "@tanstack/react-router"
-import { Pencil } from "lucide-react"
+import { Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import TableToolbar from "#/components/base/TableToolbar"
 import { formatDate } from "#/lib/date"
+import MemberActions from "#/members/components/list/MemberActions"
 import type { Member } from "#/members/model/member.ts"
 
 interface MembersTableProps {
@@ -38,7 +37,6 @@ export default function MembersTable({
   members,
   locationsByMember,
 }: MembersTableProps) {
-  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState("")
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...MEMBER_COLUMN_KEYS,
@@ -146,25 +144,14 @@ export default function MembersTable({
     {
       key: "actions",
       header: "Aktionen",
-      width: pixel(64),
+      width: pixel(112),
       align: "end",
       resizable: false,
       renderCell: (member) => (
-        <HStack gap={1} hAlign="end">
-          <IconButton
-            label={`Mitglied ${member.name} bearbeiten`}
-            tooltip="Bearbeiten"
-            icon={<Pencil className="size-4" />}
-            variant="secondary"
-            size="lg"
-            onClick={() => {
-              void navigate({
-                to: "/members/$memberId/edit",
-                params: { memberId: String(member.id) },
-              })
-            }}
-          />
-        </HStack>
+        <MemberActions
+          member={member}
+          locations={locationsByMember.get(member.id) ?? []}
+        />
       ),
     },
   ]

@@ -35,6 +35,20 @@ export class MembersPage {
       .click()
   }
 
+  async clickDeleteForMember(name: string) {
+    await this.page
+      .getByRole("button", { name: `Mitglied ${name} löschen` })
+      .click()
+  }
+
+  async confirmDelete() {
+    await this.deleteDialog().getByRole("button", { name: "Löschen" }).click()
+  }
+
+  deleteDialog() {
+    return this.page.getByRole("alertdialog")
+  }
+
   async clickMemberName(name: string) {
     await this.page.getByRole("link", { name, exact: true }).click()
   }
