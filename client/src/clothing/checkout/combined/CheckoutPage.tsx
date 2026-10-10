@@ -382,9 +382,7 @@ function StepSwapContent({
               Keine Kleidung im Spind.
             </Text>
           </RenderIf>
-          <RenderIf
-            when={lockerItems.length > 0 || foreignReturnItems.length > 0}
-          >
+          <RenderIf when={lockerItems.length > 0}>
             <List hasDividers>
               {lockerItems.map((item) => (
                 <CheckboxListItem
@@ -395,17 +393,35 @@ function StepSwapContent({
                   onCheck={() => onToggleReturnItem(item.clothingItem.id)}
                 />
               ))}
-              {foreignReturnItems.map((item) => (
-                <CheckboxListItem
-                  key={item.clothingItem.id}
-                  label={`${item.clothingType.name} – ${item.clothingItem.size}`}
-                  description={item.clothingItem.barcode ?? undefined}
-                  isChecked={true}
-                  onCheck={() => onMoveItemToTake(item)}
-                  endContent={<ItemOriginToken item={item} />}
-                />
-              ))}
             </List>
+          </RenderIf>
+          <RenderIf when={foreignReturnItems.length > 0}>
+            <div className="space-y-2 border-t pt-3">
+              <Text as="p" type="label">
+                Nicht im Spind
+              </Text>
+              <div className="space-y-2">
+                {foreignReturnItems.map((item) => (
+                  <ClothingItemRow
+                    key={item.clothingItem.id}
+                    item={item}
+                    trailing={
+                      <div className="flex items-center gap-2">
+                        <ItemOriginToken item={item} />
+                        <IconButton
+                          variant="ghost"
+                          size="lg"
+                          label={`${item.clothingType.name} zur Ausgabe verschieben`}
+                          tooltip="Zur Ausgabe verschieben"
+                          icon={<ArrowRightLeftIcon className="size-4" />}
+                          onClick={() => onMoveItemToTake(item)}
+                        />
+                      </div>
+                    }
+                  />
+                ))}
+              </div>
+            </div>
           </RenderIf>
         </div>
       </Grid>

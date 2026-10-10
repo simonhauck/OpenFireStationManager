@@ -189,7 +189,7 @@ test.describe("Checkout – items not recorded at the target location", () => {
     await expect(row).toContainText(washLocationName)
   })
 
-  test("Zurückgeben moves the item into the Rückgabe selection", async ({
+  test("the swap action moves the item into the Rückgabe selection", async ({
     page,
   }) => {
     const checkoutPage = new CheckoutPage(page)
@@ -201,13 +201,11 @@ test.describe("Checkout – items not recorded at the target location", () => {
     await checkoutPage.moveToReturn(`${typeName} – L`)
 
     await expect(checkoutPage.ausgabeRow(`${typeName} – L`)).not.toBeVisible()
-    await expect(
-      checkoutPage.rueckgabeCheckbox(`${typeName} – L`),
-    ).toBeChecked()
+    await expect(checkoutPage.rueckgabeRow(`${typeName} – L`)).toBeVisible()
     await expect(checkoutPage.rueckgabeColumn()).toContainText(washLocationName)
   })
 
-  test("unchecking a forced return puts the item back into Ausgabe", async ({
+  test("moving a forced return back puts the item into Ausgabe", async ({
     page,
   }) => {
     const checkoutPage = new CheckoutPage(page)
@@ -217,11 +215,9 @@ test.describe("Checkout – items not recorded at the target location", () => {
 
     await checkoutPage.scanBarcode(barcode)
     await checkoutPage.moveToReturn(`${typeName} – L`)
-    await checkoutPage.rueckgabeCheckbox(`${typeName} – L`).click()
+    await checkoutPage.moveToAusgabe(`${typeName} – L`)
 
     await expect(checkoutPage.ausgabeRow(`${typeName} – L`)).toBeVisible()
-    await expect(
-      checkoutPage.rueckgabeCheckbox(`${typeName} – L`),
-    ).not.toBeVisible()
+    await expect(checkoutPage.rueckgabeRow(`${typeName} – L`)).not.toBeVisible()
   })
 })

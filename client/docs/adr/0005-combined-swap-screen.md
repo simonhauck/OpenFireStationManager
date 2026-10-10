@@ -26,9 +26,9 @@ The user never chooses a scanning phase; the app sorts, and the move actions cor
 
 ### The two columns
 
-- **Ausgabe (left)** — the take list. Rows show an inline origin badge for non-POOL origins (`Standort: …`) or `Kein Standort` when unset, plus a **"Zurückgeben"** action (force return) and the existing remove action.
-- **Rückgabe (right)** — the full contents of the target Standort with a per-row checkbox, exactly the inventory the old return step listed, and any forced returns from the left. Type-match auto-selection (ADR-0001; type only, size ignored) now applies live on the same screen.
-- Unticking a locker row means **keep it** (no movement is recorded). Unticking a forced return puts the item back into Ausgabe. Explicit actions are overrides in the #323 sense: they survive re-reconciliation and remounting.
+- **Ausgabe (left)** — the take list. Rows show an inline origin chip for non-POOL origins (the location name with a map-pin icon) or "Kein Standort" when unset, plus a **swap icon** ("Zur Rückgabe verschieben") and the existing remove action.
+- **Rückgabe (right)** — the full contents of the target Standort with a per-row checkbox, exactly the inventory the old return step listed. Forced returns from the left are kept visually separate below the inventory under a "Nicht im Spind" heading, rendered as bordered rows with their origin chip and the mirrored **swap icon** ("Zur Ausgabe verschieben"). The checkbox therefore always means the same thing — *in the Spind, selected for return* — while the swap icon always means *moves between the columns*. Type-match auto-selection (ADR-0001; type only, size ignored) applies live on the same screen.
+- Unticking a locker row means **keep it** (no movement is recorded). A forced return moves back to Ausgabe via its swap icon. Explicit actions are overrides in the #323 sense: they survive re-reconciliation and remounting.
 - Continue is enabled while either side has content, so a return-only batch can run through the swap flow.
 - Changing the Standort still clears the return selection and overrides; takes survive.
 
@@ -38,17 +38,18 @@ The "Kleidungsstück nicht im Pool" AlertDialog is removed. The recorded locatio
 
 ### Scope
 
-Only the Tauschen flow changes. The return-only routes (`/pool-clothing/return`) keep their current shape, including the any-locker picker. The right column is anchored to the one target Standort; returning an item recorded elsewhere is expressed by scanning it and pressing "Zurückgeben".
+Only the Tauschen flow changes. The return-only routes (`/pool-clothing/return`) keep their current shape, including the any-locker picker. The right column is anchored to the one target Standort; returning an item recorded elsewhere is expressed by scanning it and pressing the swap icon.
 
 ## Consequences
 
--
-
-# 321's ambiguity disappears: there is no phase to misunderstand, and the copy ("die App sortiert automatisch") describes what actually happens.
+- Issue #321's ambiguity disappears: there is no phase to misunderstand, and the copy ("die App sortiert automatisch") describes what actually happens.
 
 - The modal interruption is gone; discrepancy visibility is inline and non-blocking.
+
 - Step 2 is denser than either old step. On narrow screens the columns stack (Astryx `Grid` auto-fit); the tablet layout is two columns.
+
 - The 5-step order revises ADR-0001's 6-step order; ADR-0001's type-match auto-toggle rule still holds and now runs live.
+
 - Return-only operations can drift into the swap flow, making the dedicated return buttons convenience shortcuts rather than the only path.
 
 ## Alternatives rejected
