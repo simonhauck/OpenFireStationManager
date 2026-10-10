@@ -12,8 +12,9 @@ import {
   useTableSortable,
   useTableSortableState,
 } from "@astryxdesign/core/Table"
+import { Text } from "@astryxdesign/core/Text"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useNavigate } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import type { ClothingType } from "#/clothing/model/clothingType"
@@ -21,8 +22,10 @@ import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
+import RenderIf from "#/components/base/RenderIf"
 import TableToolbar from "#/components/base/TableToolbar"
 import { formatDate } from "#/lib/date"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 interface ClothingItemsTableProps {
   items: ClothingItem[]
@@ -36,6 +39,7 @@ const ITEM_COLUMN_OPTIONS = [
   { key: "type", label: "Typ", isAlwaysVisible: true },
   { key: "size", label: "Größe" },
   { key: "location", label: "Standort" },
+  { key: "member", label: "Mitglied" },
   { key: "createdAt", label: "Erstellt am" },
   { key: "actions", label: "Aktionen", isAlwaysVisible: true },
 ]
@@ -51,6 +55,7 @@ export default function ClothingItemsTable({
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...ITEM_COLUMN_KEYS,
   ])
+  const memberName = useMemberNameLookup()
 
   const columnSettings = useTableColumnSettingsState({
     columns: ITEM_COLUMN_OPTIONS,
@@ -71,6 +76,12 @@ export default function ClothingItemsTable({
     [locations],
   )
 
+  const locationMemberIdById = useMemo(
+    () =>
+      new Map(locations.map((location) => [location.id, location.memberId])),
+    [locations],
+  )
+
   const filteredItems = useMemo(() => {
     const terms = searchTerm
       .toLowerCase()
@@ -83,6 +94,11 @@ export default function ClothingItemsTable({
     }
 
     return items.filter((item) => {
+      const owner = memberName(
+        item.locationId != null
+          ? locationMemberIdById.get(item.locationId)
+          : undefined,
+      )
       const haystack = [
         String(item.id),
         item.barcode ?? "-",
@@ -91,6 +107,7 @@ export default function ClothingItemsTable({
         item.locationId != null
           ? (locationNameById.get(item.locationId) ?? "-")
           : "-",
+        owner ?? "",
         formatDate(item.metaData.createdAt) ?? "-",
       ]
         .join(" ")
@@ -98,7 +115,14 @@ export default function ClothingItemsTable({
 
       return terms.every((term) => haystack.includes(term))
     })
-  }, [items, locationNameById, searchTerm, typeNameById])
+  }, [
+    items,
+    locationMemberIdById,
+    locationNameById,
+    memberName,
+    searchTerm,
+    typeNameById,
+  ])
 
   const { sortedData, sortConfig } = useTableSortableState<ClothingItem>({
     data: filteredItems,
@@ -106,6 +130,20 @@ export default function ClothingItemsTable({
     allowUnsortedState: false,
     comparators: {
       id: (a, b) => a.id - b.id,
+      member: (a, b) =>
+        (
+          memberName(
+            a.locationId != null
+              ? locationMemberIdById.get(a.locationId)
+              : undefined,
+          ) ?? ""
+        ).localeCompare(
+          memberName(
+            b.locationId != null
+              ? locationMemberIdById.get(b.locationId)
+              : undefined,
+          ) ?? "",
+        ),
       createdAt: (a, b) =>
         new Date(a.metaData.createdAt).getTime() -
         new Date(b.metaData.createdAt).getTime(),
@@ -155,6 +193,38 @@ export default function ClothingItemsTable({
         item.locationId != null
           ? (locationNameById.get(item.locationId) ?? "-")
           : "-",
+    },
+    {
+      key: "member",
+      header: "Mitglied",
+      width: proportional(1),
+      sortable: true,
+      resizable: false,
+      renderCell: (item) => {
+        const memberId =
+          item.locationId != null
+            ? locationMemberIdById.get(item.locationId)
+            : undefined
+        const owner = memberName(memberId)
+        const hasOwner = memberId !== undefined && owner !== undefined
+
+        return (
+          <>
+            <RenderIf when={hasOwner}>
+              <Link
+                to="/members/$memberId"
+                params={{ memberId: String(memberId) }}
+                className="hover:underline"
+              >
+                {owner}
+              </Link>
+            </RenderIf>
+            <RenderIf when={!hasOwner}>
+              <Text type="supporting">–</Text>
+            </RenderIf>
+          </>
+        )
+      },
     },
     {
       key: "createdAt",
