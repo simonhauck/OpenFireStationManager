@@ -35,13 +35,19 @@ UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creatin
 
 `/pool-clothing` and `/pool-clothing/checkout` are the tablet-facing routes. Both enforce Material-standard minimum tap-target sizes (48 dp / 48 px) through a coarse-pointer theme adaptation that raises control sizes on touch devices. The rest of the app uses the default element sizes because it is operated on desktop by Kleiderwart and Admin users.
 
+### Ausgabe (Issue)
+
+The left column of the combined swap screen: items that will be moved to the chosen PERSONAL Standort. The same word labels the take section of the review step. Counterpart: Rückgabe.
+
 ### Checkout flow
 
-The `/pool-clothing/checkout` route is a single route that runs an internal step machine; it is not a set of sub-routes. Wizard steps in order: pick target PERSONAL → pick items to take → review locker contents and toggle returns (auto-pre-toggled by type match) → if any returns, pick WAESCHE → review screen → submit. There is no source-pool pre-selection; the source is inferred per item from the item's current `locationId`.
+The `/pool-clothing/checkout` route is a single route that runs an internal step machine; it is not a set of sub-routes. Wizard steps in order: pick target PERSONAL → combined Ausgabe/Rückgabe screen → if any returns, pick WAESCHE → review screen → submit (5 steps). There is no source-pool pre-selection; the source is inferred per item from the item's current `locationId`.
+
+The combined screen (ADR-0005) sorts every scanned or selected item automatically: items recorded at the chosen Standort are return candidates and are selected in the right Rückgabe column; everything else goes to the left Ausgabe column. The right column lists the Standort's full contents with a per-item checkbox; items of a taken type are pre-selected (type match, size ignored). Each Ausgabe row has a swap action ("Zur Rückgabe verschieben") to force a return; forced returns appear below the Spind inventory under "Nicht im Spind" as bordered rows with an origin chip and the mirrored swap action ("Zur Ausgabe verschieben"). The recorded location of non-POOL items is shown inline as a chip — there is no confirmation dialog. Unticking a locker row keeps the item; the swap icon moves a forced return back to Ausgabe. Continue is enabled while either column has content, so a return-only batch can run through the swap flow.
 
 The route is reached from a "Klamotten tauschen" button on `/pool-clothing` (top-right of the page); it is also reachable by direct URL. The route itself is `RoleGuard`-ed for the `USER` role.
 
-When the user scans or selects an item that is not at a POOL location, a client-side confirmation dialog is shown before the item is added to the list. This is a purely frontend UX guard — the backend does not validate the source location type and performs no two-phase protocol.
+During a user-feedback trial on the feature branch, the previous wizard remains reachable at `/pool-clothing/checkout-classic` ("Klamotten tauschen (klassisch)"). It runs the original 6-step flow unchanged (separate scan step, return toggles, discrepancy dialog), same `USER` guard. Both routes submit the same `POST /api/clothing/checkouts` and share no state; the classic variant is removed once the trial concludes.
 
 Picker UI scales by cardinality:
 
@@ -50,7 +56,7 @@ Picker UI scales by cardinality:
 
 ### Barcode-Bilder
 
-The always-visible gallery on every scanner screen, showing all `BarcodeImage`s grouped by clothing type under the heading "Wo finde ich den Barcode?". Tapping an image opens it full-screen. Managed by the Kleiderwart on the clothing type create and edit pages; hidden when no type has images. A deliberate trial of showing everything at once — the fallback shape is a horizontally scrollable one-tile-per-type strip.
+The barcode guide on every scanner screen: a "Wo finde ich den Barcode?" button in the scanner's mode-switch row (hidden when no type has an image) opens a dialog showing all `BarcodeImage`s grouped by clothing type at a readable size; tapping an image opens it full-screen. Managed by the Kleiderwart on the clothing type create and edit pages. Replaced the always-visible gallery of #325, which consumed too much scanner space while its tiles stayed too small to recognize.
 
 ### Inventarisierung (Inventory Reconciliation)
 
@@ -63,6 +69,8 @@ The `/pool-clothing/inventory-reconciliation` route is a KLEIDERWART-only wizard
 The `/pool-clothing/relocation` route is a KLEIDERWART-only batch operation for moving items between locations of any type. Reached from an "Umlagerung starten" button on `/pool-clothing`. The route is `RoleGuard`-ed for the `KLEIDERWART` role.
 
 ### Rückgabe (Return)
+
+The word also labels the right column of the combined swap screen (see Checkout flow); this section covers the return-only route.
 
 The `/pool-clothing/return` route handles clothing returns without taking new items. Two variants reached from separate buttons on `/pool-clothing`:
 

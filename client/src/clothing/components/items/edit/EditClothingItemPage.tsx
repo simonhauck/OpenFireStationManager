@@ -20,7 +20,7 @@ export default function EditClothingItemPage() {
   if (!Number.isFinite(numericClothingItemId)) {
     return (
       <div className="px-4 py-12">
-        <ErrorState message="Ungueltige Kleidungsstueck-ID." />
+        <ErrorState message="Ungültige Kleidungsstück-ID." />
       </div>
     )
   }
@@ -28,7 +28,7 @@ export default function EditClothingItemPage() {
   if (isLoading) {
     return (
       <div className="px-4 py-12">
-        <LoadingIndicator label="Kleidungsstueck wird geladen..." />
+        <LoadingIndicator label="Kleidungsstück wird geladen..." />
       </div>
     )
   }
@@ -36,7 +36,7 @@ export default function EditClothingItemPage() {
   if (isError || !clothingItem) {
     return (
       <div className="px-4 py-12">
-        <ErrorState message="Kleidungsstueck konnte nicht geladen werden." />
+        <ErrorState message="Kleidungsstück konnte nicht geladen werden." />
       </div>
     )
   }

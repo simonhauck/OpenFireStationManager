@@ -17,7 +17,7 @@ export class ClothingItemsPage {
 
   async openCreateDropdown() {
     await this.page
-      .getByRole("button", { name: "Neues Kleidungsstueck" })
+      .getByRole("button", { name: "Neues Kleidungsstück" })
       .click()
   }
 
@@ -58,6 +58,12 @@ export class ClothingItemsPage {
       name: "Standort (optional)",
     })
     await trigger.click()
+    // Wait until the option list contains the target location before using the
+    // native typeahead: a location created after the locations query was cached
+    // is otherwise silently missed.
+    await this.page
+      .getByRole("option", { name: locationName })
+      .waitFor({ state: "attached" })
     await trigger.pressSequentially(locationName)
     await trigger.press("Enter")
   }
@@ -75,7 +81,7 @@ export class ClothingItemsPage {
   async clickEditForItem(id: string | number) {
     await this.page
       .getByRole("button", {
-        name: `Kleidungsstueck ${id} bearbeiten`,
+        name: `Kleidungsstück ${id} bearbeiten`,
       })
       .click()
   }
@@ -83,7 +89,7 @@ export class ClothingItemsPage {
   async clickDeleteForItem(id: string | number) {
     await this.page
       .getByRole("button", {
-        name: `Kleidungsstueck ${id} löschen`,
+        name: `Kleidungsstück ${id} löschen`,
       })
       .click()
   }

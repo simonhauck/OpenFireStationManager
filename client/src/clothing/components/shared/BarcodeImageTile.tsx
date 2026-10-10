@@ -9,6 +9,8 @@ type BarcodeImageTileProps = {
   alt: string
   onOpen: () => void
   onRemove?: () => void
+  /** Rendered tile width; defaults to the inline size used on management pages. */
+  width?: number | string
 }
 
 /**
@@ -20,13 +22,14 @@ export default function BarcodeImageTile({
   alt,
   onOpen,
   onRemove,
+  width = 192,
 }: BarcodeImageTileProps) {
   return (
     <ClickableCard
       label={`${alt} vergrößern`}
       onClick={onOpen}
       padding={0}
-      width={192}
+      width={width}
       variant="transparent"
     >
       <div className="relative">

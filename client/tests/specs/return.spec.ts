@@ -99,7 +99,7 @@ test("pool overview shows exchange and return buttons", async ({ page }) => {
   await poolPage.goto()
 
   await expect(
-    page.getByRole("link", { name: "Klamotten tauschen" }),
+    page.getByRole("link", { name: "Klamotten tauschen", exact: true }),
   ).toBeVisible()
   await expect(
     page.getByRole("link", { name: "Klamotten in die Wäsche geben" }),
@@ -113,7 +113,9 @@ test("'Klamotten tauschen' button navigates to checkout", async ({ page }) => {
   const poolPage = new PoolKlamottenPage(page)
   await poolPage.goto()
 
-  await page.getByRole("link", { name: "Klamotten tauschen" }).click()
+  await page
+    .getByRole("link", { name: "Klamotten tauschen", exact: true })
+    .click()
   await page.waitForURL("**/pool-clothing/checkout")
 })
 

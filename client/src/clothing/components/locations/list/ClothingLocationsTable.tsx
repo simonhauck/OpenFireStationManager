@@ -254,7 +254,7 @@ function ClothingLocationActions({ location }: ClothingLocationActionsProps) {
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         title="Standort löschen"
-        description={`Moechten Sie den Standort "${location.name}" wirklich löschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
+        description={`Möchten Sie den Standort "${location.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
         actionLabel="Löschen"
         onAction={handleDelete}
         cancelLabel="Abbrechen"

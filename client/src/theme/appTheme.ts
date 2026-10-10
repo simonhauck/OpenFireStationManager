@@ -41,12 +41,22 @@ export const appTheme = defineTheme({
       "oklch(0.6397 0.172 36.4421)",
       "oklch(0.7859 0.1342 83.6986)",
     ],
-    "--color-error": [
-      "oklch(0.6368 0.2078 25.3313)",
-      "oklch(0.6368 0.2078 25.3313)",
-    ],
+    // Astryx uses this for error text, error borders and focus rings. Dark
+    // mode needs the lighter tone so it stays readable on dark surfaces.
+    "--color-error": ["oklch(0.48 0.2 25.3313)", "oklch(0.8 0.12 25.3313)"],
     "--color-border": ["oklch(0.8452 0 0)", "oklch(0.329 0 0)"],
     "--color-border-emphasized": ["oklch(0.8452 0 0)", "oklch(0.329 0 0)"],
+  },
+  // Solid destructive button treatment (see components.button below). The
+  // neutral theme paints destructive buttons as a red tint, which reads like
+  // a secondary button; a solid red fill with white content is unmistakably
+  // destructive. The red is the app's previous destructive red, a touch
+  // deeper so white text clears 4.5:1.
+  localTokens: {
+    "--color-destructive-solid": "oklch(0.58 0.22 25.3313)",
+    "--color-on-destructive-solid": "oklch(1 0 0)",
+    "--color-destructive-solid-overlay-hover": "oklch(1 0 0 / 0.08)",
+    "--color-destructive-solid-overlay-pressed": "oklch(1 0 0 / 0.16)",
   },
   adaptations: {
     rules: [
@@ -63,6 +73,18 @@ export const appTheme = defineTheme({
     ],
   },
   components: {
+    // Destructive buttons get a solid red fill with white content so they
+    // stand apart from secondary buttons; the neutral theme's tint reads as
+    // neutral. Hover and pressed states wash the fill with white.
+    button: {
+      "variant:destructive": {
+        backgroundColor: "var(--color-destructive-solid)",
+        color: "var(--color-on-destructive-solid)",
+        "--color-overlay-hover": "var(--color-destructive-solid-overlay-hover)",
+        "--color-overlay-pressed":
+          "var(--color-destructive-solid-overlay-pressed)",
+      },
+    },
     // Chips are rounded rectangles, not pills.
     badge: {
       base: {

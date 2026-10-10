@@ -282,6 +282,18 @@ type ClothingItem = components["schemas"]["ClothingItem"]
 
 ---
 
+## Known Upstream Issues
+
+- **`moveTo` / `start` / `cancel` React warnings from sortable tables.** Astryx 0.6.6/0.6.7 (and
+  `facebook/astryx` `main`) spread `useLongPress()`'s full return — including `start`, `moveTo` and
+  `cancel` — onto the `ContextMenu` trigger element
+  (`node_modules/@astryxdesign/core/dist/ContextMenu/ContextMenu.js`, `...longPressHandlers`).
+  `useTableSortable` wraps every sortable header cell in a `ContextMenu`, so any table with sortable
+  columns logs "React does not recognize the `moveTo` prop" and "Invalid values for props `start`,
+  `cancel`" in the dev console. It is dev-only — React strips these warnings in production. Do
+  **not** work around it (no console filters, no stripping `contextMenuActions`) unless explicitly
+  asked; first check whether a newer Astryx version fixes it.
+
 ## Implementation Preferences
 
 - Keep code type-safe; avoid `any`.
