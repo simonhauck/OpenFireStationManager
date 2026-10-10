@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto"
 import { expect, test } from "@playwright/test"
+import { createClothingItem } from "../flows/createClothingItem"
 import { createClothingLocation } from "../flows/createClothingLocation"
 import { createClothingType } from "../flows/createClothingType"
+import { createMember } from "../flows/createMember"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
+import { MemberDetailPage } from "../pages/MemberDetailPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
 
@@ -153,5 +156,59 @@ test.describe("Clothing Items", () => {
     await itemsPage.submitForm()
     await expect(page).toHaveURL(/\/clothing-management\/items$/)
     await expect(itemsPage.itemRow(barcode)).toBeVisible()
+  })
+
+  test("shows the holder of an item and links to the member detail page", async ({
+    page,
+  }) => {
+    const suffix = randomUUID().slice(0, 8)
+    const memberName = `Mitglied-${suffix}`
+    const locationName = `Spind-${suffix}`
+    const barcode = `BC-Holder-${suffix}`
+    const itemsPage = new ClothingItemsPage(page)
+
+    await createMember(page, memberName)
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: locationName,
+      memberName,
+    })
+    await createClothingItem(page, {
+      typeName,
+      size: "L",
+      barcode,
+      locationName,
+    })
+
+    await itemsPage.goto()
+    await expect(itemsPage.holderLink(barcode, memberName)).toBeVisible()
+
+    await itemsPage.fillSearch(memberName)
+    await expect(itemsPage.itemRow(barcode)).toBeVisible()
+
+    await itemsPage.holderLink(barcode, memberName).click()
+    await expect(page).toHaveURL(/\/members\/\d+$/)
+    await expect(new MemberDetailPage(page).heading(memberName)).toBeVisible()
+  })
+
+  test("shows a dash when the item's location has no owner", async ({
+    page,
+  }) => {
+    const suffix = randomUUID().slice(0, 8)
+    const locationName = `Lager-${suffix}`
+    const barcode = `BC-Unassigned-${suffix}`
+    const itemsPage = new ClothingItemsPage(page)
+
+    await createClothingLocation(page, { type: "POOL", name: locationName })
+    await createClothingItem(page, {
+      typeName,
+      size: "M",
+      barcode,
+      locationName,
+    })
+
+    await itemsPage.goto()
+    await expect(itemsPage.itemRow(barcode)).toBeVisible()
+    await expect(itemsPage.holderEmptyCell(barcode)).toBeVisible()
   })
 })

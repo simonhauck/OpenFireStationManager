@@ -23,11 +23,18 @@ import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueri
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
 import { formatDate } from "#/lib/date"
+import MemberName from "#/members/components/shared/MemberName"
+import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 interface ClothingItemsTableProps {
   items: ClothingItem[]
   types: ClothingType[]
   locations: ClothingLocation[]
+}
+
+type ClothingItemRow = ClothingItem & {
+  memberId?: number
+  memberName?: string
 }
 
 const ITEM_COLUMN_OPTIONS = [
@@ -36,6 +43,7 @@ const ITEM_COLUMN_OPTIONS = [
   { key: "type", label: "Typ", isAlwaysVisible: true },
   { key: "size", label: "Größe" },
   { key: "location", label: "Standort" },
+  { key: "member", label: "Mitglied" },
   { key: "createdAt", label: "Erstellt am" },
   { key: "actions", label: "Aktionen", isAlwaysVisible: true },
 ]
@@ -51,13 +59,14 @@ export default function ClothingItemsTable({
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...ITEM_COLUMN_KEYS,
   ])
+  const lookupMemberName = useMemberNameLookup()
 
   const columnSettings = useTableColumnSettingsState({
     columns: ITEM_COLUMN_OPTIONS,
     activeColumnKeys,
     onChangeActiveColumnKeys: (keys) => setActiveColumnKeys([...keys]),
   })
-  const columnSettingsPlugin = useTableColumnSettings<ClothingItem>(
+  const columnSettingsPlugin = useTableColumnSettings<ClothingItemRow>(
     columnSettings.columnSettingsConfig,
   )
 
@@ -71,6 +80,29 @@ export default function ClothingItemsTable({
     [locations],
   )
 
+  const locationMemberIdById = useMemo(
+    () =>
+      new Map(locations.map((location) => [location.id, location.memberId])),
+    [locations],
+  )
+
+  const rows = useMemo<ClothingItemRow[]>(
+    () =>
+      items.map((item) => {
+        const memberId =
+          item.locationId != null
+            ? locationMemberIdById.get(item.locationId)
+            : undefined
+
+        return {
+          ...item,
+          memberId,
+          memberName: lookupMemberName(memberId),
+        }
+      }),
+    [items, locationMemberIdById, lookupMemberName],
+  )
+
   const filteredItems = useMemo(() => {
     const terms = searchTerm
       .toLowerCase()
@@ -79,10 +111,10 @@ export default function ClothingItemsTable({
       .filter((term) => term.length > 0)
 
     if (terms.length === 0) {
-      return items
+      return rows
     }
 
-    return items.filter((item) => {
+    return rows.filter((item) => {
       const haystack = [
         String(item.id),
         item.barcode ?? "-",
@@ -91,6 +123,7 @@ export default function ClothingItemsTable({
         item.locationId != null
           ? (locationNameById.get(item.locationId) ?? "-")
           : "-",
+        item.memberName ?? "",
         formatDate(item.metaData.createdAt) ?? "-",
       ]
         .join(" ")
@@ -98,22 +131,23 @@ export default function ClothingItemsTable({
 
       return terms.every((term) => haystack.includes(term))
     })
-  }, [items, locationNameById, searchTerm, typeNameById])
+  }, [locationNameById, rows, searchTerm, typeNameById])
 
-  const { sortedData, sortConfig } = useTableSortableState<ClothingItem>({
+  const { sortedData, sortConfig } = useTableSortableState<ClothingItemRow>({
     data: filteredItems,
     defaultSort: [{ sortKey: "id", direction: "ascending" }],
     allowUnsortedState: false,
     comparators: {
       id: (a, b) => a.id - b.id,
+      member: (a, b) => (a.memberName ?? "").localeCompare(b.memberName ?? ""),
       createdAt: (a, b) =>
         new Date(a.metaData.createdAt).getTime() -
         new Date(b.metaData.createdAt).getTime(),
     },
   })
-  const sortPlugin = useTableSortable<ClothingItem>(sortConfig)
+  const sortPlugin = useTableSortable<ClothingItemRow>(sortConfig)
 
-  const columns: TableColumn<ClothingItem>[] = [
+  const columns: TableColumn<ClothingItemRow>[] = [
     {
       key: "id",
       header: "ID",
@@ -155,6 +189,16 @@ export default function ClothingItemsTable({
         item.locationId != null
           ? (locationNameById.get(item.locationId) ?? "-")
           : "-",
+    },
+    {
+      key: "member",
+      header: "Mitglied",
+      width: proportional(1),
+      sortable: true,
+      resizable: false,
+      renderCell: (item) => (
+        <MemberName memberId={item.memberId} name={item.memberName} />
+      ),
     },
     {
       key: "createdAt",

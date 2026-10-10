@@ -443,6 +443,10 @@
     line-height: var(--text-display-3-leading);
   }
 
+  .astryx-text[data-color="error"] {
+    color: var(--color-error);
+  }
+
   .astryx-button[data-variant="destructive"] {
     background-color: var(--color-destructive-solid);
     color: var(--color-on-destructive-solid);

@@ -17,6 +17,7 @@ import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import TableToolbar from "#/components/base/TableToolbar"
 import { formatDate } from "#/lib/date"
 import MemberActions from "#/members/components/list/MemberActions"
+import MemberName from "#/members/components/shared/MemberName"
 import type { Member } from "#/members/model/member.ts"
 
 interface MembersTableProps {
@@ -96,13 +97,7 @@ export default function MembersTable({
       sortable: true,
       resizable: false,
       renderCell: (member) => (
-        <Link
-          to="/members/$memberId"
-          params={{ memberId: String(member.id) }}
-          className="hover:underline"
-        >
-          {member.name}
-        </Link>
+        <MemberName memberId={member.id} name={member.name} />
       ),
     },
     {

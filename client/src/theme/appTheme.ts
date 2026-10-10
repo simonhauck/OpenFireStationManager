@@ -101,5 +101,13 @@ export const appTheme = defineTheme({
         color: "var(--color-text-primary)",
       },
     },
+    // `<Text color="error">` for inline error copy (e.g. a failed delete
+    // inside a dialog). Astryx's built-in text colors have no error tone;
+    // this maps one to the theme's --color-error pair.
+    text: {
+      "color:error": {
+        color: "var(--color-error)",
+      },
+    },
   },
 })
