@@ -64,9 +64,12 @@ committed. It has three consumers, so an API change is never finished at the con
    **Nothing in CI checks this**, so a stale binding passes unnoticed.
 3. **The MCP tool surface** — the `ofsm-api` server in `opencode.jsonc` reads the same file, so
    `@Operation` and `@Schema` annotations directly determine how usable the API is to an agent.
+   This is a **secondary** consumer, used sporadically for environment tasks; it does not drive
+   API design (see `docs/adr/0001`).
 
-Because of consumer 3, the SpringDoc annotation rules in `server/AGENTS.md` ("API Design") are
-strict and include a worked example. Follow it rather than improvising a new style.
+Because the annotations are the API documentation shared by all consumers, the SpringDoc
+annotation rules in `server/AGENTS.md` ("API Design") are strict and include a worked example.
+Follow it rather than improvising a new style. MCP ergonomics are not the reason for the rules.
 
 ---
 
