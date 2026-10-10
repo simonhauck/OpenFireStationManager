@@ -40,11 +40,10 @@
     oklch(0.3791 0.1378 265.5222),
     oklch(0.8823 0.0571 254.1284)
   );
-  --destructive: light-dark(
-    oklch(0.6368 0.2078 25.3313),
-    oklch(0.6368 0.2078 25.3313)
-  );
-  --destructive-foreground: light-dark(oklch(1 0 0), oklch(1 0 0));
+  /* Mirrors the theme's --color-error pair (see appTheme.ts) so Tailwind's
+     text-destructive etc. track the same light/dark tones. */
+  --destructive: light-dark(oklch(0.48 0.2 25.3313), oklch(0.8 0.12 25.3313));
+  --destructive-foreground: light-dark(oklch(1 0 0), oklch(0.145 0 0));
   --border: light-dark(oklch(0.8452 0 0), oklch(0.329 0 0));
   --input: light-dark(oklch(0.9 0.0029 264.542), oklch(0.3092 0 0));
   --ring: light-dark(oklch(0.6397 0.172 36.4421), oklch(0.6397 0.172 36.4421));
@@ -128,6 +127,18 @@
    stack and vertical margins apply. */
 p.astryx-text {
   display: block;
+}
+
+/* Astryx's alert dialog stacks its title and description flush: the heading
+   carries no margin and LayoutContent adds no inner rhythm, so the body
+   reads as part of the title. Give the title breathing room so every
+   confirmation dialog keeps its title -> body -> actions structure. The
+   margin lives on the block-level heading: Astryx Text renders inline, where
+   vertical margins do not apply. Scoped to alert dialogs so other
+   LayoutContent users are untouched. Unlayered on purpose: Astryx's reset
+   zeroes margins with :where(), so a layered rule could lose to it. */
+.astryx-alert-dialog .astryx-layout-content > .astryx-heading {
+  margin-block-end: var(--spacing-2);
 }
 
 /* The mobile drawer reuses the TopNav heading slot as its header. Our custom

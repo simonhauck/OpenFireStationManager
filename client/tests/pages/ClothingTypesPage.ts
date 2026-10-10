@@ -29,7 +29,7 @@ export class ClothingTypesPage {
 
   async submitEdit() {
     await this.page
-      .getByRole("button", { name: "Aenderungen speichern" })
+      .getByRole("button", { name: "Änderungen speichern" })
       .click()
   }
 

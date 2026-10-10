@@ -151,7 +151,7 @@ export default function UsersTable({ users }: UsersTableProps) {
       renderCell: (user) => (
         <HStack gap={1} hAlign="end">
           <IconButton
-            label={`Passwort fuer Nutzer ${user.username} ändern`}
+            label={`Passwort für Nutzer ${user.username} ändern`}
             tooltip="Passwort ändern"
             icon={<KeyRound className="size-4" />}
             variant="secondary"

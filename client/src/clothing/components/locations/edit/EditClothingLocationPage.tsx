@@ -27,7 +27,7 @@ function EditClothingLocationPageContent() {
   } = useClothingLocationById(numericLocationId)
 
   if (!Number.isFinite(numericLocationId)) {
-    return <ErrorState message="Ungueltige Standort-ID." />
+    return <ErrorState message="Ungültige Standort-ID." />
   }
 
   if (isLoading) {

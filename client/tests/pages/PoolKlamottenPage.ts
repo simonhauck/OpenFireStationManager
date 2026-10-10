@@ -8,17 +8,17 @@ export class PoolKlamottenPage {
   }
 
   loadingIndicator() {
-    return this.page.getByText("Uebersicht wird geladen...")
+    return this.page.getByText("Übersicht wird geladen...")
   }
 
   emptyState() {
     return this.page.getByText(
-      "Es sind keine Standorte fuer die Anzeige konfiguriert.",
+      "Es sind keine Standorte für die Anzeige konfiguriert.",
     )
   }
 
   errorState() {
-    return this.page.getByText("Uebersicht konnte nicht geladen werden.")
+    return this.page.getByText("Übersicht konnte nicht geladen werden.")
   }
 
   /**

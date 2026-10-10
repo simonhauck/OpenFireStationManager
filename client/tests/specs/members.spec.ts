@@ -321,6 +321,54 @@ test.describe("Members", () => {
     await expect(detailPage.deleteDialog()).toContainText("umgelagert")
   })
 
+  test("deletes a member from the list after warning about affected Standorte and clothing", async ({
+    page,
+  }) => {
+    const suffix = randomUUID().slice(0, 8)
+    const memberName = `Mitglied-${suffix}`
+    const locationName = `Spind-${suffix}`
+    const typeName = `Jacke-${suffix}`
+    const membersPage = new MembersPage(page)
+    const locationsPage = new ClothingLocationsPage(page)
+
+    await createMember(page, memberName)
+    await createClothingLocation(page, {
+      type: "PERSONAL",
+      name: locationName,
+      memberName,
+    })
+    await createClothingType(page, typeName)
+    await createClothingItem(page, {
+      typeName,
+      size: "XXL",
+      barcode: `BC-${suffix}-1`,
+      locationName,
+    })
+    await createClothingItem(page, {
+      typeName,
+      size: "XXL",
+      barcode: `BC-${suffix}-2`,
+      locationName,
+    })
+
+    await membersPage.goto()
+    await membersPage.clickDeleteForMember(memberName)
+
+    await expect(membersPage.deleteDialog()).toContainText("1 Standort")
+    await expect(membersPage.deleteDialog()).toContainText("2 Kleidungsstücke")
+    await expect(membersPage.deleteDialog()).toContainText("umgelagert")
+
+    await membersPage.confirmDelete()
+
+    await expect(membersPage.memberRow(memberName)).not.toBeVisible()
+
+    await locationsPage.goto()
+    await expect(locationsPage.locationRow(locationName)).toBeVisible()
+    await expect(locationsPage.locationRow(locationName)).not.toContainText(
+      memberName,
+    )
+  })
+
   test("shows an empty state for a Standort without clothing", async ({
     page,
   }) => {

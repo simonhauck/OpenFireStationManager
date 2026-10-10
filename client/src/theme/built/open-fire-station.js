@@ -125,7 +125,7 @@ export const openFireStationTheme = {
     "--color-icon-secondary": "light-dark(#6a6a6a, #9e9e9e)",
     "--color-icon-disabled": "light-dark(#919191, #525252)",
     "--color-success": "light-dark(#00490b, #a4d6a3)",
-    "--color-error": "light-dark(oklch(0.6368 0.2078 25.3313), oklch(0.6368 0.2078 25.3313))",
+    "--color-error": "light-dark(oklch(0.48 0.2 25.3313), oklch(0.8 0.12 25.3313))",
     "--color-warning": "light-dark(#4b3900, #f8d36a)",
     "--color-success-muted": "light-dark(#bce0bb, #90ca903D)",
     "--color-error-muted": "light-dark(#ffc4be, #ff98903D)",
@@ -200,7 +200,11 @@ export const openFireStationTheme = {
     "--astryx-theme-neutral-color-on-tint-overlay-hover": "light-dark(#fafafa1A, #0a0a0a1A)",
     "--astryx-theme-neutral-color-on-tint-overlay-pressed": "light-dark(#fafafa33, #0a0a0a33)",
     "--astryx-theme-neutral-color-destructive-overlay-hover": "light-dark(#ff7f770D, #ee736c0D)",
-    "--astryx-theme-neutral-color-destructive-overlay-pressed": "light-dark(#ff7f771A, #ee736c1A)"
+    "--astryx-theme-neutral-color-destructive-overlay-pressed": "light-dark(#ff7f771A, #ee736c1A)",
+    "--color-destructive-solid": "oklch(0.58 0.22 25.3313)",
+    "--color-on-destructive-solid": "oklch(1 0 0)",
+    "--color-destructive-solid-overlay-hover": "oklch(1 0 0 / 0.08)",
+    "--color-destructive-solid-overlay-pressed": "oklch(1 0 0 / 0.16)"
   },
   __localTokenOwners: {
     "--astryx-theme-neutral-color-status-fill-accent": "neutral",
@@ -212,7 +216,11 @@ export const openFireStationTheme = {
     "--astryx-theme-neutral-color-on-tint-overlay-hover": "neutral",
     "--astryx-theme-neutral-color-on-tint-overlay-pressed": "neutral",
     "--astryx-theme-neutral-color-destructive-overlay-hover": "neutral",
-    "--astryx-theme-neutral-color-destructive-overlay-pressed": "neutral"
+    "--astryx-theme-neutral-color-destructive-overlay-pressed": "neutral",
+    "--color-destructive-solid": "open-fire-station",
+    "--color-on-destructive-solid": "open-fire-station",
+    "--color-destructive-solid-overlay-hover": "open-fire-station",
+    "--color-destructive-solid-overlay-pressed": "open-fire-station"
   },
   __localTokenLineage: ["neutral","open-fire-station"],
   components: {
@@ -313,10 +321,10 @@ export const openFireStationTheme = {
     },
     "button": {
       "variant:destructive": {
-        "backgroundColor": "var(--color-error-muted)",
-        "color": "var(--color-error)",
-        "--color-overlay-hover": "var(--astryx-theme-neutral-color-destructive-overlay-hover)",
-        "--color-overlay-pressed": "var(--astryx-theme-neutral-color-destructive-overlay-pressed)"
+        "backgroundColor": "var(--color-destructive-solid)",
+        "color": "var(--color-on-destructive-solid)",
+        "--color-overlay-hover": "var(--color-destructive-solid-overlay-hover)",
+        "--color-overlay-pressed": "var(--color-destructive-solid-overlay-pressed)"
       }
     },
     "badge": {
