@@ -21,6 +21,7 @@ import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueri
 import { deleteClothingLocationMutation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
+import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 const LOCATION_TYPE_LABELS: Record<ClothingLocation["type"], string> = {
@@ -32,6 +33,10 @@ const LOCATION_TYPE_LABELS: Record<ClothingLocation["type"], string> = {
 
 interface ClothingLocationsTableProps {
   locations: ClothingLocation[]
+}
+
+type ClothingLocationRow = ClothingLocation & {
+  memberName?: string
 }
 
 const LOCATION_COLUMN_OPTIONS = [
@@ -54,15 +59,24 @@ export default function ClothingLocationsTable({
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...LOCATION_COLUMN_KEYS,
   ])
-  const memberName = useMemberNameLookup()
+  const lookupMemberName = useMemberNameLookup()
 
   const columnSettings = useTableColumnSettingsState({
     columns: LOCATION_COLUMN_OPTIONS,
     activeColumnKeys,
     onChangeActiveColumnKeys: (keys) => setActiveColumnKeys([...keys]),
   })
-  const columnSettingsPlugin = useTableColumnSettings<ClothingLocation>(
+  const columnSettingsPlugin = useTableColumnSettings<ClothingLocationRow>(
     columnSettings.columnSettingsConfig,
+  )
+
+  const rows = useMemo<ClothingLocationRow[]>(
+    () =>
+      locations.map((location) => ({
+        ...location,
+        memberName: lookupMemberName(location.memberId),
+      })),
+    [locations, lookupMemberName],
   )
 
   const filteredLocations = useMemo(() => {
@@ -73,15 +87,14 @@ export default function ClothingLocationsTable({
       .filter((term) => term.length > 0)
 
     if (terms.length === 0) {
-      return locations
+      return rows
     }
 
-    return locations.filter((location) => {
-      const owner = memberName(location.memberId)
+    return rows.filter((location) => {
       const haystack = [
         String(location.id),
         location.name,
-        owner ?? "",
+        location.memberName ?? "",
         LOCATION_TYPE_LABELS[location.type],
         location.comment,
         location.onlyVisibleForKleiderwart ? "Ja" : "Nein",
@@ -91,29 +104,29 @@ export default function ClothingLocationsTable({
 
       return terms.every((term) => haystack.includes(term))
     })
-  }, [locations, memberName, searchTerm])
+  }, [rows, searchTerm])
 
-  const { sortedData, sortConfig } = useTableSortableState<ClothingLocation>({
-    data: filteredLocations,
-    defaultSort: [{ sortKey: "id", direction: "ascending" }],
-    allowUnsortedState: false,
-    comparators: {
-      id: (a, b) => a.id - b.id,
-      member: (a, b) =>
-        (memberName(a.memberId) ?? a.comment).localeCompare(
-          memberName(b.memberId) ?? b.comment,
-        ),
-      onlyVisibleForKleiderwart: (a, b) =>
-        Number(a.onlyVisibleForKleiderwart) -
-        Number(b.onlyVisibleForKleiderwart),
-      createdAt: (a, b) =>
-        new Date(a.metaData.createdAt).getTime() -
-        new Date(b.metaData.createdAt).getTime(),
+  const { sortedData, sortConfig } = useTableSortableState<ClothingLocationRow>(
+    {
+      data: filteredLocations,
+      defaultSort: [{ sortKey: "id", direction: "ascending" }],
+      allowUnsortedState: false,
+      comparators: {
+        id: (a, b) => a.id - b.id,
+        member: (a, b) =>
+          (a.memberName ?? "").localeCompare(b.memberName ?? ""),
+        onlyVisibleForKleiderwart: (a, b) =>
+          Number(a.onlyVisibleForKleiderwart) -
+          Number(b.onlyVisibleForKleiderwart),
+        createdAt: (a, b) =>
+          new Date(a.metaData.createdAt).getTime() -
+          new Date(b.metaData.createdAt).getTime(),
+      },
     },
-  })
-  const sortPlugin = useTableSortable<ClothingLocation>(sortConfig)
+  )
+  const sortPlugin = useTableSortable<ClothingLocationRow>(sortConfig)
 
-  const columns: TableColumn<ClothingLocation>[] = [
+  const columns: TableColumn<ClothingLocationRow>[] = [
     {
       key: "id",
       header: "ID",
@@ -134,11 +147,9 @@ export default function ClothingLocationsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (location) => {
-        const owner = memberName(location.memberId)
-        if (owner) return owner
-        return location.type === "PERSONAL" ? location.comment || "-" : "-"
-      },
+      renderCell: (location) => (
+        <MemberName memberId={location.memberId} name={location.memberName} />
+      ),
     },
     {
       key: "type",

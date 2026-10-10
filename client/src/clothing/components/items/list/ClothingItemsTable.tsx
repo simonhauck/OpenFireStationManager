@@ -12,9 +12,8 @@ import {
   useTableSortable,
   useTableSortableState,
 } from "@astryxdesign/core/Table"
-import { Text } from "@astryxdesign/core/Text"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import type { ClothingType } from "#/clothing/model/clothingType"
@@ -22,15 +21,20 @@ import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
-import RenderIf from "#/components/base/RenderIf"
 import TableToolbar from "#/components/base/TableToolbar"
 import { formatDate } from "#/lib/date"
+import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 interface ClothingItemsTableProps {
   items: ClothingItem[]
   types: ClothingType[]
   locations: ClothingLocation[]
+}
+
+type ClothingItemRow = ClothingItem & {
+  memberId?: number
+  memberName?: string
 }
 
 const ITEM_COLUMN_OPTIONS = [
@@ -55,14 +59,14 @@ export default function ClothingItemsTable({
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...ITEM_COLUMN_KEYS,
   ])
-  const memberName = useMemberNameLookup()
+  const lookupMemberName = useMemberNameLookup()
 
   const columnSettings = useTableColumnSettingsState({
     columns: ITEM_COLUMN_OPTIONS,
     activeColumnKeys,
     onChangeActiveColumnKeys: (keys) => setActiveColumnKeys([...keys]),
   })
-  const columnSettingsPlugin = useTableColumnSettings<ClothingItem>(
+  const columnSettingsPlugin = useTableColumnSettings<ClothingItemRow>(
     columnSettings.columnSettingsConfig,
   )
 
@@ -82,6 +86,23 @@ export default function ClothingItemsTable({
     [locations],
   )
 
+  const rows = useMemo<ClothingItemRow[]>(
+    () =>
+      items.map((item) => {
+        const memberId =
+          item.locationId != null
+            ? locationMemberIdById.get(item.locationId)
+            : undefined
+
+        return {
+          ...item,
+          memberId,
+          memberName: lookupMemberName(memberId),
+        }
+      }),
+    [items, locationMemberIdById, lookupMemberName],
+  )
+
   const filteredItems = useMemo(() => {
     const terms = searchTerm
       .toLowerCase()
@@ -90,15 +111,10 @@ export default function ClothingItemsTable({
       .filter((term) => term.length > 0)
 
     if (terms.length === 0) {
-      return items
+      return rows
     }
 
-    return items.filter((item) => {
-      const owner = memberName(
-        item.locationId != null
-          ? locationMemberIdById.get(item.locationId)
-          : undefined,
-      )
+    return rows.filter((item) => {
       const haystack = [
         String(item.id),
         item.barcode ?? "-",
@@ -107,7 +123,7 @@ export default function ClothingItemsTable({
         item.locationId != null
           ? (locationNameById.get(item.locationId) ?? "-")
           : "-",
-        owner ?? "",
+        item.memberName ?? "",
         formatDate(item.metaData.createdAt) ?? "-",
       ]
         .join(" ")
@@ -115,43 +131,23 @@ export default function ClothingItemsTable({
 
       return terms.every((term) => haystack.includes(term))
     })
-  }, [
-    items,
-    locationMemberIdById,
-    locationNameById,
-    memberName,
-    searchTerm,
-    typeNameById,
-  ])
+  }, [locationNameById, rows, searchTerm, typeNameById])
 
-  const { sortedData, sortConfig } = useTableSortableState<ClothingItem>({
+  const { sortedData, sortConfig } = useTableSortableState<ClothingItemRow>({
     data: filteredItems,
     defaultSort: [{ sortKey: "id", direction: "ascending" }],
     allowUnsortedState: false,
     comparators: {
       id: (a, b) => a.id - b.id,
-      member: (a, b) =>
-        (
-          memberName(
-            a.locationId != null
-              ? locationMemberIdById.get(a.locationId)
-              : undefined,
-          ) ?? ""
-        ).localeCompare(
-          memberName(
-            b.locationId != null
-              ? locationMemberIdById.get(b.locationId)
-              : undefined,
-          ) ?? "",
-        ),
+      member: (a, b) => (a.memberName ?? "").localeCompare(b.memberName ?? ""),
       createdAt: (a, b) =>
         new Date(a.metaData.createdAt).getTime() -
         new Date(b.metaData.createdAt).getTime(),
     },
   })
-  const sortPlugin = useTableSortable<ClothingItem>(sortConfig)
+  const sortPlugin = useTableSortable<ClothingItemRow>(sortConfig)
 
-  const columns: TableColumn<ClothingItem>[] = [
+  const columns: TableColumn<ClothingItemRow>[] = [
     {
       key: "id",
       header: "ID",
@@ -200,31 +196,9 @@ export default function ClothingItemsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (item) => {
-        const memberId =
-          item.locationId != null
-            ? locationMemberIdById.get(item.locationId)
-            : undefined
-        const owner = memberName(memberId)
-        const hasOwner = memberId !== undefined && owner !== undefined
-
-        return (
-          <>
-            <RenderIf when={hasOwner}>
-              <Link
-                to="/members/$memberId"
-                params={{ memberId: String(memberId) }}
-                className="hover:underline"
-              >
-                {owner}
-              </Link>
-            </RenderIf>
-            <RenderIf when={!hasOwner}>
-              <Text type="supporting">–</Text>
-            </RenderIf>
-          </>
-        )
-      },
+      renderCell: (item) => (
+        <MemberName memberId={item.memberId} name={item.memberName} />
+      ),
     },
     {
       key: "createdAt",

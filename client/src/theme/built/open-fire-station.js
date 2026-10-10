@@ -317,6 +317,9 @@ export const openFireStationTheme = {
         "fontFamily": "var(--font-family-heading)",
         "fontSize": "var(--text-display-3-size)",
         "lineHeight": "var(--text-display-3-leading)"
+      },
+      "color:error": {
+        "color": "var(--color-error)"
       }
     },
     "button": {

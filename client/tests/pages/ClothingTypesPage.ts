@@ -46,21 +46,19 @@ export class ClothingTypesPage {
   }
 
   async confirmDelete() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Löschen" })
-      .click()
+    await this.deleteDialog().getByRole("button", { name: "Löschen" }).click()
   }
 
   async cancelDelete() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Abbrechen" })
-      .click()
+    await this.deleteDialog().getByRole("button", { name: "Abbrechen" }).click()
+  }
+
+  deleteDialog() {
+    return this.page.getByRole("alertdialog")
   }
 
   deleteDialogErrorMessage() {
-    return this.page.getByText(
+    return this.deleteDialog().getByText(
       "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind.",
     )
   }
