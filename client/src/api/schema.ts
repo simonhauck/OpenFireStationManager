@@ -325,9 +325,9 @@ export interface paths {
     }
     /**
      * List every clothing item
-     * @description Returns all clothing items in the station, unfiltered and unpaginated. Each item is returned in its raw form: `typeId` and `locationId` are numeric references, not expanded objects. To get the type and location names alongside each item, use `searchClothingItems` or `getClothingItemByBarcode` instead, which return the resolved form.
+     * @description Returns all clothing items in the station, unfiltered and unpaginated. Each item is returned in its **resolved** form: the full clothing type and the item's current location are embedded, so no follow-up lookups are needed. `location` is null when the item is not assigned anywhere.
      *
-     *     Unlike the search and barcode endpoints, this endpoint does **not** hide items stored in locations flagged `onlyVisibleForKleiderwart`.
+     *     Unlike `searchClothingItems` and `getClothingItemByBarcode`, this endpoint does **not** hide items stored in locations flagged `onlyVisibleForKleiderwart`, matching `listClothingLocations`. Use the search endpoint when the caller should not see restricted locations.
      *
      *     **Authorisation:** any signed-in user.
      */
@@ -2716,7 +2716,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ClothingItem"][]
+          "*/*": components["schemas"]["ResolvedClothingItem"][]
         }
       }
       /** @description Not authenticated — no valid session cookie was supplied. */

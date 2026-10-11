@@ -9,9 +9,10 @@ import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
-import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
-import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
+import {
+  getAllClothingLocationsQuery,
+  getClothingLocationItemsQuery,
+} from "#/clothing/service/clothingLocationsQueries"
 import RenderIf from "#/components/base/RenderIf"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
@@ -30,15 +31,17 @@ export function LockerItemDialog({
   existingItemIds,
   onAddItems,
 }: LockerItemDialogProps) {
-  const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
-  const { data: allItems } = useQuery(getAllClothingItemsQuery())
-  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
-  const memberName = useMemberNameLookup()
-
   const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
     null,
   )
   const [checkedIds, setCheckedIds] = useState<Set<number>>(new Set())
+
+  const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
+  const { data: lockerItems = [] } = useQuery({
+    ...getClothingLocationItemsQuery(selectedLocationId ?? 0),
+    enabled: selectedLocationId !== null,
+  })
+  const memberName = useMemberNameLookup()
 
   // Reset state when dialog opens
   const handleOpenChange = (nextOpen: boolean) => {
@@ -55,18 +58,6 @@ export function LockerItemDialog({
       value: String(l.id),
       label: formatClothingLocationLabel(l, memberName(l.memberId)),
     }))
-
-  // Items at selected PERSONAL location
-  const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
-  const lockerItems: ResolvedClothingItem[] = selectedLocationId
-    ? (allItems ?? [])
-        .filter((i) => i.locationId === selectedLocationId)
-        .flatMap((i) => {
-          const type = typeMap.get(i.typeId)
-          if (!type) return []
-          return [{ clothingItem: i, clothingType: type }]
-        })
-    : []
 
   function toggleCheck(id: number) {
     setCheckedIds((prev) => {

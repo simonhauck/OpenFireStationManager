@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component
 @Component
 class ClothingItemControllerCalls(private val testRestTemplate: TestRestTemplate) {
 
-    fun getAllItems(authCookie: String? = null): ResponseEntity<Array<ClothingItem>> {
-        return testRestTemplate.exchange<Array<ClothingItem>>(
+    fun getAllItems(authCookie: String? = null): ResponseEntity<Array<ResolvedClothingItem>> {
+        return testRestTemplate.exchange<Array<ResolvedClothingItem>>(
             "/api/clothing/items",
             HttpMethod.GET,
             HttpEntity<Unit>(headersWithCookie(authCookie)),

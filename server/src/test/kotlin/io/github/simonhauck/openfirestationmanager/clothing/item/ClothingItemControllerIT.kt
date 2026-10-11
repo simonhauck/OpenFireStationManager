@@ -99,13 +99,18 @@ class ClothingItemControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `getAllItems should include created items`() {
+    fun `getAllItems should include created items with resolved type and location`() {
         val type = createType()
+        val location = createLocation()
         val uniqueSize = "Size-${System.nanoTime()}"
         val created =
             itemCalls
                 .createItem(
-                    CreateOrUpdateClothingItemRequest(typeId = type.id, size = uniqueSize),
+                    CreateOrUpdateClothingItemRequest(
+                        typeId = type.id,
+                        size = uniqueSize,
+                        locationId = AggregateReference.to(location.id),
+                    ),
                     authCookie = validCookieHeader,
                 )
                 .body!!
@@ -113,8 +118,10 @@ class ClothingItemControllerIT : IntegrationTest() {
         val response = itemCalls.getAllItems(authCookie = validCookieHeader)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.map { it.id }).contains(created.id)
-        assertThat(response.body?.map { it.size }).contains(uniqueSize)
+        val resolved = response.body!!.first { it.clothingItem.id == created.id }
+        assertThat(resolved.clothingItem.size).isEqualTo(uniqueSize)
+        assertThat(resolved.clothingType.name).isEqualTo(type.name)
+        assertThat(resolved.location?.id).isEqualTo(location.id)
     }
 
     @Test

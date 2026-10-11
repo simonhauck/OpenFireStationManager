@@ -31,7 +31,6 @@ import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
@@ -345,20 +344,14 @@ function StepItemScannerContent({
 // ─── Step 3: Return Toggles ───────────────────────────────────────────────────
 
 function useLockerItems(targetLocationId: number | null) {
-  const { data: allItems } = useQuery(getAllClothingItemsQuery())
-  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
+  const { data: resolvedItems } = useQuery(getAllClothingItemsQuery())
 
   return useMemo((): ResolvedClothingItem[] => {
-    if (!allItems || !allTypes || targetLocationId === null) return []
-    const typeMap = new Map(allTypes.map((t) => [t.id, t]))
-    return allItems
-      .filter((i) => i.locationId === targetLocationId)
-      .flatMap((i) => {
-        const type = typeMap.get(i.typeId)
-        if (!type) return []
-        return [{ clothingItem: i, clothingType: type }]
-      })
-  }, [allItems, allTypes, targetLocationId])
+    if (!resolvedItems || targetLocationId === null) return []
+    return resolvedItems.filter(
+      (i) => i.clothingItem.locationId === targetLocationId,
+    )
+  }, [resolvedItems, targetLocationId])
 }
 
 interface StepReturnTogglesContentProps {
@@ -498,8 +491,7 @@ function StepReviewContent({
   onSubmitOk,
   onBack,
 }: StepReviewContentProps) {
-  const { data: allItems } = useQuery(getAllClothingItemsQuery())
-  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
+  const { data: resolvedItems } = useQuery(getAllClothingItemsQuery())
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
 
   const queryClient = useQueryClient()
@@ -507,7 +499,6 @@ function StepReviewContent({
   const memberName = useMemberNameLookup()
   const showToast = useToast()
 
-  const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
   const targetLocation =
     state.targetLocationId !== null
@@ -520,11 +511,10 @@ function StepReviewContent({
 
   const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
     (id) => {
-      const raw = (allItems ?? []).find((i) => i.id === id)
-      if (!raw) return []
-      const type = typeMap.get(raw.typeId)
-      if (!type) return []
-      return [{ clothingItem: raw, clothingType: type }]
+      const resolved = (resolvedItems ?? []).find(
+        (i) => i.clothingItem.id === id,
+      )
+      return resolved ? [resolved] : []
     },
   )
 

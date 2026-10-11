@@ -59,3 +59,26 @@ The data volume is small (hundreds of clothing items, tens of locations, tens of
 - **Keep in-memory assembly.** Works and is simple, but the N+1 query pattern scales poorly and `search()` already loads everything into memory anyway — a view eliminates the N+1 without adding complexity.
 - **Materialised view.** Adds refresh management (triggers, cron, or manual refresh) for a dataset that fits in memory. No benefit at current scale.
 - **Spring Data JDBC mapping to the view.** Requires `AggregateReference` fields that the view cannot produce because FK columns in the view are plain values, not references. Would need a new entity class anyway — `JdbcTemplate` is simpler.
+
+## Addendum: `listClothingItems` returns the resolved form (2026-10-11)
+
+### Context
+
+The client reconstructed `ResolvedClothingItem` from three separate queries (`items` + `types` + `locations`) in six places — the items list table, both checkout review steps, the classic locker lookup, the combined checkout hook, and `LockerItemDialog` — building `typeNameById` / `locationNameById` / `locationMemberIdById` maps only to discard them. The view and `resolveAll()` already existed, but `searchClothingItems` requires a non-blank `q` and caps at 50 results, while by-barcode and per-location are single-target. No endpoint returned the resolved form for the full list.
+
+### Decision
+
+- `GET /api/clothing/items` now returns `List<ResolvedClothingItem>` by delegating to `ClothingItemResolver.resolveAll()`. The `operationId` stays `listClothingItems` — operationIds are public API (they are MCP tool names).
+- **No visibility filtering.** The list returns every item, including those held in locations flagged `onlyVisibleForKleiderwart`, exactly as the raw list did before. The filtering lives where it did: `searchClothingItems` and `getClothingItemByBarcode` hide such items from callers without `KLEIDERWART`. The `@Operation` description documents this difference because it is the MCP tool description.
+- Embedding the location adds no new exposure: `listClothingLocations` is already readable by any signed-in user.
+
+### Alternatives Rejected
+
+- **A new `GET /api/clothing/items/resolved`.** Leaves two near-duplicate list endpoints and two ways to ask the same question.
+- **`?expanded=true` on the existing endpoint.** A union response is awkward for the generated TypeScript and the MCP input schema.
+- **Apply `onlyVisibleForKleiderwart` filtering to the list.** Would change the items-page behaviour, which this change deliberately leaves untouched; restricted locations are already visible via `listClothingLocations`.
+
+### Consequences
+
+- `ClothingItemService.getAllItems()` is no longer needed and was removed; the controller depends on `ClothingItemResolver` directly, mirroring `ClothingLocationController`.
+- Pagination and the rendering cost of the full list are explicitly out of scope; a future `q`/page parameter on the same endpoint stays compatible with this change.
