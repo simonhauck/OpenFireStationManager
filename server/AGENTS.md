@@ -218,6 +218,15 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   cookie names and remember-me validity rather than hardcoding them, so the documentation cannot
   contradict `application.yml`. Apply the same instinct to any other configurable fact.
 
+### Test-profile seeding controllers
+
+Test-only seeding endpoints under `/api/test/**` are gated by `app.testing.enabled` and exist
+only to create E2E fixtures. They **are part of the committed OpenAPI contract** (the contract
+integration test boots with the test profile), so they are subject to every SpringDoc rule
+above: a `@Tag(name = ApiTags.TEST)` on the controller, `@Operation` with all three fields, and
+`@Schema` on every DTO property. They call domain services with the same production DTOs the
+real endpoints use, so the seeded data behaves exactly like data created through the UI.
+
 ### Worked example
 
 Copy this shape rather than inventing a new one. Note that `401`, `403`, and `500` are absent
