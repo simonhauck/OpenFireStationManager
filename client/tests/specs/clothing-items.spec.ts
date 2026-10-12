@@ -1,26 +1,44 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingItem } from "../flows/createClothingItem"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
-import { createMember } from "../flows/createMember"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingItem,
+  seedClothingLocation,
+  seedClothingType,
+  seedMember,
+} from "../api/seeding"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
 import { MemberDetailPage } from "../pages/MemberDetailPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
 
 test.describe("Clothing Items", () => {
+  let api: APIRequestContext
+  let typeId: number
   let typeName: string
 
-  test.beforeAll(async ({ browser }) => {
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
-    })
-    typeName = await createClothingType(
-      page,
-      `Test-Typ-Items-${randomUUID().slice(0, 8)}`,
-    )
-    await page.close()
+  test.beforeAll(async () => {
+    typeName = `Test-Typ-Items-${randomUUID().slice(0, 8)}`
+    api = await createSeedRequest()
+    typeId = (await seedClothingType(api, typeName)).id
+  })
+
+  test.afterAll(async () => {
+    await api.dispose()
+  })
+
+  test("creates a new item and shows it in the list", async ({ page }) => {
+    const barcode = `BC-${randomUUID().slice(0, 8)}`
+    const itemsPage = new ClothingItemsPage(page)
+
+    await itemsPage.gotoNew()
+    await itemsPage.selectType(typeName)
+    await itemsPage.fillSize("L")
+    await itemsPage.fillBarcode(barcode)
+    await itemsPage.submitForm()
+
+    await expect(page).toHaveURL(/\/clothing-management\/items$/)
+    await expect(itemsPage.itemRow(barcode)).toBeVisible()
   })
 
   test("shows German error when creating an item with a duplicate barcode", async ({
@@ -48,20 +66,6 @@ test.describe("Clothing Items", () => {
     )
   })
 
-  test("creates a new item and shows it in the list", async ({ page }) => {
-    const barcode = `BC-${randomUUID().slice(0, 8)}`
-    const itemsPage = new ClothingItemsPage(page)
-
-    await itemsPage.gotoNew()
-    await itemsPage.selectType(typeName)
-    await itemsPage.fillSize("L")
-    await itemsPage.fillBarcode(barcode)
-    await itemsPage.submitForm()
-
-    await expect(page).toHaveURL(/\/clothing-management\/items$/)
-    await expect(itemsPage.itemRow(barcode)).toBeVisible()
-  })
-
   test("edits an existing item", async ({ page }) => {
     const barcode = `BC-${randomUUID().slice(0, 8)}`
     const itemsPage = new ClothingItemsPage(page)
@@ -83,83 +87,12 @@ test.describe("Clothing Items", () => {
     await itemsPage.submitForm()
 
     await expect(page).toHaveURL(/\/clothing-management\/items$/)
-    // The barcode should still be visible in the updated row
-    await expect(itemsPage.itemRow(barcode)).toBeVisible()
-  })
-
-  test("deletes an item", async ({ page }) => {
-    const barcode = `BC-${randomUUID().slice(0, 8)}`
-    const itemsPage = new ClothingItemsPage(page)
-
-    await itemsPage.gotoNew()
-    await itemsPage.selectType(typeName)
-    await itemsPage.fillSize("S")
-    await itemsPage.fillBarcode(barcode)
-    await itemsPage.submitForm()
-    await expect(page).toHaveURL(/\/clothing-management\/items$/)
-    await expect(itemsPage.itemRow(barcode)).toBeVisible()
-
-    const row = itemsPage.itemRow(barcode)
-    const idCell = row.getByRole("cell").first()
-    const id = await idCell.textContent()
-
-    if (!id) throw new Error("Expected the item ID cell to contain text")
-    await itemsPage.clickDeleteForItem(id.trim())
-    await itemsPage.confirmDelete()
-
-    await expect(itemsPage.itemRow(barcode)).not.toBeVisible()
-  })
-
-  test("can clear a selected location back to no location", async ({
-    page,
-  }) => {
-    const barcode = `BC-${randomUUID().slice(0, 8)}`
-    const locationName = `Loc-${randomUUID().slice(0, 8)}`
-    const itemsPage = new ClothingItemsPage(page)
-
-    // Create a location to assign
-    await createClothingLocation(page, { type: "POOL", name: locationName })
-
-    // Create an item with the location
-    await itemsPage.gotoNew()
-    await itemsPage.selectType(typeName)
-    await itemsPage.fillSize("M")
-    await itemsPage.fillBarcode(barcode)
-    await itemsPage.selectLocation(locationName)
-    await itemsPage.submitForm()
-    await expect(page).toHaveURL(/\/clothing-management\/items$/)
-
-    // Edit the item and clear the location
-    const row = itemsPage.itemRow(barcode)
-    const idCell = row.getByRole("cell").first()
-    const id = await idCell.textContent()
-
-    if (!id) throw new Error("Expected the item ID cell to contain text")
-    await itemsPage.clickEditForItem(id.trim())
-
-    // The clear button should be visible because a location is selected
-    await expect(
-      page.getByRole("button", { name: "Standort (optional) löschen" }),
-    ).toBeVisible()
-
-    await itemsPage.clearLocation()
-
-    // After clearing, the placeholder "Kein Standort" should be shown
-    await expect(page.getByText("Kein Standort")).toBeVisible()
-
-    // Clear button should be gone
-    await expect(
-      page.getByRole("button", { name: "Standort (optional) löschen" }),
-    ).not.toBeVisible()
-
-    // Submit and verify save succeeds (navigates back to list)
-    await itemsPage.submitForm()
-    await expect(page).toHaveURL(/\/clothing-management\/items$/)
     await expect(itemsPage.itemRow(barcode)).toBeVisible()
   })
 
   test("shows the holder of an item and links to the member detail page", async ({
     page,
+    request,
   }) => {
     const suffix = randomUUID().slice(0, 8)
     const memberName = `Mitglied-${suffix}`
@@ -167,48 +100,24 @@ test.describe("Clothing Items", () => {
     const barcode = `BC-Holder-${suffix}`
     const itemsPage = new ClothingItemsPage(page)
 
-    await createMember(page, memberName)
-    await createClothingLocation(page, {
-      type: "PERSONAL",
+    const member = await seedMember(request, memberName)
+    const location = await seedClothingLocation(request, {
       name: locationName,
-      memberName,
+      type: "PERSONAL",
+      memberId: member.id,
     })
-    await createClothingItem(page, {
-      typeName,
+    await seedClothingItem(request, {
+      typeId,
       size: "L",
       barcode,
-      locationName,
+      locationId: location.id,
     })
 
     await itemsPage.goto()
     await expect(itemsPage.holderLink(barcode, memberName)).toBeVisible()
 
-    await itemsPage.fillSearch(memberName)
-    await expect(itemsPage.itemRow(barcode)).toBeVisible()
-
     await itemsPage.holderLink(barcode, memberName).click()
     await expect(page).toHaveURL(/\/members\/\d+$/)
     await expect(new MemberDetailPage(page).heading(memberName)).toBeVisible()
-  })
-
-  test("shows a dash when the item's location has no owner", async ({
-    page,
-  }) => {
-    const suffix = randomUUID().slice(0, 8)
-    const locationName = `Lager-${suffix}`
-    const barcode = `BC-Unassigned-${suffix}`
-    const itemsPage = new ClothingItemsPage(page)
-
-    await createClothingLocation(page, { type: "POOL", name: locationName })
-    await createClothingItem(page, {
-      typeName,
-      size: "M",
-      barcode,
-      locationName,
-    })
-
-    await itemsPage.goto()
-    await expect(itemsPage.itemRow(barcode)).toBeVisible()
-    await expect(itemsPage.holderEmptyCell(barcode)).toBeVisible()
   })
 })

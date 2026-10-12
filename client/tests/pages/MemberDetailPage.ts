@@ -23,10 +23,6 @@ export class MemberDetailPage {
     return this.locationsSection().getByRole("link", { name, exact: true })
   }
 
-  locationEmptyState() {
-    return this.locationsSection().getByText("Keine Standorte zugewiesen.")
-  }
-
   clothingSection() {
     return this.page.getByTestId("section-Kleidung")
   }
@@ -35,12 +31,6 @@ export class MemberDetailPage {
     return this.clothingSection()
       .getByTestId("clothing-group")
       .filter({ hasText: locationName })
-  }
-
-  clothingEmptyState() {
-    return this.clothingSection().getByText(
-      "Keine Kleidung, da keine Standorte zugewiesen sind.",
-    )
   }
 
   async clickDelete() {

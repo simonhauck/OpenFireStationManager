@@ -51,6 +51,9 @@
   }, {
     "name": "Admin - Legal",
     "description": "Maintaining the Impressum and privacy policy documents. Requires the ADMIN role. Exclude this tag to keep legal-document mutation out of automated tool surfaces."
+  }, {
+    "name": "Test",
+    "description": "Test-only seeding endpoints for end-to-end fixtures. Available only when `app.testing.enabled` is `true` (the test profile); they are absent from the production profile. Each endpoint delegates to the same domain service as its production counterpart, so seeded data behaves exactly like UI-created data."
   } ],
   "paths": {
     "/api/admin/users/{id}/password": {
@@ -312,6 +315,261 @@
             }
           }
         }
+      }
+    },
+    "/api/test/users": {
+      "post": {
+        "tags": [ "Test" ],
+        "summary": "Seed a user account",
+        "description": "Test-only fixture endpoint. Creates a user account through the production user service so the Playwright global setup can create one persona per role. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "seedTestUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created account.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccount"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/api/test/members": {
+      "post": {
+        "tags": [ "Test" ],
+        "summary": "Seed a member",
+        "description": "Test-only fixture endpoint. Creates a member through the same service the production `POST /api/members` uses. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "seedMember",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The newly created member.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/api/test/clothing-types": {
+      "post": {
+        "tags": [ "Test" ],
+        "summary": "Seed a clothing type",
+        "description": "Test-only fixture endpoint. Creates a clothing type through the same service the production `POST /api/clothing/types` uses. Prefer this over driving the create form in a browser. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "seedClothingType",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateClothingTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The newly created type.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingType"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/api/test/clothing-locations": {
+      "post": {
+        "tags": [ "Test" ],
+        "summary": "Seed a clothing location",
+        "description": "Test-only fixture endpoint. Creates a clothing location through the same service the production `POST /api/clothing/locations` uses, including the optional owning member for `PERSONAL` locations. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "seedClothingLocation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClothingLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The newly created location.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingLocation"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/api/test/clothing-items": {
+      "post": {
+        "tags": [ "Test" ],
+        "summary": "Seed a clothing item",
+        "description": "Test-only fixture endpoint. Creates a clothing item through the same service the production `POST /api/clothing/items` uses. When a `locationId` is supplied, the initial-placement movement is recorded exactly as the production endpoint does. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "seedClothingItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateClothingItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The newly created item.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClothingItem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
       }
     },
     "/api/public/setup/initial-admin": {
@@ -4056,63 +4314,49 @@
         },
         "required": [ "address", "contactEmail", "name" ]
       },
-      "InitialAdminSetupRequest": {
+      "CreateUserRequest": {
         "type": "object",
-        "description": "Details of the very first administrator account.",
+        "description": "Details of a new user account, including its initial password.",
         "properties": {
           "username": {
             "type": "string",
-            "description": "Username for the new administrator.",
-            "example": "admin",
+            "description": "Login name. Must not already be taken.",
+            "example": "m.mustermann",
             "minLength": 1
           },
           "password": {
             "type": "string",
-            "description": "Plaintext password. Between 4 and 32 characters.",
+            "description": "Initial plaintext password, between 4 and 32 characters. Stored hashed.",
             "example": "correct-horse",
             "maxLength": 32,
             "minLength": 4
           },
           "firstName": {
             "type": "string",
-            "description": "Given name of the administrator.",
+            "description": "Given name.",
             "example": "Max",
             "maxLength": 100,
             "minLength": 0
           },
           "lastName": {
             "type": "string",
-            "description": "Family name of the administrator.",
+            "description": "Family name.",
             "example": "Mustermann",
             "maxLength": 100,
             "minLength": 0
+          },
+          "roles": {
+            "type": "array",
+            "description": "Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.",
+            "example": [ "USER" ],
+            "items": {
+              "type": "string",
+              "description": "\n        What an account is allowed to do. Roles are cumulative in effect, not exclusive:\n\n        - `USER` — read clothing data, and check garments out and back in.\n        - `KLEIDERWART` — the quartermaster. Additionally create, update, and delete clothing\n          types, items, and locations, run relocations and stock-takes, and see locations\n          flagged `onlyVisibleForKleiderwart`.\n        - `ADMIN` — implicitly granted every other role, so an admin can call every endpoint in\n          this API. Additionally manages user accounts and legal documents.\n        ",
+              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
+            }
           }
         },
-        "required": [ "firstName", "lastName", "password", "username" ]
-      },
-      "LoginRequest": {
-        "type": "object",
-        "description": "Credentials for starting a session.",
-        "properties": {
-          "username": {
-            "type": "string",
-            "description": "The account's username.",
-            "example": "m.mustermann",
-            "minLength": 1
-          },
-          "password": {
-            "type": "string",
-            "description": "The account's plaintext password.",
-            "example": "correct-horse",
-            "minLength": 1
-          },
-          "rememberMe": {
-            "type": "boolean",
-            "description": "When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.",
-            "example": false
-          }
-        },
-        "required": [ "password", "rememberMe", "username" ]
+        "required": [ "firstName", "lastName", "password", "roles", "username" ]
       },
       "CreateOrUpdateMemberRequest": {
         "type": "object",
@@ -4183,91 +4427,6 @@
           }
         },
         "required": [ "id", "metaData", "name" ]
-      },
-      "ClothingTypeImageMetadata": {
-        "type": "object",
-        "description": "Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`.",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Server-assigned identifier of the image.",
-            "example": 12
-          },
-          "contentType": {
-            "type": "string",
-            "description": "MIME type of the stored image — one of `image/jpeg`, `image/png`, or `image/webp`.",
-            "example": "image/jpeg"
-          },
-          "fileSize": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Size of the image in bytes.",
-            "example": 182734
-          }
-        },
-        "required": [ "contentType", "fileSize", "id" ]
-      },
-      "RelocationRequest": {
-        "type": "object",
-        "description": "A bulk move of garments into one destination, regardless of where each of them is now.",
-        "properties": {
-          "targetLocationId": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Id of the location every listed garment is moved into. Any location type is accepted — unlike checkout, relocation places no restriction on the destination.",
-            "example": 7
-          },
-          "itemIds": {
-            "type": "array",
-            "description": "Ids of the garments to move. Must contain at least one entry. If any id is unknown the whole request fails and nothing is moved.",
-            "example": [ 41, 42, 43 ],
-            "items": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "minItems": 1
-          }
-        },
-        "required": [ "itemIds", "targetLocationId" ]
-      },
-      "ClothingItem": {
-        "type": "object",
-        "description": "One physical garment. `typeId` and `locationId` are numeric references, not embedded objects; see `ResolvedClothingItem` for the form that includes them in full.",
-        "properties": {
-          "typeId": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Id of the clothing type this garment belongs to.",
-            "example": 3
-          },
-          "size": {
-            "type": "string",
-            "description": "Size label as printed on the garment.",
-            "example": "52"
-          },
-          "barcode": {
-            "type": "string",
-            "description": "Barcode printed on the garment, unique across all items. Null if untagged.",
-            "example": "1234567890128"
-          },
-          "locationId": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Id of the location holding this garment. Null when unassigned.",
-            "example": 7
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Server-assigned identifier.",
-            "example": 42
-          },
-          "metaData": {
-            "$ref": "#/components/schemas/EntityMetaData"
-          }
-        },
-        "required": [ "id", "metaData", "size", "typeId" ]
       },
       "CreateClothingLocationRequest": {
         "type": "object",
@@ -4347,21 +4506,6 @@
         },
         "required": [ "comment", "id", "metaData", "name", "onlyVisibleForKleiderwart", "type" ]
       },
-      "BatchCreateClothingLocationsRequest": {
-        "type": "object",
-        "description": "A set of clothing locations to create together in a single request.",
-        "properties": {
-          "items": {
-            "type": "array",
-            "description": "Locations to create. Must contain at least one entry, and every entry is validated individually.",
-            "items": {
-              "$ref": "#/components/schemas/CreateClothingLocationRequest"
-            },
-            "minItems": 1
-          }
-        },
-        "required": [ "items" ]
-      },
       "CreateOrUpdateClothingItemRequest": {
         "type": "object",
         "description": "Full set of properties for a clothing item. Used for both creation and replacement; on update every field is applied, so omitted optional fields are cleared.",
@@ -4394,6 +4538,164 @@
           }
         },
         "required": [ "size", "typeId" ]
+      },
+      "ClothingItem": {
+        "type": "object",
+        "description": "One physical garment. `typeId` and `locationId` are numeric references, not embedded objects; see `ResolvedClothingItem` for the form that includes them in full.",
+        "properties": {
+          "typeId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Id of the clothing type this garment belongs to.",
+            "example": 3
+          },
+          "size": {
+            "type": "string",
+            "description": "Size label as printed on the garment.",
+            "example": "52"
+          },
+          "barcode": {
+            "type": "string",
+            "description": "Barcode printed on the garment, unique across all items. Null if untagged.",
+            "example": "1234567890128"
+          },
+          "locationId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Id of the location holding this garment. Null when unassigned.",
+            "example": 7
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Server-assigned identifier.",
+            "example": 42
+          },
+          "metaData": {
+            "$ref": "#/components/schemas/EntityMetaData"
+          }
+        },
+        "required": [ "id", "metaData", "size", "typeId" ]
+      },
+      "InitialAdminSetupRequest": {
+        "type": "object",
+        "description": "Details of the very first administrator account.",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username for the new administrator.",
+            "example": "admin",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "Plaintext password. Between 4 and 32 characters.",
+            "example": "correct-horse",
+            "maxLength": 32,
+            "minLength": 4
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Given name of the administrator.",
+            "example": "Max",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Family name of the administrator.",
+            "example": "Mustermann",
+            "maxLength": 100,
+            "minLength": 0
+          }
+        },
+        "required": [ "firstName", "lastName", "password", "username" ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "description": "Credentials for starting a session.",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "The account's username.",
+            "example": "m.mustermann",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "The account's plaintext password.",
+            "example": "correct-horse",
+            "minLength": 1
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.",
+            "example": false
+          }
+        },
+        "required": [ "password", "rememberMe", "username" ]
+      },
+      "ClothingTypeImageMetadata": {
+        "type": "object",
+        "description": "Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Server-assigned identifier of the image.",
+            "example": 12
+          },
+          "contentType": {
+            "type": "string",
+            "description": "MIME type of the stored image — one of `image/jpeg`, `image/png`, or `image/webp`.",
+            "example": "image/jpeg"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Size of the image in bytes.",
+            "example": 182734
+          }
+        },
+        "required": [ "contentType", "fileSize", "id" ]
+      },
+      "RelocationRequest": {
+        "type": "object",
+        "description": "A bulk move of garments into one destination, regardless of where each of them is now.",
+        "properties": {
+          "targetLocationId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Id of the location every listed garment is moved into. Any location type is accepted — unlike checkout, relocation places no restriction on the destination.",
+            "example": 7
+          },
+          "itemIds": {
+            "type": "array",
+            "description": "Ids of the garments to move. Must contain at least one entry. If any id is unknown the whole request fails and nothing is moved.",
+            "example": [ 41, 42, 43 ],
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [ "itemIds", "targetLocationId" ]
+      },
+      "BatchCreateClothingLocationsRequest": {
+        "type": "object",
+        "description": "A set of clothing locations to create together in a single request.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Locations to create. Must contain at least one entry, and every entry is validated individually.",
+            "items": {
+              "$ref": "#/components/schemas/CreateClothingLocationRequest"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [ "items" ]
       },
       "BatchCreateClothingItemsRequest": {
         "type": "object",
@@ -4551,50 +4853,6 @@
           }
         },
         "required": [ "batchId" ]
-      },
-      "CreateUserRequest": {
-        "type": "object",
-        "description": "Details of a new user account, including its initial password.",
-        "properties": {
-          "username": {
-            "type": "string",
-            "description": "Login name. Must not already be taken.",
-            "example": "m.mustermann",
-            "minLength": 1
-          },
-          "password": {
-            "type": "string",
-            "description": "Initial plaintext password, between 4 and 32 characters. Stored hashed.",
-            "example": "correct-horse",
-            "maxLength": 32,
-            "minLength": 4
-          },
-          "firstName": {
-            "type": "string",
-            "description": "Given name.",
-            "example": "Max",
-            "maxLength": 100,
-            "minLength": 0
-          },
-          "lastName": {
-            "type": "string",
-            "description": "Family name.",
-            "example": "Mustermann",
-            "maxLength": 100,
-            "minLength": 0
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.",
-            "example": [ "USER" ],
-            "items": {
-              "type": "string",
-              "description": "\n        What an account is allowed to do. Roles are cumulative in effect, not exclusive:\n\n        - `USER` — read clothing data, and check garments out and back in.\n        - `KLEIDERWART` — the quartermaster. Additionally create, update, and delete clothing\n          types, items, and locations, run relocations and stock-takes, and see locations\n          flagged `onlyVisibleForKleiderwart`.\n        - `ADMIN` — implicitly granted every other role, so an admin can call every endpoint in\n          this API. Additionally manages user accounts and legal documents.\n        ",
-              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
-            }
-          }
-        },
-        "required": [ "firstName", "lastName", "password", "roles", "username" ]
       },
       "PrivacyPolicyMetadata": {
         "type": "object",

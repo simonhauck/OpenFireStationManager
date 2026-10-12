@@ -49,13 +49,43 @@ All commands below are run from the `client/` directory.
 
 ## Testing Strategy
 
-Frontend testing is done **primarily with Playwright** (end-to-end / integration tests).
+The frontend test layers are defined by **ADR-0007**. Pick the cheapest layer that can express
+the behaviour:
 
-- Write Playwright tests for all user-facing features and flows.
-- Prefer Playwright tests over unit tests for UI behaviour; unit tests are reserved for pure
-  utility functions and logic that is hard to exercise through the browser.
-- Playwright tests live under `tests/` and are configured via `playwright.config.ts`.
-- Run Playwright tests with `npm run test:e2e` (or `npm run test:e2e:ui` for interactive UI mode).
+1. **Unit (`vitest`, node)** — pure logic: reducers, wizard step machines, parsers, formatters,
+   comparators, and derived state. This is the default home for behaviour.
+2. **Component (`vitest` + jsdom + Testing Library)** — a **fallback** for rendering-only
+   concerns: conditional rendering, dialog visibility, empty/error states, and prop-driven
+   markup. Not for workflows or navigation.
+3. **E2E (`Playwright`)** — **exactly one happy-path test per user workflow**, plus all
+   browser-boundary behaviour: auth/session/cookies, redirects/history, scanner input, file
+   upload, and real API round-trips.
+
+Run unit/component tests with `npm run test`; run E2E with `npm run test:e2e` (or
+`npm run test:e2e:ui` for interactive UI mode).
+
+### E2E structure rules
+
+- **One test = one workflow.** A spec covers a single user journey end to end.
+- **No chaining.** Do not sequence independent workflows inside one test to save setup.
+- **One happy path per workflow.** Assert a workflow's happy path exactly once across the suite.
+- **No full-workflow re-runs to assert a variation.** Rendering, state and branch variations
+  belong in unit/component tests. Length is a smell: if a spec grows past its one journey, it is
+  hiding tests that belong in a lower layer.
+
+### Seeding rule
+
+Preconditions **seed through the `/api/test` endpoints**, never by re-driving a covered UI
+workflow. The test-profile controllers call domain services with production DTOs, are part of
+the committed OpenAPI contract under the `Test` tag, and are called from Playwright with the
+generated types via the helpers in `tests/api/`. Seed helpers use a plain request context — no
+browser.
+
+### Disposition rule
+
+Every removed E2E test is either **moved to a unit/component test**, **already covered by a
+server integration test**, or **consciously dropped and named**. Record the disposition when
+removing a test; never delete silently.
 
 ### Infrastructure
 
@@ -63,22 +93,21 @@ Playwright starts both the backend and the Vite dev server via `webServer` in
 `playwright.config.ts`. Both use `reuseExistingServer: true`, so if you already have them
 running locally Playwright will not start a second copy.
 
-The backend is started with `SPRING_PROFILES_ACTIVE=test`, which enables the
-`POST /api/test/users` endpoint used by global setup to create test personas. This endpoint
-does **not** exist in the production profile.
+The backend is started with `SPRING_PROFILES_ACTIVE=test`, which enables the `/api/test/**`
+endpoints used to create test personas and seed fixtures. These endpoints do **not** exist in
+the production profile.
 
 ### Folder structure
 
 ```text
 tests/
 ├── global-setup.ts     ← creates personas, saves auth state to playwright/.auth/
+├── api/                ← `/api/test` seeding helpers (generated types, no browser)
 ├── pages/              ← page objects (one per route/feature)
-└── flows/              ← reusable multi-step sequences used as test preconditions
+└── specs/              ← Playwright specs, `<feature>.spec.ts`
 playwright.config.ts
 playwright/.auth/       ← gitignored session state files written by global-setup
 ```
-
-Specs live under `tests/specs/` and follow the naming convention `<feature>.spec.ts`.
 
 ### Authentication
 
@@ -116,28 +145,22 @@ await expect(typesPage.typeRow(name)).toBeVisible()
 await typesPage.assertTypeVisible(name)
 ```
 
-### Flow helpers
+### Seeding helpers
 
-Reusable multi-step sequences that set up preconditions live in `tests/flows/`. A flow
-composes one or more page objects to perform a complete sub-task (e.g. create a clothing
-type) and leaves the page in a known state (typically the list page after a successful
-create).
-
-Use flows inside `test.beforeAll` or at the start of a test to establish the data a test
-depends on — never to perform the action being tested.
+Preconditions live in `tests/api/` as thin helpers over the `/api/test` endpoints. A helper
+takes a seeded value (e.g. a clothing type name), calls the test endpoint with a plain
+`request` context, and returns the created resource. Use them inside `test.beforeAll` or at
+the start of a test to establish data — never to perform the action being tested, and never
+by driving the corresponding create form.
 
 ```ts
-// ✅ correct — flow used as precondition, spec tests the real behaviour
-test.beforeAll(async ({ browser }) => {
-  const page = await browser.newPage({
-    storageState: "playwright/.auth/kleiderwart.json",
-  })
-  typeName = await createClothingType(page, `Typ-${randomUUID().slice(0, 8)}`)
-  await page.close()
+// ✅ correct — seeds via /api/test, spec tests the real behaviour
+test.beforeAll(async ({ request }) => {
+  type = await seedClothingType(request, `Typ-${randomUUID().slice(0, 8)}`)
 })
 
 test("creates an item of that type", async ({ page }) => {
-  // ... uses typeName as a precondition, not the thing under test
+  // ... uses type as a precondition, not the thing under test
 })
 ```
 
@@ -147,12 +170,12 @@ Tests share a database with manual testing and with each other. To stay safe:
 
 - Use `randomUUID().slice(0, 8)` suffixes for all names and barcodes created in tests.
 - Never rely on a clean database; never delete data after a test.
-- Never hardcode IDs; look up the ID from the rendered UI if needed.
+- Never hardcode IDs; use the id returned by a seeding helper, or look it up from the UI.
 
 ### Scope
 
-Focus on **main user flows** — happy-path end-to-end coverage of each feature. Do not test
-every invariant or validation edge case through Playwright; those belong in unit tests.
+See `docs/adr/0007-frontend-test-layers.md`. E2E covers one happy path per workflow plus
+browser-boundary behaviour; everything else belongs in unit or component tests.
 
 ---
 

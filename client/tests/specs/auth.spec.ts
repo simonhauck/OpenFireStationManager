@@ -39,14 +39,6 @@ test.describe("Auth – redirect after login", () => {
     await expect(page).toHaveURL(/\/login/)
   })
 
-  test("login URL contains the original protected route as redirect param", async ({
-    page,
-  }) => {
-    await page.goto(protectedRoute)
-    await expect(page).toHaveURL(/redirect=/)
-    await expect(page).toHaveURL(/pool-clothing/)
-  })
-
   test("after login the user is redirected back to the originally requested page", async ({
     page,
   }) => {

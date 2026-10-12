@@ -9,6 +9,7 @@ import ErrorState from "#/components/base/ErrorState"
 import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
+import ImpressumDetails from "#/legal/impressum/components/ImpressumDetails"
 import ImpressumDialog from "#/legal/impressum/components/ImpressumDialog"
 import {
   deleteImpressumMutation,
@@ -61,16 +62,7 @@ export default function ImpressumSection() {
               data-testid="impressum-current"
               className="border-border bg-card flex flex-wrap items-start justify-between gap-3 rounded-md border px-3 py-2"
             >
-              <div className="flex flex-col gap-1">
-                <Text weight="medium">{impressum?.name}</Text>
-                <Text type="supporting" className="whitespace-pre-line">
-                  {impressum?.address}
-                </Text>
-                <Text type="supporting">{impressum?.contactEmail}</Text>
-                <RenderIf when={!!impressum?.phone}>
-                  <Text type="supporting">{impressum?.phone}</Text>
-                </RenderIf>
-              </div>
+              <ImpressumDetails impressum={impressum} />
               <div className="flex gap-2">
                 <Button
                   label="Bearbeiten"

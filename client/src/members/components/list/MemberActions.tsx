@@ -8,6 +8,7 @@ import { useState } from "react"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import { getClothingLocationItemsQuery } from "#/clothing/service/clothingLocationsQueries"
 import type { Member } from "#/members/model/member.ts"
+import { formatCount } from "#/members/model/memberFilters.ts"
 import { deleteMemberMutation } from "#/members/service/memberQueries"
 
 interface MemberActionsProps {
@@ -94,8 +95,4 @@ export default function MemberActions({
       />
     </HStack>
   )
-}
-
-function formatCount(count: number, singular: string, plural: string): string {
-  return `${count} ${count === 1 ? singular : plural}`
 }

@@ -25,10 +25,6 @@ export class MembersPage {
     await this.page.getByRole("button", { name: "Speichern" }).click()
   }
 
-  async confirmDuplicate() {
-    await this.page.getByRole("button", { name: "Trotzdem erstellen" }).click()
-  }
-
   async clickEditForMember(name: string) {
     await this.page
       .getByRole("button", { name: `Mitglied ${name} bearbeiten` })
@@ -53,14 +49,6 @@ export class MembersPage {
     await this.page.getByRole("link", { name, exact: true }).click()
   }
 
-  async fillSearch(searchTerm: string) {
-    await this.page.getByPlaceholder("Mitglieder suchen...").fill(searchTerm)
-  }
-
-  duplicateWarning() {
-    return this.page.getByRole("alertdialog")
-  }
-
   memberRow(name: string) {
     return this.page.getByRole("row").filter({ hasText: name })
   }
@@ -70,9 +58,5 @@ export class MembersPage {
       name: locationName,
       exact: true,
     })
-  }
-
-  locationsCell(memberName: string) {
-    return this.memberRow(memberName).getByRole("cell").nth(1)
   }
 }

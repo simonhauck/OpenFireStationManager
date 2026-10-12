@@ -66,6 +66,116 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/test/users": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a user account
+     * @description Test-only fixture endpoint. Creates a user account through the production user service so the Playwright global setup can create one persona per role. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedTestUser"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/test/members": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a member
+     * @description Test-only fixture endpoint. Creates a member through the same service the production `POST /api/members` uses. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedMember"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/test/clothing-types": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a clothing type
+     * @description Test-only fixture endpoint. Creates a clothing type through the same service the production `POST /api/clothing/types` uses. Prefer this over driving the create form in a browser. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedClothingType"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/test/clothing-locations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a clothing location
+     * @description Test-only fixture endpoint. Creates a clothing location through the same service the production `POST /api/clothing/locations` uses, including the optional owning member for `PERSONAL` locations. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedClothingLocation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/test/clothing-items": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a clothing item
+     * @description Test-only fixture endpoint. Creates a clothing item through the same service the production `POST /api/clothing/items` uses. When a `locationId` is supplied, the initial-placement movement is recorded exactly as the production endpoint does. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedClothingItem"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/public/setup/initial-admin": {
     parameters: {
       query?: never
@@ -1183,46 +1293,35 @@ export interface components {
        */
       phone?: string
     }
-    /** @description Details of the very first administrator account. */
-    InitialAdminSetupRequest: {
+    /** @description Details of a new user account, including its initial password. */
+    CreateUserRequest: {
       /**
-       * @description Username for the new administrator.
-       * @example admin
-       */
-      username: string
-      /**
-       * @description Plaintext password. Between 4 and 32 characters.
-       * @example correct-horse
-       */
-      password: string
-      /**
-       * @description Given name of the administrator.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name of the administrator.
-       * @example Mustermann
-       */
-      lastName: string
-    }
-    /** @description Credentials for starting a session. */
-    LoginRequest: {
-      /**
-       * @description The account's username.
+       * @description Login name. Must not already be taken.
        * @example m.mustermann
        */
       username: string
       /**
-       * @description The account's plaintext password.
+       * @description Initial plaintext password, between 4 and 32 characters. Stored hashed.
        * @example correct-horse
        */
       password: string
       /**
-       * @description When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.
-       * @example false
+       * @description Given name.
+       * @example Max
        */
-      rememberMe: boolean
+      firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
+      lastName: string
+      /**
+       * @description Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.
+       * @example [
+       *       "USER"
+       *     ]
+       */
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
     /** @description The details of a member. Used for both creation and update. */
     CreateOrUpdateMemberRequest: {
@@ -1266,76 +1365,6 @@ export interface components {
        * Format: int64
        * @description Server-assigned identifier.
        * @example 3
-       */
-      id: number
-      metaData: components["schemas"]["EntityMetaData"]
-    }
-    /** @description Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`. */
-    ClothingTypeImageMetadata: {
-      /**
-       * Format: int64
-       * @description Server-assigned identifier of the image.
-       * @example 12
-       */
-      id: number
-      /**
-       * @description MIME type of the stored image — one of `image/jpeg`, `image/png`, or `image/webp`.
-       * @example image/jpeg
-       */
-      contentType: string
-      /**
-       * Format: int64
-       * @description Size of the image in bytes.
-       * @example 182734
-       */
-      fileSize: number
-    }
-    /** @description A bulk move of garments into one destination, regardless of where each of them is now. */
-    RelocationRequest: {
-      /**
-       * Format: int64
-       * @description Id of the location every listed garment is moved into. Any location type is accepted — unlike checkout, relocation places no restriction on the destination.
-       * @example 7
-       */
-      targetLocationId: number
-      /**
-       * @description Ids of the garments to move. Must contain at least one entry. If any id is unknown the whole request fails and nothing is moved.
-       * @example [
-       *       41,
-       *       42,
-       *       43
-       *     ]
-       */
-      itemIds: number[]
-    }
-    /** @description One physical garment. `typeId` and `locationId` are numeric references, not embedded objects; see `ResolvedClothingItem` for the form that includes them in full. */
-    ClothingItem: {
-      /**
-       * Format: int64
-       * @description Id of the clothing type this garment belongs to.
-       * @example 3
-       */
-      typeId: number
-      /**
-       * @description Size label as printed on the garment.
-       * @example 52
-       */
-      size: string
-      /**
-       * @description Barcode printed on the garment, unique across all items. Null if untagged.
-       * @example 1234567890128
-       */
-      barcode?: string
-      /**
-       * Format: int64
-       * @description Id of the location holding this garment. Null when unassigned.
-       * @example 7
-       */
-      locationId?: number
-      /**
-       * Format: int64
-       * @description Server-assigned identifier.
-       * @example 42
        */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
@@ -1402,11 +1431,6 @@ export interface components {
       id: number
       metaData: components["schemas"]["EntityMetaData"]
     }
-    /** @description A set of clothing locations to create together in a single request. */
-    BatchCreateClothingLocationsRequest: {
-      /** @description Locations to create. Must contain at least one entry, and every entry is validated individually. */
-      items: components["schemas"]["CreateClothingLocationRequest"][]
-    }
     /** @description Full set of properties for a clothing item. Used for both creation and replacement; on update every field is applied, so omitted optional fields are cleared. */
     CreateOrUpdateClothingItemRequest: {
       /**
@@ -1431,6 +1455,122 @@ export interface components {
        * @example 7
        */
       locationId?: number
+    }
+    /** @description One physical garment. `typeId` and `locationId` are numeric references, not embedded objects; see `ResolvedClothingItem` for the form that includes them in full. */
+    ClothingItem: {
+      /**
+       * Format: int64
+       * @description Id of the clothing type this garment belongs to.
+       * @example 3
+       */
+      typeId: number
+      /**
+       * @description Size label as printed on the garment.
+       * @example 52
+       */
+      size: string
+      /**
+       * @description Barcode printed on the garment, unique across all items. Null if untagged.
+       * @example 1234567890128
+       */
+      barcode?: string
+      /**
+       * Format: int64
+       * @description Id of the location holding this garment. Null when unassigned.
+       * @example 7
+       */
+      locationId?: number
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 42
+       */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
+    /** @description Details of the very first administrator account. */
+    InitialAdminSetupRequest: {
+      /**
+       * @description Username for the new administrator.
+       * @example admin
+       */
+      username: string
+      /**
+       * @description Plaintext password. Between 4 and 32 characters.
+       * @example correct-horse
+       */
+      password: string
+      /**
+       * @description Given name of the administrator.
+       * @example Max
+       */
+      firstName: string
+      /**
+       * @description Family name of the administrator.
+       * @example Mustermann
+       */
+      lastName: string
+    }
+    /** @description Credentials for starting a session. */
+    LoginRequest: {
+      /**
+       * @description The account's username.
+       * @example m.mustermann
+       */
+      username: string
+      /**
+       * @description The account's plaintext password.
+       * @example correct-horse
+       */
+      password: string
+      /**
+       * @description When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.
+       * @example false
+       */
+      rememberMe: boolean
+    }
+    /** @description Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`. */
+    ClothingTypeImageMetadata: {
+      /**
+       * Format: int64
+       * @description Server-assigned identifier of the image.
+       * @example 12
+       */
+      id: number
+      /**
+       * @description MIME type of the stored image — one of `image/jpeg`, `image/png`, or `image/webp`.
+       * @example image/jpeg
+       */
+      contentType: string
+      /**
+       * Format: int64
+       * @description Size of the image in bytes.
+       * @example 182734
+       */
+      fileSize: number
+    }
+    /** @description A bulk move of garments into one destination, regardless of where each of them is now. */
+    RelocationRequest: {
+      /**
+       * Format: int64
+       * @description Id of the location every listed garment is moved into. Any location type is accepted — unlike checkout, relocation places no restriction on the destination.
+       * @example 7
+       */
+      targetLocationId: number
+      /**
+       * @description Ids of the garments to move. Must contain at least one entry. If any id is unknown the whole request fails and nothing is moved.
+       * @example [
+       *       41,
+       *       42,
+       *       43
+       *     ]
+       */
+      itemIds: number[]
+    }
+    /** @description A set of clothing locations to create together in a single request. */
+    BatchCreateClothingLocationsRequest: {
+      /** @description Locations to create. Must contain at least one entry, and every entry is validated individually. */
+      items: components["schemas"]["CreateClothingLocationRequest"][]
     }
     /** @description A set of clothing items to create together in a single transaction. */
     BatchCreateClothingItemsRequest: {
@@ -1549,36 +1689,6 @@ export interface components {
        * @example 3f2b1c9e-5d47-4a1b-9f8e-2c6d0a7b4e13
        */
       batchId: string
-    }
-    /** @description Details of a new user account, including its initial password. */
-    CreateUserRequest: {
-      /**
-       * @description Login name. Must not already be taken.
-       * @example m.mustermann
-       */
-      username: string
-      /**
-       * @description Initial plaintext password, between 4 and 32 characters. Stored hashed.
-       * @example correct-horse
-       */
-      password: string
-      /**
-       * @description Given name.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name.
-       * @example Mustermann
-       */
-      lastName: string
-      /**
-       * @description Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.
-       * @example [
-       *       "USER"
-       *     ]
-       */
-      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
     /** @description Details about the stored privacy policy file, without its contents. Download the file itself from `GET /privacy-policy`. */
     PrivacyPolicyMetadata: {
@@ -1973,6 +2083,216 @@ export interface operations {
         }
         content: {
           "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedTestUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUserRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created account. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedMember: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateMemberRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created member. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["Member"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedClothingType: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created type. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedClothingLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateClothingLocationRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created location. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingLocation"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedClothingItem: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingItemRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created item. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingItem"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */

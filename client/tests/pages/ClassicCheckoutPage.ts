@@ -28,11 +28,6 @@ export class ClassicCheckoutPage {
     return this.page.locator(".rounded-lg.border").filter({ hasText: label })
   }
 
-  /** Always-visible "where do I find the barcode?" gallery on the scanner step. */
-  barcodeGallery() {
-    return this.page.getByTestId("barcode-images-gallery")
-  }
-
   async clickWeiter() {
     await this.page.getByRole("button", { name: "Weiter →" }).click()
   }
@@ -41,20 +36,6 @@ export class ClassicCheckoutPage {
 
   discrepancyDialog() {
     return this.page.getByRole("alertdialog")
-  }
-
-  async dismissDiscrepancyDialog() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Abbrechen" })
-      .click()
-  }
-
-  async confirmDiscrepancyDialog() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Trotzdem hinzufügen" })
-      .click()
   }
 
   // ─── Step 3: Rückgabe wählen ────────────────────────────────────────────────

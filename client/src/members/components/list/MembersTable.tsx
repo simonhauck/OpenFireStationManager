@@ -19,6 +19,7 @@ import { formatDate } from "#/lib/date"
 import MemberActions from "#/members/components/list/MemberActions"
 import MemberName from "#/members/components/shared/MemberName"
 import type { Member } from "#/members/model/member.ts"
+import { filterMembers } from "#/members/model/memberFilters.ts"
 
 interface MembersTableProps {
   members: Member[]
@@ -52,30 +53,10 @@ export default function MembersTable({
     columnSettings.columnSettingsConfig,
   )
 
-  const filteredMembers = useMemo(() => {
-    const terms = searchTerm
-      .toLowerCase()
-      .split(",")
-      .map((term) => term.trim())
-      .filter((term) => term.length > 0)
-
-    if (terms.length === 0) {
-      return members
-    }
-
-    return members.filter((member) => {
-      const memberLocations = locationsByMember.get(member.id) ?? []
-      const haystack = [
-        member.name,
-        ...memberLocations.map((location) => location.name),
-        formatDate(member.metaData.createdAt) ?? "",
-      ]
-        .join(" ")
-        .toLowerCase()
-
-      return terms.every((term) => haystack.includes(term))
-    })
-  }, [locationsByMember, members, searchTerm])
+  const filteredMembers = useMemo(
+    () => filterMembers(members, locationsByMember, searchTerm),
+    [locationsByMember, members, searchTerm],
+  )
 
   const { sortedData, sortConfig } = useTableSortableState<Member>({
     data: filteredMembers,

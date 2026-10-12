@@ -7,14 +7,6 @@ export class ReturnPage {
     await this.page.goto(`/pool-clothing/return?returnTarget=${returnTarget}`)
   }
 
-  pageTitle() {
-    return this.page.getByRole("heading", { level: 1 })
-  }
-
-  cancelButton() {
-    return this.page.getByRole("button", { name: "Abbrechen" })
-  }
-
   async scanBarcode(barcode: string) {
     await this.page.click("body")
     await this.page.keyboard.type(barcode)
@@ -23,10 +15,6 @@ export class ReturnPage {
 
   scannedItem(label: string) {
     return this.page.locator(".rounded-lg.border").filter({ hasText: label })
-  }
-
-  removeItemButton(typeName: string) {
-    return this.page.getByLabel(`${typeName} entfernen`)
   }
 
   weiterButton() {
@@ -43,13 +31,5 @@ export class ReturnPage {
 
   successHeading() {
     return this.page.getByText("Vorgang abgeschlossen")
-  }
-
-  newProcessButton() {
-    return this.page.getByRole("button", { name: "Neuen Vorgang starten" })
-  }
-
-  overviewButton() {
-    return this.page.getByRole("button", { name: "Zur Übersicht" })
   }
 }

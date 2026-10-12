@@ -45,34 +45,6 @@ export class CheckoutPage {
     return this.rueckgabeColumn().getByRole("checkbox", { name: label })
   }
 
-  /** The row for a forced return in the Rückgabe column, matched by type+size label. */
-  rueckgabeRow(label: string) {
-    return this.rueckgabeColumn()
-      .locator(".rounded-lg.border")
-      .filter({ hasText: label })
-  }
-
-  /** Moves the given Ausgabe row into the Rückgabe selection. */
-  async moveToReturn(label: string) {
-    await this.ausgabeRow(label)
-      .getByRole("button", { name: /zur Rückgabe verschieben/ })
-      .click()
-  }
-
-  /** Moves a forced return from the Rückgabe column back to Ausgabe. */
-  async moveToAusgabe(label: string) {
-    await this.rueckgabeRow(label)
-      .getByRole("button", { name: /zur Ausgabe verschieben/ })
-      .click()
-  }
-
-  /** Removes a taken item of `typeName` from the Ausgabe column. */
-  async removeTake(typeName: string) {
-    await this.ausgabeColumn()
-      .getByRole("button", { name: `${typeName} entfernen` })
-      .click()
-  }
-
   /** The trigger for the "where do I find the barcode?" dialog. */
   barcodeGalleryButton() {
     return this.page.getByRole("button", { name: "Wo finde ich den Barcode?" })
