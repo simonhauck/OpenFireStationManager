@@ -27,18 +27,6 @@ export class ImpressumAdminPage {
     return this.page.getByRole("button", { name: "Bearbeiten" })
   }
 
-  deleteButton() {
-    return this.page
-      .getByTestId("impressum-current")
-      .getByRole("button", { name: "Löschen" })
-  }
-
-  confirmDeleteButton() {
-    return this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Löschen" })
-  }
-
   // --- Dialog form locators ---
 
   nameInput() {
@@ -67,10 +55,6 @@ export class ImpressumAdminPage {
 
   saveButton() {
     return this.page.getByRole("button", { name: "Speichern" })
-  }
-
-  cancelButton() {
-    return this.page.getByRole("button", { name: "Abbrechen" })
   }
 
   // --- Actions ---
@@ -120,11 +104,6 @@ export class ImpressumAdminPage {
     await this.fillForm(options)
     await this.save()
   }
-
-  async deleteImpressum() {
-    await this.deleteButton().click()
-    await this.confirmDeleteButton().click()
-  }
 }
 
 export class ImpressumPublicPage {
@@ -139,10 +118,6 @@ export class ImpressumPublicPage {
   }
 
   name(value: string) {
-    return this.page.getByText(value, { exact: true })
-  }
-
-  phone(value: string) {
     return this.page.getByText(value, { exact: true })
   }
 }

@@ -12,6 +12,7 @@ import { TextArea } from "@astryxdesign/core/TextArea"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+import { parseClothingItemsCsv } from "#/clothing/components/shared/batchImportCsv"
 import type { CreateOrUpdateClothingItemRequest } from "#/clothing/model/clothingItems"
 import type { ClothingType } from "#/clothing/model/clothingType"
 import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
@@ -21,42 +22,6 @@ import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-
-interface ParsedRow {
-  size: string
-  barcode?: string
-}
-
-interface ParseResult {
-  rows: ParsedRow[]
-  errors: string[]
-}
-
-function parseCsv(csv: string): ParseResult {
-  const lines = csv
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0)
-
-  const rows: ParsedRow[] = []
-  const errors: string[] = []
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const parts = line.split(",").map((p) => p.trim())
-
-    const [size, barcode] = parts
-
-    if (!size) {
-      errors.push(`Zeile ${i + 1}: Größe darf nicht leer sein.`)
-      continue
-    }
-
-    rows.push({ size, barcode })
-  }
-
-  return { rows, errors }
-}
 
 const previewColumns: TableColumn<CreateOrUpdateClothingItemRequest>[] = [
   {
@@ -130,7 +95,7 @@ function ClothingItemBatchImportPageContent() {
   function handlePreview() {
     if (selectedTypeId === null) return
 
-    const { rows, errors } = parseCsv(csvInput)
+    const { rows, errors } = parseClothingItemsCsv(csvInput)
     setParseErrors(errors)
     setPreview(null)
 

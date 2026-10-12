@@ -49,10 +49,4 @@ export class RelocationPage {
   navigateToOverviewButton() {
     return this.page.getByRole("button", { name: "Zur Übersicht" })
   }
-
-  // ─── Pool Klamotten entry point ─────────────────────────────────────────────
-
-  umlagerungButton(page: Page) {
-    return page.getByRole("link", { name: "Umlagerung starten" })
-  }
 }

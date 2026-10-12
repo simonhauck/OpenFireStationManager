@@ -11,6 +11,7 @@ import LoadingIndicator from "#/components/base/LoadingIndicator"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import type { Member } from "#/members/model/member.ts"
+import { hasDuplicateMemberName } from "#/members/model/memberFilters.ts"
 import {
   createMemberMutation,
   updateMemberMutation,
@@ -78,12 +79,8 @@ export default function MemberForm({ existingMember }: MemberFormProps) {
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
 
-    const normalizedName = name.trim().toLowerCase()
     const hasDuplicate =
-      !isEditing &&
-      members?.some(
-        (member) => member.name.trim().toLowerCase() === normalizedName,
-      )
+      !isEditing && hasDuplicateMemberName(members ?? [], name)
 
     if (hasDuplicate) {
       setDuplicateWarningOpen(true)

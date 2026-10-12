@@ -44,12 +44,6 @@ export class InventoryReconciliationPage {
       .click()
   }
 
-  warningBanner() {
-    return this.page.getByText(
-      /Fehlende Kleidung wird auf .*Kein Standort.* gesetzt/,
-    )
-  }
-
   // ─── Step 4: Success ────────────────────────────────────────────────────────
 
   successHeading() {

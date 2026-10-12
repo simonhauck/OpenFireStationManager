@@ -14,8 +14,4 @@ export class BreadcrumbPage {
   crumbLink(name: string) {
     return this.breadcrumb().getByRole("link", { name })
   }
-
-  homeLink() {
-    return this.breadcrumb().getByRole("link", { name: "Startseite" })
-  }
 }

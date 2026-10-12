@@ -17,10 +17,6 @@ export class PoolKlamottenPage {
     )
   }
 
-  errorState() {
-    return this.page.getByText("Übersicht konnte nicht geladen werden.")
-  }
-
   /**
    * Returns a locator scoped to the PageSubSection for the given pool location.
    * Use this to assert presence/absence of content within a specific location,

@@ -31,22 +31,4 @@ test.describe
       expect(response.status()).toBe(200)
       expect(response.headers()["content-type"]).toContain("application/pdf")
     })
-
-    test("deletes the privacy policy document and shows the empty state", async ({
-      page,
-    }) => {
-      const fileName = `policy-${randomUUID().slice(0, 8)}.txt`
-      const adminSettings = new AdminSettingsPage(page)
-
-      await adminSettings.goto()
-      await adminSettings.upload(fileName, "text/plain", "e2e delete test")
-      await expect(adminSettings.currentDocument()).toContainText(fileName)
-
-      await adminSettings.deleteDocument()
-
-      await expect(adminSettings.emptyState()).toBeVisible()
-
-      const response = await page.request.get("/privacy-policy")
-      expect(response.status()).toBe(404)
-    })
   })

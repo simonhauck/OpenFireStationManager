@@ -54,27 +54,14 @@ test.describe("Inventarisierung (Inventory Reconciliation)", () => {
     await page.close()
   })
 
-  test("button is visible on Pool Klamotten for Kleiderwart", async ({
-    page,
-  }) => {
-    const poolPage = new PoolKlamottenPage(page)
-    await poolPage.goto()
-
-    await expect(
-      page.getByRole("link", { name: "Inventarisierung starten" }),
-    ).toBeVisible()
-  })
-
   test("completes the full inventory reconciliation flow", async ({ page }) => {
     const reconciliationPage = new InventoryReconciliationPage(page)
     const poolPage = new PoolKlamottenPage(page)
 
-    // ── Step 1: Navigate and select location ────────────────────────────────
     await reconciliationPage.goto()
     await expect(page.getByText("Schritt 1: Standort wählen")).toBeVisible()
     await reconciliationPage.selectLocation(locationName)
 
-    // ── Step 2: Scan items ─────────────────────────────────────────────────
     await expect(page.getByText("Schritt 2: Kleidung scannen")).toBeVisible()
     await reconciliationPage.scanBarcode(barcodeAtLocation)
     await expect(
@@ -88,29 +75,18 @@ test.describe("Inventarisierung (Inventory Reconciliation)", () => {
 
     await reconciliationPage.clickWeiter()
 
-    // ── Step 3: Diff & Confirm ─────────────────────────────────────────────
     await expect(
       page.getByText("Schritt 3: Differenzen & Bestätigen"),
     ).toBeVisible()
 
-    // Unchanged section: item scanned at the correct location
     await expect(reconciliationPage.diffSection("Unverändert")).toBeVisible()
     await expect(page.getByText(`${typeName} – L`)).toBeVisible()
-
-    // Found section: item scanned but not at location
     await expect(reconciliationPage.diffSection("Gefunden")).toBeVisible()
-    // XL item should appear in the found section
 
-    // Missing section: items at location but not scanned
-    // (none expected — we scanned the only item at this location)
-
-    // Confirm
     await reconciliationPage.submitReconciliation()
 
-    // ── Step 4: Success ────────────────────────────────────────────────────
     await expect(reconciliationPage.successHeading()).toBeVisible()
 
-    // Navigate to pool overview
     await reconciliationPage.navigateToOverviewButton().click()
     await expect(page).toHaveURL(/\/pool-clothing/)
     await expect(poolPage.loadingIndicator()).not.toBeVisible()

@@ -68,12 +68,6 @@ export class ClothingItemsPage {
     await trigger.press("Enter")
   }
 
-  async clearLocation() {
-    await this.page
-      .getByRole("button", { name: "Standort (optional) löschen" })
-      .click()
-  }
-
   async submitForm() {
     await this.page.getByRole("button", { name: "Speichern" }).click()
   }
@@ -86,21 +80,6 @@ export class ClothingItemsPage {
       .click()
   }
 
-  async clickDeleteForItem(id: string | number) {
-    await this.page
-      .getByRole("button", {
-        name: `Kleidungsstück ${id} löschen`,
-      })
-      .click()
-  }
-
-  async confirmDelete() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Löschen" })
-      .click()
-  }
-
   itemRow(barcode: string) {
     return this.page.getByRole("row").filter({ hasText: barcode })
   }
@@ -110,14 +89,6 @@ export class ClothingItemsPage {
       name: memberName,
       exact: true,
     })
-  }
-
-  holderEmptyCell(barcode: string) {
-    return this.itemRow(barcode).getByRole("cell", { name: "–", exact: true })
-  }
-
-  async fillSearch(searchTerm: string) {
-    await this.page.getByPlaceholder("Suchen...").fill(searchTerm)
   }
 
   formErrorAlert() {

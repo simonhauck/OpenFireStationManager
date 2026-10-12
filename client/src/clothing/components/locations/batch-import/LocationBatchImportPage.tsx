@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
+import { parseClothingLocationsCsv } from "#/clothing/components/shared/batchImportCsv"
 import type {
   ClothingLocation,
   CreateClothingLocationRequest,
@@ -29,42 +30,6 @@ const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
   WAESCHE: "Wäsche",
   PERSONAL: "Persönlicher Standort",
   OTHER: "Sonstiges",
-}
-
-interface ParsedRow {
-  name: string
-  comment: string
-}
-
-interface ParseResult {
-  rows: ParsedRow[]
-  errors: string[]
-}
-
-function parseCsv(csv: string): ParseResult {
-  const lines = csv
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0)
-
-  const rows: ParsedRow[] = []
-  const errors: string[] = []
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const parts = line.split(",").map((p) => p.trim())
-
-    const [name, comment = ""] = parts
-
-    if (!name) {
-      errors.push(`Zeile ${i + 1}: Bezeichnung darf nicht leer sein.`)
-      continue
-    }
-
-    rows.push({ name, comment })
-  }
-
-  return { rows, errors }
 }
 
 const previewColumns: TableColumn<CreateClothingLocationRequest>[] = [
@@ -140,7 +105,7 @@ function LocationBatchImportPageContent() {
   const [mutationError, setMutationError] = useState<Error | null>(null)
 
   function handlePreview() {
-    const { rows, errors } = parseCsv(csvInput)
+    const { rows, errors } = parseClothingLocationsCsv(csvInput)
     setParseErrors(errors)
     setPreview(null)
 

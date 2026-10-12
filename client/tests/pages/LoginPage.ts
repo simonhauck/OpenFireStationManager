@@ -27,8 +27,4 @@ export class LoginPage {
       "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.",
     )
   }
-
-  loginButton() {
-    return this.page.getByRole("button", { name: "Anmelden" })
-  }
 }

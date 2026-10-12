@@ -49,10 +49,6 @@ export class ClothingTypesPage {
     await this.deleteDialog().getByRole("button", { name: "Löschen" }).click()
   }
 
-  async cancelDelete() {
-    await this.deleteDialog().getByRole("button", { name: "Abbrechen" }).click()
-  }
-
   deleteDialog() {
     return this.page.getByRole("alertdialog")
   }
@@ -77,19 +73,6 @@ export class ClothingTypesPage {
 
   typeImageThumbnails() {
     return this.page.getByTestId("clothing-type-images").locator("img")
-  }
-
-  removeImageButton() {
-    return this.page
-      .getByTestId("clothing-type-images")
-      .getByRole("button", { name: /entfernen$/ })
-  }
-
-  async confirmRemoveImage() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Löschen" })
-      .click()
   }
 
   emptyState() {

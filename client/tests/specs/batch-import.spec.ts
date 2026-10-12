@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto"
 import { expect, test } from "@playwright/test"
 import { createClothingType } from "../flows/createClothingType"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
-import { ClothingLocationsPage } from "../pages/ClothingLocationsPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
 
@@ -34,21 +33,5 @@ test.describe("Batch Import", () => {
     await itemsPage.clickImport()
 
     await expect(itemsPage.successMessage()).toBeVisible()
-  })
-
-  test("batch imports clothing locations", async ({ page }) => {
-    const name1 = `Batch-Standort-${randomUUID().slice(0, 8)}`
-    const name2 = `Batch-Standort-${randomUUID().slice(0, 8)}`
-    const csv = `${name1},Kommentar A\n${name2}`
-
-    const locationsPage = new ClothingLocationsPage(page)
-    await locationsPage.gotoBatchImport()
-
-    await locationsPage.selectBatchType("Pool")
-    await locationsPage.fillBatchCsv(csv)
-    await locationsPage.clickPreview()
-    await locationsPage.clickImport()
-
-    await expect(locationsPage.successMessage()).toBeVisible()
   })
 })

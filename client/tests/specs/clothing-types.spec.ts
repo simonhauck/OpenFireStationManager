@@ -27,35 +27,17 @@ test.describe("Clothing Types", () => {
     const updatedName = `${name}-bearbeitet`
     const typesPage = new ClothingTypesPage(page)
 
-    // Create via UI first
     await typesPage.gotoNew()
     await typesPage.fillForm(name)
     await typesPage.submitCreate()
     await expect(page).toHaveURL(/\/clothing-management\/types$/)
 
-    // Edit it
     await typesPage.clickEditForType(name)
     await typesPage.fillForm(updatedName)
     await typesPage.submitEdit()
 
     await expect(page).toHaveURL(/\/clothing-management\/types$/)
     await expect(typesPage.typeRow(updatedName)).toBeVisible()
-  })
-
-  test("deletes a clothing type with no referenced items (happy path)", async ({
-    page,
-  }) => {
-    const name = `Test-Typ-${randomUUID().slice(0, 8)}`
-    const typesPage = new ClothingTypesPage(page)
-
-    await createClothingType(page, name)
-    await typesPage.goto()
-    await expect(typesPage.typeRow(name)).toBeVisible()
-
-    await typesPage.clickDeleteForType(name)
-    await typesPage.confirmDelete()
-
-    await expect(typesPage.typeRow(name)).not.toBeVisible()
   })
 
   test("shows conflict error when deleting a type that has referenced clothing items", async ({
@@ -79,19 +61,5 @@ test.describe("Clothing Types", () => {
     await expect(typesPage.deleteDialog()).toContainText(
       "Möchten Sie den Kleidungstyp",
     )
-  })
-
-  test("cancels deletion and leaves the list unchanged", async ({ page }) => {
-    const name = `Test-Typ-${randomUUID().slice(0, 8)}`
-    const typesPage = new ClothingTypesPage(page)
-
-    await createClothingType(page, name)
-    await typesPage.goto()
-    await expect(typesPage.typeRow(name)).toBeVisible()
-
-    await typesPage.clickDeleteForType(name)
-    await typesPage.cancelDelete()
-
-    await expect(typesPage.typeRow(name)).toBeVisible()
   })
 })

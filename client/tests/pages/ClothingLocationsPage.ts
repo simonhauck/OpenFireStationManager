@@ -58,14 +58,6 @@ export class ClothingLocationsPage {
     await this.page.getByRole("option", { name }).click()
   }
 
-  async clearMember() {
-    await this.page.getByRole("button", { name: "Mitglied löschen" }).click()
-  }
-
-  memberPicker() {
-    return this.page.getByRole("button", { name: "Mitglied" })
-  }
-
   async submitForm() {
     await this.page.getByRole("button", { name: "Speichern" }).click()
   }
@@ -73,19 +65,6 @@ export class ClothingLocationsPage {
   async clickEditForLocation(name: string) {
     await this.page
       .getByRole("button", { name: `Standort ${name} bearbeiten` })
-      .click()
-  }
-
-  async clickDeleteForLocation(name: string) {
-    await this.page
-      .getByRole("button", { name: `Standort ${name} löschen` })
-      .click()
-  }
-
-  async confirmDelete() {
-    await this.page
-      .getByRole("alertdialog")
-      .getByRole("button", { name: "Löschen" })
       .click()
   }
 
