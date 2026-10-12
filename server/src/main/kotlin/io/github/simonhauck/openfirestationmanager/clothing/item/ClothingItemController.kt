@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController
 class ClothingItemController(
     private val service: ClothingItemService,
     private val lookupService: ClothingItemLookupService,
+    private val itemResolver: ClothingItemResolver,
 ) {
 
     @GetMapping
@@ -41,14 +42,15 @@ class ClothingItemController(
         summary = "List every clothing item",
         description =
             "Returns all clothing items in the station, unfiltered and unpaginated. Each item is " +
-                "returned in its raw form: `typeId` and `locationId` are numeric references, not " +
-                "expanded objects. To get the type and location names alongside each item, use " +
-                "`searchClothingItems` or `getClothingItemByBarcode` instead, which return the " +
-                "resolved form.\n\n" +
-                "Unlike the search and barcode endpoints, this endpoint does **not** hide items " +
-                "stored in locations flagged `onlyVisibleForKleiderwart`.",
+                "returned in its **resolved** form: the full clothing type and the item's current " +
+                "location are embedded, so no follow-up lookups are needed. `location` is null " +
+                "when the item is not assigned anywhere.\n\n" +
+                "Unlike `searchClothingItems` and `getClothingItemByBarcode`, this endpoint does " +
+                "**not** hide items stored in locations flagged `onlyVisibleForKleiderwart`, " +
+                "matching `listClothingLocations`. Use the search endpoint when the caller should " +
+                "not see restricted locations.",
     )
-    fun getAllItems(): List<ClothingItem> = service.getAllItems()
+    fun getAllItems(): List<ResolvedClothingItem> = itemResolver.resolveAll()
 
     @GetMapping("/{id}")
     @Operation(

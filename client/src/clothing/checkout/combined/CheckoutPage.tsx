@@ -26,7 +26,7 @@ import { useEffect, useMemo, useState } from "react"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import type { CheckoutStep } from "#/clothing/checkout/combined/useCheckoutWizard"
 import { useCheckoutWizard } from "#/clothing/checkout/combined/useCheckoutWizard"
-import { useResolvedClothingItems } from "#/clothing/checkout/combined/useResolvedClothingItems"
+import { selectItemsById } from "#/clothing/checkout/selectItemsById"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
@@ -36,9 +36,8 @@ import {
 } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
-import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
+import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
-import { getAllClothingTypesQuery } from "#/clothing/service/clothingTypesQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
@@ -47,6 +46,11 @@ interface WizardStep {
   label: string
   description: string
   content: ReactNode
+}
+
+function useResolvedClothingItems(): ResolvedClothingItem[] {
+  const { data } = useClothingItems()
+  return data ?? []
 }
 
 export default function CheckoutPage() {
@@ -249,8 +253,8 @@ function StepSwapContent({
   onNext,
 }: StepSwapContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
-  const memberName = useMemberNameLookup()
   const resolvedItems = useResolvedClothingItems()
+  const memberName = useMemberNameLookup()
 
   const targetLocation = (allLocations ?? []).find(
     (l) => l.id === state.targetLocationId,
@@ -269,11 +273,7 @@ function StepSwapContent({
   )
 
   const selectedReturnItems = useMemo(
-    () =>
-      [...state.returnItemIds].flatMap((id) => {
-        const resolved = resolvedItems.find((i) => i.clothingItem.id === id)
-        return resolved ? [resolved] : []
-      }),
+    () => selectItemsById(resolvedItems, state.returnItemIds),
     [resolvedItems, state.returnItemIds],
   )
 
@@ -544,8 +544,7 @@ function StepReviewContent({
   onSubmitOk,
   onBack,
 }: StepReviewContentProps) {
-  const { data: allItems } = useQuery(getAllClothingItemsQuery())
-  const { data: allTypes } = useQuery(getAllClothingTypesQuery())
+  const resolvedItems = useResolvedClothingItems()
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
 
   const queryClient = useQueryClient()
@@ -553,7 +552,6 @@ function StepReviewContent({
   const memberName = useMemberNameLookup()
   const showToast = useToast()
 
-  const typeMap = new Map((allTypes ?? []).map((t) => [t.id, t]))
   const locationMap = new Map((allLocations ?? []).map((l) => [l.id, l]))
   const targetLocation =
     state.targetLocationId !== null
@@ -564,15 +562,7 @@ function StepReviewContent({
     memberName(targetLocation?.memberId),
   )
 
-  const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
-    (id) => {
-      const raw = (allItems ?? []).find((i) => i.id === id)
-      if (!raw) return []
-      const type = typeMap.get(raw.typeId)
-      if (!type) return []
-      return [{ clothingItem: raw, clothingType: type }]
-    },
-  )
+  const returnItems = selectItemsById(resolvedItems, state.returnItemIds)
 
   const location =
     state.returnLocationId !== null

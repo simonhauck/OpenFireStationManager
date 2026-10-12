@@ -14,8 +14,6 @@ class ClothingItemService(
     private val movementService: MovementService,
 ) {
 
-    fun getAllItems(): List<ClothingItem> = repository.findAll().sortedBy { it.id }
-
     fun getItemById(id: Long): ClothingItem = findOrThrow(id)
 
     @Transactional

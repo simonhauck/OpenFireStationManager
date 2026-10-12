@@ -6,6 +6,7 @@ import { queryKeys } from "#/api/queryKeys"
 import type {
   ClothingItem,
   CreateOrUpdateClothingItemRequest,
+  ResolvedClothingItem,
 } from "#/clothing/model/clothingItems"
 
 export type { ClothingItem, CreateOrUpdateClothingItemRequest }
@@ -18,7 +19,7 @@ type UpdateClothingItemVariables = {
 export const getAllClothingItemsQuery = () =>
   queryOptions({
     queryKey: queryKeys.clothingItems(),
-    queryFn: async (): Promise<ClothingItem[]> => {
+    queryFn: async (): Promise<ResolvedClothingItem[]> => {
       const { data, error } = await client.GET("/api/clothing/items")
       return ensureData(data, error, "GET /api/clothing/items")
     },

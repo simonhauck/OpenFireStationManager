@@ -16,10 +16,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
-import type { ClothingType } from "#/clothing/model/clothingType"
-import type { ClothingItem } from "#/clothing/service/clothingItemsQueries"
+import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
-import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
 import { formatDate } from "#/lib/date"
@@ -27,13 +25,10 @@ import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 interface ClothingItemsTableProps {
-  items: ClothingItem[]
-  types: ClothingType[]
-  locations: ClothingLocation[]
+  items: ResolvedClothingItem[]
 }
 
-type ClothingItemRow = ClothingItem & {
-  memberId?: number
+type ClothingItemRow = ResolvedClothingItem & {
   memberName?: string
 }
 
@@ -50,11 +45,7 @@ const ITEM_COLUMN_OPTIONS = [
 
 const ITEM_COLUMN_KEYS = ITEM_COLUMN_OPTIONS.map((option) => option.key)
 
-export default function ClothingItemsTable({
-  items,
-  types,
-  locations,
-}: ClothingItemsTableProps) {
+export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...ITEM_COLUMN_KEYS,
@@ -70,37 +61,13 @@ export default function ClothingItemsTable({
     columnSettings.columnSettingsConfig,
   )
 
-  const typeNameById = useMemo(
-    () => new Map(types.map((type) => [type.id, type.name])),
-    [types],
-  )
-
-  const locationNameById = useMemo(
-    () => new Map(locations.map((location) => [location.id, location.name])),
-    [locations],
-  )
-
-  const locationMemberIdById = useMemo(
-    () =>
-      new Map(locations.map((location) => [location.id, location.memberId])),
-    [locations],
-  )
-
   const rows = useMemo<ClothingItemRow[]>(
     () =>
-      items.map((item) => {
-        const memberId =
-          item.locationId != null
-            ? locationMemberIdById.get(item.locationId)
-            : undefined
-
-        return {
-          ...item,
-          memberId,
-          memberName: lookupMemberName(memberId),
-        }
-      }),
-    [items, locationMemberIdById, lookupMemberName],
+      items.map((item) => ({
+        ...item,
+        memberName: lookupMemberName(item.location?.memberId),
+      })),
+    [items, lookupMemberName],
   )
 
   const filteredItems = useMemo(() => {
@@ -116,33 +83,39 @@ export default function ClothingItemsTable({
 
     return rows.filter((item) => {
       const haystack = [
-        String(item.id),
-        item.barcode ?? "-",
-        typeNameById.get(item.typeId) ?? String(item.typeId),
-        item.size,
-        item.locationId != null
-          ? (locationNameById.get(item.locationId) ?? "-")
-          : "-",
+        String(item.clothingItem.id),
+        item.clothingItem.barcode ?? "-",
+        item.clothingType.name,
+        item.clothingItem.size,
+        item.location?.name ?? "-",
         item.memberName ?? "",
-        formatDate(item.metaData.createdAt) ?? "-",
+        formatDate(item.clothingItem.metaData.createdAt) ?? "-",
       ]
         .join(" ")
         .toLowerCase()
 
       return terms.every((term) => haystack.includes(term))
     })
-  }, [locationNameById, rows, searchTerm, typeNameById])
+  }, [rows, searchTerm])
 
   const { sortedData, sortConfig } = useTableSortableState<ClothingItemRow>({
     data: filteredItems,
     defaultSort: [{ sortKey: "id", direction: "ascending" }],
     allowUnsortedState: false,
     comparators: {
-      id: (a, b) => a.id - b.id,
+      id: (a, b) => a.clothingItem.id - b.clothingItem.id,
+      barcode: (a, b) =>
+        (a.clothingItem.barcode ?? "").localeCompare(
+          b.clothingItem.barcode ?? "",
+        ),
+      type: (a, b) => a.clothingType.name.localeCompare(b.clothingType.name),
+      size: (a, b) => a.clothingItem.size.localeCompare(b.clothingItem.size),
+      location: (a, b) =>
+        (a.location?.name ?? "").localeCompare(b.location?.name ?? ""),
       member: (a, b) => (a.memberName ?? "").localeCompare(b.memberName ?? ""),
       createdAt: (a, b) =>
-        new Date(a.metaData.createdAt).getTime() -
-        new Date(b.metaData.createdAt).getTime(),
+        new Date(a.clothingItem.metaData.createdAt).getTime() -
+        new Date(b.clothingItem.metaData.createdAt).getTime(),
     },
   })
   const sortPlugin = useTableSortable<ClothingItemRow>(sortConfig)
@@ -154,6 +127,7 @@ export default function ClothingItemsTable({
       width: pixel(72),
       sortable: true,
       resizable: false,
+      renderCell: (item) => item.clothingItem.id,
     },
     {
       key: "barcode",
@@ -161,7 +135,7 @@ export default function ClothingItemsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (item) => item.barcode ?? "-",
+      renderCell: (item) => item.clothingItem.barcode ?? "-",
     },
     {
       key: "type",
@@ -169,8 +143,7 @@ export default function ClothingItemsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (item) =>
-        typeNameById.get(item.typeId) ?? String(item.typeId),
+      renderCell: (item) => item.clothingType.name,
     },
     {
       key: "size",
@@ -178,6 +151,7 @@ export default function ClothingItemsTable({
       width: pixel(96),
       sortable: true,
       resizable: false,
+      renderCell: (item) => item.clothingItem.size,
     },
     {
       key: "location",
@@ -185,10 +159,7 @@ export default function ClothingItemsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (item) =>
-        item.locationId != null
-          ? (locationNameById.get(item.locationId) ?? "-")
-          : "-",
+      renderCell: (item) => item.location?.name ?? "-",
     },
     {
       key: "member",
@@ -197,7 +168,7 @@ export default function ClothingItemsTable({
       sortable: true,
       resizable: false,
       renderCell: (item) => (
-        <MemberName memberId={item.memberId} name={item.memberName} />
+        <MemberName memberId={item.location?.memberId} name={item.memberName} />
       ),
     },
     {
@@ -206,7 +177,9 @@ export default function ClothingItemsTable({
       width: pixel(130),
       sortable: true,
       resizable: false,
-      renderCell: (item) => <FormattedDate value={item.metaData.createdAt} />,
+      renderCell: (item) => (
+        <FormattedDate value={item.clothingItem.metaData.createdAt} />
+      ),
     },
     {
       key: "actions",
@@ -232,7 +205,7 @@ export default function ClothingItemsTable({
       <Table
         data={sortedData}
         columns={columns}
-        idKey="id"
+        idKey={(item) => item.clothingItem.id}
         plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
         emptyState={
           <EmptyState title="Keine Kleidungsstücke gefunden." isCompact />
@@ -243,7 +216,7 @@ export default function ClothingItemsTable({
 }
 
 interface ClothingItemActionsProps {
-  item: ClothingItem
+  item: ResolvedClothingItem
 }
 
 function ClothingItemActions({ item }: ClothingItemActionsProps) {
@@ -254,8 +227,10 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
     deleteClothingItemMutation(queryClient),
   )
 
+  const itemId = item.clothingItem.id
+
   function handleDelete() {
-    deleteItem(item.id, {
+    deleteItem(itemId, {
       onSuccess: () => setIsDeleteDialogOpen(false),
     })
   }
@@ -263,7 +238,7 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
   return (
     <HStack gap={1} hAlign="end">
       <IconButton
-        label={`Kleidungsstück ${item.id} bearbeiten`}
+        label={`Kleidungsstück ${itemId} bearbeiten`}
         tooltip="Bearbeiten"
         icon={<Pencil className="size-4" />}
         variant="secondary"
@@ -271,12 +246,12 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
         onClick={() => {
           void navigate({
             to: "/clothing-management/items/$clothingItemId/edit",
-            params: { clothingItemId: String(item.id) },
+            params: { clothingItemId: String(itemId) },
           })
         }}
       />
       <IconButton
-        label={`Kleidungsstück ${item.id} löschen`}
+        label={`Kleidungsstück ${itemId} löschen`}
         tooltip="Löschen"
         icon={<Trash2 className="size-4" />}
         variant="destructive"
@@ -287,7 +262,7 @@ function ClothingItemActions({ item }: ClothingItemActionsProps) {
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         title="Kleidungsstück löschen"
-        description={`Möchten Sie das Kleidungsstück mit der ID ${item.id} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
+        description={`Möchten Sie das Kleidungsstück mit der ID ${itemId} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
         actionLabel="Löschen"
         onAction={handleDelete}
         cancelLabel="Abbrechen"
