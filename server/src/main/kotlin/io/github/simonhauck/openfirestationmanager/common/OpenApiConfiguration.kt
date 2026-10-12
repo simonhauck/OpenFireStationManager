@@ -47,6 +47,7 @@ object ApiTags {
     const val ADMIN_USERS = "Admin - Users"
     const val ADMIN_LEGAL = "Admin - Legal"
     const val LEGAL = "Legal"
+    const val TEST = "Test"
 
     /** Name of the session cookie carrying the authenticated session. */
     const val SESSION_COOKIE_SCHEME = "sessionCookie"
@@ -256,6 +257,14 @@ class OpenApiConfiguration(
                             "Maintaining the Impressum and privacy policy documents. Requires the ADMIN role. " +
                                 "Exclude this tag to keep legal-document mutation out of automated tool surfaces."
                         ),
+                    Tag()
+                        .name(ApiTags.TEST)
+                        .description(
+                            "Test-only seeding endpoints for end-to-end fixtures. Available only when " +
+                                "`app.testing.enabled` is `true` (the test profile); they are absent from the " +
+                                "production profile. Each endpoint delegates to the same domain service as its " +
+                                "production counterpart, so seeded data behaves exactly like UI-created data."
+                        ),
                 )
             )
 
@@ -396,7 +405,9 @@ class OpenApiConfiguration(
             ?.filter { it.isNotBlank() } ?: emptyList()
 
     private fun isPublicPath(path: String): Boolean =
-        path.startsWith("/api/public/") || path == "/privacy-policy"
+        path.startsWith("/api/public/") ||
+            path.startsWith("/api/test/") ||
+            path == "/privacy-policy"
 
     /**
      * Builds the document description with the cookie names this instance actually issues.

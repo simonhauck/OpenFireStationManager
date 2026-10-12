@@ -66,6 +66,50 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/test/users": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a user account
+     * @description Test-only fixture endpoint. Creates a user account through the production user service so the Playwright global setup can create one persona per role. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedTestUser"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/test/clothing-types": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Seed a clothing type
+     * @description Test-only fixture endpoint. Creates a clothing type through the same service the production `POST /api/clothing/types` uses. Prefer this over driving the create form in a browser. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["seedClothingType"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/public/setup/initial-admin": {
     parameters: {
       query?: never
@@ -1183,6 +1227,59 @@ export interface components {
        */
       phone?: string
     }
+    /** @description Details of a new user account, including its initial password. */
+    CreateUserRequest: {
+      /**
+       * @description Login name. Must not already be taken.
+       * @example m.mustermann
+       */
+      username: string
+      /**
+       * @description Initial plaintext password, between 4 and 32 characters. Stored hashed.
+       * @example correct-horse
+       */
+      password: string
+      /**
+       * @description Given name.
+       * @example Max
+       */
+      firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
+      lastName: string
+      /**
+       * @description Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.
+       * @example [
+       *       "USER"
+       *     ]
+       */
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+    }
+    /** @description The name of a clothing type. Used for both creation and update. */
+    CreateOrUpdateClothingTypeRequest: {
+      /**
+       * @description Display name of the category, e.g. `Einsatzjacke` or `Helm`. Names are not required to be unique, but duplicates make the overview reports ambiguous.
+       * @example Einsatzjacke
+       */
+      name: string
+    }
+    /** @description A category of garment (`Kleidungsart`), such as `Einsatzjacke` or `Helm`. Types carry no size or quantity of their own — those live on the individual clothing items. */
+    ClothingType: {
+      /**
+       * @description Display name of the category.
+       * @example Einsatzjacke
+       */
+      name: string
+      /**
+       * Format: int64
+       * @description Server-assigned identifier.
+       * @example 3
+       */
+      id: number
+      metaData: components["schemas"]["EntityMetaData"]
+    }
     /** @description Details of the very first administrator account. */
     InitialAdminSetupRequest: {
       /**
@@ -1243,29 +1340,6 @@ export interface components {
        * Format: int64
        * @description Server-assigned identifier.
        * @example 5
-       */
-      id: number
-      metaData: components["schemas"]["EntityMetaData"]
-    }
-    /** @description The name of a clothing type. Used for both creation and update. */
-    CreateOrUpdateClothingTypeRequest: {
-      /**
-       * @description Display name of the category, e.g. `Einsatzjacke` or `Helm`. Names are not required to be unique, but duplicates make the overview reports ambiguous.
-       * @example Einsatzjacke
-       */
-      name: string
-    }
-    /** @description A category of garment (`Kleidungsart`), such as `Einsatzjacke` or `Helm`. Types carry no size or quantity of their own — those live on the individual clothing items. */
-    ClothingType: {
-      /**
-       * @description Display name of the category.
-       * @example Einsatzjacke
-       */
-      name: string
-      /**
-       * Format: int64
-       * @description Server-assigned identifier.
-       * @example 3
        */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
@@ -1549,36 +1623,6 @@ export interface components {
        * @example 3f2b1c9e-5d47-4a1b-9f8e-2c6d0a7b4e13
        */
       batchId: string
-    }
-    /** @description Details of a new user account, including its initial password. */
-    CreateUserRequest: {
-      /**
-       * @description Login name. Must not already be taken.
-       * @example m.mustermann
-       */
-      username: string
-      /**
-       * @description Initial plaintext password, between 4 and 32 characters. Stored hashed.
-       * @example correct-horse
-       */
-      password: string
-      /**
-       * @description Given name.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name.
-       * @example Mustermann
-       */
-      lastName: string
-      /**
-       * @description Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.
-       * @example [
-       *       "USER"
-       *     ]
-       */
-      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
     /** @description Details about the stored privacy policy file, without its contents. Download the file itself from `GET /privacy-policy`. */
     PrivacyPolicyMetadata: {
@@ -1973,6 +2017,90 @@ export interface operations {
         }
         content: {
           "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedTestUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUserRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created account. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["UserAccount"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  seedClothingType: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOrUpdateClothingTypeRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created type. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "*/*": components["schemas"]["ClothingType"]
+        }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */

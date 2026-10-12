@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { expect, test } from "@playwright/test"
-import { createClothingType } from "../flows/createClothingType"
+import { seedClothingType } from "../api/seeding"
 import { ClothingTypesPage } from "../pages/ClothingTypesPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
@@ -22,11 +22,14 @@ test.describe("Clothing type barcode images", () => {
     await expect(typesPage.typeImageThumbnails()).toHaveCount(1)
   })
 
-  test("deletes an uploaded image on the edit page", async ({ page }) => {
+  test("deletes an uploaded image on the edit page", async ({
+    page,
+    request,
+  }) => {
     const name = `Test-Typ-${randomUUID().slice(0, 8)}`
     const typesPage = new ClothingTypesPage(page)
 
-    await createClothingType(page, name)
+    await seedClothingType(request, name)
     await typesPage.goto()
     await typesPage.clickEditForType(name)
     await typesPage.selectImages(["tests/fixtures/barcode.png"])
