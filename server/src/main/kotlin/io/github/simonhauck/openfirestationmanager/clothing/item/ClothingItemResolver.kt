@@ -33,7 +33,10 @@ class ClothingItemResolver(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun resolveAll(): List<ResolvedClothingItem> {
-        return jdbcTemplate.query("SELECT * FROM resolved_clothing_item_view", rowMapper)
+        return jdbcTemplate.query(
+            "SELECT * FROM resolved_clothing_item_view ORDER BY item_id",
+            rowMapper,
+        )
     }
 
     fun resolveByBarcode(barcode: String): ResolvedClothingItem? {

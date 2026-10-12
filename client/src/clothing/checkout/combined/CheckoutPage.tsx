@@ -26,6 +26,7 @@ import { useEffect, useMemo, useState } from "react"
 import { autoToggleReturnsByType } from "#/clothing/checkout/autoToggleReturnsByType"
 import type { CheckoutStep } from "#/clothing/checkout/combined/useCheckoutWizard"
 import { useCheckoutWizard } from "#/clothing/checkout/combined/useCheckoutWizard"
+import { selectItemsById } from "#/clothing/checkout/selectItemsById"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
@@ -35,7 +36,7 @@ import {
 } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations"
-import { getAllClothingItemsQuery } from "#/clothing/service/clothingItemsQueries"
+import { useClothingItems } from "#/clothing/service/clothingItemsQueries"
 import { getAllClothingLocationsQuery } from "#/clothing/service/clothingLocationsQueries"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
@@ -45,6 +46,11 @@ interface WizardStep {
   label: string
   description: string
   content: ReactNode
+}
+
+function useResolvedClothingItems(): ResolvedClothingItem[] {
+  const { data } = useClothingItems()
+  return data ?? []
 }
 
 export default function CheckoutPage() {
@@ -247,7 +253,7 @@ function StepSwapContent({
   onNext,
 }: StepSwapContentProps) {
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
-  const { data: resolvedItems } = useQuery(getAllClothingItemsQuery())
+  const resolvedItems = useResolvedClothingItems()
   const memberName = useMemberNameLookup()
 
   const targetLocation = (allLocations ?? []).find(
@@ -260,20 +266,14 @@ function StepSwapContent({
 
   const lockerItems = useMemo(
     () =>
-      (resolvedItems ?? []).filter(
+      resolvedItems.filter(
         (i) => i.clothingItem.locationId === state.targetLocationId,
       ),
     [resolvedItems, state.targetLocationId],
   )
 
   const selectedReturnItems = useMemo(
-    () =>
-      [...state.returnItemIds].flatMap((id) => {
-        const resolved = (resolvedItems ?? []).find(
-          (i) => i.clothingItem.id === id,
-        )
-        return resolved ? [resolved] : []
-      }),
+    () => selectItemsById(resolvedItems, state.returnItemIds),
     [resolvedItems, state.returnItemIds],
   )
 
@@ -544,7 +544,7 @@ function StepReviewContent({
   onSubmitOk,
   onBack,
 }: StepReviewContentProps) {
-  const { data: resolvedItems } = useQuery(getAllClothingItemsQuery())
+  const resolvedItems = useResolvedClothingItems()
   const { data: allLocations } = useQuery(getAllClothingLocationsQuery())
 
   const queryClient = useQueryClient()
@@ -562,14 +562,7 @@ function StepReviewContent({
     memberName(targetLocation?.memberId),
   )
 
-  const returnItems: ResolvedClothingItem[] = [...state.returnItemIds].flatMap(
-    (id) => {
-      const resolved = (resolvedItems ?? []).find(
-        (i) => i.clothingItem.id === id,
-      )
-      return resolved ? [resolved] : []
-    },
-  )
+  const returnItems = selectItemsById(resolvedItems, state.returnItemIds)
 
   const location =
     state.returnLocationId !== null
