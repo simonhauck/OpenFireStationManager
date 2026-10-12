@@ -1,26 +1,30 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingItem } from "../flows/createClothingItem"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
-import { createMember } from "../flows/createMember"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingItem,
+  seedClothingLocation,
+  seedClothingType,
+  seedMember,
+} from "../api/seeding"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
 import { MemberDetailPage } from "../pages/MemberDetailPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
 
 test.describe("Clothing Items", () => {
+  let api: APIRequestContext
+  let typeId: number
   let typeName: string
 
-  test.beforeAll(async ({ browser }) => {
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
-    })
-    typeName = await createClothingType(
-      page,
-      `Test-Typ-Items-${randomUUID().slice(0, 8)}`,
-    )
-    await page.close()
+  test.beforeAll(async () => {
+    typeName = `Test-Typ-Items-${randomUUID().slice(0, 8)}`
+    api = await createSeedRequest()
+    typeId = (await seedClothingType(api, typeName)).id
+  })
+
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("creates a new item and shows it in the list", async ({ page }) => {
@@ -88,6 +92,7 @@ test.describe("Clothing Items", () => {
 
   test("shows the holder of an item and links to the member detail page", async ({
     page,
+    request,
   }) => {
     const suffix = randomUUID().slice(0, 8)
     const memberName = `Mitglied-${suffix}`
@@ -95,17 +100,17 @@ test.describe("Clothing Items", () => {
     const barcode = `BC-Holder-${suffix}`
     const itemsPage = new ClothingItemsPage(page)
 
-    await createMember(page, memberName)
-    await createClothingLocation(page, {
-      type: "PERSONAL",
+    const member = await seedMember(request, memberName)
+    const location = await seedClothingLocation(request, {
       name: locationName,
-      memberName,
+      type: "PERSONAL",
+      memberId: member.id,
     })
-    await createClothingItem(page, {
-      typeName,
+    await seedClothingItem(request, {
+      typeId,
       size: "L",
       barcode,
-      locationName,
+      locationId: location.id,
     })
 
     await itemsPage.goto()

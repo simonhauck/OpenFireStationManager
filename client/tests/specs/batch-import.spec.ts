@@ -1,22 +1,22 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingType } from "../flows/createClothingType"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import { createSeedRequest, seedClothingType } from "../api/seeding"
 import { ClothingItemsPage } from "../pages/ClothingItemsPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
 
 test.describe("Batch Import", () => {
+  let api: APIRequestContext
   let typeName: string
 
-  test.beforeAll(async ({ browser }) => {
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
-    })
-    typeName = await createClothingType(
-      page,
-      `Test-Typ-Batch-${randomUUID().slice(0, 8)}`,
-    )
-    await page.close()
+  test.beforeAll(async () => {
+    typeName = `Test-Typ-Batch-${randomUUID().slice(0, 8)}`
+    api = await createSeedRequest()
+    await seedClothingType(api, typeName)
+  })
+
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("batch imports clothing items", async ({ page }) => {

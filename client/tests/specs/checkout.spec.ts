@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingItem } from "../flows/createClothingItem"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingItem,
+  seedClothingLocation,
+  seedClothingType,
+} from "../api/seeding"
 import { CheckoutPage } from "../pages/CheckoutPage"
 import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
 
@@ -10,37 +13,39 @@ import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
 test.use({ storageState: "playwright/.auth/user.json" })
 
 test.describe("Checkout", () => {
+  let api: APIRequestContext
   let typeName: string
   let barcode: string
   let personalLocationName: string
   let poolLocationName: string
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     const suffix = randomUUID().slice(0, 8)
     typeName = `Typ-Checkout-${suffix}`
     barcode = `BC-CO-${suffix}`
     personalLocationName = `Spind-${suffix}`
     poolLocationName = `Pool-${suffix}`
 
-    // Setup requires KLEIDERWART role — use a dedicated page for preconditions.
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
+    api = await createSeedRequest()
+    const type = await seedClothingType(api, typeName)
+    const pool = await seedClothingLocation(api, {
+      name: poolLocationName,
+      type: "POOL",
     })
-
-    await createClothingType(page, typeName)
-    await createClothingLocation(page, { type: "POOL", name: poolLocationName })
-    await createClothingItem(page, {
-      typeName,
+    await seedClothingItem(api, {
+      typeId: type.id,
       size: "M",
       barcode,
-      locationName: poolLocationName,
+      locationId: pool.id,
     })
-    await createClothingLocation(page, {
-      type: "PERSONAL",
+    await seedClothingLocation(api, {
       name: personalLocationName,
+      type: "PERSONAL",
     })
+  })
 
-    await page.close()
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("completes the full checkout and item is no longer shown in the pool", async ({
@@ -83,42 +88,40 @@ test.describe("Checkout", () => {
 })
 
 test.describe("Checkout – items not recorded at the target location", () => {
+  let api: APIRequestContext
   let typeName: string
   let barcode: string
   let personalLocationName: string
   let washLocationName: string
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     const suffix = randomUUID().slice(0, 8)
     typeName = `Typ-Disc-${suffix}`
     barcode = `BC-DC-${suffix}`
     personalLocationName = `Spind-Disc-${suffix}`
     washLocationName = `Waesche-Disc-${suffix}`
 
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
-    })
-
-    await createClothingType(page, typeName)
-
-    // Item lives at a WAESCHE location — deliberately not a POOL location
-    await createClothingLocation(page, {
-      type: "WAESCHE",
+    api = await createSeedRequest()
+    const type = await seedClothingType(api, typeName)
+    // Item lives at a WAESCHE location — deliberately not a POOL location.
+    const wash = await seedClothingLocation(api, {
       name: washLocationName,
+      type: "WAESCHE",
     })
-    await createClothingItem(page, {
-      typeName,
+    await seedClothingItem(api, {
+      typeId: type.id,
       size: "L",
       barcode,
-      locationName: washLocationName,
+      locationId: wash.id,
     })
-
-    await createClothingLocation(page, {
-      type: "PERSONAL",
+    await seedClothingLocation(api, {
       name: personalLocationName,
+      type: "PERSONAL",
     })
+  })
 
-    await page.close()
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("scanned item is put into Ausgabe with its recorded location shown inline", async ({

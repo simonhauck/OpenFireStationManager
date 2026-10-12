@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingLocation,
+  seedClothingType,
+} from "../api/seeding"
 import { CheckoutPage } from "../pages/CheckoutPage"
 import { ClothingTypesPage } from "../pages/ClothingTypesPage"
 
@@ -9,6 +12,7 @@ import { ClothingTypesPage } from "../pages/ClothingTypesPage"
 test.use({ storageState: "playwright/.auth/user.json" })
 
 test.describe("Barcode images gallery", () => {
+  let api: APIRequestContext
   let typeWithImage: string
   let typeWithoutImage: string
   let personalLocationName: string
@@ -19,27 +23,29 @@ test.describe("Barcode images gallery", () => {
     typeWithoutImage = `Typ-Ohne-Bild-${suffix}`
     personalLocationName = `Spind-Galerie-${suffix}`
 
-    // Setup requires KLEIDERWART role — use a dedicated page for preconditions.
+    api = await createSeedRequest()
+    await seedClothingType(api, typeWithImage)
+    await seedClothingType(api, typeWithoutImage)
+    await seedClothingLocation(api, {
+      name: personalLocationName,
+      type: "PERSONAL",
+    })
+
+    // Image upload has no seeding endpoint — manage it through the UI.
     const page = await browser.newPage({
       storageState: "playwright/.auth/kleiderwart.json",
     })
     const typesPage = new ClothingTypesPage(page)
-
-    await createClothingType(page, typeWithImage)
-    await createClothingType(page, typeWithoutImage)
-
     await typesPage.goto()
     await typesPage.clickEditForType(typeWithImage)
     await typesPage.selectImages(["tests/fixtures/barcode.png"])
     await typesPage.uploadSelectedImage()
     await expect(typesPage.typeImageThumbnails()).toHaveCount(1)
-
-    await createClothingLocation(page, {
-      type: "PERSONAL",
-      name: personalLocationName,
-    })
-
     await page.close()
+  })
+
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("shows the types that have barcode images in the guide dialog", async ({

@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingItem } from "../flows/createClothingItem"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingItem,
+  seedClothingLocation,
+  seedClothingType,
+} from "../api/seeding"
 import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
 import { RelocationPage } from "../pages/RelocationPage"
 
@@ -10,47 +13,46 @@ import { RelocationPage } from "../pages/RelocationPage"
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
 
 test.describe("Umlagerung (Relocation)", () => {
+  let api: APIRequestContext
   let typeName: string
   let barcode1: string
   let barcode2: string
-  let sourceLocationName: string
   let targetLocationName: string
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     const suffix = randomUUID().slice(0, 8)
     typeName = `Typ-Relocation-${suffix}`
     barcode1 = `BC-REL-A-${suffix}`
     barcode2 = `BC-REL-B-${suffix}`
-    sourceLocationName = `Pool-Src-${suffix}`
+    const sourceLocationName = `Pool-Src-${suffix}`
     targetLocationName = `Pool-Target-${suffix}`
 
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
-    })
-
-    await createClothingType(page, typeName)
-    await createClothingLocation(page, {
-      type: "POOL",
+    api = await createSeedRequest()
+    const type = await seedClothingType(api, typeName)
+    const source = await seedClothingLocation(api, {
       name: sourceLocationName,
+      type: "POOL",
     })
-    await createClothingItem(page, {
-      typeName,
+    await seedClothingItem(api, {
+      typeId: type.id,
       size: "L",
       barcode: barcode1,
-      locationName: sourceLocationName,
+      locationId: source.id,
     })
-    await createClothingItem(page, {
-      typeName,
+    await seedClothingItem(api, {
+      typeId: type.id,
       size: "XL",
       barcode: barcode2,
-      locationName: sourceLocationName,
+      locationId: source.id,
     })
-    await createClothingLocation(page, {
-      type: "POOL",
+    await seedClothingLocation(api, {
       name: targetLocationName,
+      type: "POOL",
     })
+  })
 
-    await page.close()
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("completes the full relocation flow and items are moved to target", async ({

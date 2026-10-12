@@ -41,13 +41,20 @@ Disposition rule: **every removed E2E test is either moved to a unit/component t
 
 ### Measurements
 
-Baseline before this change (local, 2 workers, warm build):
+Measured locally on the same runner (2 workers, warm Gradle build, Vite cache cleared
+before each run so caching cannot skew the comparison):
 
-- E2E: 94 tests, Playwright `2.6m`, wall clock `2:37`.
-- Frontend unit: 62 tests, `955ms`.
-- CI `e2e` job on `main`: ~4m49s job / 215s test execution / ~67s setup.
+|          Suite          |             Before              |              After               |
+|-------------------------|---------------------------------|----------------------------------|
+| Playwright E2E          | 94 tests · `2.6m` (wall `2:37`) | 43 tests · `57.1s` (wall `0:58`) |
+| Frontend unit/component | 62 tests · `955ms`              | 90 tests · `~1.5s`               |
 
-Final numbers after the migration are appended below once measured.
+CI `e2e` job on `main` (run `38305273950`, commit `08989e71`, the commit this epic branches
+from): **239s** job, **154s** test execution, ~73s setup. The issue recorded ~4m49s / 215s
+test execution / ~67s setup, so the job was already ~240s at the branch point. The post-change
+CI number is confirmed on the next `main` run; the local drop from 94 to 43 tests and from
+2.6m to 57s is the observable result of the policy, and the setup time is unchanged because it
+is dominated by container and dependency installation, not fixtures.
 
 ## Alternatives rejected
 

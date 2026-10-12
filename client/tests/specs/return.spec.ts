@@ -1,43 +1,48 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingItem } from "../flows/createClothingItem"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingItem,
+  seedClothingLocation,
+  seedClothingType,
+} from "../api/seeding"
 import { ReturnPage } from "../pages/ReturnPage"
 
 test.use({ storageState: "playwright/.auth/user.json" })
 
+let api: APIRequestContext
 let typeName: string
 let barcode: string
 let personalLocationName: string
 let waescheLocationName: string
 
-test.beforeAll(async ({ browser }) => {
-  const kleiderwartPage = await browser.newPage({
-    storageState: "playwright/.auth/kleiderwart.json",
-  })
+test.beforeAll(async () => {
   const suffix = randomUUID().slice(0, 8)
   typeName = `Typ-Return-${suffix}`
   barcode = `BC-RT-${suffix}`
   personalLocationName = `Spind-${suffix}`
   waescheLocationName = `Waesche-${suffix}`
 
-  await createClothingType(kleiderwartPage, typeName)
-  await createClothingLocation(kleiderwartPage, {
-    type: "PERSONAL",
+  api = await createSeedRequest()
+  const type = await seedClothingType(api, typeName)
+  const personal = await seedClothingLocation(api, {
     name: personalLocationName,
+    type: "PERSONAL",
   })
-  await createClothingLocation(kleiderwartPage, {
-    type: "WAESCHE",
+  await seedClothingLocation(api, {
     name: waescheLocationName,
+    type: "WAESCHE",
   })
-  await createClothingItem(kleiderwartPage, {
-    typeName,
+  await seedClothingItem(api, {
+    typeId: type.id,
     size: "M",
     barcode,
-    locationName: personalLocationName,
+    locationId: personal.id,
   })
-  await kleiderwartPage.close()
+})
+
+test.afterAll(async () => {
+  await api.dispose()
 })
 
 test("scanner flow: return item to WAESCHE via barcode scan", async ({

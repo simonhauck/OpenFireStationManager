@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { expect, test } from "@playwright/test"
-import { createMember } from "../flows/createMember"
+import { seedMember } from "../api/seeding"
 import { ClothingLocationsPage } from "../pages/ClothingLocationsPage"
 
 test.use({ storageState: "playwright/.auth/kleiderwart.json" })
@@ -40,13 +40,13 @@ test.describe("Clothing Locations", () => {
     await expect(locationsPage.locationRow(updatedName)).toBeVisible()
   })
 
-  test("assigns a member to a personal location", async ({ page }) => {
+  test("assigns a member to a personal location", async ({ page, request }) => {
     const suffix = randomUUID().slice(0, 8)
     const memberName = `Mitglied-${suffix}`
     const locationName = `Spind-${suffix}`
     const locationsPage = new ClothingLocationsPage(page)
 
-    await createMember(page, memberName)
+    await seedMember(request, memberName)
 
     await locationsPage.gotoNew()
     await locationsPage.selectType("PERSONAL")

@@ -1,60 +1,64 @@
 import { randomUUID } from "node:crypto"
-import { expect, test } from "@playwright/test"
-import { createClothingItem } from "../flows/createClothingItem"
-import { createClothingLocation } from "../flows/createClothingLocation"
-import { createClothingType } from "../flows/createClothingType"
+import { type APIRequestContext, expect, test } from "@playwright/test"
+import {
+  createSeedRequest,
+  seedClothingItem,
+  seedClothingLocation,
+  seedClothingType,
+} from "../api/seeding"
 import { CheckoutPage } from "../pages/CheckoutPage"
 
 // The checkout route is guarded to USER role only.
 test.use({ storageState: "playwright/.auth/user.json" })
 
 test.describe("Checkout – return selection (regression #323)", () => {
+  let api: APIRequestContext
   let scannedTypeName: string
   let scannedBarcode: string
   let lockerWithAutoItem: string
   let washLocationName: string
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeAll(async () => {
     const suffix = randomUUID().slice(0, 8)
     scannedTypeName = `Typ-Scan-${suffix}`
     scannedBarcode = `BC-SCAN-${suffix}`
     lockerWithAutoItem = `Spind-Auto-${suffix}`
     washLocationName = `Waesche-Desync-${suffix}`
 
-    const page = await browser.newPage({
-      storageState: "playwright/.auth/kleiderwart.json",
+    api = await createSeedRequest()
+    const type = await seedClothingType(api, scannedTypeName)
+
+    const pool = await seedClothingLocation(api, {
+      name: `Pool-Desync-${suffix}`,
+      type: "POOL",
     })
-
-    await createClothingType(page, scannedTypeName)
-
-    const poolLocationName = `Pool-Desync-${suffix}`
-    await createClothingLocation(page, { type: "POOL", name: poolLocationName })
-    await createClothingLocation(page, {
-      type: "WAESCHE",
+    await seedClothingLocation(api, {
       name: washLocationName,
+      type: "WAESCHE",
     })
 
     // Item the user scans at checkout (lives in the pool).
-    await createClothingItem(page, {
-      typeName: scannedTypeName,
+    await seedClothingItem(api, {
+      typeId: type.id,
       size: "M",
       barcode: scannedBarcode,
-      locationName: poolLocationName,
+      locationId: pool.id,
     })
 
-    await createClothingLocation(page, {
-      type: "PERSONAL",
+    const locker = await seedClothingLocation(api, {
       name: lockerWithAutoItem,
+      type: "PERSONAL",
     })
-
     // Locker item of the scanned type — auto-selected as a return.
-    await createClothingItem(page, {
-      typeName: scannedTypeName,
+    await seedClothingItem(api, {
+      typeId: type.id,
       size: "L",
-      locationName: lockerWithAutoItem,
+      locationId: locker.id,
     })
+  })
 
-    await page.close()
+  test.afterAll(async () => {
+    await api.dispose()
   })
 
   test("auto-selected return is kept, taken item issued and return routed to the wash step", async ({
