@@ -27,6 +27,14 @@ A `PERSONAL` location's owner is the linked `Mitglied`; the `comment` field is g
 
 Informal vs. formal labels for clothing items. Both appear in the UI; "Klamotten" tends to be used in headings/navigation, "Kleidung" in form labels.
 
+### Barcode
+
+User-facing label for the station-assigned barcode of a `ClothingItem` (item form: "Barcode (optional)"; item table: "Barcode"). Optional. Distinct from the **Hersteller-Barcode**.
+
+### Hersteller-Barcode
+
+User-facing label for the barcode a manufacturer or supplier prints on a garment. Optional; entered next to the `Barcode` on the item form and in the batch import's third CSV column. Either barcode resolves an item when scanned.
+
 ### Location type
 
 UI surfaces the four backend types (POOL, WAESCHE, PERSONAL, OTHER) when creating/editing a `Standort`. Only POOL is selectable as a checkout source; only PERSONAL is selectable as a checkout target; WAESCHE and POOL are selectable as return targets.

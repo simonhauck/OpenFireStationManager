@@ -22,6 +22,14 @@ The `type` replaces the older `shouldBeShownOnDashboard` boolean: dashboard visi
 
 The clothing officer role (`UserRole.KLEIDERWART`). Manages clothing types, items, and locations. Distinct from `ADMIN` and `USER`.
 
+### Barcode
+
+The code the station assigns to a `ClothingItem` and applies to it as its label. Optional; at most one per item. A barcode value is unique across all items — it never repeats as another item's `Barcode` or `Hersteller-Barcode`. Either kind resolves its item when scanned. German UI label: "Barcode".
+
+### Hersteller-Barcode
+
+The barcode the manufacturer or supplier prints on the garment itself. Optional; at most one per item. Exists so users can scan whichever barcode they find first without hunting for the station's label. German UI label: "Hersteller-Barcode".
+
 ### BarcodeImage
 
 An image attached to a `ClothingType` showing where on that garment its barcode is located, so scanning users can find it. A type has zero to many; they are upload-ordered and carry no captions. Upload and delete are part of managing a type (Kleiderwart), and every scanner flow shows all of them grouped by type. Deleting a type deletes its `BarcodeImage`s. German UI label: "Barcode-Bilder".
@@ -56,8 +64,8 @@ Any authenticated user may perform a Checkout. Discrepancy handling for taken it
 
 Two purpose-built endpoints serve the Checkout flow's item picker:
 
-- `GET /api/clothing/items/by-barcode/{barcode}` — strict-equality lookup for the HID barcode scanner. Returns a `ResolvedClothingItem` DTO carrying the item plus its current location's name and type. 404 when the barcode is unknown **or** when the requesting user is not Kleiderwart and the item is at an `onlyVisibleForKleiderwart` location (the two cases are intentionally indistinguishable to clients; logs record the real reason).
-- `GET /api/clothing/items/search?q=<text>&limit=<n>` — fuzzy typeahead for the Combobox backup. Matches type name, size, and barcode (case-insensitive contains, any field). Hard-capped result count, no pagination. Items at `onlyVisibleForKleiderwart` locations are filtered out for non-Kleiderwart callers.
+- `GET /api/clothing/items/by-barcode/{barcode}` — strict-equality lookup for the HID barcode scanner, matching either the station `Barcode` or the `Hersteller-Barcode`. Returns a `ResolvedClothingItem` DTO carrying the item plus its current location's name and type. 404 when the barcode is unknown **or** when the requesting user is not Kleiderwart and the item is at an `onlyVisibleForKleiderwart` location (the two cases are intentionally indistinguishable to clients; logs record the real reason).
+- `GET /api/clothing/items/search?q=<text>&limit=<n>` — fuzzy typeahead for the Combobox backup. Matches type name, size, and either barcode (case-insensitive contains, any field). Hard-capped result count, no pagination. Items at `onlyVisibleForKleiderwart` locations are filtered out for non-Kleiderwart callers.
 - `GET /api/clothing/locations/{id}/items` — every `ResolvedClothingItem` currently at a location. Any authenticated user; returns 404 when the location is `onlyVisibleForKleiderwart` and the caller is not Kleiderwart, indistinguishable from a missing location. Returns resolved rather than raw items so callers never have to join type names client-side.
 
 ### Umlagerung (Relocation)
