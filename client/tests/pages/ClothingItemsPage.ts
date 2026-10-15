@@ -49,7 +49,16 @@ export class ClothingItemsPage {
 
   async fillBarcode(barcode: string) {
     await this.page
-      .getByRole("textbox", { name: "Barcode (optional)" })
+      .getByRole("textbox", { name: "Barcode (optional)", exact: true })
+      .fill(barcode)
+  }
+
+  async fillManufacturerBarcode(barcode: string) {
+    await this.page
+      .getByRole("textbox", {
+        name: "Hersteller-Barcode (optional)",
+        exact: true,
+      })
       .fill(barcode)
   }
 

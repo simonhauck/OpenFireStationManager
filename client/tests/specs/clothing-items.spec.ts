@@ -29,16 +29,20 @@ test.describe("Clothing Items", () => {
 
   test("creates a new item and shows it in the list", async ({ page }) => {
     const barcode = `BC-${randomUUID().slice(0, 8)}`
+    const manufacturerBarcode = `MB-${randomUUID().slice(0, 8)}`
     const itemsPage = new ClothingItemsPage(page)
 
     await itemsPage.gotoNew()
     await itemsPage.selectType(typeName)
     await itemsPage.fillSize("L")
     await itemsPage.fillBarcode(barcode)
+    await itemsPage.fillManufacturerBarcode(manufacturerBarcode)
     await itemsPage.submitForm()
 
     await expect(page).toHaveURL(/\/clothing-management\/items$/)
-    await expect(itemsPage.itemRow(barcode)).toBeVisible()
+    const row = itemsPage.itemRow(barcode)
+    await expect(row).toBeVisible()
+    await expect(row).toContainText(manufacturerBarcode)
   })
 
   test("shows German error when creating an item with a duplicate barcode", async ({

@@ -33,5 +33,6 @@ test.describe("Batch Import", () => {
     await itemsPage.clickImport()
 
     await expect(itemsPage.successMessage()).toBeVisible()
+    await expect(itemsPage.itemRow(manufacturerBarcode)).toBeVisible()
   })
 })
