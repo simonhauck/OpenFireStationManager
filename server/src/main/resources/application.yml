@@ -30,6 +30,9 @@ app:
     token-name: ${server.servlet.session.cookie.name}_REMEMBER_ME
 
 springdoc:
+  model-converters:
+    kotlin-nullable-property-customizer:
+      enabled: false
   swagger-ui:
     enabled: true
   api-docs:

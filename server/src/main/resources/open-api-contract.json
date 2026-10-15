@@ -4514,7 +4514,8 @@
             "type": "integer",
             "format": "int64",
             "description": "Id of an existing clothing type (`Kleidungsart`) this garment belongs to. Must reference a type that already exists.",
-            "example": 3
+            "example": 3,
+            "exclusiveMinimum": 0
           },
           "size": {
             "type": "string",
