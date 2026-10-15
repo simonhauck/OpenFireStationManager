@@ -64,6 +64,14 @@ the behaviour:
 Run unit/component tests with `npm run test`; run E2E with `npm run test:e2e` (or
 `npm run test:e2e:ui` for interactive UI mode).
 
+### Verification rule
+
+Before reporting work done or opening a PR, run the tests for every layer the change touched.
+E2E is required whenever the change touches UI, routes, or user-facing copy: run the affected
+specs (`npx playwright test tests/specs/<file>`) while iterating, and the full suite once before
+finishing. Backend-only changes are verified by the server tests and need no Playwright run. The
+`e2e` CI job runs the full suite as a required check.
+
 ### E2E structure rules
 
 - **One test = one workflow.** A spec covers a single user journey end to end.
@@ -144,6 +152,10 @@ await expect(typesPage.typeRow(name)).toBeVisible()
 // ❌ avoid — assertion inside page object hides intent from the test
 await typesPage.assertTypeVisible(name)
 ```
+
+Accessible-name matching is substring-based: a locator for `"Barcode (optional)"` also matches
+a `Hersteller-Barcode (optional)` field. Add `{ exact: true }` or use a distinct locator when a
+new label contains an existing label.
 
 ### Seeding helpers
 
