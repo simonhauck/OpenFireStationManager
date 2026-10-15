@@ -82,6 +82,10 @@ Follow it rather than improvising a new style. MCP ergonomics are not the reason
   in `client/` and `server/`.
 - **Dependency updates:** Managed by Renovate (see `renovate.json`) with auto-merge enabled and
   a 14-day minimum release age. npm updates are enabled (including grouped `@tanstack/**` updates).
+- **PR labels:** When you create a PR, tag it with the label matching the change so release notes
+  categorize it correctly (`.github/release.yml`): `enhancement` for new features, `bug` for fixes,
+  `dependencies` for dependency updates. Everything else (including unlabeled PRs) falls into
+  "Chores & Other".
 - **CI workflows are configured in `.github/workflows/`.** Run lint, format checks, and tests locally before committing.
 - **No git hooks are installed.** Discipline is manual at this stage.
 
