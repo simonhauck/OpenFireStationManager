@@ -27,13 +27,13 @@ class SnapshotTestDriver(val resourceLoader: ResourceLoader) {
         modifier: (RecursiveComparisonAssert<*>) -> RecursiveComparisonAssert<*> = { it },
     ) {
         runCatching {
-                require(this != null) { "Can not use snapshot test if value is null" }
+            require(this != null) { "Can not use snapshot test if value is null" }
 
-                val expected = resourceLoader.readAnyObject(fileName, this::class.java)
+            val expected = resourceLoader.readAnyObject(fileName, this::class.java)
 
-                val usingRecursiveComparison = assertThat(this).usingRecursiveComparison()
-                modifier(usingRecursiveComparison).isEqualTo(expected)
-            }
+            val usingRecursiveComparison = assertThat(this).usingRecursiveComparison()
+            modifier(usingRecursiveComparison).isEqualTo(expected)
+        }
             .recover { printErrorOrUpdateSnapshot(this, fileName, it) }
     }
 
@@ -50,11 +50,11 @@ class SnapshotTestDriver(val resourceLoader: ResourceLoader) {
         require(this != null) { "Can not use snapshot test if value is null" }
 
         runCatching {
-                val expected = resourceLoader.readObjectList(fileName, clazz.java)
+            val expected = resourceLoader.readObjectList(fileName, clazz.java)
 
-                val usingRecursiveComparison = assertThat(this).usingRecursiveComparison()
-                modifier(usingRecursiveComparison).isEqualTo(expected)
-            }
+            val usingRecursiveComparison = assertThat(this).usingRecursiveComparison()
+            modifier(usingRecursiveComparison).isEqualTo(expected)
+        }
             .recover { printErrorOrUpdateSnapshot(this, fileName, it) }
     }
 
