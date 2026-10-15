@@ -24,8 +24,6 @@ interface ClothingItemRepository : Repository<ClothingItem, Long> {
 
     fun findById(id: Long): ClothingItem?
 
-    fun findByBarcode(barcode: String): ClothingItem?
-
     fun findAllByLocationId(
         locationId: AggregateReference<ClothingLocation, Long>
     ): List<ClothingItem>

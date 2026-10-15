@@ -42,8 +42,10 @@ class ClothingItemResolver(private val jdbcTemplate: JdbcTemplate) {
     fun resolveByBarcode(barcode: String): ResolvedClothingItem? {
         val results =
             jdbcTemplate.query(
-                "SELECT * FROM resolved_clothing_item_view WHERE item_barcode = ?",
+                "SELECT * FROM resolved_clothing_item_view " +
+                    "WHERE item_barcode = ? OR item_manufacturer_barcode = ?",
                 rowMapper,
+                barcode,
                 barcode,
             )
         return results.firstOrNull()
@@ -73,6 +75,7 @@ class ClothingItemResolver(private val jdbcTemplate: JdbcTemplate) {
             typeId = AggregateReference.to(rs.getLong("item_type_id")),
             size = rs.getString("item_size"),
             barcode = rs.getString("item_barcode"),
+            manufacturerBarcode = rs.getString("item_manufacturer_barcode"),
             locationId = locationId,
             metaData = buildMetaData(rs, "item"),
         )

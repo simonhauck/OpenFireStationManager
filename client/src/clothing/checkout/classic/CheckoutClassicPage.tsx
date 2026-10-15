@@ -22,6 +22,7 @@ import type { CheckoutStep } from "#/clothing/checkout/classic/useClassicCheckou
 import { useClassicCheckoutWizard } from "#/clothing/checkout/classic/useClassicCheckoutWizard"
 import { selectItemsById } from "#/clothing/checkout/selectItemsById"
 import { checkoutMutation } from "#/clothing/checkout/service/checkoutQueries"
+import { displayBarcode } from "#/clothing/components/shared/barcodeDisplay"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import ClothingItemScanner from "#/clothing/components/shared/ClothingItemScanner"
 import {
@@ -405,7 +406,7 @@ function StepReturnTogglesContent({
             <CheckboxListItem
               key={item.clothingItem.id}
               label={`${item.clothingType.name} – ${item.clothingItem.size}`}
-              description={item.clothingItem.barcode ?? undefined}
+              description={displayBarcode(item.clothingItem)}
               isChecked={state.returnItemIds.has(item.clothingItem.id)}
               onCheck={() => onToggleReturnItem(item.clothingItem.id)}
             />

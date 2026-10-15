@@ -2,6 +2,7 @@ import { HStack } from "@astryxdesign/core/HStack"
 import { StackItem, VStack } from "@astryxdesign/core/Stack"
 import { Text } from "@astryxdesign/core/Text"
 import type { ReactNode } from "react"
+import { displayBarcode } from "#/clothing/components/shared/barcodeDisplay"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import RenderIf from "#/components/base/RenderIf"
 
@@ -38,9 +39,9 @@ export default function ClothingItemRow({
           <Text as="p">
             {item.clothingType.name} – {item.clothingItem.size}
           </Text>
-          <RenderIf when={!!item.clothingItem.barcode}>
+          <RenderIf when={displayBarcode(item.clothingItem) !== undefined}>
             <Text as="p" type="supporting">
-              {item.clothingItem.barcode}
+              {displayBarcode(item.clothingItem)}
             </Text>
           </RenderIf>
         </VStack>

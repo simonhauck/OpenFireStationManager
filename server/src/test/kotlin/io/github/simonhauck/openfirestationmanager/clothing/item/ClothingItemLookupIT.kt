@@ -65,6 +65,26 @@ class ClothingItemLookupIT : IntegrationTest() {
     }
 
     @Test
+    fun `by-barcode resolves an item by its manufacturer barcode`() {
+        val type = createType()
+        val manufacturerBarcode = "MANUF-${System.nanoTime()}"
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(
+                typeId = type.id,
+                size = "L",
+                manufacturerBarcode = manufacturerBarcode,
+            ),
+            authCookie = validCookieHeader,
+        )
+
+        val response = getByBarcode(manufacturerBarcode, validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.clothingItem?.manufacturerBarcode).isEqualTo(manufacturerBarcode)
+        assertThat(response.body?.clothingType?.name).isEqualTo(type.name)
+    }
+
+    @Test
     fun `by-barcode returns 404 for an unknown barcode`() {
         val response = getByBarcodeExpectingError("UNKNOWN-${System.nanoTime()}", validCookieHeader)
 
@@ -142,6 +162,26 @@ class ClothingItemLookupIT : IntegrationTest() {
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body?.map { it.clothingItem.barcode }).contains(uniqueBarcode)
+    }
+
+    @Test
+    fun `search matches items by manufacturer barcode (case-insensitive contains)`() {
+        val type = createType()
+        val uniqueBarcode = "MANUF-BC-${System.nanoTime()}"
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(
+                typeId = type.id,
+                size = "S",
+                manufacturerBarcode = uniqueBarcode,
+            ),
+            authCookie = validCookieHeader,
+        )
+
+        val response = search(uniqueBarcode.lowercase(), validCookieHeader)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.map { it.clothingItem.manufacturerBarcode })
+            .contains(uniqueBarcode)
     }
 
     @Test

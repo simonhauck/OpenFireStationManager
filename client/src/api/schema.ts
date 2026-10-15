@@ -447,7 +447,9 @@ export interface paths {
      * Register a new clothing item
      * @description Creates one physical garment. The `typeId` must reference an existing clothing type; create the type first if it does not exist yet.
      *
-     *     `locationId` is optional — an item created without one is unassigned and will not appear in any location's stock until it is moved. Supplying one records an `INITIAL_PLACEMENT` movement. A blank `barcode` is normalised to null rather than stored as an empty string.
+     *     `locationId` is optional — an item created without one is unassigned and will not appear in any location's stock until it is moved. Supplying one records an `INITIAL_PLACEMENT` movement.
+     *
+     *     Both barcodes are optional: the station-assigned `barcode` and the manufacturer-printed `manufacturerBarcode`. They share one value space and must each be unique across all items. A blank value is normalised to null rather than stored as an empty string.
      *
      *     Returns `200 OK` with the created item, including its assigned `id`. This API deliberately does not use `201 Created`.
      *
@@ -1063,7 +1065,7 @@ export interface paths {
     }
     /**
      * Search clothing items by type name, size, or barcode
-     * @description Free-text search across the clothing type name, the size, and the barcode. Use this to answer questions like "which jackets in size 52 do we have?" — pass the type name and the size together as one query string.
+     * @description Free-text search across the clothing type name, the size, and either barcode (the station `Barcode` or the `Hersteller-Barcode`). Use this to answer questions like "which jackets in size 52 do we have?" — pass the type name and the size together as one query string.
      *
      *     Results are returned in **resolved** form, each embedding its full clothing type and current location. Callers without the `KLEIDERWART` role never see items held in locations flagged `onlyVisibleForKleiderwart`.
      *
@@ -1088,12 +1090,12 @@ export interface paths {
       cookie?: never
     }
     /**
-     * Look up a clothing item by its barcode
-     * @description Resolves the barcode printed on a physical garment to the item it identifies. This is the endpoint to use when a scanner is involved.
+     * Look up a clothing item by either of its barcodes
+     * @description Resolves a barcode scanned from a physical garment to the item it identifies. This is the endpoint to use when a scanner is involved. Both the station-assigned `barcode` and the manufacturer- or supplier-printed `manufacturerBarcode` (`Hersteller-Barcode`) resolve, so a user can scan whichever barcode they find first.
      *
      *     The response is the **resolved** form: it embeds the full clothing type and the full current location alongside the item, so no follow-up lookups are needed. `location` is null when the item is not currently assigned anywhere.
      *
-     *     Barcodes are unique across all items. Callers without the `KLEIDERWART` role cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for them such an item reads as not found.
+     *     Barcodes share one value space and are unique across all items. Callers without the `KLEIDERWART` role cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for them such an item reads as not found.
      *
      *     **Authorisation:** any signed-in user.
      */
@@ -1445,10 +1447,15 @@ export interface components {
        */
       size: string
       /**
-       * @description Barcode printed on the garment. Must be unique across all items. Optional — a blank value is stored as null rather than an empty string.
+       * @description Station-assigned barcode printed on our label. Must be unique across all items. Optional — a blank value is stored as null rather than an empty string.
        * @example 1234567890128
        */
       barcode?: string
+      /**
+       * @description Manufacturer- or supplier-printed barcode (`Hersteller-Barcode`) on the garment itself. Shares one value space with `barcode`: it must be unique across all items. Optional — a blank value is stored as null rather than an empty string.
+       * @example 4006381333931
+       */
+      manufacturerBarcode?: string
       /**
        * Format: int64
        * @description Id of the location where this garment currently is. Null means the item is not assigned anywhere and will not show up in any location's stock.
@@ -1470,10 +1477,15 @@ export interface components {
        */
       size: string
       /**
-       * @description Barcode printed on the garment, unique across all items. Null if untagged.
+       * @description Station-assigned barcode, unique across all items. Null if untagged.
        * @example 1234567890128
        */
       barcode?: string
+      /**
+       * @description Manufacturer- or supplier-printed barcode (`Hersteller-Barcode`), sharing the same value space as `barcode` and therefore also unique across all items. Null if absent.
+       * @example 4006381333931
+       */
+      manufacturerBarcode?: string
       /**
        * Format: int64
        * @description Id of the location holding this garment. Null when unassigned.
@@ -1574,7 +1586,7 @@ export interface components {
     }
     /** @description A set of clothing items to create together in a single transaction. */
     BatchCreateClothingItemsRequest: {
-      /** @description Items to create. Must contain at least one entry. If any entry is invalid, or any barcode collides with an existing item or another entry in this list, the whole batch is rejected and nothing is created. */
+      /** @description Items to create. Must contain at least one entry. If any entry is invalid, or any barcode value collides with an existing item, another entry in this list, or the other barcode of its own item, the whole batch is rejected and nothing is created. */
       items: components["schemas"]["CreateOrUpdateClothingItemRequest"][]
     }
     /** @description The set of garments physically found at a location during a stock-take. */
@@ -3108,7 +3120,7 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description Another item already carries this barcode. */
+      /** @description Another item already carries this value as its `Barcode` or `Hersteller-Barcode`. */
       409: {
         headers: {
           [name: string]: unknown
@@ -3177,7 +3189,7 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description A barcode in the batch is already taken, or repeated within the batch. */
+      /** @description A barcode value in the batch is already taken as another item's `Barcode` or `Hersteller-Barcode`, or is repeated within the batch or a single item. */
       409: {
         headers: {
           [name: string]: unknown
@@ -4523,7 +4535,7 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description Another item already carries this barcode. */
+      /** @description Another item already carries this value as its `Barcode` or `Hersteller-Barcode`. */
       409: {
         headers: {
           [name: string]: unknown
@@ -5173,7 +5185,7 @@ export interface operations {
     parameters: {
       query: {
         /**
-         * @description Search term matched against clothing type name, size, and barcode. Required, and must not be blank.
+         * @description Search term matched against clothing type name, size, and either barcode. Required, and must not be blank.
          * @example Einsatzjacke 52
          */
         q: string
@@ -5233,7 +5245,7 @@ export interface operations {
       header?: never
       path: {
         /**
-         * @description Barcode exactly as printed on the garment.
+         * @description Barcode exactly as printed, either the station `Barcode` or the `Hersteller-Barcode`.
          * @example 1234567890128
          */
         barcode: string
@@ -5269,7 +5281,7 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
-      /** @description No item carries this barcode, or the item is in a location the caller may not see. */
+      /** @description No item carries this barcode in either column, or the item is in a location the caller may not see. */
       404: {
         headers: {
           [name: string]: unknown

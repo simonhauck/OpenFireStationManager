@@ -169,6 +169,32 @@ class ClothingItemControllerIT : IntegrationTest() {
     }
 
     @Test
+    fun `createItem rejects a value already used as another item's manufacturer barcode`() {
+        val type = createType()
+        val sharedValue = "SHARED-${System.nanoTime()}"
+        itemCalls.createItem(
+            CreateOrUpdateClothingItemRequest(
+                typeId = type.id,
+                size = "L",
+                manufacturerBarcode = sharedValue,
+            ),
+            authCookie = validCookieHeader,
+        )
+
+        val response =
+            itemCalls.createItemExpectingError(
+                CreateOrUpdateClothingItemRequest(
+                    typeId = type.id,
+                    size = "M",
+                    barcode = sharedValue,
+                ),
+                authCookie = validCookieHeader,
+            )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)
+    }
+
+    @Test
     fun `locationId should be set to null when location is deleted`() {
         val type = createType()
         val location = createLocation()

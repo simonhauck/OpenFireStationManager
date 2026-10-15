@@ -1,6 +1,7 @@
 export interface ParsedItemRow {
   size: string
   barcode?: string
+  manufacturerBarcode?: string
 }
 
 export interface ParsedLocationRow {
@@ -21,8 +22,9 @@ function nonEmptyLines(csv: string): string[] {
 }
 
 /**
- * Parses the batch-import CSV for clothing items: one `size,barcode` pair per line. The barcode
- * column is optional; an empty size is reported as a per-line error.
+ * Parses the batch-import CSV for clothing items: one `size,barcode,manufacturerBarcode` triple
+ * per line. Both barcode columns are optional and may be left empty; an empty size is reported as
+ * a per-line error. Existing two-column pastes keep working unchanged.
  */
 export function parseClothingItemsCsv(
   csv: string,
@@ -32,14 +34,16 @@ export function parseClothingItemsCsv(
 
   const lines = nonEmptyLines(csv)
   for (let i = 0; i < lines.length; i++) {
-    const [size, barcode] = lines[i].split(",").map((part) => part.trim())
+    const [size, barcode, manufacturerBarcode] = lines[i]
+      .split(",")
+      .map((part) => part.trim())
 
     if (!size) {
       errors.push(`Zeile ${i + 1}: Größe darf nicht leer sein.`)
       continue
     }
 
-    rows.push({ size, barcode })
+    rows.push({ size, barcode, manufacturerBarcode })
   }
 
   return { rows, errors }

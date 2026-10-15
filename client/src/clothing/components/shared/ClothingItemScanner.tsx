@@ -13,6 +13,7 @@ import {
   searchClothingItems,
 } from "#/clothing/checkout/service/checkoutQueries"
 import BarcodeImagesGallery from "#/clothing/components/shared/BarcodeImagesGallery"
+import { displayBarcode } from "#/clothing/components/shared/barcodeDisplay"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import RenderIf from "#/components/base/RenderIf"
@@ -151,11 +152,14 @@ export default function ClothingItemScanner({
       search: async (query: string) => {
         try {
           const results = await searchClothingItems(query)
-          return results.map((result) => ({
-            id: String(result.clothingItem.id),
-            label: `${result.clothingType.name} ${result.clothingItem.size}${result.clothingItem.barcode ? ` (${result.clothingItem.barcode})` : ""}`,
-            auxiliaryData: result,
-          }))
+          return results.map((result) => {
+            const barcode = displayBarcode(result.clothingItem)
+            return {
+              id: String(result.clothingItem.id),
+              label: `${result.clothingType.name} ${result.clothingItem.size}${barcode ? ` (${barcode})` : ""}`,
+              auxiliaryData: result,
+            }
+          })
         } catch {
           // silent — search is a backup, not critical
           return []

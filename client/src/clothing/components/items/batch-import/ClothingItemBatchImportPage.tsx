@@ -40,6 +40,12 @@ const previewColumns: TableColumn<CreateOrUpdateClothingItemRequest>[] = [
     width: proportional(1),
     renderCell: (item) => item.barcode || "—",
   },
+  {
+    key: "manufacturerBarcode",
+    header: "Hersteller-Barcode",
+    width: proportional(1),
+    renderCell: (item) => item.manufacturerBarcode || "—",
+  },
 ]
 
 const resultColumns: TableColumn<ClothingItem>[] = [
@@ -63,6 +69,12 @@ const resultColumns: TableColumn<ClothingItem>[] = [
     header: "Barcode",
     width: proportional(1),
     renderCell: (item) => item.barcode || "—",
+  },
+  {
+    key: "manufacturerBarcode",
+    header: "Hersteller-Barcode",
+    width: proportional(1),
+    renderCell: (item) => item.manufacturerBarcode || "—",
   },
 ]
 
@@ -105,6 +117,7 @@ function ClothingItemBatchImportPageContent() {
       typeId: selectedTypeId,
       size: row.size,
       barcode: row.barcode,
+      manufacturerBarcode: row.manufacturerBarcode,
     }))
 
     setPreview(requests)
@@ -166,7 +179,7 @@ function ClothingItemBatchImportPageContent() {
               <BatchPreviewSection
                 items={preview ?? []}
                 isPending={isPending}
-                hasError={mutationError !== null}
+                errorMessage={mutationError?.message ?? null}
                 onSubmit={() => void handleSubmit()}
                 onCancel={() =>
                   void navigate({ to: "/clothing-management/items" })
@@ -252,14 +265,16 @@ function CsvInputSection({
           <br />
           Format:{" "}
           <code>
-            Größe<sup>*</sup>,Barcode
+            Größe<sup>*</sup>,Barcode,Hersteller-Barcode
           </code>
           <br />
         </p>
-        <p className="text-sm italic">Beispiel: L,ExampleBarcode1</p>
+        <p className="text-sm italic">
+          Beispiel: L,ExampleBarcode1,4006381333931
+        </p>
         <TextArea
           label="CSV-Daten"
-          placeholder={"L,BARCODE001\nM\nXL,BARCODE003"}
+          placeholder={"L,BARCODE001\nM\nXL,BARCODE003,4006381333931"}
           rows={8}
           value={value}
           onChange={onChange}
@@ -282,7 +297,7 @@ function CsvInputSection({
 interface BatchPreviewSectionProps {
   items: CreateOrUpdateClothingItemRequest[]
   isPending: boolean
-  hasError: boolean
+  errorMessage: string | null
   onSubmit: () => void
   onCancel: () => void
 }
@@ -290,7 +305,7 @@ interface BatchPreviewSectionProps {
 function BatchPreviewSection({
   items,
   isPending,
-  hasError,
+  errorMessage,
   onSubmit,
   onCancel,
 }: BatchPreviewSectionProps) {
@@ -303,8 +318,8 @@ function BatchPreviewSection({
         emptyState={<EmptyState title="Keine Einträge vorhanden." isCompact />}
       />
 
-      <RenderIf when={hasError}>
-        <ErrorState message="Die Kleidungsstücke konnten nicht erstellt werden." />
+      <RenderIf when={errorMessage !== null}>
+        <ErrorState message={errorMessage ?? "Unbekannter Fehler."} />
       </RenderIf>
 
       <div className="flex flex-wrap justify-end gap-2 pt-2">
