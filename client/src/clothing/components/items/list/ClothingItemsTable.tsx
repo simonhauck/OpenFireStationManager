@@ -3,12 +3,14 @@ import { EmptyState } from "@astryxdesign/core/EmptyState"
 import { HStack } from "@astryxdesign/core/HStack"
 import { IconButton } from "@astryxdesign/core/IconButton"
 import {
+  paginateData,
   pixel,
   proportional,
   Table,
   type TableColumn,
   useTableColumnSettings,
   useTableColumnSettingsState,
+  useTablePagination,
   useTableSortable,
   useTableSortableState,
 } from "@astryxdesign/core/Table"
@@ -45,8 +47,13 @@ const ITEM_COLUMN_OPTIONS = [
 
 const ITEM_COLUMN_KEYS = ITEM_COLUMN_OPTIONS.map((option) => option.key)
 
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
+const DEFAULT_PAGE_SIZE = 25
+
 export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...ITEM_COLUMN_KEYS,
   ])
@@ -100,7 +107,7 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
 
   const { sortedData, sortConfig } = useTableSortableState<ClothingItemRow>({
     data: filteredItems,
-    defaultSort: [{ sortKey: "id", direction: "ascending" }],
+    defaultSort: [{ sortKey: "id", direction: "descending" }],
     allowUnsortedState: false,
     comparators: {
       id: (a, b) => a.clothingItem.id - b.clothingItem.id,
@@ -119,6 +126,24 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
     },
   })
   const sortPlugin = useTableSortable<ClothingItemRow>(sortConfig)
+
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const pageData = useMemo(
+    () => paginateData(sortedData, currentPage, pageSize),
+    [sortedData, currentPage, pageSize],
+  )
+  const paginationPlugin = useTablePagination<ClothingItemRow>({
+    page: currentPage,
+    onPageChange: setPage,
+    totalItems: sortedData.length,
+    pageSize,
+    pageSizeOptions: PAGE_SIZE_OPTIONS,
+    onPageSizeChange: (newPageSize) => {
+      setPageSize(newPageSize)
+      setPage(1)
+    },
+  })
 
   const columns: TableColumn<ClothingItemRow>[] = [
     {
@@ -197,16 +222,25 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
         searchLabel="Suchen"
         searchPlaceholder="Suchen..."
         searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={(term) => {
+          setSearchTerm(term)
+          setPage(1)
+        }}
         columnOptions={ITEM_COLUMN_OPTIONS}
         activeColumnKeys={columnSettings.activeColumnKeys}
         onChangeActiveColumnKeys={columnSettings.setActiveColumnKeys}
       />
       <Table
-        data={sortedData}
+        data={pageData}
         columns={columns}
         idKey={(item) => item.clothingItem.id}
-        plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
+        rowIndexStart={(currentPage - 1) * pageSize + 1}
+        rowCount={sortedData.length}
+        plugins={{
+          sort: sortPlugin,
+          columnSettings: columnSettingsPlugin,
+          pagination: paginationPlugin,
+        }}
         emptyState={
           <EmptyState title="Keine Kleidungsstücke gefunden." isCompact />
         }
