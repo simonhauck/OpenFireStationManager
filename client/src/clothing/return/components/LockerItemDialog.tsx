@@ -7,6 +7,7 @@ import { Text } from "@astryxdesign/core/Text"
 import { VStack } from "@astryxdesign/core/VStack"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
+import { displayBarcode } from "#/clothing/components/shared/barcodeDisplay"
 import { formatClothingLocationLabel } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
 import {
@@ -126,7 +127,7 @@ export function LockerItemDialog({
                 <CheckboxListItem
                   key={item.clothingItem.id}
                   label={`${item.clothingType.name} – ${item.clothingItem.size}`}
-                  description={item.clothingItem.barcode ?? undefined}
+                  description={displayBarcode(item.clothingItem)}
                   isChecked={
                     alreadyAdded || checkedIds.has(item.clothingItem.id)
                   }

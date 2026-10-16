@@ -25,6 +25,7 @@ export interface SeedItemOptions {
   typeId: number
   size: string
   barcode?: string
+  manufacturerBarcode?: string
   locationId?: number
 }
 
@@ -114,6 +115,7 @@ export function seedClothingItem(
       typeId: options.typeId,
       size: options.size,
       barcode: options.barcode,
+      manufacturerBarcode: options.manufacturerBarcode,
       locationId: options.locationId,
     },
     `item (type ${options.typeId}, size ${options.size})`,

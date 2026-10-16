@@ -85,23 +85,27 @@ class ClothingItemController(
     @GetMapping("/by-barcode/{barcode}")
     @Operation(
         operationId = "getClothingItemByBarcode",
-        summary = "Look up a clothing item by its barcode",
+        summary = "Look up a clothing item by either of its barcodes",
         description =
-            "Resolves the barcode printed on a physical garment to the item it identifies. This " +
-                "is the endpoint to use when a scanner is involved.\n\n" +
+            "Resolves a barcode scanned from a physical garment to the item it identifies. This " +
+                "is the endpoint to use when a scanner is involved. Both the station-assigned " +
+                "`barcode` and the manufacturer- or supplier-printed `manufacturerBarcode` " +
+                "(`Hersteller-Barcode`) resolve, so a user can scan whichever barcode they find " +
+                "first.\n\n" +
                 "The response is the **resolved** form: it embeds the full clothing type and the " +
                 "full current location alongside the item, so no follow-up lookups are needed. " +
                 "`location` is null when the item is not currently assigned anywhere.\n\n" +
-                "Barcodes are unique across all items. Callers without the `KLEIDERWART` role " +
-                "cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for " +
-                "them such an item reads as not found.",
+                "Barcodes share one value space and are unique across all items. Callers without " +
+                "the `KLEIDERWART` role cannot resolve items held in locations flagged " +
+                "`onlyVisibleForKleiderwart`; for them such an item reads as not found.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "The resolved clothing item."),
         ApiResponse(
             responseCode = "404",
             description =
-                "No item carries this barcode, or the item is in a location the caller may not see.",
+                "No item carries this barcode in either column, or the item is in a location the " +
+                    "caller may not see.",
             content =
                 [
                     Content(
@@ -113,7 +117,9 @@ class ClothingItemController(
     )
     fun getItemByBarcode(
         @Parameter(
-            description = "Barcode exactly as printed on the garment.",
+            description =
+                "Barcode exactly as printed, either the station `Barcode` or the " +
+                    "`Hersteller-Barcode`.",
             example = "1234567890128",
         )
         @PathVariable
@@ -127,9 +133,10 @@ class ClothingItemController(
         operationId = "searchClothingItems",
         summary = "Search clothing items by type name, size, or barcode",
         description =
-            "Free-text search across the clothing type name, the size, and the barcode. Use this " +
-                "to answer questions like \"which jackets in size 52 do we have?\" — pass the " +
-                "type name and the size together as one query string.\n\n" +
+            "Free-text search across the clothing type name, the size, and either barcode (the " +
+                "station `Barcode` or the `Hersteller-Barcode`). Use this to answer questions " +
+                "like \"which jackets in size 52 do we have?\" — pass the type name and the size " +
+                "together as one query string.\n\n" +
                 "Results are returned in **resolved** form, each embedding its full clothing type " +
                 "and current location. Callers without the `KLEIDERWART` role never see items " +
                 "held in locations flagged `onlyVisibleForKleiderwart`.\n\n" +
@@ -139,8 +146,8 @@ class ClothingItemController(
     fun searchItems(
         @Parameter(
             description =
-                "Search term matched against clothing type name, size, and barcode. Required, and " +
-                    "must not be blank.",
+                "Search term matched against clothing type name, size, and either barcode. " +
+                    "Required, and must not be blank.",
             example = "Einsatzjacke 52",
         )
         @RequestParam
@@ -166,8 +173,11 @@ class ClothingItemController(
                 "create the type first if it does not exist yet.\n\n" +
                 "`locationId` is optional — an item created without one is unassigned and will " +
                 "not appear in any location's stock until it is moved. Supplying one records an " +
-                "`INITIAL_PLACEMENT` movement. A blank `barcode` is normalised to null rather " +
-                "than stored as an empty string.\n\n" +
+                "`INITIAL_PLACEMENT` movement.\n\n" +
+                "Both barcodes are optional: the station-assigned `barcode` and the " +
+                "manufacturer-printed `manufacturerBarcode`. They share one value space and must " +
+                "each be unique across all items. A blank value is normalised to null rather than " +
+                "stored as an empty string.\n\n" +
                 "Returns `200 OK` with the created item, including its assigned `id`. This API " +
                 "deliberately does not use `201 Created`.",
     )
@@ -175,7 +185,8 @@ class ClothingItemController(
         ApiResponse(responseCode = "200", description = "The newly created clothing item."),
         ApiResponse(
             responseCode = "409",
-            description = "Another item already carries this barcode.",
+            description =
+                "Another item already carries this value as its `Barcode` or `Hersteller-Barcode`.",
             content =
                 [
                     Content(
@@ -204,7 +215,9 @@ class ClothingItemController(
         ApiResponse(responseCode = "200", description = "The newly created clothing items."),
         ApiResponse(
             responseCode = "409",
-            description = "A barcode in the batch is already taken, or repeated within the batch.",
+            description =
+                "A barcode value in the batch is already taken as another item's `Barcode` or " +
+                    "`Hersteller-Barcode`, or is repeated within the batch or a single item.",
             content =
                 [
                     Content(
@@ -248,7 +261,8 @@ class ClothingItemController(
         ),
         ApiResponse(
             responseCode = "409",
-            description = "Another item already carries this barcode.",
+            description =
+                "Another item already carries this value as its `Barcode` or `Hersteller-Barcode`.",
             content =
                 [
                     Content(

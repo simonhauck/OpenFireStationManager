@@ -21,8 +21,8 @@ test.describe("Batch Import", () => {
 
   test("batch imports clothing items", async ({ page }) => {
     const barcode1 = `BC-${randomUUID().slice(0, 8)}`
-    const barcode2 = `BC-${randomUUID().slice(0, 8)}`
-    const csv = `L,${barcode1}\nM,${barcode2}`
+    const manufacturerBarcode = `MB-${randomUUID().slice(0, 8)}`
+    const csv = `L,${barcode1},${manufacturerBarcode}\nM`
 
     const itemsPage = new ClothingItemsPage(page)
     await itemsPage.gotoBatchImport()
@@ -33,5 +33,6 @@ test.describe("Batch Import", () => {
     await itemsPage.clickImport()
 
     await expect(itemsPage.successMessage()).toBeVisible()
+    await expect(itemsPage.itemRow(manufacturerBarcode)).toBeVisible()
   })
 })

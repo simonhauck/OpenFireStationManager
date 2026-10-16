@@ -41,12 +41,21 @@ data class CreateOrUpdateClothingItemRequest(
     val size: String,
     @field:Schema(
         description =
-            "Barcode printed on the garment. Must be unique across all items. Optional — a " +
-                "blank value is stored as null rather than an empty string.",
+            "Station-assigned barcode printed on our label. Must be unique across all items. " +
+                "Optional — a blank value is stored as null rather than an empty string.",
         example = "1234567890128",
     )
     @Size(max = 255)
     val barcode: String? = null,
+    @field:Schema(
+        description =
+            "Manufacturer- or supplier-printed barcode (`Hersteller-Barcode`) on the garment " +
+                "itself. Shares one value space with `barcode`: it must be unique across all " +
+                "items. Optional — a blank value is stored as null rather than an empty string.",
+        example = "4006381333931",
+    )
+    @Size(max = 255)
+    val manufacturerBarcode: String? = null,
     @field:Schema(
         implementation = Long::class,
         description =
@@ -60,6 +69,11 @@ data class CreateOrUpdateClothingItemRequest(
         if (barcode?.isBlank() == true) return null
         return barcode
     }
+
+    fun manufacturerBarcodeSanitized(): String? {
+        if (manufacturerBarcode?.isBlank() == true) return null
+        return manufacturerBarcode
+    }
 }
 
 @Schema(description = "A set of clothing items to create together in a single transaction.")
@@ -67,8 +81,9 @@ data class BatchCreateClothingItemsRequest(
     @field:Schema(
         description =
             "Items to create. Must contain at least one entry. If any entry is invalid, or any " +
-                "barcode collides with an existing item or another entry in this list, the whole " +
-                "batch is rejected and nothing is created."
+                "barcode value collides with an existing item, another entry in this list, or " +
+                "the other barcode of its own item, the whole batch is rejected and nothing is " +
+                "created."
     )
     @field:Valid
     @field:NotEmpty
@@ -91,10 +106,17 @@ data class ClothingItem(
     @field:Schema(description = "Size label as printed on the garment.", example = "52")
     val size: String,
     @field:Schema(
-        description = "Barcode printed on the garment, unique across all items. Null if untagged.",
+        description = "Station-assigned barcode, unique across all items. Null if untagged.",
         example = "1234567890128",
     )
     val barcode: String? = null,
+    @field:Schema(
+        description =
+            "Manufacturer- or supplier-printed barcode (`Hersteller-Barcode`), sharing the same " +
+                "value space as `barcode` and therefore also unique across all items. Null if absent.",
+        example = "4006381333931",
+    )
+    val manufacturerBarcode: String? = null,
     @field:Schema(
         implementation = Long::class,
         description = "Id of the location holding this garment. Null when unassigned.",

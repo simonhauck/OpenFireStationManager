@@ -35,6 +35,7 @@ type ClothingItemRow = ResolvedClothingItem & {
 const ITEM_COLUMN_OPTIONS = [
   { key: "id", label: "ID" },
   { key: "barcode", label: "Barcode" },
+  { key: "manufacturerBarcode", label: "Hersteller-Barcode" },
   { key: "type", label: "Typ", isAlwaysVisible: true },
   { key: "size", label: "Größe" },
   { key: "location", label: "Standort" },
@@ -85,6 +86,7 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
       const haystack = [
         String(item.clothingItem.id),
         item.clothingItem.barcode ?? "-",
+        item.clothingItem.manufacturerBarcode ?? "-",
         item.clothingType.name,
         item.clothingItem.size,
         item.location?.name ?? "-",
@@ -107,6 +109,10 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
       barcode: (a, b) =>
         (a.clothingItem.barcode ?? "").localeCompare(
           b.clothingItem.barcode ?? "",
+        ),
+      manufacturerBarcode: (a, b) =>
+        (a.clothingItem.manufacturerBarcode ?? "").localeCompare(
+          b.clothingItem.manufacturerBarcode ?? "",
         ),
       type: (a, b) => a.clothingType.name.localeCompare(b.clothingType.name),
       size: (a, b) => a.clothingItem.size.localeCompare(b.clothingItem.size),
@@ -136,6 +142,14 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
       sortable: true,
       resizable: false,
       renderCell: (item) => item.clothingItem.barcode ?? "-",
+    },
+    {
+      key: "manufacturerBarcode",
+      header: "Hersteller-Barcode",
+      width: proportional(1),
+      sortable: true,
+      resizable: false,
+      renderCell: (item) => item.clothingItem.manufacturerBarcode ?? "-",
     },
     {
       key: "type",

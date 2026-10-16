@@ -38,7 +38,9 @@ class ClothingItemLookupService(private val itemResolver: ClothingItemResolver) 
                 val typeName = resolved.clothingType.name.lowercase()
                 typeName.contains(query) ||
                     resolved.clothingItem.size.lowercase().contains(query) ||
-                    (resolved.clothingItem.barcode?.lowercase()?.contains(query) == true)
+                    (resolved.clothingItem.barcode?.lowercase()?.contains(query) == true) ||
+                    (resolved.clothingItem.manufacturerBarcode?.lowercase()?.contains(query) ==
+                        true)
             }
             .take(effectiveLimit)
             .toList()

@@ -34,6 +34,9 @@ export default function ClothingItemForm({
   )
   const [size, setSize] = useState(existingItem?.size ?? "")
   const [barcode, setBarcode] = useState(existingItem?.barcode ?? "")
+  const [manufacturerBarcode, setManufacturerBarcode] = useState(
+    existingItem?.manufacturerBarcode ?? "",
+  )
   const [locationId, setLocationId] = useState<number | undefined>(
     existingItem?.locationId,
   )
@@ -78,6 +81,7 @@ export default function ClothingItemForm({
       typeId,
       size,
       barcode: barcode,
+      manufacturerBarcode: manufacturerBarcode,
       locationId: locationId,
     }
 
@@ -137,6 +141,12 @@ export default function ClothingItemForm({
             label="Barcode (optional)"
             value={barcode}
             onChange={setBarcode}
+          />
+
+          <TextInput
+            label="Hersteller-Barcode (optional)"
+            value={manufacturerBarcode}
+            onChange={setManufacturerBarcode}
           />
 
           <ClothingLocationSelect
