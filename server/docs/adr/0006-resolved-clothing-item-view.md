@@ -1,7 +1,7 @@
 
 # ADR-0006: PostgreSQL view for resolved clothing items
 
-**Status:** Accepted — pagination consequence partially superseded by [client ADR-0008](../../../client/docs/adr/0008-clothing-items-client-side-pagination.md)
+**Status:** Accepted — pagination consequence partially superseded by [client ADR-0008](../../../client/docs/adr/0008-client-side-pagination-for-list-tables.md)
 **Date:** 2026-06-12
 
 ## Context
@@ -82,4 +82,4 @@ The client reconstructed `ResolvedClothingItem` from three separate queries (`it
 
 - `ClothingItemService.getAllItems()` is no longer needed and was removed; the controller depends on `ClothingItemResolver` directly, mirroring `ClothingLocationController`.
 - Pagination and the rendering cost of the full list are explicitly out of scope; a future `q`/page parameter on the same endpoint stays compatible with this change.
-  - **Partially superseded by [client ADR-0008](../../../client/docs/adr/0008-clothing-items-client-side-pagination.md):** the Kleidungsstücke table now paginates client-side. The endpoint itself is unchanged and still returns every item; server-side pagination remains a future option.
+  - **Partially superseded by [client ADR-0008](../../../client/docs/adr/0008-client-side-pagination-for-list-tables.md):** the list tables now paginate client-side. The endpoint itself is unchanged and still returns every item; server-side pagination remains a future option.

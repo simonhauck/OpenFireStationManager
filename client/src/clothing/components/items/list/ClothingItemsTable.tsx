@@ -3,14 +3,12 @@ import { EmptyState } from "@astryxdesign/core/EmptyState"
 import { HStack } from "@astryxdesign/core/HStack"
 import { IconButton } from "@astryxdesign/core/IconButton"
 import {
-  paginateData,
   pixel,
   proportional,
   Table,
   type TableColumn,
   useTableColumnSettings,
   useTableColumnSettingsState,
-  useTablePagination,
   useTableSortable,
   useTableSortableState,
 } from "@astryxdesign/core/Table"
@@ -22,6 +20,7 @@ import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
+import { useClientPagination } from "#/components/base/useClientPagination"
 import { formatDate } from "#/lib/date"
 import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
@@ -47,13 +46,8 @@ const ITEM_COLUMN_OPTIONS = [
 
 const ITEM_COLUMN_KEYS = ITEM_COLUMN_OPTIONS.map((option) => option.key)
 
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
-const DEFAULT_PAGE_SIZE = 25
-
 export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
   const [searchTerm, setSearchTerm] = useState("")
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
     ...ITEM_COLUMN_KEYS,
   ])
@@ -127,23 +121,8 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
   })
   const sortPlugin = useTableSortable<ClothingItemRow>(sortConfig)
 
-  const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize))
-  const currentPage = Math.min(page, totalPages)
-  const pageData = useMemo(
-    () => paginateData(sortedData, currentPage, pageSize),
-    [sortedData, currentPage, pageSize],
-  )
-  const paginationPlugin = useTablePagination<ClothingItemRow>({
-    page: currentPage,
-    onPageChange: setPage,
-    totalItems: sortedData.length,
-    pageSize,
-    pageSizeOptions: PAGE_SIZE_OPTIONS,
-    onPageSizeChange: (newPageSize) => {
-      setPageSize(newPageSize)
-      setPage(1)
-    },
-  })
+  const { pageData, paginationPlugin, rowIndexStart, rowCount, resetPage } =
+    useClientPagination(sortedData)
 
   const columns: TableColumn<ClothingItemRow>[] = [
     {
@@ -224,7 +203,7 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
         searchValue={searchTerm}
         onSearchChange={(term) => {
           setSearchTerm(term)
-          setPage(1)
+          resetPage()
         }}
         columnOptions={ITEM_COLUMN_OPTIONS}
         activeColumnKeys={columnSettings.activeColumnKeys}
@@ -234,8 +213,8 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
         data={pageData}
         columns={columns}
         idKey={(item) => item.clothingItem.id}
-        rowIndexStart={(currentPage - 1) * pageSize + 1}
-        rowCount={sortedData.length}
+        rowIndexStart={rowIndexStart}
+        rowCount={rowCount}
         plugins={{
           sort: sortPlugin,
           columnSettings: columnSettingsPlugin,
