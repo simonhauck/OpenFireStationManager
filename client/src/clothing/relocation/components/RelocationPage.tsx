@@ -380,16 +380,16 @@ function StepSuccessContent({
       </Text>
       <div className="flex gap-3">
         <Button
-          label="Neue Umlagerung starten"
+          label="Zur Übersicht"
           variant="primary"
           size="lg"
-          onClick={onReset}
+          onClick={onNavigateToOverview}
         />
         <Button
-          label="Zur Übersicht"
+          label="Neue Umlagerung starten"
           variant="secondary"
           size="lg"
-          onClick={onNavigateToOverview}
+          onClick={onReset}
         />
       </div>
     </div>
