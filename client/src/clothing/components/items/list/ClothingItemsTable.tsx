@@ -20,6 +20,7 @@ import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
+import { useClientPagination } from "#/components/base/useClientPagination"
 import { formatDate } from "#/lib/date"
 import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
@@ -102,7 +103,7 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
 
   const { sortedData, sortConfig } = useTableSortableState<ClothingItemRow>({
     data: filteredItems,
-    defaultSort: [{ sortKey: "id", direction: "ascending" }],
+    defaultSort: [{ sortKey: "id", direction: "descending" }],
     allowUnsortedState: false,
     comparators: {
       id: (a, b) => a.clothingItem.id - b.clothingItem.id,
@@ -125,6 +126,9 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
     },
   })
   const sortPlugin = useTableSortable<ClothingItemRow>(sortConfig)
+
+  const { pageData, paginationPlugin, rowIndexStart, rowCount, resetPage } =
+    useClientPagination(sortedData)
 
   const columns: TableColumn<ClothingItemRow>[] = [
     {
@@ -211,16 +215,25 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
         searchLabel="Suchen"
         searchPlaceholder="Suchen..."
         searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={(term) => {
+          setSearchTerm(term)
+          resetPage()
+        }}
         columnOptions={ITEM_COLUMN_OPTIONS}
         activeColumnKeys={columnSettings.activeColumnKeys}
         onChangeActiveColumnKeys={columnSettings.setActiveColumnKeys}
       />
       <Table
-        data={sortedData}
+        data={pageData}
         columns={columns}
         idKey={(item) => item.clothingItem.id}
-        plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
+        rowIndexStart={rowIndexStart}
+        rowCount={rowCount}
+        plugins={{
+          sort: sortPlugin,
+          columnSettings: columnSettingsPlugin,
+          pagination: paginationPlugin,
+        }}
         emptyState={
           <EmptyState title="Keine Kleidungsstücke gefunden." isCompact />
         }
