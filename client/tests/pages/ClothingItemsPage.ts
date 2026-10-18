@@ -100,6 +100,13 @@ export class ClothingItemsPage {
     })
   }
 
+  locationLink(barcode: string, locationName: string) {
+    return this.itemRow(barcode).getByRole("link", {
+      name: locationName,
+      exact: true,
+    })
+  }
+
   formErrorAlert() {
     return this.page.getByRole("alert")
   }

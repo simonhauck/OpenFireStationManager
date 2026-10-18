@@ -1,5 +1,4 @@
 import { AlertDialog } from "@astryxdesign/core/AlertDialog"
-import { Badge } from "@astryxdesign/core/Badge"
 import { Button } from "@astryxdesign/core/Button"
 import { Card } from "@astryxdesign/core/Card"
 import { CheckboxListItem } from "@astryxdesign/core/CheckboxList"
@@ -11,9 +10,11 @@ import { Selector } from "@astryxdesign/core/Selector"
 import { Step, Stepper } from "@astryxdesign/core/Stepper"
 import { Text } from "@astryxdesign/core/Text"
 import { useToast } from "@astryxdesign/core/Toast"
+import { Token } from "@astryxdesign/core/Token"
 import { VStack } from "@astryxdesign/core/VStack"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import { MapPinIcon } from "lucide-react"
 import type { ReactNode } from "react"
 import { useEffect, useMemo, useState } from "react"
 
@@ -295,8 +296,9 @@ function StepItemScannerContent({
             const loc = item.location
             if (!loc || loc.type === "POOL") return null
             return (
-              <Badge
-                variant="neutral"
+              <Token
+                color="orange"
+                icon={<MapPinIcon className="size-4" />}
                 label={formatClothingLocationLabel(
                   loc,
                   memberName(loc.memberId),

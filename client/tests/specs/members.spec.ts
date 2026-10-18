@@ -41,7 +41,7 @@ test.describe("Members", () => {
     await expect(membersPage.memberRow(updatedName)).toBeVisible()
   })
 
-  test("shows a member's Standorte as chips linking to the Standort edit page", async ({
+  test("shows a member's Standorte as links to the Standort edit page", async ({
     page,
     request,
   }) => {
@@ -65,13 +65,13 @@ test.describe("Members", () => {
     await membersPage.goto()
 
     await expect(
-      membersPage.locationChip(memberName, firstLocation),
+      membersPage.locationLink(memberName, firstLocation),
     ).toBeVisible()
     await expect(
-      membersPage.locationChip(memberName, secondLocation),
+      membersPage.locationLink(memberName, secondLocation),
     ).toBeVisible()
 
-    await membersPage.locationChip(memberName, secondLocation).click()
+    await membersPage.locationLink(memberName, secondLocation).click()
     await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
     await expect(
       page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
