@@ -1,108 +1,83 @@
 
 # AGENTS.md — OpenFireStationManager
 
-Guidance for agentic coding assistants working in this repository.
+Guidance for agentic coding assistants.
 
-## Project Overview
+Open-source firefighting-station management platform. This monorepo has two independent components
+and no root build orchestrator; each is built and run separately.
 
-**OpenFireStationManager** is an open-source platform for managing firefighting stations. It is a
-monorepo with two independent components:
-
-- `client/` — React 19 + TypeScript frontend (Vite, TanStack Router, TanStack Query, Astryx, Tailwind CSS)
-- `server/` — Spring Boot 4 + Kotlin backend (Spring Data JDBC, PostgreSQL, SpringDoc OpenAPI)
-
-There is no root-level build orchestrator. Each component is built and run independently.
-
----
+- `client/` — React 19 + TypeScript (Vite, TanStack Router/Query, Astryx, Tailwind CSS)
+- `server/` — Spring Boot 4 + Kotlin (Spring Data JDBC, PostgreSQL, SpringDoc OpenAPI)
 
 ## Client (`client/`)
 
-React 19 + TypeScript frontend. See **`client/AGENTS.md`** for the full guide: commands,
-testing, TypeScript rules, code style, routing, and PWA notes.
+Read `client/AGENTS.md` for testing, TypeScript rules, code style, routing, and PWA notes.
 
-**Quick reference:**
-
-|            Purpose             | Command (from `client/`) |
-|--------------------------------|--------------------------|
-| Start dev server               | `npm run dev`            |
-| Run tests                      | `npm run test`           |
-| Production build               | `npm run build`          |
-| Format and lint check          | `npm run format:check`   |
-| TypeScript type check          | `npm run build:check`    |
-| Format and lint auto-fix       | `npm run format:fix`     |
-| Generate frontend API bindings | `npm run prepareEnv`     |
-
----
+From `client/`: `npm run dev` (dev server), `npm run test` (tests), `npm run build` (production
+build), `npm run format:check` / `format:fix` (lint/format), `npm run build:check` (type check),
+`npm run prepareEnv` (API bindings).
 
 ## Server (`server/`)
 
-Spring Boot 4 + Kotlin backend. See **`server/AGENTS.md`** for the full guide: commands,
-testing, code style, API design, and database conventions.
+Read `server/AGENTS.md` for testing, code style, API design, and database conventions.
 
-**Quick reference** (the Gradle wrapper lives at the repo root, not in `server/`):
+The Gradle wrapper is at the repo root, not in `server/`. From the repo root:
 
-|      Purpose       |                                    Command (from repo root)                                    |
-|--------------------|------------------------------------------------------------------------------------------------|
-| Build              | `./gradlew :server:build`                                                                      |
-| Run                | `./gradlew :server:bootRun`                                                                    |
-| Test all           | `./gradlew :server:test`                                                                       |
-| Single test class  | `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest"`          |
-| Single test method | `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest.myMethod"` |
+- `./gradlew :server:build` — build
+- `./gradlew :server:bootRun` — run
+- `./gradlew :server:test` — all tests
+- `./gradlew :server:test --tests "io.github.simonhauck.openfirestationmanager.MyTest"` — one class;
+  add `.myMethod` for one method
 
-> **Docker must be running** before executing integration tests.
+Docker must be running before integration tests.
 
----
+## OpenAPI contract
 
-## The OpenAPI contract
+`server/src/main/resources/open-api-contract.json` is generated from SpringDoc annotations and
+committed. An API change is not finished at the controller; update all three consumers:
 
-`server/src/main/resources/open-api-contract.json` is generated from the SpringDoc annotations and
-committed. It has three consumers, so an API change is never finished at the controller:
+1. **Contract snapshot:** `./update-api-definition.sh` from the repo root. CI fails if it is stale.
+2. **TypeScript bindings:** `npm run prepareEnv` from `client/`. No CI check, so a stale binding
+   passes unnoticed.
+3. **MCP surface:** the `ofsm-api` server in `opencode.jsonc` reads the same file, so
+   `@Operation`/`@Schema` shape its usability. This consumer is secondary, used sporadically for
+   environment tasks, and does not drive API design (see `docs/adr/0001`).
 
-1. **The contract snapshot** — regenerate with `./update-api-definition.sh` from the repo root.
-   CI fails if it is stale.
-2. **The TypeScript bindings** — regenerate with `npm run prepareEnv` from `client/`.
-   **Nothing in CI checks this**, so a stale binding passes unnoticed.
-3. **The MCP tool surface** — the `ofsm-api` server in `opencode.jsonc` reads the same file, so
-   `@Operation` and `@Schema` annotations directly determine how usable the API is to an agent.
-   This is a **secondary** consumer, used sporadically for environment tasks; it does not drive
-   API design (see `docs/adr/0001`).
+The SpringDoc annotation rules in `server/AGENTS.md` ("API Design") are strict and include a worked
+example; follow them rather than improvising. MCP ergonomics are not the reason for the rules.
 
-Because the annotations are the API documentation shared by all consumers, the SpringDoc
-annotation rules in `server/AGENTS.md` ("API Design") are strict and include a worked example.
-Follow it rather than improvising a new style. MCP ergonomics are not the reason for the rules.
+## Repository notes
 
----
+- **Formatting:** Biome formats/lints the frontend. Spotless formats root JSON/JSONC, backend JSON,
+  Kotlin, and Markdown. YAML is not auto-formatted.
+- **Root Gradle:** mainly Spotless checks/formatting on repo-level files (`*.gradle.kts`,
+  JSON/JSONC, Markdown). Build/run/test workflows stay component-local.
+- **Dependencies:** Renovate (auto-merge, 14-day minimum release age); npm updates are enabled,
+  including grouped `@tanstack/**` updates.
+- **CI:** workflows live in `.github/workflows/`. Run lint, format checks, and tests locally before
+  committing.
+- **No git hooks:** discipline is manual.
 
-## Repository-level Notes
+## Pull requests
 
-- **Formatting ownership:** Biome formats and lints the frontend. Spotless formats root JSON/JSONC,
-  backend JSON, Kotlin, and Markdown. YAML is not formatted automatically.
-- **Root Gradle usage:** Root `./gradlew` is mainly for Spotless checks/formatting on
-  repo-level files (`*.gradle.kts`, JSON/JSONC, and Markdown). Build/run/test workflows remain component-local
-  in `client/` and `server/`.
-- **Dependency updates:** Managed by Renovate (see `renovate.json`) with auto-merge enabled and
-  a 14-day minimum release age. npm updates are enabled (including grouped `@tanstack/**` updates).
-- **PR labels:** When you create a PR, tag it with the label matching the change so release notes
-  categorize it correctly (`.github/release.yml`): `enhancement` for new features, `bug` for fixes,
-  `dependencies` for dependency updates. Everything else (including unlabeled PRs) falls into
-  "Chores & Other".
-- **CI workflows are configured in `.github/workflows/`.** Run lint, format checks, and tests locally before committing.
-- **No git hooks are installed.** Discipline is manual at this stage.
+**Titles:** Describe the change, never the branch. Use an imperative, sentence-case summary, e.g.
+`Fix return selection desync in checkout wizard (#323)` or `Client: add pagination to the members
+list`. Add the area prefix (`Client:`, `Server:`, `Docs:`) when not obvious and the issue reference
+when there is one. Titles appear verbatim in release notes and become the squash-merge commit
+message, so they must stand alone.
 
----
+Never use branch-name artifacts (`opencode/...`, `feat/...`, timestamps, bare issue numbers). Always
+pass `--title` to `gh pr create`; otherwise it falls back to the branch name.
+
+**Labels:** Use the label matching the change so release notes categorize it correctly
+(`.github/release.yml`): `enhancement` (features), `bug` (fixes), `dependencies` (dependency
+updates). Anything else, including unlabeled PRs, lands in "Chores & Other".
 
 ## Agent skills
 
-### Issue tracker
-
-GitHub Issues at `simonhauck/OpenFireStationManager`. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See
-`docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Multi-context: `CONTEXT-MAP.md` at the root, with per-component `CONTEXT.md` and `docs/adr/` under `client/` and
-`server/`. See `docs/agents/domain.md`.
+- **Issue tracker:** GitHub Issues at `simonhauck/OpenFireStationManager`; see
+  `docs/agents/issue-tracker.md`.
+- **Triage labels:** canonical labels are `needs-triage`, `needs-info`, `ready-for-agent`,
+  `ready-for-human`, `wontfix`; see `docs/agents/triage-labels.md`.
+- **Domain docs:** multi-context setup with `CONTEXT-MAP.md` at the root and per-component
+  `CONTEXT.md` and `docs/adr/` under `client/` and `server/`; see `docs/agents/domain.md`.
