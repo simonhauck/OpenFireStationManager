@@ -715,7 +715,7 @@ export interface paths {
     }
     /**
      * Get one clothing location by its numeric id
-     * @description Looks up a single location by its database id. This returns the location's own properties only — it does not list the garments currently stored there. To find those, use `searchClothingItems`.
+     * @description Looks up a single location by its database id. This returns the location's own properties only — it does not list the garments currently stored there. To find those, use `GET /api/clothing/locations/{id}/items`.
      *
      *     **Authorisation:** any signed-in user.
      */
@@ -724,7 +724,7 @@ export interface paths {
     post?: never
     /**
      * Delete a clothing location
-     * @description Removes a place from the station. Move any garments still stored here first — deleting a location does not delete or relocate its contents, and items left pointing at it become hard to find.
+     * @description Removes a place from the station. Deleting a location clears the location assignment of its clothing items; the items themselves remain and can be assigned to another location later.
      *
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */

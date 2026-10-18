@@ -14,6 +14,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
 import { parseClothingLocationsCsv } from "#/clothing/components/shared/batchImportCsv"
+import { LOCATION_TYPE_LABELS } from "#/clothing/components/shared/clothingLocationLabel"
 import type {
   ClothingLocation,
   CreateClothingLocationRequest,
@@ -24,13 +25,6 @@ import ErrorState from "#/components/base/ErrorState"
 import PageSection from "#/components/base/PageSection"
 import RenderIf from "#/components/base/RenderIf"
 import RoleGuard from "#/components/base/RoleGuard"
-
-const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
-  POOL: "Pool",
-  WAESCHE: "Wäsche",
-  PERSONAL: "Persönlicher Standort",
-  OTHER: "Sonstiges",
-}
 
 const previewColumns: TableColumn<CreateClothingLocationRequest>[] = [
   {

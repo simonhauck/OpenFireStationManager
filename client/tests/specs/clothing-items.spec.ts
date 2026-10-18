@@ -125,7 +125,7 @@ test.describe("Clothing Items", () => {
     await expect(new MemberDetailPage(page).heading(memberName)).toBeVisible()
   })
 
-  test("links the Standort of an item to the Standort edit page", async ({
+  test("links the Standort of an item to the Standort detail page", async ({
     page,
     request,
   }) => {
@@ -149,9 +149,9 @@ test.describe("Clothing Items", () => {
     await expect(itemsPage.locationLink(barcode, locationName)).toBeVisible()
 
     await itemsPage.locationLink(barcode, locationName).click()
-    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
+    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+$/)
     await expect(
-      page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
-    ).toHaveValue(locationName)
+      page.getByRole("heading", { name: locationName, level: 1 }),
+    ).toBeVisible()
   })
 })

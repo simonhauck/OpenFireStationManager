@@ -2,11 +2,13 @@ import { AlertDialog } from "@astryxdesign/core/AlertDialog"
 import { EmptyState } from "@astryxdesign/core/EmptyState"
 import { HStack } from "@astryxdesign/core/HStack"
 import { IconButton } from "@astryxdesign/core/IconButton"
+import { Link } from "@astryxdesign/core/Link"
 import {
   pixel,
   proportional,
   Table,
   type TableColumn,
+  type TableSortState,
   useTableColumnSettings,
   useTableColumnSettingsState,
   useTableSortable,
@@ -26,37 +28,87 @@ import { formatDate } from "#/lib/date"
 import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
+export type ClothingItemColumnKey =
+  | "id"
+  | "barcode"
+  | "manufacturerBarcode"
+  | "type"
+  | "size"
+  | "location"
+  | "member"
+  | "createdAt"
+  | "actions"
+
 interface ClothingItemsTableProps {
   items: ResolvedClothingItem[]
+  columnKeys?: ReadonlyArray<ClothingItemColumnKey>
+  linkItemLabels?: boolean
+  searchLabel?: string
+  searchPlaceholder?: string
+  emptyStateTitle?: string
+  defaultSort?: TableSortState
 }
 
 type ClothingItemRow = ResolvedClothingItem & {
   memberName?: string
 }
 
-const ITEM_COLUMN_OPTIONS = [
-  { key: "id", label: "ID" },
-  { key: "barcode", label: "Barcode" },
-  { key: "manufacturerBarcode", label: "Hersteller-Barcode" },
-  { key: "type", label: "Typ", isAlwaysVisible: true },
-  { key: "size", label: "Größe" },
-  { key: "location", label: "Standort" },
-  { key: "member", label: "Mitglied" },
-  { key: "createdAt", label: "Erstellt am" },
-  { key: "actions", label: "Aktionen", isAlwaysVisible: true },
+const ITEM_COLUMN_LABELS: Record<ClothingItemColumnKey, string> = {
+  id: "ID",
+  barcode: "Barcode",
+  manufacturerBarcode: "Hersteller-Barcode",
+  type: "Typ",
+  size: "Größe",
+  location: "Standort",
+  member: "Mitglied",
+  createdAt: "Erstellt am",
+  actions: "Aktionen",
+}
+
+const ITEM_COLUMN_KEYS: ReadonlyArray<ClothingItemColumnKey> = [
+  "id",
+  "barcode",
+  "manufacturerBarcode",
+  "type",
+  "size",
+  "location",
+  "member",
+  "createdAt",
+  "actions",
 ]
 
-const ITEM_COLUMN_KEYS = ITEM_COLUMN_OPTIONS.map((option) => option.key)
+const ALWAYS_VISIBLE_COLUMN_KEYS: ReadonlySet<ClothingItemColumnKey> = new Set([
+  "type",
+  "actions",
+])
 
-export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
+const DEFAULT_SORT: TableSortState = [
+  { sortKey: "id", direction: "descending" },
+]
+
+export default function ClothingItemsTable({
+  items,
+  columnKeys = ITEM_COLUMN_KEYS,
+  linkItemLabels = false,
+  searchLabel = "Suchen",
+  searchPlaceholder = "Suchen...",
+  emptyStateTitle = "Keine Kleidungsstücke gefunden.",
+  defaultSort = DEFAULT_SORT,
+}: ClothingItemsTableProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeColumnKeys, setActiveColumnKeys] = useState<string[]>([
-    ...ITEM_COLUMN_KEYS,
+    ...columnKeys,
   ])
   const lookupMemberName = useMemberNameLookup()
 
+  const columnOptions = columnKeys.map((key) => ({
+    key,
+    label: ITEM_COLUMN_LABELS[key],
+    isAlwaysVisible: ALWAYS_VISIBLE_COLUMN_KEYS.has(key),
+  }))
+
   const columnSettings = useTableColumnSettingsState({
-    columns: ITEM_COLUMN_OPTIONS,
+    columns: columnOptions,
     activeColumnKeys,
     onChangeActiveColumnKeys: (keys) => setActiveColumnKeys([...keys]),
   })
@@ -104,7 +156,7 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
 
   const { sortedData, sortConfig } = useTableSortableState<ClothingItemRow>({
     data: filteredItems,
-    defaultSort: [{ sortKey: "id", direction: "descending" }],
+    defaultSort,
     allowUnsortedState: false,
     comparators: {
       id: (a, b) => a.clothingItem.id - b.clothingItem.id,
@@ -162,7 +214,16 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (item) => item.clothingType.name,
+      renderCell: (item) =>
+        linkItemLabels ? (
+          <Link
+            href={`/clothing-management/items/${item.clothingItem.id}/edit`}
+          >
+            {item.clothingType.name}
+          </Link>
+        ) : (
+          item.clothingType.name
+        ),
     },
     {
       key: "size",
@@ -170,7 +231,16 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
       width: pixel(96),
       sortable: true,
       resizable: false,
-      renderCell: (item) => item.clothingItem.size,
+      renderCell: (item) =>
+        linkItemLabels ? (
+          <Link
+            href={`/clothing-management/items/${item.clothingItem.id}/edit`}
+          >
+            {item.clothingItem.size}
+          </Link>
+        ) : (
+          item.clothingItem.size
+        ),
     },
     {
       key: "location",
@@ -218,14 +288,14 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
   return (
     <div className="space-y-3">
       <TableToolbar
-        searchLabel="Suchen"
-        searchPlaceholder="Suchen..."
+        searchLabel={searchLabel}
+        searchPlaceholder={searchPlaceholder}
         searchValue={searchTerm}
         onSearchChange={(term) => {
           setSearchTerm(term)
           resetPage()
         }}
-        columnOptions={ITEM_COLUMN_OPTIONS}
+        columnOptions={columnOptions}
         activeColumnKeys={columnSettings.activeColumnKeys}
         onChangeActiveColumnKeys={columnSettings.setActiveColumnKeys}
       />
@@ -240,9 +310,7 @@ export default function ClothingItemsTable({ items }: ClothingItemsTableProps) {
           columnSettings: columnSettingsPlugin,
           pagination: paginationPlugin,
         }}
-        emptyState={
-          <EmptyState title="Keine Kleidungsstücke gefunden." isCompact />
-        }
+        emptyState={<EmptyState title={emptyStateTitle} isCompact />}
       />
     </div>
   )

@@ -60,7 +60,7 @@ class ClothingLocationController(
         description =
             "Looks up a single location by its database id. This returns the location's own " +
                 "properties only — it does not list the garments currently stored there. To find " +
-                "those, use `searchClothingItems`.",
+                "those, use `GET /api/clothing/locations/{id}/items`.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "The clothing location."),
@@ -251,9 +251,9 @@ class ClothingLocationController(
         operationId = "deleteClothingLocation",
         summary = "Delete a clothing location",
         description =
-            "Removes a place from the station. Move any garments still stored here first — " +
-                "deleting a location does not delete or relocate its contents, and items left " +
-                "pointing at it become hard to find.",
+            "Removes a place from the station. Deleting a location clears the location " +
+                "assignment of its clothing items; the items themselves remain and can be " +
+                "assigned to another location later.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "The location was deleted."),

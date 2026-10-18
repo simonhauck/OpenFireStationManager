@@ -41,7 +41,7 @@ test.describe("Members", () => {
     await expect(membersPage.memberRow(updatedName)).toBeVisible()
   })
 
-  test("shows a member's Standorte as links to the Standort edit page", async ({
+  test("shows a member's Standorte as links to the Standort detail page", async ({
     page,
     request,
   }) => {
@@ -72,10 +72,10 @@ test.describe("Members", () => {
     ).toBeVisible()
 
     await membersPage.locationLink(memberName, secondLocation).click()
-    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
+    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+$/)
     await expect(
-      page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
-    ).toHaveValue(secondLocation)
+      page.getByRole("heading", { name: secondLocation, level: 1 }),
+    ).toBeVisible()
   })
 
   test("opens the member detail page showing audit metadata", async ({
@@ -96,7 +96,7 @@ test.describe("Members", () => {
     await expect(detailPage.metadata()).toContainText("Zuletzt geändert")
   })
 
-  test("lists the member's Standorte with links to the Standort edit page", async ({
+  test("lists the member's Standorte with links to the Standort detail page", async ({
     page,
     request,
   }) => {
@@ -117,10 +117,10 @@ test.describe("Members", () => {
 
     await expect(detailPage.locationLink(locationName)).toBeVisible()
     await detailPage.locationLink(locationName).click()
-    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
+    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+$/)
     await expect(
-      page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
-    ).toHaveValue(locationName)
+      page.getByRole("heading", { name: locationName, level: 1 }),
+    ).toBeVisible()
   })
 
   test("lists the clothing in the member's Standorte grouped by Standort", async ({
@@ -172,6 +172,12 @@ test.describe("Members", () => {
     await expect(groupA).toContainText("XXL")
     await expect(groupA).toContainText(barcodeA)
     await expect(groupA).not.toContainText(typeB)
+    await expect(
+      groupA.getByRole("link", { name: "Details", exact: true }),
+    ).toHaveAttribute(
+      "href",
+      `/clothing-management/locations/${locationOne.id}`,
+    )
 
     const groupB = detailPage.clothingGroup(locationB)
     await expect(groupB).toContainText(typeB)

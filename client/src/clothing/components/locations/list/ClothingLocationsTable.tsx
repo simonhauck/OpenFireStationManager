@@ -1,4 +1,3 @@
-import { AlertDialog } from "@astryxdesign/core/AlertDialog"
 import { Badge } from "@astryxdesign/core/Badge"
 import { EmptyState } from "@astryxdesign/core/EmptyState"
 import { HStack } from "@astryxdesign/core/HStack"
@@ -13,25 +12,18 @@ import {
   useTableSortable,
   useTableSortableState,
 } from "@astryxdesign/core/Table"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
+import DeleteClothingLocationDialog from "#/clothing/components/locations/shared/DeleteClothingLocationDialog"
+import { LOCATION_TYPE_LABELS } from "#/clothing/components/shared/clothingLocationLabel"
 import LocationName from "#/clothing/components/shared/LocationName"
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
-import { deleteClothingLocationMutation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
 import { useClientPagination } from "#/components/base/useClientPagination"
 import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
-
-const LOCATION_TYPE_LABELS: Record<ClothingLocation["type"], string> = {
-  POOL: "Pool",
-  WAESCHE: "Wäsche",
-  PERSONAL: "Persönlicher Standort",
-  OTHER: "Sonstiges",
-}
 
 interface ClothingLocationsTableProps {
   locations: ClothingLocation[]
@@ -243,17 +235,7 @@ interface ClothingLocationActionsProps {
 
 function ClothingLocationActions({ location }: ClothingLocationActionsProps) {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const { mutate: deleteLocation } = useMutation(
-    deleteClothingLocationMutation(queryClient),
-  )
-
-  function handleDelete() {
-    deleteLocation(location.id, {
-      onSuccess: () => setIsDeleteDialogOpen(false),
-    })
-  }
 
   return (
     <HStack gap={1} hAlign="end">
@@ -278,15 +260,10 @@ function ClothingLocationActions({ location }: ClothingLocationActionsProps) {
         size="lg"
         onClick={() => setIsDeleteDialogOpen(true)}
       />
-      <AlertDialog
+      <DeleteClothingLocationDialog
+        location={location}
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        title="Standort löschen"
-        description={`Möchten Sie den Standort "${location.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
-        actionLabel="Löschen"
-        onAction={handleDelete}
-        cancelLabel="Abbrechen"
-        actionVariant="destructive"
       />
     </HStack>
   )
