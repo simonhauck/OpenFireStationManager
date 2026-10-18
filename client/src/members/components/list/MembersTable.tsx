@@ -15,6 +15,7 @@ import { Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import TableToolbar from "#/components/base/TableToolbar"
+import { useClientPagination } from "#/components/base/useClientPagination"
 import { formatDate } from "#/lib/date"
 import MemberActions from "#/members/components/list/MemberActions"
 import MemberName from "#/members/components/shared/MemberName"
@@ -60,7 +61,7 @@ export default function MembersTable({
 
   const { sortedData, sortConfig } = useTableSortableState<Member>({
     data: filteredMembers,
-    defaultSort: [{ sortKey: "name", direction: "ascending" }],
+    defaultSort: [{ sortKey: "createdAt", direction: "descending" }],
     allowUnsortedState: false,
     comparators: {
       createdAt: (a, b) =>
@@ -69,6 +70,9 @@ export default function MembersTable({
     },
   })
   const sortPlugin = useTableSortable<Member>(sortConfig)
+
+  const { pageData, paginationPlugin, rowIndexStart, rowCount, resetPage } =
+    useClientPagination(sortedData)
 
   const columns: TableColumn<Member>[] = [
     {
@@ -138,16 +142,25 @@ export default function MembersTable({
         searchLabel="Mitglieder suchen"
         searchPlaceholder="Mitglieder suchen..."
         searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={(term) => {
+          setSearchTerm(term)
+          resetPage()
+        }}
         columnOptions={MEMBER_COLUMN_OPTIONS}
         activeColumnKeys={columnSettings.activeColumnKeys}
         onChangeActiveColumnKeys={columnSettings.setActiveColumnKeys}
       />
       <Table
-        data={sortedData}
+        data={pageData}
         columns={columns}
         idKey="id"
-        plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
+        rowIndexStart={rowIndexStart}
+        rowCount={rowCount}
+        plugins={{
+          sort: sortPlugin,
+          columnSettings: columnSettingsPlugin,
+          pagination: paginationPlugin,
+        }}
       />
     </div>
   )

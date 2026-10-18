@@ -21,6 +21,7 @@ import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueri
 import { deleteClothingLocationMutation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
 import TableToolbar from "#/components/base/TableToolbar"
+import { useClientPagination } from "#/components/base/useClientPagination"
 import MemberName from "#/members/components/shared/MemberName"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
@@ -109,7 +110,7 @@ export default function ClothingLocationsTable({
   const { sortedData, sortConfig } = useTableSortableState<ClothingLocationRow>(
     {
       data: filteredLocations,
-      defaultSort: [{ sortKey: "id", direction: "ascending" }],
+      defaultSort: [{ sortKey: "id", direction: "descending" }],
       allowUnsortedState: false,
       comparators: {
         id: (a, b) => a.id - b.id,
@@ -125,6 +126,9 @@ export default function ClothingLocationsTable({
     },
   )
   const sortPlugin = useTableSortable<ClothingLocationRow>(sortConfig)
+
+  const { pageData, paginationPlugin, rowIndexStart, rowCount, resetPage } =
+    useClientPagination(sortedData)
 
   const columns: TableColumn<ClothingLocationRow>[] = [
     {
@@ -204,16 +208,25 @@ export default function ClothingLocationsTable({
         searchLabel="Standorte suchen"
         searchPlaceholder="Standorte suchen..."
         searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={(term) => {
+          setSearchTerm(term)
+          resetPage()
+        }}
         columnOptions={LOCATION_COLUMN_OPTIONS}
         activeColumnKeys={columnSettings.activeColumnKeys}
         onChangeActiveColumnKeys={columnSettings.setActiveColumnKeys}
       />
       <Table
-        data={sortedData}
+        data={pageData}
         columns={columns}
         idKey="id"
-        plugins={{ sort: sortPlugin, columnSettings: columnSettingsPlugin }}
+        rowIndexStart={rowIndexStart}
+        rowCount={rowCount}
+        plugins={{
+          sort: sortPlugin,
+          columnSettings: columnSettingsPlugin,
+          pagination: paginationPlugin,
+        }}
         emptyState={<EmptyState title="Keine Standorte gefunden." isCompact />}
       />
     </div>
