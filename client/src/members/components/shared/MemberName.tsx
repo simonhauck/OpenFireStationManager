@@ -1,5 +1,5 @@
 import { Text } from "@astryxdesign/core/Text"
-import { Link } from "@tanstack/react-router"
+import EntityNameLink from "#/components/base/EntityNameLink"
 import { useMemberNameLookup } from "#/members/service/memberQueries"
 
 type MemberNameProps = {
@@ -20,12 +20,8 @@ export default function MemberName({ memberId, name }: MemberNameProps) {
   }
 
   return (
-    <Link
-      to="/members/$memberId"
-      params={{ memberId: String(memberId) }}
-      className="hover:underline"
-    >
+    <EntityNameLink href={`/members/${memberId}`}>
       {resolvedName}
-    </Link>
+    </EntityNameLink>
   )
 }

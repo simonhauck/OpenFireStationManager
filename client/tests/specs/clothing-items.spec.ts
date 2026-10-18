@@ -124,4 +124,34 @@ test.describe("Clothing Items", () => {
     await expect(page).toHaveURL(/\/members\/\d+$/)
     await expect(new MemberDetailPage(page).heading(memberName)).toBeVisible()
   })
+
+  test("links the Standort of an item to the Standort edit page", async ({
+    page,
+    request,
+  }) => {
+    const suffix = randomUUID().slice(0, 8)
+    const locationName = `Spind-${suffix}`
+    const barcode = `BC-Location-${suffix}`
+    const itemsPage = new ClothingItemsPage(page)
+
+    const location = await seedClothingLocation(request, {
+      name: locationName,
+      type: "OTHER",
+    })
+    await seedClothingItem(request, {
+      typeId,
+      size: "L",
+      barcode,
+      locationId: location.id,
+    })
+
+    await itemsPage.goto()
+    await expect(itemsPage.locationLink(barcode, locationName)).toBeVisible()
+
+    await itemsPage.locationLink(barcode, locationName).click()
+    await expect(page).toHaveURL(/\/clothing-management\/locations\/\d+\/edit$/)
+    await expect(
+      page.getByRole("textbox", { name: /^Bezeichnung( Erforderlich)?$/ }),
+    ).toHaveValue(locationName)
+  })
 })

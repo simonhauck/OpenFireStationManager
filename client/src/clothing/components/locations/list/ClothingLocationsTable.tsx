@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
+import LocationName from "#/clothing/components/shared/LocationName"
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import { deleteClothingLocationMutation } from "#/clothing/service/clothingLocationsQueries"
 import FormattedDate from "#/components/base/FormattedDate"
@@ -144,6 +145,9 @@ export default function ClothingLocationsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
+      renderCell: (location) => (
+        <LocationName locationId={location.id} name={location.name} />
+      ),
     },
     {
       key: "member",
