@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@astryxdesign/cli": "^0.6.6",
-    "@biomejs/biome": "2.5.14",
+    "@biomejs/biome": "2.5.15",
     "@playwright/test": "^1.59.1",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/router-plugin": "latest",
