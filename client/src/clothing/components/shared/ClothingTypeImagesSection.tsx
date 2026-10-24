@@ -99,47 +99,45 @@ export default function ClothingTypeImagesSection({
       </RenderIf>
 
       <RenderIf when={!isLoading && !isError}>
-        <>
-          <div className="space-y-3" data-testid="clothing-type-images">
-            <RenderIf when={(images?.length ?? 0) > 0}>
-              <div className="flex flex-wrap gap-3">
-                {images?.map((image, index) => (
-                  <BarcodeImageTile
-                    key={image.id}
-                    imageUrl={clothingTypeImageUrl(typeId, image.id)}
-                    alt={`Barcode-Bild ${index + 1}`}
-                    onOpen={() => lightbox.open(index)}
-                    onRemove={() => setImageToDelete(image)}
-                  />
-                ))}
-              </div>
-            </RenderIf>
-
-            <div className="flex flex-wrap items-end gap-3">
-              <FileInput
-                label="Bild hinzufügen"
-                description="JPEG, PNG oder WebP, max. 5 MB."
-                value={selectedFile}
-                onChange={(value) =>
-                  setSelectedFile(
-                    Array.isArray(value) ? (value[0] ?? null) : value,
-                  )
-                }
-                accept={ACCEPTED_IMAGE_TYPES}
-                maxSize={MAX_IMAGE_SIZE_BYTES}
-              />
-              <Button
-                label="Bild hochladen"
-                icon={<Upload className="size-4" />}
-                variant="secondary"
-                isDisabled={!selectedFile || isUploading}
-                isLoading={isUploading}
-                onClick={handleUpload}
-              />
+        <div className="space-y-3" data-testid="clothing-type-images">
+          <RenderIf when={(images?.length ?? 0) > 0}>
+            <div className="flex flex-wrap gap-3">
+              {images?.map((image, index) => (
+                <BarcodeImageTile
+                  key={image.id}
+                  imageUrl={clothingTypeImageUrl(typeId, image.id)}
+                  alt={`Barcode-Bild ${index + 1}`}
+                  onOpen={() => lightbox.open(index)}
+                  onRemove={() => setImageToDelete(image)}
+                />
+              ))}
             </div>
+          </RenderIf>
+
+          <div className="flex flex-wrap items-end gap-3">
+            <FileInput
+              label="Bild hinzufügen"
+              description="JPEG, PNG oder WebP, max. 5 MB."
+              value={selectedFile}
+              onChange={(value) =>
+                setSelectedFile(
+                  Array.isArray(value) ? (value[0] ?? null) : value,
+                )
+              }
+              accept={ACCEPTED_IMAGE_TYPES}
+              maxSize={MAX_IMAGE_SIZE_BYTES}
+            />
+            <Button
+              label="Bild hochladen"
+              icon={<Upload className="size-4" />}
+              variant="secondary"
+              isDisabled={!selectedFile || isUploading}
+              isLoading={isUploading}
+              onClick={handleUpload}
+            />
           </div>
-          {lightbox.element}
-        </>
+        </div>
+        {lightbox.element}
       </RenderIf>
 
       <AlertDialog

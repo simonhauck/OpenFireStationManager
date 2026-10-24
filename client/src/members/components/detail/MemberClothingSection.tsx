@@ -1,4 +1,6 @@
+import { Button } from "@astryxdesign/core/Button"
 import { Heading } from "@astryxdesign/core/Heading"
+import { HStack } from "@astryxdesign/core/HStack"
 import { Text } from "@astryxdesign/core/Text"
 import ClothingItemRow from "#/clothing/components/shared/ClothingItemRow"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems.ts"
@@ -51,7 +53,15 @@ function MemberClothingGroup({ group }: MemberClothingGroupProps) {
 
   return (
     <div data-testid="clothing-group" className="space-y-2">
-      <Heading level={3}>{location.name}</Heading>
+      <HStack gap={2} vAlign="center">
+        <Heading level={3}>{location.name}</Heading>
+        <Button
+          label="Details"
+          size="sm"
+          variant="secondary"
+          href={`/clothing-management/locations/${location.id}`}
+        />
+      </HStack>
 
       <RenderIf when={isLoading}>
         <LoadingIndicator label="Kleidung wird geladen..." />

@@ -2,7 +2,7 @@ import type { ClothingLocation } from "#/clothing/model/clothingLocations"
 
 type LocationType = ClothingLocation["type"]
 
-const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
+export const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
   POOL: "Pool",
   WAESCHE: "Wäsche",
   PERSONAL: "Persönlicher Standort",

@@ -72,6 +72,10 @@ export class ClothingLocationsPage {
     return this.page.getByRole("row").filter({ hasText: name })
   }
 
+  locationNameLink(name: string) {
+    return this.locationRow(name).getByRole("link", { name, exact: true })
+  }
+
   // --- Batch import ---
 
   async selectBatchType(

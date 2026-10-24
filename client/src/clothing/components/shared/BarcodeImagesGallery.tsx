@@ -43,61 +43,55 @@ export default function BarcodeImagesGallery() {
 
   return (
     <RenderIf when={(types?.length ?? 0) > 0}>
-      <>
-        <Button
-          label="Wo finde ich den Barcode?"
-          variant="secondary"
-          size="lg"
-          onClick={() => setIsOpen(true)}
-        />
-        <Dialog
-          isOpen={isOpen}
-          onOpenChange={setIsOpen}
-          width={GALLERY_DIALOG_WIDTH}
-        >
-          <Layout
-            header={
-              <DialogHeader
-                title="Wo finde ich den Barcode?"
-                onOpenChange={setIsOpen}
-              />
-            }
-            content={
-              <LayoutContent>
-                <div data-testid="barcode-images-gallery" className="space-y-4">
-                  {types?.map((type, typeIndex) => (
-                    <div key={type.typeId} className="space-y-2">
-                      <Text as="p" type="supporting">
-                        {type.typeName}
-                      </Text>
-                      <div className="flex flex-wrap gap-3">
-                        {type.images.map((image, imageIndex) => (
-                          <BarcodeImageTile
-                            key={image.id}
-                            imageUrl={clothingTypeImageUrl(
-                              type.typeId,
-                              image.id,
-                            )}
-                            alt={`Barcode-Bild ${type.typeName}`}
-                            width={GALLERY_TILE_WIDTH}
-                            onOpen={() =>
-                              lightbox.open(
-                                (groupStartIndices[typeIndex] ?? 0) +
-                                  imageIndex,
-                              )
-                            }
-                          />
-                        ))}
-                      </div>
+      <Button
+        label="Wo finde ich den Barcode?"
+        variant="secondary"
+        size="lg"
+        onClick={() => setIsOpen(true)}
+      />
+      <Dialog
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        width={GALLERY_DIALOG_WIDTH}
+      >
+        <Layout
+          header={
+            <DialogHeader
+              title="Wo finde ich den Barcode?"
+              onOpenChange={setIsOpen}
+            />
+          }
+          content={
+            <LayoutContent>
+              <div data-testid="barcode-images-gallery" className="space-y-4">
+                {types?.map((type, typeIndex) => (
+                  <div key={type.typeId} className="space-y-2">
+                    <Text as="p" type="supporting">
+                      {type.typeName}
+                    </Text>
+                    <div className="flex flex-wrap gap-3">
+                      {type.images.map((image, imageIndex) => (
+                        <BarcodeImageTile
+                          key={image.id}
+                          imageUrl={clothingTypeImageUrl(type.typeId, image.id)}
+                          alt={`Barcode-Bild ${type.typeName}`}
+                          width={GALLERY_TILE_WIDTH}
+                          onOpen={() =>
+                            lightbox.open(
+                              (groupStartIndices[typeIndex] ?? 0) + imageIndex,
+                            )
+                          }
+                        />
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </LayoutContent>
-            }
-          />
-        </Dialog>
-        {lightbox.element}
-      </>
+                  </div>
+                ))}
+              </div>
+            </LayoutContent>
+          }
+        />
+      </Dialog>
+      {lightbox.element}
     </RenderIf>
   )
 }

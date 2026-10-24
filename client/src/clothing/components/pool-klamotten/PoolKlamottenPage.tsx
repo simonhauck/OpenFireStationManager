@@ -139,13 +139,21 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
       title={summary.locationName}
       subtitle="Verfügbare Pool-Kleidung am Standort"
       right={
-        <div className="text-right">
-          <Text as="p" type="supporting" className="uppercase tracking-wide">
-            Gesamt
-          </Text>
-          <Text as="p" size="2xl" weight="bold" className="text-success">
-            {totalCount}
-          </Text>
+        <div className="flex items-center gap-3 text-right">
+          <div>
+            <Text as="p" type="supporting" className="uppercase tracking-wide">
+              Gesamt
+            </Text>
+            <Text as="p" size="2xl" weight="bold" className="text-success">
+              {totalCount}
+            </Text>
+          </div>
+          <Button
+            label="Details"
+            variant="secondary"
+            size="lg"
+            href={`/clothing-management/locations/${summary.locationId}`}
+          />
         </div>
       }
     >
