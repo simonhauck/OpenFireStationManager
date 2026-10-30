@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@astryxdesign/core": "^0.6.6",
-    "@astryxdesign/theme-neutral": "^0.6.6",
+    "@astryxdesign/theme-neutral": "^0.7.0",
     "@stylexjs/stylex": "^0.19.1",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
