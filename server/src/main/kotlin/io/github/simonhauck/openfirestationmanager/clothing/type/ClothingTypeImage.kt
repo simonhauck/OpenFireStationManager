@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table
     description =
         "Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, " +
             "without its contents. Download the image itself from " +
-            "`GET /api/clothing/types/{typeId}/images/{imageId}`."
+            "`GET /api/clothing/types/{typeId}/images/{imageId}`.",
 )
 data class ClothingTypeImageMetadata(
     @field:Schema(description = "Server-assigned identifier of the image.", example = "12")
@@ -30,7 +30,7 @@ data class ClothingTypeImageMetadata(
 @Schema(
     description =
         "Every barcode guide image (`Barcode-Bild`) of one clothing type, with the type's name " +
-            "so a scanner screen can label the group without a second lookup."
+            "so a scanner screen can label the group without a second lookup.",
 )
 data class ClothingTypeBarcodeImages(
     @field:Schema(description = "Id of the clothing type.", example = "3") val typeId: Long,

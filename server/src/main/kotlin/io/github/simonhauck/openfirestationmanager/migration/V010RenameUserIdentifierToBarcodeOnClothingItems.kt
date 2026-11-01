@@ -30,7 +30,7 @@ class V010RenameUserIdentifierToBarcodeOnClothingItems : DatabaseMigration {
                 END IF;
             END $$;
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute(
@@ -38,7 +38,7 @@ class V010RenameUserIdentifierToBarcodeOnClothingItems : DatabaseMigration {
             ALTER INDEX IF EXISTS clothing_items_user_identifier_unique
             RENAME TO clothing_items_barcode_unique
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute(
@@ -47,7 +47,7 @@ class V010RenameUserIdentifierToBarcodeOnClothingItems : DatabaseMigration {
             ON clothing_items (barcode)
             WHERE barcode IS NOT NULL
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

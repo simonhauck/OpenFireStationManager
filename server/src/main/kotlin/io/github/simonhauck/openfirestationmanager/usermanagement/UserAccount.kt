@@ -21,7 +21,7 @@ import org.springframework.data.relational.core.mapping.Table
           flagged `onlyVisibleForKleiderwart`.
         - `ADMIN` — implicitly granted every other role, so an admin can call every endpoint in
           this API. Additionally manages user accounts and legal documents.
-        """
+        """,
 )
 enum class UserRole {
     USER,
@@ -64,7 +64,7 @@ data class CreateUserRequest(
 @Schema(
     description =
         "Replacement values for an existing account's profile and roles. The username cannot be " +
-            "changed, and the password is changed through its own endpoint."
+            "changed, and the password is changed through its own endpoint.",
 )
 data class UpdateUserRequest(
     @field:Schema(description = "Given name.", example = "Max")
@@ -94,13 +94,13 @@ data class ChangePasswordRequest(
     )
     @field:NotBlank
     @field:Size(min = 4, max = 32)
-    val newPassword: String
+    val newPassword: String,
 )
 
 @Schema(
     description =
         "A user account. The password hash is never serialised, so it is absent from every " +
-            "response."
+            "response.",
 )
 @Table("users")
 data class UserAccount(

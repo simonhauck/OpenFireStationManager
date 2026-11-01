@@ -19,7 +19,7 @@ class V001CreateUsersTable : DatabaseMigration {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

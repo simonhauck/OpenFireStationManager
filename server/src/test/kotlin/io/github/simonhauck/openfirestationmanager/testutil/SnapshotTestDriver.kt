@@ -88,7 +88,7 @@ class SnapshotTestDriver(val resourceLoader: ResourceLoader) {
             File(
                 classLoaderFile.path
                     .replace("\\", "/")
-                    .replace(Regex("build/resources/([^/]+)"), "src/$1/resources")
+                    .replace(Regex("build/resources/([^/]+)"), "src/$1/resources"),
             )
 
         originalFile.parentFile.mkdirs()

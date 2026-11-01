@@ -155,7 +155,7 @@ class MovementServiceIT : IntegrationTest() {
                                         size = "M",
                                         locationId = AggregateReference.to(location.id),
                                     ),
-                                )
+                                ),
                         ),
                     authCookie = validCookieHeader,
                 )

@@ -35,7 +35,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
     }
 
     fun createBatchLocations(
-        requests: List<CreateClothingLocationRequest>
+        requests: List<CreateClothingLocationRequest>,
     ): List<ClothingLocation> {
         requests.forEach { validateMemberAssignment(it.type, it.memberId) }
         val entities = requests.map { req ->
@@ -66,7 +66,7 @@ class ClothingLocationService(private val repository: ClothingLocationRepository
                 onlyVisibleForKleiderwart = request.onlyVisibleForKleiderwart,
                 type = request.type,
                 memberId = request.memberId,
-            )
+            ),
         )
     }
 

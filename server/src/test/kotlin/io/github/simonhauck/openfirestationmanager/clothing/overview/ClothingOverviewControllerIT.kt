@@ -48,7 +48,7 @@ class ClothingOverviewControllerIT : IntegrationTest() {
                         SizeGroupSummary(
                             name = "3XL",
                             sizes = listOf(SizeSummary(size = "3XL-2", count = 1)),
-                        )
+                        ),
                     ),
             )
         assertThat(summaryForType).isEqualTo(expected)
@@ -90,9 +90,9 @@ class ClothingOverviewControllerIT : IntegrationTest() {
                             SizeGroupSummary(
                                 name = "M",
                                 sizes = listOf(SizeSummary(size = "M", count = 1)),
-                            )
+                            ),
                         ),
-                )
+                ),
             )
     }
 

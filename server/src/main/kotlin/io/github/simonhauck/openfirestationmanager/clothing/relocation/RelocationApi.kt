@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty
 
 @Schema(
     description =
-        "A bulk move of garments into one destination, regardless of where each of them is now."
+        "A bulk move of garments into one destination, regardless of where each of them is now.",
 )
 data class RelocationRequest(
     @field:Schema(

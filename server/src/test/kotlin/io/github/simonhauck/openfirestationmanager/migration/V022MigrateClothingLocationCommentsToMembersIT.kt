@@ -161,7 +161,7 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
                     jdbcTemplate.queryForList<Long>(
                         "SELECT id FROM members WHERE name = ?",
                         ownerName,
-                    )
+                    ),
                 )
                 .containsExactly(memberId)
             assertMigratedTo(listOf(migratedId), memberId)
@@ -195,7 +195,7 @@ class V022MigrateClothingLocationCommentsToMembersIT : IntegrationTest() {
 
     private fun ownedLocationCount(): Long? =
         jdbcTemplate.queryForObject<Long>(
-            "SELECT COUNT(*) FROM clothing_locations WHERE member_id IS NOT NULL"
+            "SELECT COUNT(*) FROM clothing_locations WHERE member_id IS NOT NULL",
         )
 
     private fun locationMemberId(locationId: Long): Long? =

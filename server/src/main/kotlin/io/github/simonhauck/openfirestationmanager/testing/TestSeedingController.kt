@@ -54,7 +54,7 @@ class TestSeedingController(
     )
     @ApiResponses(ApiResponse(responseCode = "200", description = "The newly created type."))
     fun seedClothingType(
-        @Valid @RequestBody request: CreateOrUpdateClothingTypeRequest
+        @Valid @RequestBody request: CreateOrUpdateClothingTypeRequest,
     ): ClothingType = clothingTypeService.createType(request)
 
     @PostMapping("/clothing-locations")
@@ -68,7 +68,7 @@ class TestSeedingController(
     )
     @ApiResponses(ApiResponse(responseCode = "200", description = "The newly created location."))
     fun seedClothingLocation(
-        @Valid @RequestBody request: CreateClothingLocationRequest
+        @Valid @RequestBody request: CreateClothingLocationRequest,
     ): ClothingLocation = clothingLocationService.createLocation(request)
 
     @PostMapping("/clothing-items")
@@ -83,7 +83,7 @@ class TestSeedingController(
     )
     @ApiResponses(ApiResponse(responseCode = "200", description = "The newly created item."))
     fun seedClothingItem(
-        @Valid @RequestBody request: CreateOrUpdateClothingItemRequest
+        @Valid @RequestBody request: CreateOrUpdateClothingItemRequest,
     ): ClothingItem = clothingItemService.createItem(request)
 
     @PostMapping("/members")

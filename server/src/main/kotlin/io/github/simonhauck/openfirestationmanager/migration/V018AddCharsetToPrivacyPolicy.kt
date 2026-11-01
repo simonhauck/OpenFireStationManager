@@ -12,7 +12,7 @@ class V018AddCharsetToPrivacyPolicy : DatabaseMigration {
             """
             ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS charset TEXT
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

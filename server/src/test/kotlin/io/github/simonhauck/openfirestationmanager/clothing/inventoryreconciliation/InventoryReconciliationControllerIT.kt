@@ -49,7 +49,7 @@ class InventoryReconciliationControllerIT : IntegrationTest() {
                 locationId = location.id,
                 request =
                     InventoryReconciliationPreviewRequest(
-                        scannedItemIds = listOf(itemAtLocation.id, itemElsewhere.id)
+                        scannedItemIds = listOf(itemAtLocation.id, itemElsewhere.id),
                     ),
                 authCookie = validCookieHeader,
             )
@@ -143,7 +143,7 @@ class InventoryReconciliationControllerIT : IntegrationTest() {
                 locationId = location.id,
                 request =
                     InventoryReconciliationPreviewRequest(
-                        scannedItemIds = listOf(itemAtLocation.id, itemElsewhere.id)
+                        scannedItemIds = listOf(itemAtLocation.id, itemElsewhere.id),
                     ),
                 authCookie = validCookieHeader,
             )

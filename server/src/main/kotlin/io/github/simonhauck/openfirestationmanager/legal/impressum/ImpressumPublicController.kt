@@ -35,7 +35,7 @@ class ImpressumPublicController(private val service: ImpressumService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )

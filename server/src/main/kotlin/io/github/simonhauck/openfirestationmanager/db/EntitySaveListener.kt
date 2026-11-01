@@ -23,7 +23,7 @@ class EntitySaveListener(private val currentUserProvider: CurrentUserProvider) :
                 createdBy = if (aggregate.id == 0L) currentUser else aggregate.metaData.createdBy,
                 lastModifiedAt = now,
                 lastModifiedBy = currentUser,
-            )
+            ),
         )
     }
 }

@@ -55,7 +55,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(
@@ -67,7 +67,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -80,7 +80,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
         @Parameter(
             description =
                 "The image to store. A JPEG, PNG, or WebP file of at most 5 MB, showing where " +
-                    "the barcode is located on the garment."
+                    "the barcode is located on the garment.",
         )
         @RequestParam("file")
         file: MultipartFile,
@@ -124,7 +124,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -132,7 +132,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
         @Parameter(description = "Numeric id of the clothing type.", example = "3")
         @PathVariable
         @Positive
-        typeId: Long
+        typeId: Long,
     ): List<ClothingTypeImageMetadata> = service.listImages(typeId)
 
     @GetMapping("/types/{typeId}/images/{imageId}")
@@ -155,7 +155,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
                     Content(
                         mediaType = "application/octet-stream",
                         schema = Schema(type = "string", format = "binary"),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(
@@ -166,7 +166,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -208,7 +208,7 @@ class ClothingTypeImageController(private val service: ClothingTypeImageService)
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )

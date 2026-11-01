@@ -22,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Table
         - `WAESCHE` — at the laundry. Garments here are in circulation but unavailable.
         - `PERSONAL` — assigned to one member, e.g. a named locker or peg.
         - `OTHER` — anything that fits none of the above.
-        """
+        """,
 )
 enum class LocationType {
     POOL,
@@ -34,7 +34,7 @@ enum class LocationType {
 @Schema(
     description =
         "Full set of properties for a clothing location. Used for both creation and update; " +
-            "on update every field is applied, so this is a full replacement."
+            "on update every field is applied, so this is a full replacement.",
 )
 data class CreateClothingLocationRequest(
     @field:Schema(
@@ -75,17 +75,17 @@ data class BatchCreateClothingLocationsRequest(
     @field:Schema(
         description =
             "Locations to create. Must contain at least one entry, and every entry is validated " +
-                "individually."
+                "individually.",
     )
     @field:Valid
     @field:NotEmpty
-    val items: List<CreateClothingLocationRequest>
+    val items: List<CreateClothingLocationRequest>,
 )
 
 @Schema(
     description =
         "A place where garments are kept (`Standort`) — the shared pool, the laundry, a " +
-            "member's personal locker, or anywhere else."
+            "member's personal locker, or anywhere else.",
 )
 @Table("clothing_locations")
 data class ClothingLocation(

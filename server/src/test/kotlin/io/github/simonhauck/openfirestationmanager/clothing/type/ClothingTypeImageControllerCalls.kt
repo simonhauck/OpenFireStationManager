@@ -89,7 +89,7 @@ class ClothingTypeImageControllerCalls(private val testRestTemplate: TestRestTem
     }
 
     fun listBarcodeImages(
-        authCookie: String? = null
+        authCookie: String? = null,
     ): ResponseEntity<Array<ClothingTypeBarcodeImages>> {
         return testRestTemplate.exchange<Array<ClothingTypeBarcodeImages>>(
             "/api/clothing/types/barcode-images",
