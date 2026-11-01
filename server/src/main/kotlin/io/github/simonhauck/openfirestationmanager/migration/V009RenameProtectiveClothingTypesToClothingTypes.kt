@@ -22,7 +22,7 @@ class V009RenameProtectiveClothingTypesToClothingTypes : DatabaseMigration {
                 END IF;
             END $$;
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

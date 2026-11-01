@@ -15,7 +15,7 @@ class V005RenameGeraetewartToKleiderwart : DatabaseMigration {
             SET roles = REPLACE(roles, 'GERAETEWART', 'KLEIDERWART')
             WHERE roles LIKE '%GERAETEWART%'
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

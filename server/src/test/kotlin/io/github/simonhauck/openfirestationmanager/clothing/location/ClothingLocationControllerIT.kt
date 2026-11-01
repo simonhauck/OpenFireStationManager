@@ -71,7 +71,7 @@ class ClothingLocationControllerIT : IntegrationTest() {
                             onlyVisibleForKleiderwart = true,
                             type = LocationType.PERSONAL,
                         ),
-                    )
+                    ),
             )
 
         val response = calls.createBatchLocations(request, authCookie = validCookieHeader)
@@ -147,7 +147,11 @@ class ClothingLocationControllerIT : IntegrationTest() {
 
         assertThat(created.memberId?.id).isEqualTo(member.id)
         assertThat(
-                calls.getLocationById(created.id, authCookie = validCookieHeader).body?.memberId?.id
+                calls
+                    .getLocationById(created.id, authCookie = validCookieHeader)
+                    .body
+                    ?.memberId
+                    ?.id,
             )
             .isEqualTo(member.id)
 

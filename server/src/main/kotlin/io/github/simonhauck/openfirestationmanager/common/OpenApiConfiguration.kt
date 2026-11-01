@@ -143,8 +143,8 @@ class OpenApiConfiguration(
                     .contact(
                         Contact()
                             .name("OpenFireStationManager")
-                            .url("https://github.com/simonhauck/OpenFireStationManager")
-                    )
+                            .url("https://github.com/simonhauck/OpenFireStationManager"),
+                    ),
             )
             .components(
                 Components()
@@ -163,7 +163,7 @@ class OpenApiConfiguration(
                             .name(sessionCookieName)
                             .description(
                                 "Server-side session cookie issued by `POST /api/public/auth/login`. " +
-                                    "Send it on every authenticated request."
+                                    "Send it on every authenticated request.",
                             ),
                     )
                     .addSecuritySchemes(
@@ -175,9 +175,9 @@ class OpenApiConfiguration(
                             .description(
                                 "Long-lived cookie issued when logging in with `rememberMe = true`, " +
                                     "valid for ${humanValidity()}. It authenticates on its own, so a " +
-                                    "long-lived client may send it instead of a session cookie."
+                                    "long-lived client may send it instead of a session cookie.",
                             ),
-                    )
+                    ),
             )
             .addSecurityItem(SecurityRequirement().addList(ApiTags.SESSION_COOKIE_SCHEME))
             .tags(
@@ -185,52 +185,52 @@ class OpenApiConfiguration(
                     Tag()
                         .name(ApiTags.AUTHENTICATION)
                         .description(
-                            "Log in, log out, and inspect the current session. Public — no session required."
+                            "Log in, log out, and inspect the current session. Public — no session required.",
                         ),
                     Tag()
                         .name(ApiTags.SETUP)
                         .description(
-                            "One-time bootstrap of the first administrator. Only usable while no user account exists."
+                            "One-time bootstrap of the first administrator. Only usable while no user account exists.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_TYPES)
                         .description(
                             "Categories of garment (*Kleidungsart*), e.g. \"Einsatzjacke\". Reading is open to any " +
                                 "signed-in user; writing requires the KLEIDERWART role. Also carries the barcode " +
-                                "guide images (`Barcode-Bild`) shown on the scanner screens, uploaded per type."
+                                "guide images (`Barcode-Bild`) shown on the scanner screens, uploaded per type.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_LOCATIONS)
                         .description(
                             "Places where garments are stored (*Standort*) — shared pool, laundry, personal lockers. " +
-                                "Reading is open to any signed-in user; writing requires the KLEIDERWART role."
+                                "Reading is open to any signed-in user; writing requires the KLEIDERWART role.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_ITEMS)
                         .description(
                             "Individual physical garments (*Kleidungsstück*), including barcode lookup and search. " +
-                                "Reading is open to any signed-in user; writing requires the KLEIDERWART role."
+                                "Reading is open to any signed-in user; writing requires the KLEIDERWART role.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_CHECKOUT)
                         .description(
-                            "Taking garments out and returning them. Available to any signed-in user."
+                            "Taking garments out and returning them. Available to any signed-in user.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_RELOCATION)
                         .description(
-                            "Bulk-moving garments between locations (*Umlagerung*). Requires the KLEIDERWART role."
+                            "Bulk-moving garments between locations (*Umlagerung*). Requires the KLEIDERWART role.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_INVENTORY)
                         .description(
                             "Stock-taking against a single location (*Inventarisierung*): preview the difference, " +
-                                "then commit it. Requires the KLEIDERWART role."
+                                "then commit it. Requires the KLEIDERWART role.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_OVERVIEW)
                         .description(
-                            "Read-only aggregated counts of garments by type and by location, for dashboards."
+                            "Read-only aggregated counts of garments by type and by location, for dashboards.",
                         ),
                     Tag()
                         .name(ApiTags.MEMBERS)
@@ -238,24 +238,24 @@ class OpenApiConfiguration(
                             "People in the organisation (*Mitglied*) — the roster of who is in the " +
                                 "brigade. Deliberately separate from user accounts: a member is a " +
                                 "person, an account is a login, and the two are not linked. " +
-                                "Requires the KLEIDERWART role to modify."
+                                "Requires the KLEIDERWART role to modify.",
                         ),
                     Tag()
                         .name(ApiTags.LEGAL)
                         .description(
-                            "Publicly readable legal documents: Impressum and privacy policy."
+                            "Publicly readable legal documents: Impressum and privacy policy.",
                         ),
                     Tag()
                         .name(ApiTags.ADMIN_USERS)
                         .description(
                             "User account administration. Requires the ADMIN role. " +
-                                "Exclude this tag to keep account management out of automated tool surfaces."
+                                "Exclude this tag to keep account management out of automated tool surfaces.",
                         ),
                     Tag()
                         .name(ApiTags.ADMIN_LEGAL)
                         .description(
                             "Maintaining the Impressum and privacy policy documents. Requires the ADMIN role. " +
-                                "Exclude this tag to keep legal-document mutation out of automated tool surfaces."
+                                "Exclude this tag to keep legal-document mutation out of automated tool surfaces.",
                         ),
                     Tag()
                         .name(ApiTags.TEST)
@@ -263,9 +263,9 @@ class OpenApiConfiguration(
                             "Test-only seeding endpoints for end-to-end fixtures. Available only when " +
                                 "`app.testing.enabled` is `true` (the test profile); they are absent from the " +
                                 "production profile. Each endpoint delegates to the same domain service as its " +
-                                "production counterpart, so seeded data behaves exactly like UI-created data."
+                                "production counterpart, so seeded data behaves exactly like UI-created data.",
                         ),
-                )
+                ),
             )
 
     /**
@@ -348,7 +348,7 @@ class OpenApiConfiguration(
             "400",
             ApiResponse()
                 .description(
-                    "The request failed validation. The `errors` array names each offending field."
+                    "The request failed validation. The `errors` array names each offending field.",
                 )
                 .content(
                     Content()
@@ -357,9 +357,9 @@ class OpenApiConfiguration(
                             MediaType()
                                 .schema(
                                     Schema<Any>()
-                                        .`$ref`("#/components/schemas/ValidationProblemDetail")
+                                        .`$ref`("#/components/schemas/ValidationProblemDetail"),
                                 ),
-                        )
+                        ),
                 ),
         )
     }
@@ -373,7 +373,7 @@ class OpenApiConfiguration(
                         PROBLEM_JSON,
                         MediaType()
                             .schema(Schema<Any>().`$ref`("#/components/schemas/ProblemDetail")),
-                    )
+                    ),
             )
 
     /** Resolves the `hasRole('ROLE_X')` expression on a handler into the bare role name. */

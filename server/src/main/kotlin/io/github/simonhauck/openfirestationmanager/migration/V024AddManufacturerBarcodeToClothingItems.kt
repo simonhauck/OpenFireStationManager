@@ -13,7 +13,7 @@ class V024AddManufacturerBarcodeToClothingItems : DatabaseMigration {
             ALTER TABLE clothing_items
             ADD COLUMN IF NOT EXISTS manufacturer_barcode VARCHAR(255)
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute(
@@ -22,7 +22,7 @@ class V024AddManufacturerBarcodeToClothingItems : DatabaseMigration {
             ON clothing_items (manufacturer_barcode)
             WHERE manufacturer_barcode IS NOT NULL
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute("DROP VIEW IF EXISTS resolved_clothing_item_view")
@@ -63,7 +63,7 @@ class V024AddManufacturerBarcodeToClothingItems : DatabaseMigration {
             LEFT JOIN clothing_locations c_l ON c_l.id = c_i.location_id
             JOIN clothing_types c_t ON c_t.id = c_i.type_id
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

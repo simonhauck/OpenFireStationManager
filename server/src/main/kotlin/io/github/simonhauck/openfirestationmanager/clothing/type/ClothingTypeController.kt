@@ -59,7 +59,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -67,7 +67,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
         @Parameter(description = "Numeric id of the clothing type.", example = "3")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ): ClothingType = service.getTypeById(id)
 
     @PostMapping
@@ -103,7 +103,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -136,7 +136,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(
@@ -149,7 +149,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -158,7 +158,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
         @Parameter(description = "Numeric id of the clothing type to delete.", example = "3")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ) {
         service.deleteType(id)
     }

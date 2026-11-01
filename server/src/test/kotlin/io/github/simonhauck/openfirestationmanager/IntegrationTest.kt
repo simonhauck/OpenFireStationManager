@@ -48,7 +48,7 @@ open class IntegrationTest {
                     password = "secret",
                     firstName = "Initial",
                     lastName = "Admin",
-                )
+                ),
             )
     }
 

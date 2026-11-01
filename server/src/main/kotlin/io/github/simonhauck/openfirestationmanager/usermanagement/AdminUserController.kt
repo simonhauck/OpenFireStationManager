@@ -59,7 +59,7 @@ class AdminUserController(private val userService: UserService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -68,7 +68,7 @@ class AdminUserController(private val userService: UserService) {
         @Parameter(description = "Numeric id of the user account.", example = "5")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ): UserAccount {
         return userService.getUserById(id)
     }
@@ -93,7 +93,7 @@ class AdminUserController(private val userService: UserService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -123,7 +123,7 @@ class AdminUserController(private val userService: UserService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -158,7 +158,7 @@ class AdminUserController(private val userService: UserService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )

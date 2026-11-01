@@ -20,7 +20,7 @@ class ClothingOverviewControllerCalls(private val testRestTemplate: TestRestTemp
     }
 
     fun getDashboardLocationSummaries(
-        authCookie: String? = null
+        authCookie: String? = null,
     ): ResponseEntity<Array<ClothingLocationSummary>> {
         return testRestTemplate.exchange<Array<ClothingLocationSummary>>(
             "/api/clothing/overview/dashboard/location",

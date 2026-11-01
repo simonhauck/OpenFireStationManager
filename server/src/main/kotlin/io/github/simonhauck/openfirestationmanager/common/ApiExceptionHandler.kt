@@ -66,7 +66,7 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(
-        exception: MethodArgumentNotValidException
+        exception: MethodArgumentNotValidException,
     ): ProblemDetail {
         val errors =
             exception.bindingResult.fieldErrors.map {
@@ -108,7 +108,7 @@ class ApiExceptionHandler {
      */
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleHandlerMethodValidationException(
-        exception: HandlerMethodValidationException
+        exception: HandlerMethodValidationException,
     ): ProblemDetail {
         val errors =
             exception.parameterValidationResults.flatMap { result ->

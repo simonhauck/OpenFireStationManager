@@ -13,7 +13,7 @@ class V009AddUserIdentifierToClothingItems : DatabaseMigration {
             ALTER TABLE clothing_items
             ADD COLUMN IF NOT EXISTS user_identifier VARCHAR(255) NULL
             """
-                .trimIndent()
+                .trimIndent(),
         )
         jdbcTemplate.execute(
             """
@@ -21,7 +21,7 @@ class V009AddUserIdentifierToClothingItems : DatabaseMigration {
             ON clothing_items (user_identifier)
             WHERE user_identifier IS NOT NULL
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

@@ -101,7 +101,7 @@ class ClothingItemService(
                     barcode = barcode,
                     manufacturerBarcode = manufacturerBarcode,
                     locationId = request.locationId,
-                )
+                ),
             )
 
         val oldLocationId = existing.locationId?.id

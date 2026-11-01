@@ -11,7 +11,7 @@ data class SizeSummary(
 @Schema(
     description =
         "A band of related sizes, so that a long list of individual sizes stays readable. " +
-            "Numeric sizes are grouped under `#`, and anything unrecognised under `Sonstige`."
+            "Numeric sizes are grouped under `#`, and anything unrecognised under `Sonstige`.",
 )
 data class SizeGroupSummary(
     @field:Schema(description = "Name of the size band, e.g. `M`, `XL`, `#`.", example = "XL")

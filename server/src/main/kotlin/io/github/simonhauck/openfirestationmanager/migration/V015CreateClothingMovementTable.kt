@@ -21,7 +21,7 @@ class V015CreateClothingMovementTable : DatabaseMigration {
                 batch_id VARCHAR(255)
             )
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

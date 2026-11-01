@@ -14,7 +14,7 @@ class V013AddLocationIdToClothingItems : DatabaseMigration {
             ADD COLUMN IF NOT EXISTS location_id BIGINT NULL
                 REFERENCES clothing_locations(id) ON DELETE SET NULL
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

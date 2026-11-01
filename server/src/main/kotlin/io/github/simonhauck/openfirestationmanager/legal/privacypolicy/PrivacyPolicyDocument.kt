@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table
 @Schema(
     description =
         "Details about the stored privacy policy file, without its contents. Download the file " +
-            "itself from `GET /privacy-policy`."
+            "itself from `GET /privacy-policy`.",
 )
 data class PrivacyPolicyMetadata(
     @field:Schema(
@@ -34,11 +34,11 @@ data class PrivacyPolicyMetadata(
 @Schema(
     description =
         "Whether a privacy policy document has been uploaded. Lets a caller check without " +
-            "downloading the file."
+            "downloading the file.",
 )
 data class PrivacyPolicyExists(
     @field:Schema(description = "True when a document is stored.", example = "true")
-    val exists: Boolean
+    val exists: Boolean,
 )
 
 @Table("privacy_policy")

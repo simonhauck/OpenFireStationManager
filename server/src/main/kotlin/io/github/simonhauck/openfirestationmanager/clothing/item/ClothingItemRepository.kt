@@ -25,7 +25,7 @@ interface ClothingItemRepository : Repository<ClothingItem, Long> {
     fun findById(id: Long): ClothingItem?
 
     fun findAllByLocationId(
-        locationId: AggregateReference<ClothingLocation, Long>
+        locationId: AggregateReference<ClothingLocation, Long>,
     ): List<ClothingItem>
 
     fun deleteById(id: Long)

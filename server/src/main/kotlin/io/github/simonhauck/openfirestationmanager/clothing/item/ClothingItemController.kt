@@ -71,7 +71,7 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -79,7 +79,7 @@ class ClothingItemController(
         @Parameter(description = "Numeric id of the clothing item.", example = "42")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ): ClothingItem = service.getItemById(id)
 
     @GetMapping("/by-barcode/{barcode}")
@@ -111,7 +111,7 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -192,7 +192,7 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -223,13 +223,13 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     fun createBatchItems(
-        @Valid @RequestBody request: BatchCreateClothingItemsRequest
+        @Valid @RequestBody request: BatchCreateClothingItemsRequest,
     ): List<ClothingItem> = service.createBatchItems(request.items)
 
     @PatchMapping("/{id}")
@@ -256,7 +256,7 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(
@@ -268,7 +268,7 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -302,7 +302,7 @@ class ClothingItemController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -311,7 +311,7 @@ class ClothingItemController(
         @Parameter(description = "Numeric id of the clothing item to delete.", example = "42")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ) {
         service.deleteItem(id)
     }

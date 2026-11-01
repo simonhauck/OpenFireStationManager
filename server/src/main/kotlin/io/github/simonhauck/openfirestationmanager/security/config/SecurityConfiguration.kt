@@ -79,7 +79,7 @@ class SecurityConfiguration {
 
     @Bean
     fun authenticationManager(
-        authenticationConfiguration: AuthenticationConfiguration
+        authenticationConfiguration: AuthenticationConfiguration,
     ): AuthenticationManager {
         return authenticationConfiguration.authenticationManager
     }

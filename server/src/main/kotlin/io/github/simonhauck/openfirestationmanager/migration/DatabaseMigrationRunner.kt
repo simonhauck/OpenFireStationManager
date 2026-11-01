@@ -42,7 +42,7 @@ class DatabaseMigrationRunner(
                 applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 

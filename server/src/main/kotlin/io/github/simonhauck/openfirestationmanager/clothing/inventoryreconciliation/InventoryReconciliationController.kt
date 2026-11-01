@@ -49,7 +49,7 @@ class InventoryReconciliationController(private val service: InventoryReconcilia
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -95,7 +95,7 @@ class InventoryReconciliationController(private val service: InventoryReconcilia
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )

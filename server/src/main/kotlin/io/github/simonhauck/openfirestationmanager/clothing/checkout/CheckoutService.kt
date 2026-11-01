@@ -72,7 +72,7 @@ class CheckoutService(
     }
 
     private fun ClothingLocation.validate(
-        allowedLocationTypes: List<LocationType>
+        allowedLocationTypes: List<LocationType>,
     ): ClothingLocation {
         val hasMatchingType = allowedLocationTypes.any { it == this.type }
 

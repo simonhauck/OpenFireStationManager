@@ -50,7 +50,7 @@ class RelocationController(private val service: RelocationService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )

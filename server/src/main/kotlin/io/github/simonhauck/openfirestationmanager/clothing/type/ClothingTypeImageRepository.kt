@@ -10,7 +10,7 @@ interface ClothingTypeImageRepository : Repository<ClothingTypeImage, Long> {
     fun findById(id: Long): ClothingTypeImage?
 
     fun findAllByTypeIdOrderByIdAsc(
-        typeId: AggregateReference<ClothingType, Long>
+        typeId: AggregateReference<ClothingType, Long>,
     ): List<ClothingTypeImage>
 
     fun findAll(): List<ClothingTypeImage>
