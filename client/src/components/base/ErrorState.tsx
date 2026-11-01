@@ -9,5 +9,7 @@ export default function ErrorState({
   message = "Es ist ein Fehler aufgetreten.",
   className,
 }: ErrorStateProps) {
-  return <Banner status="error" title={message} className={className} />
+  return (
+    <Banner status="error" title={message} className={className} role="alert" />
+  )
 }
