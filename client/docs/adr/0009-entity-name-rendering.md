@@ -29,18 +29,22 @@ Render first-class entity references according to their role in the current cont
 
 Concretely:
 
-- `EntityNameLink` (`src/components/base/EntityNameLink.tsx`) is the shared link rendering for entity names.
+- `EntityNameLink` (`src/components/base/EntityNameLink.tsx`) is the shared link rendering for entity names. It takes the target page's roles and renders plain text instead of a link when the current user does not hold one of them, so references never lead to a page the user cannot open.
 - `MemberName` keeps its resolution rules from ADR-0006 (`useMemberNameLookup`, pre-resolved names for sorting/search, no per-row fetch, muted dash fallback) and now renders through `EntityNameLink`.
 - `LocationName` (`src/clothing/components/shared/LocationName.tsx`) is the equivalent rendering primitive for Standorte: link when an id is available, plain text without one, muted dash without a name.
+- `ClothingItemLink` (`src/clothing/components/shared/ClothingItemLink.tsx`) is the item reference primitive. Because there is no read-only item detail page yet, it targets the item edit page; like the other entity links it falls back to plain text when the user cannot access clothing management.
 - Clickable `Badge` compositions are removed. The members list shows Standort links, not chips; the items and locations lists use `LocationName`.
 - Chips remain for metadata: Standort type, availability counts, and the checkout origin token. Inventory reconciliation shows the origin token only when an item's recorded location differs from the location being reconciled.
 - `formatClothingLocationLabel` remains the only formatter for string consumers (search haystacks, sort comparators, picker options, review copy).
+
+Target roles are hardcoded per entity for now. Issue #390 tracks replacing them with a shared authentication/access map used by `RoleGuard`, navigation, and the entity link components.
 
 Implementation surfaces using `LocationName`: members list, member detail Standorte, clothing items list, clothing locations list. Member clothing group headings and Pool overview section headings stay plain headings, with an explicit **Details** action next to each heading linking to the Standort detail page.
 
 ## Consequences
 
 - Members and Standorte now follow the same mental model: entity name = text, link when it navigates; chip = metadata.
+- Entity references stay plain text when the user lacks access to the target page, so no link leads to a role-guard dead end.
 - Links are recognisable without hovering, including on the tablet routes.
 - Clickable badges disappear, so neutral badges (type, roles) regain a single, read-only meaning.
 - `LocationName` targets the read-only Standort detail page; editing is an explicit action from that page or the locations list. A future destination change remains a one-line update inside `LocationName`.

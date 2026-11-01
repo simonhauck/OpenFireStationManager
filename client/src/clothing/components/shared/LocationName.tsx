@@ -21,7 +21,10 @@ export default function LocationName({ locationId, name }: LocationNameProps) {
   }
 
   return (
-    <EntityNameLink href={`/clothing-management/locations/${locationId}`}>
+    <EntityNameLink
+      href={`/clothing-management/locations/${locationId}`}
+      allowedRoles={["KLEIDERWART"]}
+    >
       {name}
     </EntityNameLink>
   )

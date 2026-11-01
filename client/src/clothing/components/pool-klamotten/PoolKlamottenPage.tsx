@@ -142,12 +142,14 @@ function LocationSizeSummaryTable({ summary }: LocationSizeSummaryTableProps) {
               {totalCount}
             </Text>
           </div>
-          <Button
-            label="Details"
-            variant="secondary"
-            size="lg"
-            href={`/clothing-management/locations/${summary.locationId}`}
-          />
+          <RoleGuard allowedRoles={["KLEIDERWART"]} hideChildComponent={true}>
+            <Button
+              label="Details"
+              variant="secondary"
+              size="lg"
+              href={`/clothing-management/locations/${summary.locationId}`}
+            />
+          </RoleGuard>
         </div>
       }
     >

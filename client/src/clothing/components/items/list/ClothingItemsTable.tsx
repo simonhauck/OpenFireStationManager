@@ -2,7 +2,6 @@ import { AlertDialog } from "@astryxdesign/core/AlertDialog"
 import { EmptyState } from "@astryxdesign/core/EmptyState"
 import { HStack } from "@astryxdesign/core/HStack"
 import { IconButton } from "@astryxdesign/core/IconButton"
-import { Link } from "@astryxdesign/core/Link"
 import {
   pixel,
   proportional,
@@ -18,6 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { Pencil, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
+import ClothingItemLink from "#/clothing/components/shared/ClothingItemLink"
 import LocationName from "#/clothing/components/shared/LocationName"
 import type { ResolvedClothingItem } from "#/clothing/model/clothingItems"
 import { deleteClothingItemMutation } from "#/clothing/service/clothingItemsQueries"
@@ -214,16 +214,14 @@ export default function ClothingItemsTable({
       width: proportional(1),
       sortable: true,
       resizable: false,
-      renderCell: (item) =>
-        linkItemLabels ? (
-          <Link
-            href={`/clothing-management/items/${item.clothingItem.id}/edit`}
-          >
-            {item.clothingType.name}
-          </Link>
-        ) : (
-          item.clothingType.name
-        ),
+      renderCell: (item) => (
+        <ClothingItemLink
+          clothingItemId={item.clothingItem.id}
+          enabled={linkItemLabels}
+        >
+          {item.clothingType.name}
+        </ClothingItemLink>
+      ),
     },
     {
       key: "size",
@@ -231,16 +229,14 @@ export default function ClothingItemsTable({
       width: pixel(96),
       sortable: true,
       resizable: false,
-      renderCell: (item) =>
-        linkItemLabels ? (
-          <Link
-            href={`/clothing-management/items/${item.clothingItem.id}/edit`}
-          >
-            {item.clothingItem.size}
-          </Link>
-        ) : (
-          item.clothingItem.size
-        ),
+      renderCell: (item) => (
+        <ClothingItemLink
+          clothingItemId={item.clothingItem.id}
+          enabled={linkItemLabels}
+        >
+          {item.clothingItem.size}
+        </ClothingItemLink>
+      ),
     },
     {
       key: "location",
