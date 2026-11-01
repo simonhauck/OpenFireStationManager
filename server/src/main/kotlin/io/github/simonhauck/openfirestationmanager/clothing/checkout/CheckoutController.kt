@@ -56,7 +56,7 @@ class CheckoutController(private val checkoutService: CheckoutService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(
@@ -67,7 +67,7 @@ class CheckoutController(private val checkoutService: CheckoutService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )

@@ -81,7 +81,7 @@ class AuthController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -141,7 +141,7 @@ class AuthController(
             responseCode = "200",
             description =
                 "The current session state. Check `authenticated` before relying on `user`.",
-        )
+        ),
     )
     fun me(): AuthStateResponse {
         return authService.getUserByAuthentication()

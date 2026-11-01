@@ -19,7 +19,7 @@ class V020CreateMembersTable : DatabaseMigration {
                 last_modified_by VARCHAR(100) NOT NULL DEFAULT 'System'
             )
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

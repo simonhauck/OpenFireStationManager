@@ -44,7 +44,7 @@ class ClothingOverviewController(private val service: ClothingOverviewService) {
         ApiResponse(
             responseCode = "200",
             description = "Stock grouped by pool and laundry locations.",
-        )
+        ),
     )
     fun getDashboardLocationSummaries(): List<ClothingLocationSummary> =
         service.getDashboardLocationSummaries()

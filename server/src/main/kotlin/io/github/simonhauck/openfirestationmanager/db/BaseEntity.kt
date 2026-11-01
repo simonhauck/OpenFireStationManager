@@ -12,7 +12,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference
     description =
         "Audit trail attached to every stored record. Maintained by the server on save — these " +
             "fields are ignored if supplied in a request. `System` appears as the actor for " +
-            "changes made outside a user session, such as database migrations."
+            "changes made outside a user session, such as database migrations.",
 )
 data class EntityMetaData(
     @field:Schema(description = "When the record was first stored.")

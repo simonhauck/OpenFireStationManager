@@ -13,7 +13,7 @@ class V003AddMetadataColumnsToUsersTable : DatabaseMigration {
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS created_by VARCHAR(100) NOT NULL DEFAULT 'System'
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute(
@@ -21,7 +21,7 @@ class V003AddMetadataColumnsToUsersTable : DatabaseMigration {
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS last_modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute(
@@ -29,7 +29,7 @@ class V003AddMetadataColumnsToUsersTable : DatabaseMigration {
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS last_modified_by VARCHAR(100) NOT NULL DEFAULT 'System'
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

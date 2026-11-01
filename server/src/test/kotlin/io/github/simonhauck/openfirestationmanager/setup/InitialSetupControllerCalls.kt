@@ -18,7 +18,7 @@ class InitialSetupControllerCalls(private val testRestTemplate: TestRestTemplate
     }
 
     fun createInitialAdminExpectingProblem(
-        request: InitialAdminSetupRequest
+        request: InitialAdminSetupRequest,
     ): ResponseEntity<ProblemDetail> {
         return testRestTemplate.postForEntity<ProblemDetail>(
             "/api/public/setup/initial-admin",

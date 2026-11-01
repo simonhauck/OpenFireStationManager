@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema
         - The same item id may not appear in both lists.
 
         Breaking any of these yields `400`, with the offending rule named in the `errors` array.
-        """
+        """,
 )
 @ValidCheckout
 data class CheckoutRequest(
@@ -60,5 +60,5 @@ data class CheckoutResponse(
                 "the whole transaction in the movement log.",
         example = "3f2b1c9e-5d47-4a1b-9f8e-2c6d0a7b4e13",
     )
-    val batchId: String
+    val batchId: String,
 )

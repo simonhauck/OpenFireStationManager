@@ -13,7 +13,7 @@ class CheckoutRequestValidator : ConstraintValidator<ValidCheckout, CheckoutRequ
         if (request.takeItemIds.isEmpty() && request.returnItemIds.isEmpty()) {
             context
                 .buildConstraintViolationWithTemplate(
-                    "takeItemIds and returnItemIds cannot both be empty"
+                    "takeItemIds and returnItemIds cannot both be empty",
                 )
                 .addConstraintViolation()
             return false
@@ -22,7 +22,7 @@ class CheckoutRequestValidator : ConstraintValidator<ValidCheckout, CheckoutRequ
         if (request.returnItemIds.isNotEmpty() && request.returnLocationId == null) {
             context
                 .buildConstraintViolationWithTemplate(
-                    "returnLocationId must be provided if returnItemIds is not empty"
+                    "returnLocationId must be provided if returnItemIds is not empty",
                 )
                 .addConstraintViolation()
             return false
@@ -31,7 +31,7 @@ class CheckoutRequestValidator : ConstraintValidator<ValidCheckout, CheckoutRequ
         if (request.takeItemIds.isNotEmpty() && request.targetLocationId == null) {
             context
                 .buildConstraintViolationWithTemplate(
-                    "targetLocationId must be provided if takeItemIds is not empty"
+                    "targetLocationId must be provided if takeItemIds is not empty",
                 )
                 .addConstraintViolation()
 
@@ -42,7 +42,7 @@ class CheckoutRequestValidator : ConstraintValidator<ValidCheckout, CheckoutRequ
         if (overlap.isNotEmpty()) {
             context
                 .buildConstraintViolationWithTemplate(
-                    "Same item cannot appear in both takeItemIds and returnItemIds"
+                    "Same item cannot appear in both takeItemIds and returnItemIds",
                 )
                 .addConstraintViolation()
             return false

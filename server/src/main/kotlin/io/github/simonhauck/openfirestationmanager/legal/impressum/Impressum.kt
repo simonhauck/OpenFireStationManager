@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table
 @Schema(
     description =
         "The legally required site notice (`Impressum`). At most one exists at a time — writing " +
-            "replaces the previous one rather than adding to it."
+            "replaces the previous one rather than adding to it.",
 )
 data class ImpressumDto(
     @field:Schema(
@@ -49,11 +49,11 @@ data class ImpressumDto(
 @Schema(
     description =
         "Whether a site notice has been configured. Lets a caller check without needing " +
-            "permission to read the notice itself."
+            "permission to read the notice itself.",
 )
 data class ImpressumExists(
     @field:Schema(description = "True when a site notice exists.", example = "true")
-    val exists: Boolean
+    val exists: Boolean,
 )
 
 @Table("impressum")

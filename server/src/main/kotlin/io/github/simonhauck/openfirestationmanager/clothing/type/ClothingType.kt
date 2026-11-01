@@ -19,13 +19,13 @@ data class CreateOrUpdateClothingTypeRequest(
     )
     @NotBlank
     @Size(max = 255)
-    val name: String
+    val name: String,
 )
 
 @Schema(
     description =
         "A category of garment (`Kleidungsart`), such as `Einsatzjacke` or `Helm`. Types carry " +
-            "no size or quantity of their own — those live on the individual clothing items."
+            "no size or quantity of their own — those live on the individual clothing items.",
 )
 @Table("clothing_types")
 data class ClothingType(

@@ -40,7 +40,7 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
                     GROUP BY t.id
                 ) counts
                 """
-                    .trimIndent()
+                    .trimIndent(),
             )
 
         assertThat(seededItemCountPerType).isGreaterThanOrEqualTo(5)
