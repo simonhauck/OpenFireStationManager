@@ -34,7 +34,7 @@ class V022MigrateClothingLocationCommentsToMembers : DatabaseMigration {
                 ON LOWER(TRIM(new_member.name)) = candidates.normalized_comment
             WHERE location.id = candidates.id
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

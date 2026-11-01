@@ -61,7 +61,7 @@ class MemberController(private val service: MemberService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -69,7 +69,7 @@ class MemberController(private val service: MemberService) {
         @Parameter(description = "Numeric id of the member.", example = "5")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ): Member = service.getMemberById(id)
 
     @PostMapping
@@ -105,7 +105,7 @@ class MemberController(private val service: MemberService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -138,7 +138,7 @@ class MemberController(private val service: MemberService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -147,7 +147,7 @@ class MemberController(private val service: MemberService) {
         @Parameter(description = "Numeric id of the member to remove.", example = "5")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ) {
         service.deleteMember(id)
     }

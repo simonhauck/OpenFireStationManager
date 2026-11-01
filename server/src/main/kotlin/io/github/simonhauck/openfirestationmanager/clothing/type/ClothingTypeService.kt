@@ -31,7 +31,7 @@ class ClothingTypeService(
         val referencingItems = clothingItemRepository.countAllByTypeId(AggregateReference.to(id))
         if (referencingItems >= 1) {
             throw ConflictException(
-                "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind."
+                "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind.",
             )
         }
         repository.deleteById(id)

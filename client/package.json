@@ -21,8 +21,8 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@astryxdesign/core": "^0.6.6",
-    "@astryxdesign/theme-neutral": "^0.6.6",
+    "@astryxdesign/core": "^0.7.0",
+    "@astryxdesign/theme-neutral": "^0.7.0",
     "@stylexjs/stylex": "^0.19.1",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
@@ -40,8 +40,8 @@
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "@astryxdesign/cli": "^0.6.6",
-    "@biomejs/biome": "2.5.14",
+    "@astryxdesign/cli": "^0.7.0",
+    "@biomejs/biome": "2.5.15",
     "@playwright/test": "^1.59.1",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/router-plugin": "latest",
@@ -54,7 +54,7 @@
     "jsdom": "^30.0.0",
     "typescript": "^7.0.0",
     "vite": "^8.0.0",
-    "vite-plugin-pwa": "^1.2.0",
+    "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.0"
   },
   "pnpm": {

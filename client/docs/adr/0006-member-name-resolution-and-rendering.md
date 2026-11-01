@@ -1,7 +1,7 @@
 
 # ADR-0006: Shared member name resolution and rendering
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0009](0009-entity-name-rendering.md)
 **Date:** 2026-10-10
 
 ## Context

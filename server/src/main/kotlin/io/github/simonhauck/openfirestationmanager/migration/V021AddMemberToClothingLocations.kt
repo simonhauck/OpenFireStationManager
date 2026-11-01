@@ -13,7 +13,7 @@ class V021AddMemberToClothingLocations : DatabaseMigration {
             ALTER TABLE clothing_locations
             ADD COLUMN IF NOT EXISTS member_id BIGINT REFERENCES members(id) ON DELETE SET NULL
             """
-                .trimIndent()
+                .trimIndent(),
         )
 
         jdbcTemplate.execute("DROP VIEW IF EXISTS resolved_clothing_item_view")
@@ -53,7 +53,7 @@ class V021AddMemberToClothingLocations : DatabaseMigration {
             LEFT JOIN clothing_locations c_l ON c_l.id = c_i.location_id
             JOIN clothing_types c_t ON c_t.id = c_i.type_id
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

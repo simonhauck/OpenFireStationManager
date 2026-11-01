@@ -103,14 +103,14 @@ jib {
         labels =
             mapOf(
                 "org.opencontainers.image.source" to
-                    "https://github.com/simonhauck/OpenFireStationManager"
+                    "https://github.com/simonhauck/OpenFireStationManager",
             )
     }
 }
 
 tasks.withType<JibTask> {
     notCompatibleWithConfigurationCache(
-        "because https://github.com/GoogleContainerTools/jib/issues/3132"
+        "because https://github.com/GoogleContainerTools/jib/issues/3132",
     )
 }
 

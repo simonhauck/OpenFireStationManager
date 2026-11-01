@@ -50,7 +50,7 @@ class PrivacyPolicyPublicController(private val service: PrivacyPolicyService) {
                     Content(
                         mediaType = "application/octet-stream",
                         schema = Schema(type = "string", format = "binary"),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(

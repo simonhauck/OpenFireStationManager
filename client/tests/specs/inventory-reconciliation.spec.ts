@@ -17,6 +17,7 @@ test.describe("Inventarisierung (Inventory Reconciliation)", () => {
   let barcodeAtLocation: string
   let barcodeElsewhere: string
   let locationName: string
+  let otherLocationName: string
 
   test.beforeAll(async () => {
     const suffix = randomUUID().slice(0, 8)
@@ -24,7 +25,7 @@ test.describe("Inventarisierung (Inventory Reconciliation)", () => {
     barcodeAtLocation = `BC-INV-A-${suffix}`
     barcodeElsewhere = `BC-INV-B-${suffix}`
     locationName = `Pool-Inv-${suffix}`
-    const otherLocationName = `Other-Inv-${suffix}`
+    otherLocationName = `Other-Inv-${suffix}`
 
     api = await createSeedRequest()
     const type = await seedClothingType(api, typeName)
@@ -67,10 +68,18 @@ test.describe("Inventarisierung (Inventory Reconciliation)", () => {
     await expect(
       reconciliationPage.scannedItem(`${typeName} – L`),
     ).toBeVisible()
+    await expect(
+      reconciliationPage.scannedItem(`${typeName} – L`).getByText(locationName),
+    ).not.toBeVisible()
 
     await reconciliationPage.scanBarcode(barcodeElsewhere)
     await expect(
       reconciliationPage.scannedItem(`${typeName} – XL`),
+    ).toBeVisible()
+    await expect(
+      reconciliationPage
+        .scannedItem(`${typeName} – XL`)
+        .getByText(otherLocationName),
     ).toBeVisible()
 
     await reconciliationPage.clickWeiter()

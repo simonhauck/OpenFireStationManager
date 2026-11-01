@@ -23,6 +23,8 @@ Location pickers (combobox dropdowns) display a formatted label built from the l
 
 A `PERSONAL` location's owner is the linked `Mitglied`; the `comment` field is generic free text alongside it ("defekt", "hinten links"). Both are shown when both are present. Before the member migration, `comment` was where the owner's name was written by hand — hence the fallback. Whether the type is shown depends on the picker context — checkout hides the type (all options are PERSONAL), relocation shows it (any type may appear).
 
+Outside pickers, a standalone Standort reference renders as a text link to the Standort edit page through `LocationName`. Headings and composed labels stay plain text, and chips are reserved for metadata such as the location type or a checkout origin. See ADR-0009.
+
 ### Klamotten / Kleidung
 
 Informal vs. formal labels for clothing items. Both appear in the UI; "Klamotten" tends to be used in headings/navigation, "Kleidung" in form labels.
@@ -108,6 +110,8 @@ User-facing label for `Member` — a person in the organisation. Deliberately di
 Top-level route `/members`, `KLEIDERWART`-guarded, with entries in `MENU_ITEMS` (nav config), `DASHBOARD_ITEMS` (`dashboard.tsx`), and `SEGMENT_LABELS` (`Breadcrumb.tsx`) — all three lists are duplicated and must be kept in step. Four routes: list, `/new`, `/$memberId` (detail), `/$memberId/edit`.
 
 The **detail page** is the "what gear does this person have?" screen and is the reason a detail view exists at all. Three sections: Kopf (name, audit metadata, Bearbeiten/Löschen actions); Standorte (the member's locations, each linking to the location edit page — assignment is only ever written from the location side); Kleidung (every item currently in those locations, from `GET /api/clothing/locations/{id}/items`, one call per locker).
+
+Standalone member references render through `MemberName` as text links to the detail page; names embedded in composed location labels remain plain text. See ADR-0009.
 
 Deleting a member unassigns their locations rather than blocking. The delete dialog states how many locations and clothing items are affected and warns that the clothing needs relocating.
 

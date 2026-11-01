@@ -26,6 +26,10 @@
 		{
 			"groupName": "Biome",
 			"matchPackageNames": ["@biomejs/biome"]
+		},
+		{
+			"groupName": "Astryx packages",
+			"matchPackageNames": ["@astryxdesign/**"]
 		}
 	]
 }

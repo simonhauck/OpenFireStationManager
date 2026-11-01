@@ -42,7 +42,7 @@ class V017CreateResolvedClothingItemView : DatabaseMigration {
             LEFT JOIN clothing_locations c_l ON c_l.id = c_i.location_id
             JOIN clothing_types c_t ON c_t.id = c_i.type_id
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

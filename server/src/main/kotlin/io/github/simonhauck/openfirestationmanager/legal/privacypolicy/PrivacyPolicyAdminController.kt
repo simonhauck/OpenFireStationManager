@@ -45,7 +45,7 @@ class PrivacyPolicyAdminController(private val service: PrivacyPolicyService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -89,7 +89,7 @@ class PrivacyPolicyAdminController(private val service: PrivacyPolicyService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -97,10 +97,10 @@ class PrivacyPolicyAdminController(private val service: PrivacyPolicyService) {
     fun upload(
         @Parameter(
             description =
-                "The document to store. Must be a PDF, HTML, or plain-text file of at most 10 MB."
+                "The document to store. Must be a PDF, HTML, or plain-text file of at most 10 MB.",
         )
         @RequestParam("file")
-        file: MultipartFile
+        file: MultipartFile,
     ): PrivacyPolicyMetadata = service.upload(file)
 
     @DeleteMapping

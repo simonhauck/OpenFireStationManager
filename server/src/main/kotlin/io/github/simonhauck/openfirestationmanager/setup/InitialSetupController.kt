@@ -78,7 +78,7 @@ class InitialSetupController(private val userService: UserService) {
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -98,7 +98,7 @@ class InitialSetupController(private val userService: UserService) {
                     firstName = requestBody.firstName,
                     lastName = requestBody.lastName,
                     roles = listOf(UserRole.ADMIN),
-                )
+                ),
             )
 
         return created

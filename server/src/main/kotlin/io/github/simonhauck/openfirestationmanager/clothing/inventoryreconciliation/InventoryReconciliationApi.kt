@@ -12,7 +12,7 @@ data class InventoryReconciliationPreviewRequest(
                 "but absent from this list is treated as missing. Duplicates are ignored.",
         example = "[41, 42, 43]",
     )
-    val scannedItemIds: List<Long>
+    val scannedItemIds: List<Long>,
 )
 
 @Schema(
@@ -24,26 +24,26 @@ data class InventoryReconciliationPreviewRequest(
         back unchanged applies exactly what the preview described. You may also **edit it first** —
         removing an entry from `missingItems` leaves that garment recorded at the location instead
         of unassigning it, which is how a user resolves "I know it's here, I just didn't scan it".
-        """
+        """,
 )
 data class InventoryReconciliationPreviewResponse(
     @field:Schema(
         description =
             "Scanned garments that the system already recorded at this location. Executing does " +
-                "nothing to these beyond counting them."
+                "nothing to these beyond counting them.",
     )
     val unchangedItems: List<ResolvedClothingItem>,
     @field:Schema(
         description =
             "Scanned garments the system believed were somewhere else. Executing moves each of " +
-                "them to this location."
+                "them to this location.",
     )
     val foundItems: List<ResolvedClothingItem>,
     @field:Schema(
         description =
             "Garments the system records at this location but which were not scanned. Executing " +
                 "clears their location entirely, leaving them unassigned rather than moving them " +
-                "somewhere else."
+                "somewhere else.",
     )
     val missingItems: List<ResolvedClothingItem>,
 )

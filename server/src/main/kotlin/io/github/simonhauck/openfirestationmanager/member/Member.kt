@@ -19,14 +19,14 @@ data class CreateOrUpdateMemberRequest(
     )
     @NotBlank
     @Size(max = 255)
-    val name: String
+    val name: String,
 )
 
 @Schema(
     description =
         "A person in the brigade (*Mitglied*). Deliberately distinct from a user account: a " +
             "member is a person on the roster, an account is a set of login credentials, and the " +
-            "two are not linked."
+            "two are not linked.",
 )
 @Table("members")
 data class Member(

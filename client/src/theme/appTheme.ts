@@ -91,8 +91,8 @@ export const appTheme = defineTheme({
         borderRadius: "6px",
       },
       // Astryx's neutral badge is a solid grey block. The app uses neutral
-      // badges for informational chips (sizes, locations, roles), so a tinted
-      // chip reads better and keeps dark mode from looking washed out.
+      // badges for informational chips (sizes, type categories, roles), so a
+      // tinted chip reads better and keeps dark mode from looking washed out.
       "variant:neutral": {
         backgroundColor: "var(--color-neutral)",
         borderColor: "var(--color-border)",

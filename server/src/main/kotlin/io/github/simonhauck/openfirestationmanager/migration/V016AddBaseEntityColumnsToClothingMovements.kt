@@ -16,7 +16,7 @@ class V016AddBaseEntityColumnsToClothingMovements : DatabaseMigration {
             ADD COLUMN IF NOT EXISTS last_modified_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             ADD COLUMN IF NOT EXISTS last_modified_by VARCHAR(100) NOT NULL DEFAULT 'System'
             """
-                .trimIndent()
+                .trimIndent(),
         )
         jdbcTemplate.execute(
             """
@@ -26,7 +26,7 @@ class V016AddBaseEntityColumnsToClothingMovements : DatabaseMigration {
                 created_by = performed_by_user_id,
                 last_modified_by = performed_by_user_id
             """
-                .trimIndent()
+                .trimIndent(),
         )
         jdbcTemplate.execute(
             """
@@ -34,7 +34,7 @@ class V016AddBaseEntityColumnsToClothingMovements : DatabaseMigration {
             DROP COLUMN IF EXISTS performed_at,
             DROP COLUMN IF EXISTS performed_by_user_id
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

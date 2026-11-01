@@ -18,7 +18,7 @@ import org.springframework.data.relational.core.mapping.Table
 @Schema(
     description =
         "Full set of properties for a clothing item. Used for both creation and replacement; " +
-            "on update every field is applied, so omitted optional fields are cleared."
+            "on update every field is applied, so omitted optional fields are cleared.",
 )
 data class CreateOrUpdateClothingItemRequest(
     // TODO 19.04.26 - Simon.Hauck Conver the typeId also to an aggregate reference type
@@ -83,17 +83,17 @@ data class BatchCreateClothingItemsRequest(
             "Items to create. Must contain at least one entry. If any entry is invalid, or any " +
                 "barcode value collides with an existing item, another entry in this list, or " +
                 "the other barcode of its own item, the whole batch is rejected and nothing is " +
-                "created."
+                "created.",
     )
     @field:Valid
     @field:NotEmpty
-    val items: List<CreateOrUpdateClothingItemRequest>
+    val items: List<CreateOrUpdateClothingItemRequest>,
 )
 
 @Schema(
     description =
         "One physical garment. `typeId` and `locationId` are numeric references, not embedded " +
-            "objects; see `ResolvedClothingItem` for the form that includes them in full."
+            "objects; see `ResolvedClothingItem` for the form that includes them in full.",
 )
 @Table("clothing_items")
 data class ClothingItem(

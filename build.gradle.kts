@@ -11,7 +11,7 @@ allprojects { group = "io.github.simonhauck" }
 release {
     versionPropertyFile.set(layout.projectDirectory.file("gradle.properties"))
     releaseCommitAddFiles.set(
-        listOf(file("gradle.properties"), file("infrastructure/ofsm-prod/compose.yml"))
+        listOf(file("gradle.properties"), file("infrastructure/ofsm-prod/compose.yml")),
     )
     postReleaseCommitAddFiles.set(listOf(file("gradle.properties")))
     gitName = "Release Bot"
@@ -28,7 +28,7 @@ spotless {
         target("**/*.json", "**/*.jsonc")
         targetExclude("client/**", "server/**", "conventions/**", "build/**", ".gradle/**")
         // renovate: datasource=npm depName=@biomejs/biome
-        biome("2.5.14").configPath(rootProject.file("biome.json"))
+        biome("2.5.15").configPath(rootProject.file("biome.json"))
     }
 
     flexmark {
@@ -48,7 +48,7 @@ spotless {
                 mapOf(
                     "FORMAT_FLAGS" to "7",
                     "MAX_TRAILING_BLANK_LINES" to "0",
-                )
+                ),
             )
     }
 }

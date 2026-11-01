@@ -10,7 +10,7 @@ interface SpringDataJdbcConverter {}
 class SpringDataJdbcConvertConfiguration {
     @Bean
     fun jdbcCustomConversions(
-        springDataJdbcConverter: List<SpringDataJdbcConverter>
+        springDataJdbcConverter: List<SpringDataJdbcConverter>,
     ): JdbcCustomConversions {
         return JdbcCustomConversions(springDataJdbcConverter)
     }

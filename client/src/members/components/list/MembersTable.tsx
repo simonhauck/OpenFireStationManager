@@ -1,4 +1,3 @@
-import { Badge } from "@astryxdesign/core/Badge"
 import { HStack } from "@astryxdesign/core/HStack"
 import {
   pixel,
@@ -11,8 +10,8 @@ import {
   useTableSortableState,
 } from "@astryxdesign/core/Table"
 import { Text } from "@astryxdesign/core/Text"
-import { Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
+import LocationName from "#/clothing/components/shared/LocationName"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import TableToolbar from "#/components/base/TableToolbar"
 import { useClientPagination } from "#/components/base/useClientPagination"
@@ -99,15 +98,13 @@ export default function MembersTable({
         }
 
         return (
-          <HStack gap={1} wrap="wrap" vAlign="center">
+          <HStack gap={2} wrap="wrap" vAlign="center">
             {memberLocations.map((location) => (
-              <Link
+              <LocationName
                 key={location.id}
-                to="/clothing-management/locations/$clothingLocationId/edit"
-                params={{ clothingLocationId: String(location.id) }}
-              >
-                <Badge label={location.name} variant="neutral" />
-              </Link>
+                locationId={location.id}
+                name={location.name}
+              />
             ))}
           </HStack>
         )

@@ -113,7 +113,7 @@ class ClothingTypeControllerIT : IntegrationTest() {
         assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.CONFLICT)
         assertThat(deleteResponse.body?.detail)
             .isEqualTo(
-                "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind."
+                "Dieser Kleidungstyp kann nicht gelöscht werden, da noch Kleidungsstücke diesem Typ zugeordnet sind.",
             )
     }
 

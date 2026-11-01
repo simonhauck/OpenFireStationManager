@@ -13,7 +13,7 @@ class V014AddTypeToClothingLocations : DatabaseMigration {
             ALTER TABLE clothing_locations
             ADD COLUMN IF NOT EXISTS type VARCHAR(50) NOT NULL DEFAULT 'OTHER'
             """
-                .trimIndent()
+                .trimIndent(),
         )
         jdbcTemplate.execute(
             """
@@ -23,21 +23,21 @@ class V014AddTypeToClothingLocations : DatabaseMigration {
                 ELSE 'OTHER'
             END
             """
-                .trimIndent()
+                .trimIndent(),
         )
         jdbcTemplate.execute(
             """
             ALTER TABLE clothing_locations
             ALTER COLUMN type DROP DEFAULT
             """
-                .trimIndent()
+                .trimIndent(),
         )
         jdbcTemplate.execute(
             """
             ALTER TABLE clothing_locations
             DROP COLUMN IF EXISTS should_be_shown_on_dashboard
             """
-                .trimIndent()
+                .trimIndent(),
         )
     }
 }

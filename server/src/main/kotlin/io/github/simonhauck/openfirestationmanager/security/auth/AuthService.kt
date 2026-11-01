@@ -17,7 +17,7 @@ class AuthService(
             UsernamePasswordAuthenticationToken.unauthenticated(
                 loginRequest.username,
                 loginRequest.password,
-            )
+            ),
         )
     }
 

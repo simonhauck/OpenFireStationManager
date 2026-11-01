@@ -72,7 +72,7 @@ class ClothingLocationController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -80,7 +80,7 @@ class ClothingLocationController(
         @Parameter(description = "Numeric id of the clothing location.", example = "7")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ): ClothingLocation = service.getLocationById(id)
 
     @GetMapping("/{id}/items")
@@ -109,7 +109,7 @@ class ClothingLocationController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -157,13 +157,13 @@ class ClothingLocationController(
                         mediaType = "application/problem+json",
                         schema =
                             Schema(oneOf = [ProblemDetail::class, ValidationProblemDetail::class]),
-                    )
+                    ),
                 ],
         ),
     )
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     fun createLocation(
-        @Valid @RequestBody request: CreateClothingLocationRequest
+        @Valid @RequestBody request: CreateClothingLocationRequest,
     ): ClothingLocation = service.createLocation(request)
 
     @PostMapping("/batch")
@@ -186,13 +186,13 @@ class ClothingLocationController(
                         mediaType = "application/problem+json",
                         schema =
                             Schema(oneOf = [ProblemDetail::class, ValidationProblemDetail::class]),
-                    )
+                    ),
                 ],
         ),
     )
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
     fun createBatchLocations(
-        @Valid @RequestBody request: BatchCreateClothingLocationsRequest
+        @Valid @RequestBody request: BatchCreateClothingLocationsRequest,
     ): List<ClothingLocation> = service.createBatchLocations(request.items)
 
     @PatchMapping("/{id}")
@@ -221,7 +221,7 @@ class ClothingLocationController(
                         mediaType = "application/problem+json",
                         schema =
                             Schema(oneOf = [ProblemDetail::class, ValidationProblemDetail::class]),
-                    )
+                    ),
                 ],
         ),
         ApiResponse(
@@ -232,7 +232,7 @@ class ClothingLocationController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -265,7 +265,7 @@ class ClothingLocationController(
                     Content(
                         mediaType = "application/problem+json",
                         schema = Schema(implementation = ProblemDetail::class),
-                    )
+                    ),
                 ],
         ),
     )
@@ -274,7 +274,7 @@ class ClothingLocationController(
         @Parameter(description = "Numeric id of the clothing location to delete.", example = "7")
         @PathVariable
         @Positive
-        id: Long
+        id: Long,
     ) {
         service.deleteLocation(id)
     }

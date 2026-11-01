@@ -1,6 +1,6 @@
 import { Table, type TableColumn } from "@astryxdesign/core/Table"
 import { Text } from "@astryxdesign/core/Text"
-import { Link } from "@tanstack/react-router"
+import LocationName from "#/clothing/components/shared/LocationName"
 import type { ClothingLocation } from "#/clothing/model/clothingLocations.ts"
 import PageSubSection from "#/components/base/PageSubSection"
 import RenderIf from "#/components/base/RenderIf"
@@ -17,13 +17,7 @@ export default function MemberLocationsSection({
       key: "name",
       header: "Standort",
       renderCell: (location) => (
-        <Link
-          to="/clothing-management/locations/$clothingLocationId/edit"
-          params={{ clothingLocationId: String(location.id) }}
-          className="hover:underline"
-        >
-          {location.name}
-        </Link>
+        <LocationName locationId={location.id} name={location.name} />
       ),
     },
     {
