@@ -19,7 +19,6 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   batch: "Stapelverarbeitung",
   "change-password": "Passwort ändern",
   checkout: "Klamotten tauschen",
-  "checkout-classic": "Klamotten tauschen (klassisch)",
   "clothing-management": "Klamotten Management",
   edit: "Bearbeiten",
   items: "Kleidungsstücke",
