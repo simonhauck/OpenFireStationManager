@@ -8,8 +8,8 @@ type LocationNameProps = {
 
 /**
  * Renders a Standort reference. A standalone reference links to the Standort's
- * edit page; without an id the name stays plain text, and a missing name falls
- * back to the muted dash used by MemberName.
+ * detail page; without an id the name stays plain text, and a missing name
+ * falls back to the muted dash used by MemberName.
  */
 export default function LocationName({ locationId, name }: LocationNameProps) {
   if (name === undefined) {
@@ -21,7 +21,10 @@ export default function LocationName({ locationId, name }: LocationNameProps) {
   }
 
   return (
-    <EntityNameLink href={`/clothing-management/locations/${locationId}/edit`}>
+    <EntityNameLink
+      href={`/clothing-management/locations/${locationId}`}
+      allowedRoles={["KLEIDERWART"]}
+    >
       {name}
     </EntityNameLink>
   )

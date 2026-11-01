@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 
+import { LOCATION_TYPE_LABELS } from "#/clothing/components/shared/clothingLocationLabel"
 import type { ClothingLocation } from "#/clothing/service/clothingLocationsQueries"
 import {
   createClothingLocationMutation,
@@ -19,12 +20,9 @@ import MemberSelect from "#/members/components/shared/MemberSelect"
 
 type LocationType = "POOL" | "WAESCHE" | "PERSONAL" | "OTHER"
 
-const LOCATION_TYPE_OPTIONS: { value: LocationType; label: string }[] = [
-  { value: "POOL", label: "Pool" },
-  { value: "WAESCHE", label: "Wäsche" },
-  { value: "PERSONAL", label: "Persönlicher Standort" },
-  { value: "OTHER", label: "Sonstiges" },
-]
+const LOCATION_TYPE_OPTIONS: { value: LocationType; label: string }[] = (
+  Object.keys(LOCATION_TYPE_LABELS) as LocationType[]
+).map((value) => ({ value, label: LOCATION_TYPE_LABELS[value] }))
 
 type ClothingLocationFormProps = {
   existingLocation?: ClothingLocation
@@ -72,6 +70,10 @@ export default function ClothingLocationForm({
   const description = isEditing
     ? "Bearbeiten Sie die Daten des Standorts."
     : "Erfassen Sie die Daten für einen neuen Standort."
+  const cancelHref =
+    existingLocation !== undefined
+      ? `/clothing-management/locations/${existingLocation.id}`
+      : "/clothing-management/locations"
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -90,15 +92,21 @@ export default function ClothingLocationForm({
       updateLocation(
         { id: Number(existingLocation.id), body },
         {
-          onSuccess: () => {
-            void navigate({ to: "/clothing-management/locations" })
+          onSuccess: (updatedLocation) => {
+            void navigate({
+              to: "/clothing-management/locations/$clothingLocationId",
+              params: { clothingLocationId: String(updatedLocation.id) },
+            })
           },
         },
       )
     } else {
       createLocation(body, {
-        onSuccess: () => {
-          void navigate({ to: "/clothing-management/locations" })
+        onSuccess: (createdLocation) => {
+          void navigate({
+            to: "/clothing-management/locations/$clothingLocationId",
+            params: { clothingLocationId: String(createdLocation.id) },
+          })
         },
       })
     }
@@ -154,11 +162,7 @@ export default function ClothingLocationForm({
           </RenderIf>
 
           <div className="flex flex-wrap justify-end gap-2 pt-2">
-            <Button
-              label="Abbrechen"
-              variant="secondary"
-              href="/clothing-management/locations"
-            />
+            <Button label="Abbrechen" variant="secondary" href={cancelHref} />
             <Button
               type="submit"
               label={isPending ? "Wird gespeichert..." : "Speichern"}

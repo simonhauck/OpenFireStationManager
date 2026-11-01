@@ -23,7 +23,9 @@ Location pickers (combobox dropdowns) display a formatted label built from the l
 
 A `PERSONAL` location's owner is the linked `Mitglied`; the `comment` field is generic free text alongside it ("defekt", "hinten links"). Both are shown when both are present. Before the member migration, `comment` was where the owner's name was written by hand — hence the fallback. Whether the type is shown depends on the picker context — checkout hides the type (all options are PERSONAL), relocation shows it (any type may appear).
 
-Outside pickers, a standalone Standort reference renders as a text link to the Standort edit page through `LocationName`. Headings and composed labels stay plain text, and chips are reserved for metadata such as the location type or a checkout origin. See ADR-0009.
+Outside pickers, a standalone Standort reference renders as a text link to the Standort detail page through `LocationName`. Headings and composed labels stay plain text, and chips are reserved for metadata such as the location type or a checkout origin. See ADR-0009. Entity links are access-aware: `EntityNameLink` renders plain text when the current user does not hold the target page's role, so members, Standorte, and clothing items never link to a role-guard dead end.
+
+The read-only detail page at `/clothing-management/locations/{id}` is KLEIDERWART-only. It shows the location's metadata (type, linked Mitglied, comment, Nur Kleiderwart and audit fields) in a **Details** section and every garment currently assigned to it in a **Kleidung** section. The clothing list reuses `ClothingItemsTable` with search, sorting and pagination; item type/size labels link to the item edit page through `ClothingItemLink` when the user may access clothing management. Deleting a Standort unassigns its clothing (`clothing_items.location_id` is set to null) but keeps the items, which the shared delete dialog makes explicit.
 
 ### Klamotten / Kleidung
 
@@ -109,7 +111,7 @@ User-facing label for `Member` — a person in the organisation. Deliberately di
 
 Top-level route `/members`, `KLEIDERWART`-guarded, with entries in `MENU_ITEMS` (nav config), `DASHBOARD_ITEMS` (`dashboard.tsx`), and `SEGMENT_LABELS` (`Breadcrumb.tsx`) — all three lists are duplicated and must be kept in step. Four routes: list, `/new`, `/$memberId` (detail), `/$memberId/edit`.
 
-The **detail page** is the "what gear does this person have?" screen and is the reason a detail view exists at all. Three sections: Kopf (name, audit metadata, Bearbeiten/Löschen actions); Standorte (the member's locations, each linking to the location edit page — assignment is only ever written from the location side); Kleidung (every item currently in those locations, from `GET /api/clothing/locations/{id}/items`, one call per locker).
+The **detail page** is the "what gear does this person have?" screen and is the reason a detail view exists at all. Three sections: Kopf (name, audit metadata, Bearbeiten/Löschen actions); Standorte (the member's locations, each linking to the location detail page — assignment is only ever written from the location side); Kleidung (every item currently in those locations, from `GET /api/clothing/locations/{id}/items`, one call per locker). Each clothing group heading keeps the Standort name plain and adds an explicit **Details** action to the location detail page.
 
 Standalone member references render through `MemberName` as text links to the detail page; names embedded in composed location labels remain plain text. See ADR-0009.
 

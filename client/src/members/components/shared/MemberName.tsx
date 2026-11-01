@@ -20,7 +20,10 @@ export default function MemberName({ memberId, name }: MemberNameProps) {
   }
 
   return (
-    <EntityNameLink href={`/members/${memberId}`}>
+    <EntityNameLink
+      href={`/members/${memberId}`}
+      allowedRoles={["KLEIDERWART"]}
+    >
       {resolvedName}
     </EntityNameLink>
   )

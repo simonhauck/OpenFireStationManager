@@ -36,4 +36,11 @@ export class PoolKlamottenPage {
       hasText: typeName,
     })
   }
+
+  detailsLink(locationName: string) {
+    return this.locationSection(locationName).getByRole("link", {
+      name: "Details",
+      exact: true,
+    })
+  }
 }

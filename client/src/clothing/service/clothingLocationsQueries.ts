@@ -132,9 +132,11 @@ export const deleteClothingLocationMutation = (queryClient: QueryClient) =>
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingLocations(),
+          exact: true,
         }),
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingLocation(id),
+          refetchType: "none",
         }),
         queryClient.invalidateQueries({
           queryKey: queryKeys.clothingOverview(),

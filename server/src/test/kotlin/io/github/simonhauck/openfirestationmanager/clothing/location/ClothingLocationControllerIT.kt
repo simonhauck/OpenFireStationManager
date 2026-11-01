@@ -1,7 +1,11 @@
 package io.github.simonhauck.openfirestationmanager.clothing.location
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.clothing.item.ClothingItemControllerCalls
+import io.github.simonhauck.openfirestationmanager.clothing.item.CreateOrUpdateClothingItemRequest
 import io.github.simonhauck.openfirestationmanager.clothing.overview.ClothingOverviewControllerCalls
+import io.github.simonhauck.openfirestationmanager.clothing.type.CreateOrUpdateClothingTypeRequest
+import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveClothingTypeControllerCalls
 import io.github.simonhauck.openfirestationmanager.member.CreateOrUpdateMemberRequest
 import io.github.simonhauck.openfirestationmanager.member.MemberControllerCalls
 import org.assertj.core.api.Assertions.assertThat
@@ -15,6 +19,8 @@ class ClothingLocationControllerIT : IntegrationTest() {
     @Autowired private lateinit var calls: ClothingLocationControllerCalls
     @Autowired private lateinit var overviewCalls: ClothingOverviewControllerCalls
     @Autowired private lateinit var memberCalls: MemberControllerCalls
+    @Autowired private lateinit var itemCalls: ClothingItemControllerCalls
+    @Autowired private lateinit var typeCalls: ProtectiveClothingTypeControllerCalls
 
     @Test
     fun `should create and read clothing locations`() {
@@ -293,6 +299,52 @@ class ClothingLocationControllerIT : IntegrationTest() {
         val deleteResponse = calls.deleteLocation(created.id, authCookie = validCookieHeader)
 
         assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
+    fun `deleting a location unassigns its clothing items`() {
+        val location =
+            calls
+                .createLocation(
+                    CreateClothingLocationRequest(
+                        name = "WithItems-${System.nanoTime()}",
+                        comment = "",
+                        onlyVisibleForKleiderwart = false,
+                        type = LocationType.POOL,
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+        val type =
+            typeCalls
+                .createType(
+                    CreateOrUpdateClothingTypeRequest(name = "Type-${System.nanoTime()}"),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+        val item =
+            itemCalls
+                .createItem(
+                    CreateOrUpdateClothingItemRequest(
+                        typeId = type.id,
+                        size = "L",
+                        locationId = AggregateReference.to(location.id),
+                    ),
+                    authCookie = validCookieHeader,
+                )
+                .body!!
+
+        assertThat(item.locationId?.id).isEqualTo(location.id)
+
+        val deleteResponse = calls.deleteLocation(location.id, authCookie = validCookieHeader)
+
+        assertThat(deleteResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+
+        val remaining = itemCalls.getItemById(item.id, authCookie = validCookieHeader)
+
+        assertThat(remaining.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(remaining.body?.id).isEqualTo(item.id)
+        assertThat(remaining.body?.locationId).isNull()
     }
 
     @Test
