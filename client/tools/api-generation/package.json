@@ -1,0 +1,10 @@
+{
+  "name": "@openfirestationmanager/api-generation",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned OpenAPI TypeScript generator. It keeps its own TypeScript version because openapi-typescript does not support the TypeScript 7 API.",
+  "dependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

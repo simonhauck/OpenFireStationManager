@@ -8,6 +8,16 @@ repositories { mavenCentral() }
 
 allprojects { group = "io.github.simonhauck" }
 
+tasks.register("prepareEnv") {
+    group = "build"
+    description = "Prepares the client for building or starting the application."
+    dependsOn(":client:prepareEnv")
+}
+
+tasks.named("spotlessApply") { dependsOn(":client:formatFix") }
+
+tasks.named("spotlessCheck") { dependsOn(":client:formatCheck") }
+
 release {
     versionPropertyFile.set(layout.projectDirectory.file("gradle.properties"))
     releaseCommitAddFiles.set(

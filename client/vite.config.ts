@@ -30,7 +30,7 @@ const config = defineConfig({
     },
   },
   build: {
-    outDir: "./../server/src/main/resources/static",
+    outDir: "./build/frontend",
     emptyOutDir: true,
   },
   plugins: [
