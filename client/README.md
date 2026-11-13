@@ -29,27 +29,35 @@ You will also need a user account to sign in with. A fresh database has none —
 
 ## Getting started
 
+From the repository root:
+
 ```bash
-npm install
-npm run prepareEnv     # generate the typed API client
+./gradlew prepareEnv   # install dependencies and generate sources
+```
+
+Then start the dev server from this folder:
+
+```bash
 npm run dev            # http://localhost:3000
 ```
 
-`prepareEnv` is not optional on a first checkout. It generates `src/api/schema.ts` from the
-backend's OpenAPI contract, and nothing compiles without it.
+`prepareEnv` is not optional on a first checkout. It installs dependencies, generates the TanStack
+route tree, generates `src/api/schema.ts` from the backend's OpenAPI contract, and builds the Astryx
+theme. Nothing compiles without it.
 
 ---
 
 ## How it talks to the backend
 
-All API types are **generated, not hand-written**. `npm run prepareEnv` reads
+All API types are **generated, not hand-written**. `./gradlew prepareEnv` reads
 `server/src/main/resources/open-api-contract.json` and writes `src/api/schema.ts`, which types the
 `openapi-fetch` client in `src/api/client.ts`. Calling an endpoint that does not exist, or passing
 the wrong body, is therefore a compile error rather than a runtime surprise.
 
-**Re-run `prepareEnv` whenever the backend API changes.** Nothing in CI checks that the generated
-file is current, so a stale one will pass the build and only fail when you touch the changed
-endpoint. If a request 404s or a type looks wrong, regenerate before debugging anything else.
+**Re-run `./gradlew prepareEnv` whenever the backend API changes.** Nothing in CI checks that the
+generated file is current, so a stale one will pass the build and only fail when you touch the
+changed endpoint. If a request 404s or a type looks wrong, regenerate before debugging anything
+else.
 
 Authentication is a session cookie set by the backend; the client sends `credentials: "include"` and
 holds no token.
@@ -58,13 +66,13 @@ holds no token.
 
 ## How it is built and deployed
 
-`npm run build` does **not** produce a standalone bundle. It writes into
-`server/src/main/resources/static/`, so the compiled frontend is packaged inside the backend JAR and
-the whole product ships as one Docker image on one port.
+`./gradlew build -Pprod` builds the production bundle into `client/build/frontend/`, and the server
+packages that output inside its JAR. The whole product still ships as one Docker image on one port.
+Without `-Pprod`, Gradle runs the checks but does not build the frontend.
 
 Two consequences worth knowing:
 
-- The output directory is emptied on each build, and it lives outside this folder.
+- The frontend now owns its output directory; a plain `./gradlew build` does not create a bundle.
 - In production the app is served from the same origin as the API, which is why no API base URL is
   configured. `VITE_API_BASE_URL` exists as an override but is normally unset.
 
@@ -76,7 +84,7 @@ End-to-end tests are the primary strategy here, because most of the value is in 
 like checkout and stock-taking rather than in isolated components.
 
 ```bash
-npm run test        # Vitest — pure logic only
+./gradlew test      # Vitest and backend unit tests
 npm run test:e2e    # Playwright — the real coverage
 npm run test:e2e:ui # Playwright, interactive
 ```
@@ -89,22 +97,24 @@ if you have one — it will not start a second copy.
 
 ## Commands
 
-|         Purpose          |        Command         |
-|--------------------------|------------------------|
-| Dev server               | `npm run dev`          |
-| Regenerate API bindings  | `npm run prepareEnv`   |
-| Production build         | `npm run build`        |
-| Type check               | `npm run build:check`  |
-| Lint and format check    | `npm run format:check` |
-| Lint and format auto-fix | `npm run format:fix`   |
-| Unit tests               | `npm run test`         |
-| End-to-end tests         | `npm run test:e2e`     |
+|                  Purpose                   |               Command               |
+|--------------------------------------------|-------------------------------------|
+| Dev server                                 | `npm run dev` (from `client/`)      |
+| Prepare dependencies and generated sources | `./gradlew prepareEnv`              |
+| All checks                                 | `./gradlew check`                   |
+| Production build                           | `./gradlew build -Pprod`            |
+| Format and lint auto-fix                   | `./gradlew spotlessApply`           |
+| Format and lint check                      | `./gradlew spotlessCheck`           |
+| Unit tests                                 | `./gradlew test`                    |
+| End-to-end tests                           | `npm run test:e2e` (from `client/`) |
 
 ---
 
 ## Layout
 
 ```text
+build.gradle.kts    Gradle module that wraps the npm build/check commands
+tools/              pinned code-generation tools (OpenAPI bindings)
 src/
 ├── api/            generated schema, typed client, shared query keys
 ├── clothing/       the main feature area — checkout, relocation, stock-taking

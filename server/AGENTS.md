@@ -46,9 +46,9 @@ All commands below are run from the repository root using the Gradle wrapper —
 > the OpenAPI schema (`schema.json`) by running `HttpApiContractIT` with `UPDATE_SNAPSHOT=true`,
 > then applies Spotless formatting in a separate step to avoid a race condition.
 >
-> Then regenerate the frontend bindings with `npm run prepareEnv` from `client/`. CI checks the
-> contract against the running server, but **nothing** checks `client/src/api/schema.ts` against
-> the contract, so a stale binding will pass CI unnoticed.
+> Then regenerate the frontend bindings with `./gradlew prepareEnv` from the repo root. CI checks
+> the contract against the running server, but **nothing** checks `client/src/api/schema.ts`
+> against the contract, so a stale binding will pass CI unnoticed.
 
 | Build (compile + test + JAR) | `./gradlew :server:build` |
 | Run application | `./gradlew :server:bootRun` |
