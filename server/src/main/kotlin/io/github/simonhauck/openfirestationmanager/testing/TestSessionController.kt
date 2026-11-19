@@ -98,9 +98,6 @@ class TestSessionController(
         val authentication =
             OAuth2AuthenticationToken(principal, principal.authorities, REGISTRATION_ID)
 
-        // Always start a fresh session, so a caller that still sends an older cookie gets a new
-        // one instead of overwriting (and sharing) the previous session.
-        request.getSession(false)?.invalidate()
 
         val securityContext = SecurityContextHolder.createEmptyContext()
         securityContext.authentication = authentication

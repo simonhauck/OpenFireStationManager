@@ -100,11 +100,11 @@ export default async function globalSetup() {
     },
   ]
 
-  const apiContext = await request.newContext()
-
+  // One request context per persona: a shared context would send the previous persona's cookie
+  // along and the personas would end up sharing one session.
   for (const persona of personas) {
+    const apiContext = await request.newContext()
     await saveSession(apiContext, persona)
+    await apiContext.dispose()
   }
-
-  await apiContext.dispose()
 }
