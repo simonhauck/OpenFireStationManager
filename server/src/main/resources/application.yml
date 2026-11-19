@@ -66,6 +66,12 @@ app:
         ADMIN: [ofsm-admin]
         KLEIDERWART: [ofsm-kleiderwart]
         USER: [ofsm-user]
+    mcp:
+      # The MCP endpoint (/mcp) accepts bearer access tokens from the provider configured above
+      # (spring.security.oauth2.client.provider.ofsm.issuer-uri) only when their `aud` claim
+      # contains one of these audiences. The local Keycloak adds `ofsm` through the `ofsm-mcp`
+      # client scope. Comma-separated in the environment variable.
+      accepted-audiences: ${MCP_ACCEPTED_AUDIENCES:ofsm}
 
 springdoc:
   model-converters:

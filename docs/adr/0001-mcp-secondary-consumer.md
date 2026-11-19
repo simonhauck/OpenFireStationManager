@@ -1,7 +1,8 @@
 
 # ADR-0001: The MCP tool surface is a secondary consumer of the API contract
 
-**Status:** Accepted
+**Status:** Accepted, amended by [ADR-0002](0002-first-party-mcp-endpoint.md) (MCP no longer
+consumes the contract; the server hosts its own `/mcp` endpoint)
 **Date:** 2026-10-11
 
 ## Context

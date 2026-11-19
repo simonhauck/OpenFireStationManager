@@ -12,7 +12,28 @@ data class AuthProperties(
      */
     val usernameClaim: String = "preferred_username",
     val roles: RoleProperties = RoleProperties(),
+    val mcp: McpAuthProperties = McpAuthProperties(),
 )
+
+/** Bearer token rules of the MCP endpoint (`/mcp`), which is an OAuth2 resource server. */
+data class McpAuthProperties(
+    /**
+     * Audiences OFSM accepts in the `aud` claim of an access token. A token whose `aud` contains
+     * none of them was issued for another application and is rejected. Must not be empty.
+     */
+    val acceptedAudiences: List<String> = listOf(DEFAULT_AUDIENCE),
+) {
+    init {
+        require(acceptedAudiences.any { it.isNotBlank() }) {
+            "app.auth.mcp.accepted-audiences must contain at least one audience " +
+                "(default: $DEFAULT_AUDIENCE)"
+        }
+    }
+
+    companion object {
+        const val DEFAULT_AUDIENCE = "ofsm"
+    }
+}
 
 /**
  * Where provider roles are found and how they translate to OFSM roles. Invalid values fail
