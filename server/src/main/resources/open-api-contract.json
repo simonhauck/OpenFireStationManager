@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenFireStationManager API",
-    "description": "REST API for **OpenFireStationManager**, an open-source platform for managing a volunteer fire\nstation. The current scope is **protective clothing management** (German: *Kleiderverwaltung*):\ntracking individual garments, where they are stored, and who has taken them out.\n\n## Domain model\n\nThe clothing domain is built from four concepts:\n\n- **Clothing Type** (*Kleidungsart*) — a category of garment, e.g. \"Einsatzjacke\", \"Helm\".\n  Types have a name only; they carry no size or count of their own.\n- **Clothing Item** (*Kleidungsstück*, colloquially *Klamotte*) — one physical garment. It has a\n  type, a size, an optional barcode, and an optional current location. An item with no location\n  is considered unassigned.\n- **Clothing Location** (*Standort*) — anywhere an item can be. Each location has a `type`:\n  `POOL` (shared stock available to everyone), `WAESCHE` (at the laundry), `PERSONAL`\n  (assigned to one member, e.g. a named locker), or `OTHER`. Locations flagged\n  `onlyVisibleForKleiderwart` are hidden from ordinary users in lookup and search results.\n- **Clothing Movement** — an append-only log entry recording that an item moved from one\n  location to another, with a reason. Movements are never written directly; they are a\n  side effect of checkout, relocation, and inventory reconciliation.\n\nOperations that move several items at once return a `batchId`. All movements produced by a\nsingle request share that id, which is what makes a bulk action auditable and reversible.\n\n## Roles\n\nThree roles exist, and they are cumulative rather than exclusive:\n\n- `USER` — may read clothing data and perform checkouts and returns for themselves.\n- `KLEIDERWART` (*quartermaster*) — additionally may create, update, and delete clothing types,\n  items, and locations, and may run relocations and inventory reconciliation.\n- `ADMIN` — implicitly holds every other role, and additionally manages user accounts and the\n  legal documents (Impressum, privacy policy).\n\nBecause `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.\n\nRoles are not stored in OFSM and cannot be changed through this API. They come from the\nOpenID Connect provider: on every sign-in the server reads the roles from the configured claims\nof the user's tokens (for example Keycloak realm roles, client roles or groups) and translates\nthem through the role mapping in `app.auth.roles` (`claim-paths` and `mapping`). Provider roles\nthat are not mapped are ignored, and a role change at the provider takes effect at the user's\nnext sign-in. A signed-in user without any mapped role holds no OFSM role.\n\n## Authentication\n\nAuthentication is **cookie-based** and delegated to an OpenID Connect provider (for example\nKeycloak). There is no username/password endpoint, no `Authorization` header and no bearer\ntoken.\n\nA browser signs in by navigating to `GET /api/public/auth/login?redirect=<path>`. The server\nsends it to the provider's login page and, after a successful sign-in, back to `<path>` with a\n`OFSM_AUTH` session cookie. Send the cookie on every subsequent request. The session\nends after 12 hours without a request; every request extends it. A new sign-in through\nthe provider needs no password while the provider's own session is still valid.\n`POST /api/public/auth/logout` ends both the session and the provider session.\n\nEndpoints under `/api/public/**` need no authentication. Everything else under `/api/**`\nrequires a valid session; `/api/admin/**` additionally requires the `ADMIN` role.\n\n## Error format\n\nAll errors return [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`.\nRequest-body validation failures (`400`) additionally carry an `errors` array naming each\noffending field, its message, and the value that was rejected.",
+    "description": "REST API for **OpenFireStationManager**, an open-source platform for managing a volunteer fire\nstation. The current scope is **protective clothing management** (German: *Kleiderverwaltung*):\ntracking individual garments, where they are stored, and who has taken them out.\n\n## Domain model\n\nThe clothing domain is built from four concepts:\n\n- **Clothing Type** (*Kleidungsart*) — a category of garment, e.g. \"Einsatzjacke\", \"Helm\".\n  Types have a name only; they carry no size or count of their own.\n- **Clothing Item** (*Kleidungsstück*, colloquially *Klamotte*) — one physical garment. It has a\n  type, a size, an optional barcode, and an optional current location. An item with no location\n  is considered unassigned.\n- **Clothing Location** (*Standort*) — anywhere an item can be. Each location has a `type`:\n  `POOL` (shared stock available to everyone), `WAESCHE` (at the laundry), `PERSONAL`\n  (assigned to one member, e.g. a named locker), or `OTHER`. Locations flagged\n  `onlyVisibleForKleiderwart` are hidden from ordinary users in lookup and search results.\n- **Clothing Movement** — an append-only log entry recording that an item moved from one\n  location to another, with a reason. Movements are never written directly; they are a\n  side effect of checkout, relocation, and inventory reconciliation.\n\nOperations that move several items at once return a `batchId`. All movements produced by a\nsingle request share that id, which is what makes a bulk action auditable and reversible.\n\n## Roles\n\nThree roles exist, and they are cumulative rather than exclusive:\n\n- `USER` — may read clothing data and perform checkouts and returns for themselves.\n- `KLEIDERWART` (*quartermaster*) — additionally may create, update, and delete clothing types,\n  items, and locations, and may run relocations and inventory reconciliation.\n- `ADMIN` — implicitly holds every other role, and additionally manages user accounts and the\n  legal documents (Impressum, privacy policy).\n\nBecause `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.\n\nRoles are not stored in OFSM and cannot be changed through this API. They come from the\nOpenID Connect provider: on every sign-in the server reads the roles from the configured claims\nof the user's tokens (for example Keycloak realm roles, client roles or groups) and translates\nthem through the role mapping in `app.auth.roles` (`claim-paths` and `mapping`). Provider roles\nthat are not mapped are ignored, and a role change at the provider takes effect at the user's\nnext sign-in. A signed-in user without any mapped role holds no OFSM role and is refused with `403`\non every endpoint outside `/api/public/**`.\n\n## Authentication\n\nAuthentication is **cookie-based** and delegated to an OpenID Connect provider (for example\nKeycloak). There is no username/password endpoint, no `Authorization` header and no bearer\ntoken.\n\nA browser signs in by navigating to `GET /api/public/auth/login?redirect=<path>`. The server\nsends it to the provider's login page and, after a successful sign-in, back to `<path>` with a\n`OFSM_AUTH` session cookie. Send the cookie on every subsequent request. The session\nends after 12 hours without a request; every request extends it. A new sign-in through\nthe provider needs no password while the provider's own session is still valid.\n`POST /api/public/auth/logout` ends both the session and the provider session.\n\nEndpoints under `/api/public/**` need no authentication. Everything else under `/api/**`\nrequires a valid session whose user holds at least one OFSM role (`USER`, `KLEIDERWART` or\n`ADMIN`); `/api/admin/**` additionally requires the `ADMIN` role.\n\n## Error format\n\nAll errors return [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`.\nRequest-body validation failures (`400`) additionally carry an `errors` array naming each\noffending field, its message, and the value that was rejected.",
     "contact": {
       "name": "OpenFireStationManager",
       "url": "https://github.com/simonhauck/OpenFireStationManager"
@@ -717,7 +717,7 @@
       "get": {
         "tags": [ "Members" ],
         "summary": "List every member",
-        "description": "Returns the whole roster of people in the brigade (*Mitglied*), in the order they were added. The list is unpaginated.\n\nA member is a **person**, not a login. User accounts are managed separately under `/api/admin/users`, and the two are not linked — someone can be on the roster without ever signing in. Use this endpoint when you need people; use `listUsers` when you need credentials.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns the whole roster of people in the brigade (*Mitglied*), in the order they were added. The list is unpaginated.\n\nA member is a **person**, not a login. User accounts are managed separately under `/api/admin/users`, and the two are not linked — someone can be on the roster without ever signing in. Use this endpoint when you need people; use `listUsers` when you need credentials.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listMembers",
         "responses": {
           "200": {
@@ -735,6 +735,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -828,7 +838,7 @@
       "get": {
         "tags": [ "Clothing Types" ],
         "summary": "List every clothing type",
-        "description": "Returns all garment categories (`Kleidungsart`) known to the station, such as `Einsatzjacke` or `Helm`. Types are the vocabulary the rest of the clothing API is built on: start here to discover the valid `typeId` values before creating or searching for items.\n\nThe list is small and is returned unpaginated.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns all garment categories (`Kleidungsart`) known to the station, such as `Einsatzjacke` or `Helm`. Types are the vocabulary the rest of the clothing API is built on: start here to discover the valid `typeId` values before creating or searching for items.\n\nThe list is small and is returned unpaginated.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listClothingTypes",
         "responses": {
           "200": {
@@ -846,6 +856,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -939,7 +959,7 @@
       "get": {
         "tags": [ "Clothing Types" ],
         "summary": "List the barcode guide images of a clothing type",
-        "description": "Returns the metadata of every image (`Barcode-Bild`) stored for one clothing type, in upload order — but not the image bytes. Use this on a type's management screen to render previews; download each image from `GET /api/clothing/types/{typeId}/images/{imageId}`.\n\nFor the scanner gallery across all types, prefer `GET /api/clothing/types/barcode-images`, which answers in one call.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns the metadata of every image (`Barcode-Bild`) stored for one clothing type, in upload order — but not the image bytes. Use this on a type's management screen to render previews; download each image from `GET /api/clothing/types/{typeId}/images/{imageId}`.\n\nFor the scanner gallery across all types, prefer `GET /api/clothing/types/barcode-images`, which answers in one call.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listClothingTypeImages",
         "parameters": [ {
           "name": "typeId",
@@ -979,6 +999,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1204,7 +1234,7 @@
       "get": {
         "tags": [ "Clothing Locations" ],
         "summary": "List every clothing location",
-        "description": "Returns all places garments can be kept (`Standort`), including personal lockers, the shared pool, and the laundry. Start here to discover valid `locationId` values for checkout, relocation, and reconciliation.\n\nThis endpoint returns locations flagged `onlyVisibleForKleiderwart` to every caller; it is the item lookups, not this list, that apply that visibility rule.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns all places garments can be kept (`Standort`), including personal lockers, the shared pool, and the laundry. Start here to discover valid `locationId` values for checkout, relocation, and reconciliation.\n\nThis endpoint returns locations flagged `onlyVisibleForKleiderwart` to every caller; it is the item lookups, not this list, that apply that visibility rule.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listClothingLocations",
         "responses": {
           "200": {
@@ -1222,6 +1252,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1396,7 +1436,7 @@
       "get": {
         "tags": [ "Clothing Items" ],
         "summary": "List every clothing item",
-        "description": "Returns all clothing items in the station, unfiltered and unpaginated. Each item is returned in its **resolved** form: the full clothing type and the item's current location are embedded, so no follow-up lookups are needed. `location` is null when the item is not assigned anywhere.\n\nUnlike `searchClothingItems` and `getClothingItemByBarcode`, this endpoint does **not** hide items stored in locations flagged `onlyVisibleForKleiderwart`, matching `listClothingLocations`. Use the search endpoint when the caller should not see restricted locations.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns all clothing items in the station, unfiltered and unpaginated. Each item is returned in its **resolved** form: the full clothing type and the item's current location are embedded, so no follow-up lookups are needed. `location` is null when the item is not assigned anywhere.\n\nUnlike `searchClothingItems` and `getClothingItemByBarcode`, this endpoint does **not** hide items stored in locations flagged `onlyVisibleForKleiderwart`, matching `listClothingLocations`. Use the search endpoint when the caller should not see restricted locations.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listClothingItems",
         "responses": {
           "200": {
@@ -1414,6 +1454,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1784,7 +1834,7 @@
       "post": {
         "tags": [ "Clothing Checkout" ],
         "summary": "Take garments out, hand garments back, or both at once",
-        "description": "Records a member taking protective clothing out of stock and/or returning it. This is the everyday operation of the clothing domain, and the correct way to move garments in normal use — it updates each item's location *and* writes an auditable movement entry, which editing an item directly does not.\n\nA single request can do both halves of a swap. Items listed in `takeItemIds` move to `targetLocationId`, which must be a `PERSONAL` location. Items listed in `returnItemIds` move to `returnLocationId`, which must be a `WAESCHE` or `POOL` location. Sending a location of the wrong type is rejected with `400`.\n\nThe entire request is applied in one transaction, so a failure part-way through leaves nothing changed. The returned `batchId` tags every movement the request produced, making the transaction traceable as a unit.\n\nNote that garments are not validated against who is checking them out: any signed-in user may check any item out to any `PERSONAL` location.\n\n**Authorisation:** any signed-in user.",
+        "description": "Records a member taking protective clothing out of stock and/or returning it. This is the everyday operation of the clothing domain, and the correct way to move garments in normal use — it updates each item's location *and* writes an auditable movement entry, which editing an item directly does not.\n\nA single request can do both halves of a swap. Items listed in `takeItemIds` move to `targetLocationId`, which must be a `PERSONAL` location. Items listed in `returnItemIds` move to `returnLocationId`, which must be a `WAESCHE` or `POOL` location. Sending a location of the wrong type is rejected with `400`.\n\nThe entire request is applied in one transaction, so a failure part-way through leaves nothing changed. The returned `batchId` tags every movement the request produced, making the transaction traceable as a unit.\n\nNote that garments are not validated against who is checking them out: any signed-in user may check any item out to any `PERSONAL` location.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "checkoutClothingItems",
         "requestBody": {
           "content": {
@@ -1829,6 +1879,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2171,7 +2231,7 @@
       "get": {
         "tags": [ "Members" ],
         "summary": "Get one member by their numeric id",
-        "description": "Looks up a single person on the roster by their database id.\n\n**Authorisation:** any signed-in user.",
+        "description": "Looks up a single person on the roster by their database id.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getMember",
         "parameters": [ {
           "name": "id",
@@ -2208,6 +2268,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2406,7 +2476,7 @@
       "get": {
         "tags": [ "Clothing Types" ],
         "summary": "Get one clothing type by its numeric id",
-        "description": "Looks up a single garment category by its database id.\n\n**Authorisation:** any signed-in user.",
+        "description": "Looks up a single garment category by its database id.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingType",
         "parameters": [ {
           "name": "id",
@@ -2443,6 +2513,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2651,7 +2731,7 @@
       "get": {
         "tags": [ "Clothing Locations" ],
         "summary": "Get one clothing location by its numeric id",
-        "description": "Looks up a single location by its database id. This returns the location's own properties only — it does not list the garments currently stored there. To find those, use `GET /api/clothing/locations/{id}/items`.\n\n**Authorisation:** any signed-in user.",
+        "description": "Looks up a single location by its database id. This returns the location's own properties only — it does not list the garments currently stored there. To find those, use `GET /api/clothing/locations/{id}/items`.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingLocation",
         "parameters": [ {
           "name": "id",
@@ -2688,6 +2768,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2890,7 +2980,7 @@
       "get": {
         "tags": [ "Clothing Items" ],
         "summary": "Get one clothing item by its numeric id",
-        "description": "Looks up a single clothing item by its database id. Returns the raw item, whose `typeId` and `locationId` are numeric references rather than expanded objects.\n\nIf you are scanning a physical garment, prefer `getClothingItemByBarcode`.\n\n**Authorisation:** any signed-in user.",
+        "description": "Looks up a single clothing item by its database id. Returns the raw item, whose `typeId` and `locationId` are numeric references rather than expanded objects.\n\nIf you are scanning a physical garment, prefer `getClothingItemByBarcode`.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingItem",
         "parameters": [ {
           "name": "id",
@@ -2927,6 +3017,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -3530,7 +3630,7 @@
       "get": {
         "tags": [ "Clothing Types" ],
         "summary": "Download one barcode guide image",
-        "description": "Streams the stored image bytes (`Barcode-Bild`) exactly as uploaded, with the MIME type they were stored with. The response is the raw image, not JSON.\n\nStored bytes never change, so responses are cacheable indefinitely; the `ETag` is derived from the image's id. Replacing an image means deleting it and uploading a new file, which produces a new id and therefore a new URL.\n\n**Authorisation:** any signed-in user.",
+        "description": "Streams the stored image bytes (`Barcode-Bild`) exactly as uploaded, with the MIME type they were stored with. The response is the raw image, not JSON.\n\nStored bytes never change, so responses are cacheable indefinitely; the `ETag` is derived from the image's id. Replacing an image means deleting it and uploading a new file, which produces a new id and therefore a new URL.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingTypeImage",
         "parameters": [ {
           "name": "typeId",
@@ -3579,6 +3679,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -3698,7 +3808,7 @@
       "get": {
         "tags": [ "Clothing Types" ],
         "summary": "List every barcode guide image, grouped by clothing type",
-        "description": "Returns all stored images (`Barcode-Bild`) across every clothing type, grouped under the type they belong to and accompanied by the type's name. This is the one call the scanner screens need to render the \"where do I find the barcode?\" gallery; image bytes are still fetched per image from `GET /api/clothing/types/{typeId}/images/{imageId}`.\n\nTypes without images are omitted, so an empty response means the gallery has nothing to show.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns all stored images (`Barcode-Bild`) across every clothing type, grouped under the type they belong to and accompanied by the type's name. This is the one call the scanner screens need to render the \"where do I find the barcode?\" gallery; image bytes are still fetched per image from `GET /api/clothing/types/{typeId}/images/{imageId}`.\n\nTypes without images are omitted, so an empty response means the gallery has nothing to show.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listBarcodeImages",
         "responses": {
           "200": {
@@ -3724,6 +3834,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Unexpected server error. The response body carries no details.",
             "content": {
@@ -3741,7 +3861,7 @@
       "get": {
         "tags": [ "Clothing Overview" ],
         "summary": "Count garments across the whole station, grouped by type and size",
-        "description": "Aggregated stock across every location, answering \"how many jackets do we own, in which sizes?\". Each type carries a `totalCount` and a breakdown into size bands, so a long tail of individual sizes stays readable.\n\nCounts include every garment regardless of where it is or whether it is currently checked out. Use this for reporting rather than availability — for what is on the shelf right now, use `getClothingDashboardByLocation`.\n\n**Authorisation:** any signed-in user.",
+        "description": "Aggregated stock across every location, answering \"how many jackets do we own, in which sizes?\". Each type carries a `totalCount` and a breakdown into size bands, so a long tail of individual sizes stays readable.\n\nCounts include every garment regardless of where it is or whether it is currently checked out. Use this for reporting rather than availability — for what is on the shelf right now, use `getClothingDashboardByLocation`.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingSummaryByType",
         "responses": {
           "200": {
@@ -3767,6 +3887,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Unexpected server error. The response body carries no details.",
             "content": {
@@ -3784,7 +3914,7 @@
       "get": {
         "tags": [ "Clothing Overview" ],
         "summary": "Show available stock per location, for the dashboard",
-        "description": "Stock broken down by location, then by type and size. This powers the station dashboard's availability view.\n\nOnly locations of type `POOL` and `WAESCHE` are included — shared stock and laundry. Personal lockers are deliberately excluded, so these figures represent what is available to the station rather than everything it owns.\n\n**Authorisation:** any signed-in user.",
+        "description": "Stock broken down by location, then by type and size. This powers the station dashboard's availability view.\n\nOnly locations of type `POOL` and `WAESCHE` are included — shared stock and laundry. Personal lockers are deliberately excluded, so these figures represent what is available to the station rather than everything it owns.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingDashboardByLocation",
         "responses": {
           "200": {
@@ -3810,6 +3940,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Unexpected server error. The response body carries no details.",
             "content": {
@@ -3827,7 +3967,7 @@
       "get": {
         "tags": [ "Clothing Locations" ],
         "summary": "List the garments currently held at a location",
-        "description": "Returns everything the system records as being at this location — the answer to \"what is in this locker?\".\n\nResults are in **resolved** form, each embedding its full clothing type and location, so no follow-up lookups are needed. An empty list means the location exists but is empty.\n\nLocations flagged `onlyVisibleForKleiderwart` are hidden from callers without that role: they receive `404` rather than `403`, so the existence of a restricted location is not revealed.\n\n**Authorisation:** any signed-in user.",
+        "description": "Returns everything the system records as being at this location — the answer to \"what is in this locker?\".\n\nResults are in **resolved** form, each embedding its full clothing type and location, so no follow-up lookups are needed. An empty list means the location exists but is empty.\n\nLocations flagged `onlyVisibleForKleiderwart` are hidden from callers without that role: they receive `404` rather than `403`, so the existence of a restricted location is not revealed.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "listItemsAtClothingLocation",
         "parameters": [ {
           "name": "id",
@@ -3875,6 +4015,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Unexpected server error. The response body carries no details.",
             "content": {
@@ -3902,7 +4052,7 @@
       "get": {
         "tags": [ "Clothing Items" ],
         "summary": "Search clothing items by type name, size, or barcode",
-        "description": "Free-text search across the clothing type name, the size, and either barcode (the station `Barcode` or the `Hersteller-Barcode`). Use this to answer questions like \"which jackets in size 52 do we have?\" — pass the type name and the size together as one query string.\n\nResults are returned in **resolved** form, each embedding its full clothing type and current location. Callers without the `KLEIDERWART` role never see items held in locations flagged `onlyVisibleForKleiderwart`.\n\nThe result set is capped at 50 entries regardless of the `limit` supplied, so a full result set is never guaranteed; narrow the query rather than raising the limit.\n\n**Authorisation:** any signed-in user.",
+        "description": "Free-text search across the clothing type name, the size, and either barcode (the station `Barcode` or the `Hersteller-Barcode`). Use this to answer questions like \"which jackets in size 52 do we have?\" — pass the type name and the size together as one query string.\n\nResults are returned in **resolved** form, each embedding its full clothing type and current location. Callers without the `KLEIDERWART` role never see items held in locations flagged `onlyVisibleForKleiderwart`.\n\nThe result set is capped at 50 entries regardless of the `limit` supplied, so a full result set is never guaranteed; narrow the query rather than raising the limit.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "searchClothingItems",
         "parameters": [ {
           "name": "q",
@@ -3949,6 +4099,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Unexpected server error. The response body carries no details.",
             "content": {
@@ -3976,7 +4136,7 @@
       "get": {
         "tags": [ "Clothing Items" ],
         "summary": "Look up a clothing item by either of its barcodes",
-        "description": "Resolves a barcode scanned from a physical garment to the item it identifies. This is the endpoint to use when a scanner is involved. Both the station-assigned `barcode` and the manufacturer- or supplier-printed `manufacturerBarcode` (`Hersteller-Barcode`) resolve, so a user can scan whichever barcode they find first.\n\nThe response is the **resolved** form: it embeds the full clothing type and the full current location alongside the item, so no follow-up lookups are needed. `location` is null when the item is not currently assigned anywhere.\n\nBarcodes share one value space and are unique across all items. Callers without the `KLEIDERWART` role cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for them such an item reads as not found.\n\n**Authorisation:** any signed-in user.",
+        "description": "Resolves a barcode scanned from a physical garment to the item it identifies. This is the endpoint to use when a scanner is involved. Both the station-assigned `barcode` and the manufacturer- or supplier-printed `manufacturerBarcode` (`Hersteller-Barcode`) resolve, so a user can scan whichever barcode they find first.\n\nThe response is the **resolved** form: it embeds the full clothing type and the full current location alongside the item, so no follow-up lookups are needed. `location` is null when the item is not currently assigned anywhere.\n\nBarcodes share one value space and are unique across all items. Callers without the `KLEIDERWART` role cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for them such an item reads as not found.\n\n**Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).",
         "operationId": "getClothingItemByBarcode",
         "parameters": [ {
           "name": "barcode",
@@ -4011,6 +4171,16 @@
           },
           "401": {
             "description": "Not authenticated — no valid session cookie was supplied.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the account lacks the required role.",
             "content": {
               "application/problem+json": {
                 "schema": {

@@ -30,7 +30,7 @@ JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API 
 - Use `/api/admin/**` for admin-only endpoints.
 - Keep protected API routes outside `/api/public/**` unless there is an explicit exception.
 - Authentication is delegated to an OpenID Connect provider (`spring.security.oauth2.client.*`, registration `ofsm`); the server keeps the result in a server-side session (`OFSM_AUTH` cookie). The frontend uses cookie credentials, not browser token storage.
-- Roles come from the provider's `realm_access.roles` claim, mapped to OFSM roles through `app.auth.roles.mapping`; `ADMIN` implies every role. Integration tests get sessions from the test-only `POST /api/test/session` endpoint; `OidcLoginIT` drives the real flow against `navikt/mock-oauth2-server`.
+- Roles come from the provider's `realm_access.roles` claim, mapped to OFSM roles through `app.auth.roles.mapping`; `ADMIN` implies every role. Everything under `/api/**` except `/api/public/**` and `/api/test/**` requires at least one OFSM role (users without one get `403`; `/me` still reports `roles: []`). Integration tests get sessions from the test-only `POST /api/test/session` endpoint; `OidcLoginIT` drives the real flow against `navikt/mock-oauth2-server`.
 
 All commands below are run from the repository root using the Gradle wrapper — there is no
 `gradlew` inside `server/`. Prefix tasks with `:server:` to scope them to this component.

@@ -4,6 +4,7 @@ import io.github.simonhauck.openfirestationmanager.security.auth.AuthProperties
 import io.github.simonhauck.openfirestationmanager.security.auth.LoginRedirect
 import io.github.simonhauck.openfirestationmanager.security.auth.OfsmUserFactory
 import io.github.simonhauck.openfirestationmanager.security.auth.ProviderLogoutUrlResolver
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -93,7 +94,9 @@ class SecurityConfiguration {
             .authorizeHttpRequests {
                 it.requestMatchers("/privacy-policy").permitAll()
                 it.requestMatchers("/api/public/**").permitAll()
-                it.requestMatchers("/api/**").authenticated()
+                // Signing in is not enough: a user without any OFSM role is refused with 403.
+                it.requestMatchers("/api/**")
+                    .hasAnyRole(*UserRole.entries.map { role -> role.name }.toTypedArray())
                 it.anyRequest().permitAll()
             }
             .securityContext { it.securityContextRepository(securityContextRepository) }

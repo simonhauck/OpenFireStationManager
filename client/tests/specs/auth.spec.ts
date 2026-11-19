@@ -14,10 +14,10 @@ const LOGIN_PAGE = /^http:\/\/localhost:3000\/login(\?|$)/
 // /pool-clothing/checkout is guarded by RoleGuard with allowedRoles=["USER"]; ADMIN holds it.
 const protectedRoute = "/pool-clothing/checkout"
 
-async function signInAtKeycloak(page: Page) {
+async function signInAtKeycloak(page: Page, username = "admin") {
   const keycloak = new KeycloakLoginPage(page)
   await expect(page).toHaveURL(KEYCLOAK_URL)
-  await keycloak.login("admin", "admin")
+  await keycloak.login(username, username)
 }
 
 test.describe("Auth", () => {
@@ -74,5 +74,19 @@ test.describe("Auth", () => {
     // The renewal goes through the provider without a password prompt.
     await expect(page).toHaveURL(/\/pool-clothing\/checkout$/)
     await expect(page.getByRole("button", { name: "Abbrechen" })).toBeVisible()
+  })
+
+  test("a user without an OFSM role sees the no-access page and can sign out", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard")
+    await signInAtKeycloak(page, "norole")
+
+    await expect(page.getByText("Kein Zugriff")).toBeVisible()
+
+    await page.getByRole("button", { name: "Abmelden" }).click()
+
+    await expect(page).toHaveURL("http://localhost:3000/")
+    await expect(new UserMenu(page).signInButton()).toBeVisible()
   })
 })

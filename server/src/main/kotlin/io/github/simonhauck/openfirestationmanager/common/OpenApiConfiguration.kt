@@ -96,7 +96,8 @@ private fun buildApiDescription(sessionCookieName: String, sessionTimeout: Strin
     of the user's tokens (for example Keycloak realm roles, client roles or groups) and translates
     them through the role mapping in `app.auth.roles` (`claim-paths` and `mapping`). Provider roles
     that are not mapped are ignored, and a role change at the provider takes effect at the user's
-    next sign-in. A signed-in user without any mapped role holds no OFSM role.
+    next sign-in. A signed-in user without any mapped role holds no OFSM role and is refused with `403`
+    on every endpoint outside `/api/public/**`.
 
     ## Authentication
 
@@ -112,7 +113,8 @@ private fun buildApiDescription(sessionCookieName: String, sessionTimeout: Strin
     `POST /api/public/auth/logout` ends both the session and the provider session.
 
     Endpoints under `/api/public/**` need no authentication. Everything else under `/api/**`
-    requires a valid session; `/api/admin/**` additionally requires the `ADMIN` role.
+    requires a valid session whose user holds at least one OFSM role (`USER`, `KLEIDERWART` or
+    `ADMIN`); `/api/admin/**` additionally requires the `ADMIN` role.
 
     ## Error format
 
@@ -275,7 +277,7 @@ class OpenApiConfiguration(
             val requiredRole = requiredRoleOf(handlerMethod)
 
             appendRoleToDescription(operation, requiredRole, isPublic)
-            addCommonErrorResponses(operation, isPublic, hasRoleRestriction = requiredRole != null)
+            addCommonErrorResponses(operation, isPublic)
             addValidationResponse(operation, handlerMethod)
 
             // Public endpoints must opt out of the document-level session-cookie requirement.
@@ -295,7 +297,9 @@ class OpenApiConfiguration(
                 requiredRole != null ->
                     "**Authorisation:** requires the `$requiredRole` role. " +
                         "An `ADMIN` account implicitly holds every role and may also call this."
-                else -> "**Authorisation:** any signed-in user."
+                else ->
+                    "**Authorisation:** any signed-in user holding at least one OFSM role " +
+                        "(`USER`, `KLEIDERWART` or `ADMIN`)."
             }
 
         operation.description =
@@ -303,11 +307,7 @@ class OpenApiConfiguration(
                 .joinToString("\n\n")
     }
 
-    private fun addCommonErrorResponses(
-        operation: Operation,
-        isPublic: Boolean,
-        hasRoleRestriction: Boolean,
-    ) {
+    private fun addCommonErrorResponses(operation: Operation, isPublic: Boolean) {
         val responses = operation.responses ?: ApiResponses().also { operation.responses = it }
 
         if (!isPublic) {
@@ -315,8 +315,7 @@ class OpenApiConfiguration(
                 "401",
                 problemResponse("Not authenticated — no valid session cookie was supplied."),
             )
-        }
-        if (hasRoleRestriction) {
+            // Every non-public endpoint needs at least one OFSM role, so 403 is always possible.
             responses.putIfAbsent(
                 "403",
                 problemResponse("Authenticated, but the account lacks the required role."),
