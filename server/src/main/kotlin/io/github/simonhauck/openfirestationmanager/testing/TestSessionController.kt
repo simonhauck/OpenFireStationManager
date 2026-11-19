@@ -98,7 +98,6 @@ class TestSessionController(
         val authentication =
             OAuth2AuthenticationToken(principal, principal.authorities, REGISTRATION_ID)
 
-
         val securityContext = SecurityContextHolder.createEmptyContext()
         securityContext.authentication = authentication
         SecurityContextHolder.setContext(securityContext)
