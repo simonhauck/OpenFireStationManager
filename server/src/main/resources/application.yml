@@ -13,6 +13,14 @@ spring:
       idle-timeout: 30000 # release idle connections after 30 s → pool drains to 0
       connection-timeout: 30000 # wait up to 30 s for a connection (handles cold starts)
       initialization-fail-timeout: -1 # don't fail on startup if DB is scaled to 0
+  session:
+    # Sessions live in PostgreSQL (SPRING_SESSION*), so a restart or update keeps users signed in.
+    # The tables come from migration V026, not from Spring Session's auto-init. Cookie settings
+    # and the idle timeout are still read from server.servlet.session.* below.
+    jdbc:
+      initialize-schema: never
+      # Spring cron (with seconds): remove expired sessions every 10 minutes by default.
+      cleanup-cron: ${SESSION_CLEANUP_CRON:0 */10 * * * *}
   security:
     oauth2:
       client:

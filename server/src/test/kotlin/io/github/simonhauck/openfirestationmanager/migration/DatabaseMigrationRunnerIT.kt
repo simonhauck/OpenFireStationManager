@@ -25,6 +25,22 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
         assertThat(appliedIds).contains("V009__rename_protective_clothing_types_to_clothing_types")
         assertThat(appliedIds).contains("V022__migrate_clothing_location_comments_to_members")
         assertThat(appliedIds).contains("V025__drop_users_table")
+        assertThat(appliedIds).contains("V026__create_spring_session_tables")
+    }
+
+    @Test
+    fun `should create the spring session tables`() {
+        val tableCount =
+            jdbcTemplate.queryForObject<Int>(
+                """
+                SELECT COUNT(*) FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name IN ('spring_session', 'spring_session_attributes')
+                """
+                    .trimIndent(),
+            )
+
+        assertThat(tableCount).isEqualTo(2)
     }
 
     @Test
