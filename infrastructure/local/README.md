@@ -80,9 +80,9 @@ curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
 
 ### Devcontainer and CI
 
-The devcontainer compose file starts the same Keycloak (same realm file, port 8180 forwarded). Inside
-the devcontainer the server can reach it as `http://keycloak:8180`; `KC_HOSTNAME_BACKCHANNEL_DYNAMIC`
-keeps the issuer `http://localhost:8180/realms/ofsm`. The CI `e2e` job starts it with
+The devcontainer compose file starts the same Keycloak (same realm file, port 8180 forwarded). Keycloak
+shares the app container's network, so the server and the browser both use the issuer
+`http://localhost:8180/realms/ofsm`. The CI `e2e` job starts it with
 `docker compose ... up -d keycloak --wait` before Playwright.
 
 ## Import Development Data

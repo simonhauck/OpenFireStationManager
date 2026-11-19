@@ -30,7 +30,7 @@ services:
         - >-
           exec 3<>/dev/tcp/127.0.0.1/9000 &&
           printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
-          grep -q '"status": "UP"' <&3
+          grep -Eq '"status" *: *"UP"' <&3
       interval: 5s
       timeout: 5s
       retries: 30
