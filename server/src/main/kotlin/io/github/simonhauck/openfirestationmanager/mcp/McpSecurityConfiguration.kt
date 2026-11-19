@@ -117,9 +117,9 @@ class McpSecurityConfiguration(
 }
 
 /**
- * Answers every unauthenticated or rejected MCP request with `401` and
- * `WWW-Authenticate: Bearer resource_metadata="…"` (RFC 9728), adding `error` and
- * `error_description` when a token was presented but rejected (RFC 6750).
+ * Answers every unauthenticated or rejected MCP request with `401` and `WWW-Authenticate: Bearer
+ * resource_metadata="…"` (RFC 9728), adding `error` and `error_description` when a token was
+ * presented but rejected (RFC 6750).
  */
 class McpAuthenticationEntryPoint : AuthenticationEntryPoint {
 

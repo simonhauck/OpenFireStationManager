@@ -215,7 +215,7 @@ class McpToolRegistry(
     private companion object {
         const val SEARCH_LIMIT = 50
 
-        /** Every read endpoint under `/api/**` requires at least one OFSM role. */
+        /** Every read endpoint under `/api` requires at least one OFSM role. */
         val ANY_OFSM_ROLE: Set<UserRole> = UserRole.entries.toSet()
 
         val NO_ARGUMENTS: Map<String, Any> = objectSchema(properties = emptyMap())

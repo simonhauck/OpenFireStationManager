@@ -15,8 +15,8 @@ import org.springframework.security.oauth2.server.resource.InvalidBearerTokenExc
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 
 /**
- * Rejects access tokens that were not issued for OFSM: the `aud` claim must contain at least one
- * of [acceptedAudiences] (`app.auth.mcp.accepted-audiences`).
+ * Rejects access tokens that were not issued for OFSM: the `aud` claim must contain at least one of
+ * [acceptedAudiences] (`app.auth.mcp.accepted-audiences`).
  */
 class McpAudienceValidator(private val acceptedAudiences: Collection<String>) :
     OAuth2TokenValidator<Jwt> {
@@ -38,7 +38,8 @@ class McpAudienceValidator(private val acceptedAudiences: Collection<String>) :
 /**
  * Turns a validated access token into the authentication of an MCP request. Roles come from the
  * token's claims through the same [RoleMapper] rules as the browser login, so `ROLE_<NAME>`
- * authorities, `ADMIN` expansion and `CurrentUserProvider` behave identically. The name is the configured username claim, falling back to `sub`.
+ * authorities, `ADMIN` expansion and `CurrentUserProvider` behave identically. The name is the
+ * configured username claim, falling back to `sub`.
  */
 class McpJwtAuthenticationConverter(private val authProperties: AuthProperties) :
     Converter<Jwt, AbstractAuthenticationToken> {

@@ -54,8 +54,7 @@ class McpEndpointIT : IntegrationTest() {
         assertThat(initialize.statusCode()).isEqualTo(200)
         assertThat(result(initialize)["protocolVersion"]).isEqualTo("2025-06-18")
 
-        val initialized =
-            mcp("""{"jsonrpc":"2.0","method":"notifications/initialized"}""", token)
+        val initialized = mcp("""{"jsonrpc":"2.0","method":"notifications/initialized"}""", token)
         assertThat(initialized.statusCode()).isEqualTo(202)
 
         val list = mcp("""{"jsonrpc":"2.0","id":2,"method":"tools/list"}""", token)

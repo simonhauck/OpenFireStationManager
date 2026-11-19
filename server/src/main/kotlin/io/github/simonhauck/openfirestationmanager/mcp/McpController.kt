@@ -78,11 +78,9 @@ class McpController(private val toolRegistry: McpToolRegistry, private val jsonM
     }
 
     /** The transport offers no server-initiated SSE stream and no sessions to delete. */
-    @GetMapping
-    fun openStream(): ResponseEntity<String> = methodNotAllowed()
+    @GetMapping fun openStream(): ResponseEntity<String> = methodNotAllowed()
 
-    @DeleteMapping
-    fun deleteSession(): ResponseEntity<String> = methodNotAllowed()
+    @DeleteMapping fun deleteSession(): ResponseEntity<String> = methodNotAllowed()
 
     private fun initialize(params: Map<String, Any?>): Map<String, Any> {
         val requested = params["protocolVersion"] as? String
@@ -103,8 +101,7 @@ class McpController(private val toolRegistry: McpToolRegistry, private val jsonM
     }
 
     private fun callTool(params: Map<String, Any?>): Map<String, Any> {
-        val name =
-            params["name"] as? String ?: throw McpInvalidParamsException("Missing tool name")
+        val name = params["name"] as? String ?: throw McpInvalidParamsException("Missing tool name")
         val rawArguments = params["arguments"] ?: emptyMap<String, Any?>()
         val arguments =
             (rawArguments as? Map<*, *>)?.entries?.associate { (key, value) ->
