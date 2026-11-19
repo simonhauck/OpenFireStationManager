@@ -189,7 +189,7 @@ export interface paths {
      *
      *     A member is a **person**, not a login. Sign-in is handled by the OpenID Connect provider, and the roster is not linked to those logins — someone can be on the roster without ever signing in.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listMembers"]
     put?: never
@@ -221,7 +221,7 @@ export interface paths {
      *
      *     The list is small and is returned unpaginated.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listClothingTypes"]
     put?: never
@@ -253,7 +253,7 @@ export interface paths {
      *
      *     For the scanner gallery across all types, prefer `GET /api/clothing/types/barcode-images`, which answers in one call.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listClothingTypeImages"]
     put?: never
@@ -311,7 +311,7 @@ export interface paths {
      *
      *     This endpoint returns locations flagged `onlyVisibleForKleiderwart` to every caller; it is the item lookups, not this list, that apply that visibility rule.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listClothingLocations"]
     put?: never
@@ -363,7 +363,7 @@ export interface paths {
      *
      *     Unlike `searchClothingItems` and `getClothingItemByBarcode`, this endpoint does **not** hide items stored in locations flagged `onlyVisibleForKleiderwart`, matching `listClothingLocations`. Use the search endpoint when the caller should not see restricted locations.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listClothingItems"]
     put?: never
@@ -483,7 +483,7 @@ export interface paths {
      *
      *     Note that garments are not validated against who is checking them out: any signed-in user may check any item out to any `PERSONAL` location.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     post: operations["checkoutClothingItems"]
     delete?: never
@@ -541,7 +541,7 @@ export interface paths {
      * Get one member by their numeric id
      * @description Looks up a single person on the roster by their database id.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getMember"]
     put?: never
@@ -575,7 +575,7 @@ export interface paths {
      * Get one clothing type by its numeric id
      * @description Looks up a single garment category by its database id.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingType"]
     put?: never
@@ -609,7 +609,7 @@ export interface paths {
      * Get one clothing location by its numeric id
      * @description Looks up a single location by its database id. This returns the location's own properties only — it does not list the garments currently stored there. To find those, use `GET /api/clothing/locations/{id}/items`.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingLocation"]
     put?: never
@@ -649,7 +649,7 @@ export interface paths {
      *
      *     If you are scanning a physical garment, prefer `getClothingItemByBarcode`.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingItem"]
     put?: never
@@ -829,7 +829,7 @@ export interface paths {
      *
      *     Stored bytes never change, so responses are cacheable indefinitely; the `ETag` is derived from the image's id. Replacing an image means deleting it and uploading a new file, which produces a new id and therefore a new URL.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingTypeImage"]
     put?: never
@@ -859,7 +859,7 @@ export interface paths {
      *
      *     Types without images are omitted, so an empty response means the gallery has nothing to show.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listBarcodeImages"]
     put?: never
@@ -883,7 +883,7 @@ export interface paths {
      *
      *     Counts include every garment regardless of where it is or whether it is currently checked out. Use this for reporting rather than availability — for what is on the shelf right now, use `getClothingDashboardByLocation`.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingSummaryByType"]
     put?: never
@@ -907,7 +907,7 @@ export interface paths {
      *
      *     Only locations of type `POOL` and `WAESCHE` are included — shared stock and laundry. Personal lockers are deliberately excluded, so these figures represent what is available to the station rather than everything it owns.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingDashboardByLocation"]
     put?: never
@@ -933,7 +933,7 @@ export interface paths {
      *
      *     Locations flagged `onlyVisibleForKleiderwart` are hidden from callers without that role: they receive `404` rather than `403`, so the existence of a restricted location is not revealed.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["listItemsAtClothingLocation"]
     put?: never
@@ -959,7 +959,7 @@ export interface paths {
      *
      *     The result set is capped at 50 entries regardless of the `limit` supplied, so a full result set is never guaranteed; narrow the query rather than raising the limit.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["searchClothingItems"]
     put?: never
@@ -985,7 +985,7 @@ export interface paths {
      *
      *     Barcodes share one value space and are unique across all items. Callers without the `KLEIDERWART` role cannot resolve items held in locations flagged `onlyVisibleForKleiderwart`; for them such an item reads as not found.
      *
-     *     **Authorisation:** any signed-in user.
+     *     **Authorisation:** any signed-in user holding at least one OFSM role (`USER`, `KLEIDERWART` or `ADMIN`).
      */
     get: operations["getClothingItemByBarcode"]
     put?: never
@@ -1090,29 +1090,6 @@ export interface components {
       /** @description Every field-level failure detected in this request. */
       errors: components["schemas"]["ValidationError"][]
     }
-    /** @description Audit trail attached to every stored record. Maintained by the server on save — these fields are ignored if supplied in a request. `System` appears as the actor for changes made outside a user session, such as database migrations. */
-    EntityMetaData: {
-      /**
-       * Format: date-time
-       * @description When the record was first stored.
-       */
-      createdAt: string
-      /**
-       * @description Username of whoever created the record, or `System`.
-       * @example m.mustermann
-       */
-      createdBy: string
-      /**
-       * Format: date-time
-       * @description When the record was last changed.
-       */
-      lastModifiedAt: string
-      /**
-       * @description Username of whoever last changed the record, or `System`.
-       * @example m.mustermann
-       */
-      lastModifiedBy: string
-    }
     /** @description The legally required site notice (`Impressum`). At most one exists at a time — writing replaces the previous one rather than adding to it. */
     ImpressumDto: {
       /**
@@ -1169,6 +1146,29 @@ export interface components {
        * @example Hans Müller
        */
       name: string
+    }
+    /** @description Audit trail attached to every stored record. Maintained by the server on save — these fields are ignored if supplied in a request. `System` appears as the actor for changes made outside a user session, such as database migrations. */
+    EntityMetaData: {
+      /**
+       * Format: date-time
+       * @description When the record was first stored.
+       */
+      createdAt: string
+      /**
+       * @description Username of whoever created the record, or `System`.
+       * @example m.mustermann
+       */
+      createdBy: string
+      /**
+       * Format: date-time
+       * @description When the record was last changed.
+       */
+      lastModifiedAt: string
+      /**
+       * @description Username of whoever last changed the record, or `System`.
+       * @example m.mustermann
+       */
+      lastModifiedBy: string
     }
     /** @description A person in the brigade (*Mitglied*). Deliberately distinct from a login: a member is a person on the roster, sign-in is handled by the OpenID Connect provider, and the two are not linked. */
     Member: {
@@ -1538,6 +1538,16 @@ export interface components {
        */
       exists: boolean
     }
+    /** @description Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session. */
+    AuthStateResponse: {
+      /**
+       * @description True when a valid session cookie was supplied.
+       * @example true
+       */
+      authenticated: boolean
+      /** @description The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
+      user?: components["schemas"]["CurrentUser"]
+    }
     /** @description The signed-in user as reported by the OpenID Connect provider. Nothing about the user is stored by this API; every value comes from the provider's tokens at sign-in. */
     CurrentUser: {
       /**
@@ -1568,16 +1578,6 @@ export interface components {
        *     ]
        */
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
-    }
-    /** @description Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session. */
-    AuthStateResponse: {
-      /**
-       * @description True when a valid session cookie was supplied.
-       * @example true
-       */
-      authenticated: boolean
-      /** @description The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
-      user?: components["schemas"]["CurrentUser"]
     }
     /** @description Every barcode guide image (`Barcode-Bild`) of one clothing type, with the type's name so a scanner screen can label the group without a second lookup. */
     ClothingTypeBarcodeImages: {
@@ -2110,6 +2110,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description Unexpected server error. The response body carries no details. */
       500: {
         headers: {
@@ -2201,6 +2210,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -2314,6 +2332,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -2527,6 +2554,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description Unexpected server error. The response body carries no details. */
       500: {
         headers: {
@@ -2682,6 +2718,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -3028,6 +3073,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description One of the referenced clothing items or locations does not exist. */
       404: {
         headers: {
@@ -3266,6 +3320,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description No member exists with this id. */
       404: {
         headers: {
@@ -3465,6 +3528,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -3687,6 +3759,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description No clothing location exists with this id. */
       404: {
         headers: {
@@ -3888,6 +3969,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -4320,6 +4410,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description No image with this id exists for this clothing type. */
       404: {
         headers: {
@@ -4441,6 +4540,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description Unexpected server error. The response body carries no details. */
       500: {
         headers: {
@@ -4479,6 +4587,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description Unexpected server error. The response body carries no details. */
       500: {
         headers: {
@@ -4510,6 +4627,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -4563,6 +4689,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -4637,6 +4772,15 @@ export interface operations {
           "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
       /** @description Unexpected server error. The response body carries no details. */
       500: {
         headers: {
@@ -4683,6 +4827,15 @@ export interface operations {
       }
       /** @description Not authenticated — no valid session cookie was supplied. */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+      /** @description Authenticated, but the account lacks the required role. */
+      403: {
         headers: {
           [name: string]: unknown
         }

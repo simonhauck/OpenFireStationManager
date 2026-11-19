@@ -47,9 +47,10 @@ class PersistentSessionIT : IntegrationTest() {
         val stored = sessionRepository.findById(sessionId)
         assertThat(stored).isNotNull
         val securityContext =
-            checkNotNull(stored).getAttribute<SecurityContext>(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-            )
+            checkNotNull(stored)
+                .getAttribute<SecurityContext>(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                )
         val principal = securityContext?.authentication?.principal as? OidcUser
         assertThat(principal?.preferredUsername).isEqualTo("persisted.user")
         assertThat(securityContext?.authentication?.authorities?.map { it.authority })
