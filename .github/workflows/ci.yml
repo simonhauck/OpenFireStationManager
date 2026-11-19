@@ -72,6 +72,13 @@ jobs:
         working-directory: client
         run: npm ci
 
+      - name: Start Keycloak (OIDC provider with the OFSM demo realm)
+        run: docker compose -f infrastructure/local/docker-compose.yml up -d keycloak --wait --wait-timeout 180
+
+      - name: Show Keycloak logs on failure
+        if: failure()
+        run: docker compose -f infrastructure/local/docker-compose.yml logs keycloak
+
       - name: Install Playwright browsers
         working-directory: client
         run: npx playwright install --with-deps chromium

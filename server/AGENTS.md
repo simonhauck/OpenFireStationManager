@@ -29,7 +29,9 @@ JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API 
 - Keep all endpoints under the `/api/**` namespace.
 - Use `/api/admin/**` for admin-only endpoints.
 - Keep protected API routes outside `/api/public/**` unless there is an explicit exception.
-- Authentication uses server-side session + remember-me cookies; frontend should use cookie credentials, not browser token storage.
+- Authentication is delegated to an OpenID Connect provider (`spring.security.oauth2.client.*`, registration `ofsm`); the server keeps the result in a server-side session (`OFSM_AUTH` cookie). Sessions are persisted in PostgreSQL with Spring Session JDBC (tables `SPRING_SESSION*` from migration V026, `spring.session.jdbc.initialize-schema: never`; cleanup cron via `SESSION_CLEANUP_CRON`), so restarts do not sign anyone out; anything stored in the session must be `Serializable`. Cookie settings and timeout still come from `server.servlet.session.*`. The frontend uses cookie credentials, not browser token storage.
+- Roles come from the provider claims listed in `app.auth.roles.claim-paths` (default `realm_access.roles`), mapped to OFSM roles through `app.auth.roles.mapping` (see `docs/role-mapping.md`); `ADMIN` implies every role. Everything under `/api/**` except `/api/public/**` and `/api/test/**` requires at least one OFSM role (users without one get `403`; `/me` still reports `roles: []`). Integration tests get sessions from the test-only `POST /api/test/session` endpoint; `OidcLoginIT` drives the real flow against `navikt/mock-oauth2-server`.
+- `/mcp` (and `/.well-known/oauth-protected-resource/**`) has its own stateless filter chain (`mcp/McpSecurityConfiguration`): bearer access tokens from the same issuer, `aud` checked against `app.auth.mcp.accepted-audiences`, roles from the access token through the same `RoleMapper`, no session and no cookie. See "Consuming the API over MCP" below.
 
 All commands below are run from the repository root using the Gradle wrapper — there is no
 `gradlew` inside `server/`. Prefix tasks with `:server:` to scope them to this component.
@@ -75,7 +77,7 @@ container.
 
 - Name test classes with a `Test` or `Tests` suffix.
 - If a test class extends `IntegrationTest`, use the `IT` suffix (for example `AuthIT`,
-  `InitialAdminSetupIT`) instead of `IntegrationTest` in the class name.
+  `OidcLoginIT`) instead of `IntegrationTest` in the class name.
 - One `@Test` method per behaviour.
 - Prefer backtick test names for longer/descriptive Kotlin test cases, for example
   ``fun `should generate valid jwt token`()``.
@@ -186,22 +188,22 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
     `.tags(...)` list. A constant without a registered description yields an undescribed tag.
   - `@Operation(operationId = …, summary = …, description = …)`. **All three are required.**
     The `operationId` must be unique across the whole API; use `verb + Resource` in camelCase
-    (`listClothingItems`, `changeUserPassword`). The `description` should state what the endpoint
+    (`listClothingItems`, `deleteClothingType`). The `description` should state what the endpoint
     does, when to prefer a sibling endpoint, and any non-obvious consequence.
   - `@ApiResponse` for the success status and for every **domain-specific** failure (`404`,
     `409`, `422`, and any `400` with a meaning beyond schema validation).
   - `@Parameter(description = …, example = …)` on every path variable and request parameter.
 - Keep `operationId` stable when practical, but rename it deliberately when a clearer name is
-  worth it. A rename reaches MCP clients as a renamed tool (MCP is a secondary consumer — see
-  `docs/adr/0001`), and because the TypeScript bindings key off paths rather than ids, nothing in
-  this repo will fail to warn you.
+  worth it. The TypeScript bindings key off paths rather than ids, and MCP tools are defined in
+  code rather than generated from the contract (`docs/adr/0002`), so a rename breaks nothing in
+  this repo — but nothing will warn you either.
 - Do **not** hand-write `401`, `403`, `500`, or generic `400` responses, and do not hand-write the
   required-role prose. `OpenApiConfiguration.commonResponsesCustomizer` derives all of them from
   the URL namespace and the `@PreAuthorize` expression, so they cannot drift from what is
   actually enforced. Adding them by hand produces duplicates.
 - Annotate DTO and entity properties with `@field:Schema(description = …, example = …)`. These
-  descriptions are the contract's documentation (and the MCP tool input schema); an undocumented
-  field is an unusable one. Use `@get:Schema` instead for computed properties declared in the class body
+  descriptions are the contract's documentation; an undocumented field is an unusable one. Use
+  `@get:Schema` instead for computed properties declared in the class body
   (for example the `totalCount` values in `ClothingOverview.kt`), where there is no constructor
   parameter to annotate.
 - Model an absent value as **optional**, never as nullable-and-optional. Declare a nullable Kotlin
@@ -215,7 +217,7 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   on the wire, which is what the full-replacement `PATCH` endpoints rely on. See
   `server/docs/adr/0009-nullable-field-representation-in-openapi.md`.
 - Prefer interpolating a configured value over restating it. `OpenApiConfiguration` injects the
-  cookie names and remember-me validity rather than hardcoding them, so the documentation cannot
+  cookie name and session timeout rather than hardcoding them, so the documentation cannot
   contradict `application.yml`. Apply the same instinct to any other configurable fact.
 
 ### Test-profile seeding controllers
@@ -283,7 +285,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
     and the `Location` header are deliberately **not** used for CRUD resources — every client is the
     generated TypeScript binding, which reads the id from the body. Follow the existing CRUD
     controllers (`ClothingLocationController`, `ClothingTypeController`, `ClothingItemController`,
-    `AdminUserController`) rather than generic REST advice here. The one exception is
+    `MemberController`) rather than generic REST advice here. The one exception is
     `PrivacyPolicyAdminController`'s multipart upload, which returns `201` because it replaces a
     stored document rather than creating an addressable resource.
   - Return `404 Not Found` for missing resources. Where a resource is optional and may legitimately
@@ -307,59 +309,61 @@ class ClothingTypeController(private val service: ClothingTypeService) {
 
 ## Consuming the API over MCP
 
-The checked-in contract doubles as the tool definition for
-[`@ivotoby/openapi-mcp-server`](https://github.com/ivo-toby/mcp-openapi-server), configured as
-`ofsm-api` in the repo-root `opencode.jsonc`. Each operation becomes one MCP tool: the tool name
-comes from `operationId`, its description from the `@Operation` description, and its input schema
-from the `@Parameter` and `@field:Schema` annotations. Poor annotations therefore degrade the tool
-surface, but the rules above are strict because the annotations are the API documentation shared
-by all consumers — MCP is a secondary consumer (`docs/adr/0001`), not the reason for the rules.
+The server hosts its own MCP endpoint at `/mcp` (package `mcp`, decision in root
+`docs/adr/0002`). Coding agents connect to the URL and sign the developer in through the OpenID
+Connect provider in the browser, following the MCP authorization spec. Nothing is copied by hand.
 
-**Authenticating.** The API uses cookies, and the MCP server can only send static headers. Rather
-than a session cookie, use the **remember-me** cookie: it authenticates on its own, is stateless
-and signed, survives server restarts, and is valid for 30 days by default
-(`app.remember-me.token-validity`, `P30D`). That turns re-authentication into a monthly chore
-instead of a per-session one.
+**Transport.** Streamable HTTP, stateless: every JSON-RPC message is one `POST /mcp` answered with
+one JSON response (`McpController`). Supported methods are `initialize`, `ping`, `tools/list` and
+`tools/call`; notifications get `202`. There is no SSE stream and no `Mcp-Session-Id`, so
+`GET`/`DELETE /mcp` return `405`. `/mcp` is hidden from the OpenAPI contract.
 
-Start the backend, log in **with `rememberMe: true`**, and export the cookie before starting
-OpenCode:
+**Authentication.** `/mcp` is an OAuth2 resource server with its own filter chain
+(`McpSecurityConfiguration`), separate from the cookie-based browser chain:
 
-```sh
-export OFSM_AUTH_COOKIE=$(curl -s -i -X POST http://localhost:8080/api/public/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"chief","password":"secret","rememberMe":true}' \
-  | grep -i '^set-cookie: OFSM_AUTH_REMEMBER_ME=' \
-  | sed 's/.*OFSM_AUTH_REMEMBER_ME=\([^;]*\).*/\1/')
-```
+- It accepts `Authorization: Bearer <access token>` (JWT) issued by
+  `spring.security.oauth2.client.provider.ofsm.issuer-uri`, and only when `aud` contains one of
+  `app.auth.mcp.accepted-audiences` (env `MCP_ACCEPTED_AUDIENCES`, default `ofsm`).
+- Without a valid token it answers `401` with
+  `WWW-Authenticate: Bearer resource_metadata="<base>/.well-known/oauth-protected-resource/mcp"`.
+  That RFC 9728 metadata (also served at `/.well-known/oauth-protected-resource`) names the
+  provider as authorization server; the agent then registers itself there (anonymous Dynamic
+  Client Registration) and runs the authorization code flow with PKCE.
+- It never creates a session and never sets a cookie.
+- Roles are read from the access token claims with the same `RoleMapper` and
+  `app.auth.roles.*` configuration as the browser login. The username is the configured username
+  claim, falling back to `sub`.
 
-Note the cookie name is `OFSM_AUTH_REMEMBER_ME` — it is derived in `application.yml` as
-`${server.servlet.session.cookie.name}_REMEMBER_ME`, so it tracks the session cookie name. If you
-rename either, `OpenApiConfiguration` picks the new names up automatically, but the `curl` above
-and `opencode.jsonc` must be updated by hand.
+**Tools.** `McpToolRegistry` holds a deliberate, read-only set: `listClothingTypes`,
+`listClothingLocations`, `getClothingItemByBarcode`, `searchClothingItems`, `listMembers`. Tool
+names reuse the `operationId` of the matching REST endpoint. When adding a tool:
 
-Re-export and restart OpenCode when calls start returning `401`. The agent inherits the full
-rights of whichever account you use, and because `ADMIN` implicitly holds every role, an admin
-cookie grants reach over user management and legal-document deletion. Pick the account
-accordingly.
+- Call the same service as the REST endpoint; never duplicate domain logic in the tool.
+- Set `requiredRoles` to what the REST endpoint enforces (any OFSM role for everything under
+  `/api/**`, plus the `@PreAuthorize` role if there is one), and pass role-dependent flags such as
+  `isKleiderwart` exactly as the controller does.
+- Report failures the caller can act on (not found, missing role, invalid value) as a tool result
+  with `isError: true`; only malformed calls become JSON-RPC errors.
+- Write tools need their own review; the initial set is read-only on purpose.
 
-**Browser-based login.** There is no built-in flow that opens a login page. The package's
-`AuthProvider` interface is the extension point, but it is library-only and not reachable through
-the `npx` CLI. Implementing one means wrapping `OpenAPIServer` in a small local package — the
-Playwright login in `client/tests/global-setup.ts` is a working precedent for extracting the
-`httpOnly` cookie from a real browser session.
+**Using it locally (OpenCode, Claude Code).** Start the local Keycloak
+(`infrastructure/local/docker-compose.yml`) and the server, then point the agent at
+`http://localhost:8080/mcp`:
 
-**Narrowing the surface.** All 46 operations load by default, which is a lot of context. Two ways
-to trim it, both set via `environment` in `opencode.jsonc`:
+- OpenCode: enable `ofsm-api` in the repo-root `opencode.jsonc` (`"type": "remote"`), start
+  OpenCode and run `opencode mcp auth ofsm-api` if it does not open the browser by itself.
+- Claude Code: `claude mcp add --transport http ofsm-api http://localhost:8080/mcp`, then `/mcp`
+  inside Claude Code to authenticate.
 
-- `"TOOLS_MODE": "dynamic"` replaces the 46 tools with three meta-tools
-  (`list-api-endpoints`, `get-api-endpoint-schema`, `invoke-api-endpoint`). Much cheaper, at the
-  cost of an extra round trip before each call.
-- Tag filters keep administration out of reach entirely. The tags exist for exactly this:
-  `Admin - Users` and `Admin - Legal` cover every destructive administrative operation.
+The browser shows the Keycloak login (demo users in `infrastructure/local/README.md`) and a
+consent screen; afterwards the agent calls tools with that user's OFSM roles. The dev realm allows
+anonymous registration only for redirect URIs on `localhost`/`127.0.0.1` and adds the `ofsm`
+audience through the default client scope `ofsm-mcp` (details and open questions in
+`docs/mcp-spike.md`). A production realm needs the same client registration policies and client
+scope, with trusted hosts and audiences adjusted to the deployment.
 
-Tag filtering is a tool-surface control, **not** authorisation — the server still enforces roles.
-
----
+Each tool call acts with the full OFSM roles of the signed-in account. Pick the account
+accordingly; `ADMIN` implies every role.
 
 ## Database
 
@@ -369,7 +373,7 @@ Tag filtering is a tool-surface control, **not** authorisation — the server st
 - Repositories should expose only the concrete operations needed by the feature (for example `findByUsername`,
   `existsByUsername`, `save`, `count`) to keep behavior obvious.
 - Schema migrations use a **custom Kotlin migration runner** (not Flyway or Liquibase). Each migration is a `@Component` implementing the `DatabaseMigration` interface (`val id: String`, `fun execute(jdbcTemplate: JdbcTemplate)`). The runner fires automatically on startup, sorts migrations by `id`, and skips already-applied ones (tracked in the `schema_migrations` table).
-- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). **Check the highest number actually present in `migration/` before picking one** — this line has gone stale before, and V009 and V017 each ended up used by two different migrations as a result. The runner tolerates it (it sorts by `id`, which stays unique), but the ordering between same-numbered migrations is then alphabetical and not what you intended. The next available version number is **V025**.
+- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). **Check the highest number actually present in `migration/` before picking one** — this line has gone stale before, and V009 and V017 each ended up used by two different migrations as a result. The runner tolerates it (it sorts by `id`, which stays unique), but the ordering between same-numbered migrations is then alphabetical and not what you intended. The next available version number is **V027**.
 - The `compose.yml` spins up `postgres:latest` on a random host port; `application.yml` uses
   Docker Compose lifecycle `start_only` so the container persists across restarts.
 - Database credentials for local dev: `POSTGRES_USER=myuser`, `POSTGRES_PASSWORD=secret`,

@@ -34,14 +34,15 @@ Docker must be running before integration tests.
 ## OpenAPI contract
 
 `server/src/main/resources/open-api-contract.json` is generated from SpringDoc annotations and
-committed. An API change is not finished at the controller; update all three consumers:
+committed. An API change is not finished at the controller; update both consumers:
 
 1. **Contract snapshot:** `./update-api-definition.sh` from the repo root. CI fails if it is stale.
 2. **TypeScript bindings:** `npm run prepareEnv` from `client/`. No CI check, so a stale binding
    passes unnoticed.
-3. **MCP surface:** the `ofsm-api` server in `opencode.jsonc` reads the same file, so
-   `@Operation`/`@Schema` shape its usability. This consumer is secondary, used sporadically for
-   environment tasks, and does not drive API design (see `docs/adr/0001`).
+
+MCP does not read the contract: the server hosts its own `/mcp` endpoint with hand-picked tools
+(`docs/adr/0002`, amending `docs/adr/0001`). A REST change only touches MCP when a tool calls the
+changed service.
 
 The SpringDoc annotation rules in `server/AGENTS.md` ("API Design") are strict and include a worked
 example; follow them rather than improvising. MCP ergonomics are not the reason for the rules.

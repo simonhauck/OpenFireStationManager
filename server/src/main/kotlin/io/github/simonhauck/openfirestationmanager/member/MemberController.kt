@@ -37,10 +37,9 @@ class MemberController(private val service: MemberService) {
         description =
             "Returns the whole roster of people in the brigade (*Mitglied*), in the order they " +
                 "were added. The list is unpaginated.\n\n" +
-                "A member is a **person**, not a login. User accounts are managed separately " +
-                "under `/api/admin/users`, and the two are not linked — someone can be on the " +
-                "roster without ever signing in. Use this endpoint when you need people; use " +
-                "`listUsers` when you need credentials.",
+                "A member is a **person**, not a login. Sign-in is handled by the OpenID Connect " +
+                "provider, and the roster is not linked to those logins — someone can be on the " +
+                "roster without ever signing in.",
     )
     @ApiResponses(ApiResponse(responseCode = "200", description = "Every member on the roster."))
     fun getAllMembers(): List<Member> = service.getAllMembers()
@@ -79,8 +78,8 @@ class MemberController(private val service: MemberService) {
         description =
             "Creates a new member. Names are not required to be unique, so check the existing " +
                 "roster first if you want to avoid a duplicate entry for the same person.\n\n" +
-                "This creates a person, not a login. If they also need to sign in, create a user " +
-                "account separately with `createUser`.",
+                "This creates a person, not a login. Signing in is handled by the OpenID Connect " +
+                "provider and is not affected.",
     )
     @ApiResponses(ApiResponse(responseCode = "200", description = "The newly created member."))
     @PreAuthorize("hasRole('ROLE_KLEIDERWART')")
@@ -126,7 +125,7 @@ class MemberController(private val service: MemberService) {
         description =
             "Deletes a member. This removes the person from the roster only — it has no effect " +
                 "on any clothing or storage location beyond clearing their ownership from linked " +
-                "`PERSONAL` locations. Those locations remain present, and no user account is touched.",
+                "`PERSONAL` locations. Those locations remain present.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "The member was removed."),

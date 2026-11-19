@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
-import { mutationOptions, queryOptions } from "@tanstack/react-query"
+import { queryOptions } from "@tanstack/react-query"
 import { client, ensureData } from "#/api/client"
-import type { AuthStateResponse, LoginRequest } from "#/api/model/auth"
+import type { AuthStateResponse } from "#/api/model/auth"
 import { queryKeys } from "#/api/queryKeys"
 
 export const meQuery = () =>
@@ -13,23 +13,12 @@ export const meQuery = () =>
     },
   })
 
-export const logoutMutation = (queryClient: QueryClient) =>
-  mutationOptions({
-    mutationFn: async (): Promise<void> => {
-      await client.POST("/api/public/auth/logout")
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries()
-      await queryClient.resetQueries()
-    },
-  })
-
-export const loginMutation = (queryClient: QueryClient) =>
-  mutationOptions({
-    mutationFn: async (body: LoginRequest): Promise<void> => {
-      await client.POST("/api/public/auth/login", { body })
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.me() })
-    },
-  })
+/**
+ * Asks the server for the current session state, ignoring any cached answer. Use it before work
+ * starts that must not fail halfway because the session expired in the meantime.
+ */
+export function fetchFreshSession(
+  queryClient: QueryClient,
+): Promise<AuthStateResponse> {
+  return queryClient.fetchQuery({ ...meQuery(), staleTime: 0 })
+}

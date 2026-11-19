@@ -11,7 +11,7 @@ A physical place where clothing items can be stored. Every `ClothingItem` has at
 
 - **POOL** — shared stock that firefighters can take items *from*. Shown on the dashboard.
 - **WAESCHE** — laundry. Items can be returned *to* it but never taken *from* it. Shown on the dashboard.
-- **PERSONAL** — assigned to one individual (e.g. "Locker 1"). Not currently linked to a `UserAccount` row; the link may be added later. Hidden from the dashboard.
+- **PERSONAL** — assigned to one individual (e.g. "Locker 1"). Not currently linked to a login; a link may be added later. Hidden from the dashboard.
 - **OTHER** — anything else (storage, lost & found, archive). Invisible to checkout and to the dashboard.
 
 The `type` replaces the older `shouldBeShownOnDashboard` boolean: dashboard visibility is now derived from type (POOL + WAESCHE).
@@ -101,15 +101,15 @@ When no document has been uploaded, the endpoint returns `404`. Uploading a new 
 
 The upload/delete admin API lives under `/api/admin/privacy-policy` (ADMIN-only, GET metadata + POST multipart upload + DELETE). The public serving endpoint is `GET /privacy-policy` — a top-level route outside the `/api/**` namespace, accessible without authentication, streamed with the stored `Content-Type` and `Content-Disposition: inline`.
 
-### UserAccount
+### CurrentUser
 
-A login. Roles: `USER`, `ADMIN`, `KLEIDERWART`. Every row in the `users` table is a credential that can authenticate — this invariant is load-bearing for Spring Security and must not be relaxed.
+The authenticated principal: who the caller signed in as through the OpenID Connect provider. Nothing about it is stored — there is no user table. `username`, `firstName`, `lastName`, optional `email` and `roles` come from the provider's tokens at sign-in, and the roles (`USER`, `ADMIN`, `KLEIDERWART`) are mapped from the provider's role names (see ADR-0010). It is returned by `/api/public/auth/me`, and its `username` is what lands in `createdBy` and `lastModifiedBy`.
 
-A `UserAccount` is *not* a person. Tablets in the station run shared accounts that belong to nobody, and most people in the organisation never get a login at all — so the logged-in user is *not* a reliable identifier of who is physically performing an action. The person is modelled separately as a `Member`, and the two are currently **not linked** (see `Member`).
+A `CurrentUser` is *not* a person. Tablets in the station run shared logins that belong to nobody, and most people in the organisation never get a login at all — so the signed-in user is *not* a reliable identifier of who is physically performing an action. The person is modelled separately as a `Member`, and the two are **not linked** (see `Member`).
 
 ### Member
 
-A person in the fire station's organisation — the human who wears the clothing. Not a login: most members have no `UserAccount` at all, and some `UserAccount`s (shared tablet logins) have no person behind them.
+A person in the fire station's organisation — the human who wears the clothing. Not a login: most members never sign in, and some logins (shared tablet accounts) have no person behind them.
 
 Named `Member` rather than `Firefighter` because the set is the whole organisation, not just operational personnel — Jugendfeuerwehr, Alterskameraden, and administrative staff can all be issued clothing. German UI label: "Mitglied".
 
@@ -119,7 +119,7 @@ A `Member` has a single free-text `name` ("Hans Müller"), not separate first/la
 
 `Member` is the natural home for person-specific attributes (e.g. a desired clothing size) that cannot live on a shared login. None are modelled yet.
 
-**No link to `UserAccount`.** A `member.userId` FK was designed and then deliberately deferred — it offers no behaviour today, and it stays cheap to add later: a nullable column plus a one-off name match against `users.first_name || ' ' || users.last_name`. Until then, `Member` and `UserAccount` are unrelated tables that happen to describe overlapping humans.
+**No link to a login.** There is no `users` table any more (ADR-0010). A future link would store the provider's stable `sub` claim on the member (see the amendment to ADR-0007). Until then, `Member` and the signed-in user are unrelated and merely describe overlapping humans.
 
 **Link to `ClothingLocation`:** one member owns many locations; a location has at most one member. The FK sits on `clothing_locations.member_id` (nullable), modelled as `AggregateReference<Member, Long>?` and serialised as a bare number. Only `PERSONAL` locations may carry a member — the service rejects a `memberId` on any other type, and rejects changing a location's type away from `PERSONAL` while a member is still attached (rather than silently clearing the owner).
 

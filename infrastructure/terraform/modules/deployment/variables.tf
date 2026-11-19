@@ -29,10 +29,42 @@ variable "db_url" {
   sensitive   = true
 }
 
-variable "remember_me_key" {
-  description = "Secret key for remember-me cookie signing"
+variable "oidc_issuer_uri" {
+  description = "OpenID Connect issuer URI, e.g. https://keycloak.example.org/realms/ofsm. The app does not start while it is unreachable"
+  type        = string
+}
+
+variable "oidc_client_id" {
+  description = "OpenID Connect client ID registered for this deployment"
+  type        = string
+}
+
+variable "oidc_client_secret" {
+  description = "OpenID Connect client secret of the confidential client"
   type        = string
   sensitive   = true
 }
 
+variable "oidc_roles_claim_path" {
+  description = "Dot-separated claim path that carries the provider roles"
+  type        = string
+  default     = "realm_access.roles"
+}
 
+variable "oidc_role_admin" {
+  description = "Provider role that grants the OFSM role ADMIN"
+  type        = string
+  default     = "ofsm-admin"
+}
+
+variable "oidc_role_kleiderwart" {
+  description = "Provider role that grants the OFSM role KLEIDERWART"
+  type        = string
+  default     = "ofsm-kleiderwart"
+}
+
+variable "oidc_role_user" {
+  description = "Provider role that grants the OFSM role USER"
+  type        = string
+  default     = "ofsm-user"
+}

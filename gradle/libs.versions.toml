@@ -9,6 +9,9 @@ testcontainers = "1.21.4"
 [libraries]
 springBootStarterDataJdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc" }
 springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
+springBootStarterSessionJdbc = { module = "org.springframework.boot:spring-boot-starter-session-jdbc" }
+springBootStarterSecurityOauth2Client = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-client" }
+springBootStarterSecurityOauth2ResourceServer = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarterWebmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 springBootStarterDataJdbcTest = { module = "org.springframework.boot:spring-boot-starter-data-jdbc-test" }
@@ -23,7 +26,6 @@ assertjCore = { module = "org.assertj:assertj-core" }
 postgresql = { module = "org.postgresql:postgresql" }
 junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 springdocOpenapiWebmvcUi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
-springSessionJdbc = { module = "org.springframework.session:spring-session-jdbc" }
 kotlinLoggingJvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLogging" }
 testcontainersJunitJupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 testcontainersPostgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }

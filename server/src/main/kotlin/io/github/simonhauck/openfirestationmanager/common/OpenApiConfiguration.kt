@@ -1,6 +1,5 @@
 package io.github.simonhauck.openfirestationmanager.common
 
-import io.github.simonhauck.openfirestationmanager.security.config.RememberMeProperties
 import io.swagger.v3.core.converter.ModelConverters
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
@@ -16,6 +15,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.tags.Tag
 import jakarta.validation.Valid
+import java.time.Duration
 import org.springdoc.core.customizers.OperationCustomizer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -43,24 +43,15 @@ object ApiTags {
     const val CLOTHING_OVERVIEW = "Clothing Overview"
     const val MEMBERS = "Members"
     const val AUTHENTICATION = "Authentication"
-    const val SETUP = "Setup"
-    const val ADMIN_USERS = "Admin - Users"
     const val ADMIN_LEGAL = "Admin - Legal"
     const val LEGAL = "Legal"
     const val TEST = "Test"
 
     /** Name of the session cookie carrying the authenticated session. */
     const val SESSION_COOKIE_SCHEME = "sessionCookie"
-
-    /** Name of the remember-me cookie issued when a login requests persistence. */
-    const val REMEMBER_ME_COOKIE_SCHEME = "rememberMeCookie"
 }
 
-private fun buildApiDescription(
-    sessionCookieName: String,
-    rememberMeCookieName: String,
-    rememberMeValidity: String,
-) =
+private fun buildApiDescription(sessionCookieName: String, sessionTimeout: String) =
     """
     REST API for **OpenFireStationManager**, an open-source platform for managing a volunteer fire
     station. The current scope is **protective clothing management** (German: *Kleiderverwaltung*):
@@ -93,23 +84,35 @@ private fun buildApiDescription(
     - `USER` — may read clothing data and perform checkouts and returns for themselves.
     - `KLEIDERWART` (*quartermaster*) — additionally may create, update, and delete clothing types,
       items, and locations, and may run relocations and inventory reconciliation.
-    - `ADMIN` — implicitly holds every other role, and additionally manages user accounts and the
-      legal documents (Impressum, privacy policy).
+    - `ADMIN` — implicitly holds every other role, and additionally manages the legal documents
+      (Impressum, privacy policy).
 
     Because `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.
 
+    Roles are not stored in OFSM and cannot be changed through this API. They come from the
+    OpenID Connect provider: on every sign-in the server reads the roles from the configured claims
+    of the user's tokens (for example Keycloak realm roles, client roles or groups) and translates
+    them through the role mapping in `app.auth.roles` (`claim-paths` and `mapping`). Provider roles
+    that are not mapped are ignored, and a role change at the provider takes effect at the user's
+    next sign-in. A signed-in user without any mapped role holds no OFSM role and is refused with `403`
+    on every endpoint outside `/api/public/**`.
+
     ## Authentication
 
-    Authentication is **cookie-based**, not token-based. Call `POST /api/public/auth/login`; on
-    success the server sets a `$sessionCookieName` session cookie, plus a `$rememberMeCookieName`
-    cookie when `rememberMe` is `true`. Send the cookie on every subsequent request. There is no
-    `Authorization` header and no bearer token.
+    Authentication is **cookie-based** and delegated to an OpenID Connect provider (for example
+    Keycloak). There is no username/password endpoint, no `Authorization` header and no bearer
+    token.
 
-    The remember-me cookie authenticates on its own and is valid for $rememberMeValidity, so a
-    long-lived client can log in once and keep using it rather than holding a session open.
+    A browser signs in by navigating to `GET /api/public/auth/login?redirect=<path>`. The server
+    sends it to the provider's login page and, after a successful sign-in, back to `<path>` with a
+    `$sessionCookieName` session cookie. Send the cookie on every subsequent request. The session
+    ends after $sessionTimeout without a request; every request extends it. A new sign-in through
+    the provider needs no password while the provider's own session is still valid.
+    `POST /api/public/auth/logout` ends both the session and the provider session.
 
     Endpoints under `/api/public/**` need no authentication. Everything else under `/api/**`
-    requires a valid session; `/api/admin/**` additionally requires the `ADMIN` role.
+    requires a valid session whose user holds at least one OFSM role (`USER`, `KLEIDERWART` or
+    `ADMIN`); `/api/admin/**` additionally requires the `ADMIN` role.
 
     ## Error format
 
@@ -128,8 +131,8 @@ private fun buildApiDescription(
  */
 @Configuration
 class OpenApiConfiguration(
-    private val rememberMeProperties: RememberMeProperties,
     @param:Value("\${server.servlet.session.cookie.name}") private val sessionCookieName: String,
+    @param:Value("\${server.servlet.session.timeout}") private val sessionTimeout: Duration,
 ) {
 
     @Bean
@@ -162,20 +165,8 @@ class OpenApiConfiguration(
                             .`in`(SecurityScheme.In.COOKIE)
                             .name(sessionCookieName)
                             .description(
-                                "Server-side session cookie issued by `POST /api/public/auth/login`. " +
-                                    "Send it on every authenticated request.",
-                            ),
-                    )
-                    .addSecuritySchemes(
-                        ApiTags.REMEMBER_ME_COOKIE_SCHEME,
-                        SecurityScheme()
-                            .type(SecurityScheme.Type.APIKEY)
-                            .`in`(SecurityScheme.In.COOKIE)
-                            .name(rememberMeProperties.tokenName)
-                            .description(
-                                "Long-lived cookie issued when logging in with `rememberMe = true`, " +
-                                    "valid for ${humanValidity()}. It authenticates on its own, so a " +
-                                    "long-lived client may send it instead of a session cookie.",
+                                "Server-side session cookie issued after signing in through " +
+                                    "`GET /api/public/auth/login`. Send it on every authenticated request.",
                             ),
                     ),
             )
@@ -185,12 +176,8 @@ class OpenApiConfiguration(
                     Tag()
                         .name(ApiTags.AUTHENTICATION)
                         .description(
-                            "Log in, log out, and inspect the current session. Public — no session required.",
-                        ),
-                    Tag()
-                        .name(ApiTags.SETUP)
-                        .description(
-                            "One-time bootstrap of the first administrator. Only usable while no user account exists.",
+                            "Sign in and out through the OpenID Connect provider, and inspect the current session. " +
+                                "Public — no session required.",
                         ),
                     Tag()
                         .name(ApiTags.CLOTHING_TYPES)
@@ -236,20 +223,14 @@ class OpenApiConfiguration(
                         .name(ApiTags.MEMBERS)
                         .description(
                             "People in the organisation (*Mitglied*) — the roster of who is in the " +
-                                "brigade. Deliberately separate from user accounts: a member is a " +
-                                "person, an account is a login, and the two are not linked. " +
+                                "brigade. Deliberately separate from logins: a member is a person, " +
+                                "sign-in is handled by the OpenID Connect provider, and the two are not linked. " +
                                 "Requires the KLEIDERWART role to modify.",
                         ),
                     Tag()
                         .name(ApiTags.LEGAL)
                         .description(
                             "Publicly readable legal documents: Impressum and privacy policy.",
-                        ),
-                    Tag()
-                        .name(ApiTags.ADMIN_USERS)
-                        .description(
-                            "User account administration. Requires the ADMIN role. " +
-                                "Exclude this tag to keep account management out of automated tool surfaces.",
                         ),
                     Tag()
                         .name(ApiTags.ADMIN_LEGAL)
@@ -283,7 +264,7 @@ class OpenApiConfiguration(
             val requiredRole = requiredRoleOf(handlerMethod)
 
             appendRoleToDescription(operation, requiredRole, isPublic)
-            addCommonErrorResponses(operation, isPublic, hasRoleRestriction = requiredRole != null)
+            addCommonErrorResponses(operation, isPublic)
             addValidationResponse(operation, handlerMethod)
 
             // Public endpoints must opt out of the document-level session-cookie requirement.
@@ -303,7 +284,9 @@ class OpenApiConfiguration(
                 requiredRole != null ->
                     "**Authorisation:** requires the `$requiredRole` role. " +
                         "An `ADMIN` account implicitly holds every role and may also call this."
-                else -> "**Authorisation:** any signed-in user."
+                else ->
+                    "**Authorisation:** any signed-in user holding at least one OFSM role " +
+                        "(`USER`, `KLEIDERWART` or `ADMIN`)."
             }
 
         operation.description =
@@ -311,11 +294,7 @@ class OpenApiConfiguration(
                 .joinToString("\n\n")
     }
 
-    private fun addCommonErrorResponses(
-        operation: Operation,
-        isPublic: Boolean,
-        hasRoleRestriction: Boolean,
-    ) {
+    private fun addCommonErrorResponses(operation: Operation, isPublic: Boolean) {
         val responses = operation.responses ?: ApiResponses().also { operation.responses = it }
 
         if (!isPublic) {
@@ -323,8 +302,7 @@ class OpenApiConfiguration(
                 "401",
                 problemResponse("Not authenticated — no valid session cookie was supplied."),
             )
-        }
-        if (hasRoleRestriction) {
+            // Every non-public endpoint needs at least one OFSM role, so 403 is always possible.
             responses.putIfAbsent(
                 "403",
                 problemResponse("Authenticated, but the account lacks the required role."),
@@ -410,22 +388,22 @@ class OpenApiConfiguration(
             path == "/privacy-policy"
 
     /**
-     * Builds the document description with the cookie names this instance actually issues.
+     * Builds the document description with the cookie name and session timeout this instance
+     * actually uses.
      *
-     * Both names are configurable, so interpolating them keeps the documentation correct rather
-     * than repeating a literal that can quietly go stale.
+     * Both are configurable, so interpolating them keeps the documentation correct rather than
+     * repeating a literal that can quietly go stale.
      */
     private fun apiDescription(): String =
         buildApiDescription(
             sessionCookieName = sessionCookieName,
-            rememberMeCookieName = rememberMeProperties.tokenName,
-            rememberMeValidity = humanValidity(),
+            sessionTimeout = humanTimeout(),
         )
 
-    private fun humanValidity(): String {
-        val days = rememberMeProperties.tokenValidity.toDays()
-        return if (days > 0) "$days days"
-        else "${rememberMeProperties.tokenValidity.toHours()} hours"
+    private fun humanTimeout(): String {
+        val hours = sessionTimeout.toHours()
+        return if (hours > 0 && sessionTimeout == Duration.ofHours(hours)) "$hours hours"
+        else "${sessionTimeout.toMinutes()} minutes"
     }
 
     /** Resolves the shared error payload schemas so the customizer's `$ref`s always resolve. */
