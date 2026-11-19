@@ -88,6 +88,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/test/session": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Start a session without credentials
+     * @description Test-only fixture endpoint. Creates an authenticated session for the given identity and roles and returns it as an `OFSM_AUTH` cookie, without a password and without any row in the user table. Use `getCurrentSession` afterwards to see who the session belongs to. Available only with the test profile.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    post: operations["createTestSession"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/test/members": {
     parameters: {
       query?: never
@@ -1325,6 +1347,31 @@ export interface components {
        */
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
+    /** @description The identity and roles of the session to create. */
+    TestSessionRequest: {
+      /**
+       * @description Login name of the session's user.
+       * @example m.mustermann
+       */
+      username: string
+      /**
+       * @description Given name.
+       * @example Max
+       */
+      firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
+      lastName: string
+      /**
+       * @description Roles the session holds. `ADMIN` implicitly grants every other role, exactly as for a normal login.
+       * @example [
+       *       "USER"
+       *     ]
+       */
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+    }
     /** @description The details of a member. Used for both creation and update. */
     CreateOrUpdateMemberRequest: {
       /**
@@ -2129,6 +2176,46 @@ export interface operations {
         content: {
           "*/*": components["schemas"]["UserAccount"]
         }
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  createTestSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TestSessionRequest"]
+      }
+    }
+    responses: {
+      /** @description The session was created. Its cookie is in the `Set-Cookie` header. */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description The request failed validation. The `errors` array names each offending field. */
       400: {

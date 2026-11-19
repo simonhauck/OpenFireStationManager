@@ -1,9 +1,11 @@
 package io.github.simonhauck.openfirestationmanager.usermanagement
 
 import io.github.simonhauck.openfirestationmanager.IntegrationTest
+import io.github.simonhauck.openfirestationmanager.security.auth.LocalAdminFixture
 import io.github.simonhauck.openfirestationmanager.testutil.snapshotTest
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -11,6 +13,12 @@ import org.springframework.http.HttpStatus
 class AdminUserControllerIT : IntegrationTest() {
 
     @Autowired private lateinit var adminUserControllerCalls: AdminUserControllerCalls
+    @Autowired private lateinit var localAdminFixture: LocalAdminFixture
+
+    @BeforeEach
+    fun createLocalAdmin() {
+        localAdminFixture.ensureLocalAdmin()
+    }
 
     @Test
     fun `createUser should return 403 when no auth cookie is provided`() {

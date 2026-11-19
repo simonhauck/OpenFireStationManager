@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto"
+import { mkdirSync, writeFileSync } from "node:fs"
 import path from "node:path"
-import { chromium, request } from "@playwright/test"
+import { request } from "@playwright/test"
 import { backupDatabase } from "./db-backup.js"
 
+// Personas are also created as real users (see createUser) because auth.spec.ts still logs in
+// with their credentials; their browser session comes from the test-only session endpoint.
 const BASE_URL = "http://localhost:8080"
 const CLIENT_URL = "http://localhost:3000"
 
@@ -36,23 +39,55 @@ async function createUser(
   }
 }
 
-async function loginAndSave(persona: Persona) {
-  const browser = await chromium.launch()
-  const context = await browser.newContext()
-  const page = await context.newPage()
+async function saveSession(
+  apiContext: Awaited<ReturnType<typeof request.newContext>>,
+  persona: Persona,
+) {
+  const response = await apiContext.post(`${BASE_URL}/api/test/session`, {
+    data: {
+      username: persona.username,
+      firstName: persona.firstName,
+      lastName: persona.lastName,
+      roles: persona.roles,
+    },
+  })
 
-  await page.goto(`${CLIENT_URL}/login`)
-  await page
-    .getByRole("textbox", { name: /^Benutzername( Erforderlich)?$/ })
-    .fill(persona.username)
-  await page
-    .getByRole("textbox", { name: /^Passwort( Erforderlich)?$/ })
-    .fill(persona.password)
-  await page.getByRole("button", { name: "Anmelden" }).click()
-  await page.waitForURL((url) => !url.pathname.includes("/login"))
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to create test session for ${persona.username}: ${response.status()} ${await response.text()}`,
+    )
+  }
 
-  await context.storageState({ path: persona.authFile })
-  await browser.close()
+  const sessionCookie = response
+    .headersArray()
+    .filter((header) => header.name.toLowerCase() === "set-cookie")
+    .map((header) => header.value)
+    .find((value) => value.startsWith("OFSM_AUTH="))
+
+  if (!sessionCookie) {
+    throw new Error(`No OFSM_AUTH cookie returned for ${persona.username}`)
+  }
+
+  const cookieValue = sessionCookie.split(";")[0].slice("OFSM_AUTH=".length)
+
+  const storageState = {
+    cookies: [
+      {
+        name: "OFSM_AUTH",
+        value: cookieValue,
+        domain: new URL(CLIENT_URL).hostname,
+        path: "/",
+        expires: -1,
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict" as const,
+      },
+    ],
+    origins: [],
+  }
+
+  mkdirSync(path.dirname(persona.authFile), { recursive: true })
+  writeFileSync(persona.authFile, JSON.stringify(storageState, null, 2))
 }
 
 export default async function globalSetup() {
@@ -104,9 +139,9 @@ export default async function globalSetup() {
     await createUser(apiContext, persona)
   }
 
-  await apiContext.dispose()
-
   for (const persona of personas) {
-    await loginAndSave(persona)
+    await saveSession(apiContext, persona)
   }
+
+  await apiContext.dispose()
 }

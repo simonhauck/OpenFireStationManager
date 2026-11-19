@@ -5,6 +5,7 @@ import io.github.simonhauck.openfirestationmanager.testutil.snapshotTest
 import io.github.simonhauck.openfirestationmanager.usermanagement.AdminUserControllerCalls
 import java.time.ZonedDateTime
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -12,6 +13,12 @@ import org.springframework.http.HttpStatus
 class AuthControllerIT() : IntegrationTest() {
     @Autowired private lateinit var authControllerCalls: AuthControllerCalls
     @Autowired private lateinit var adminUserControllerCalls: AdminUserControllerCalls
+    @Autowired private lateinit var localAdminFixture: LocalAdminFixture
+
+    @BeforeEach
+    fun createLocalAdmin() {
+        localAdminFixture.ensureLocalAdmin()
+    }
 
     @Test
     fun `should return authenticated false when user does not provide a cookie`() {

@@ -368,6 +368,51 @@
         "security": [ ]
       }
     },
+    "/api/test/session": {
+      "post": {
+        "tags": [ "Test" ],
+        "summary": "Start a session without credentials",
+        "description": "Test-only fixture endpoint. Creates an authenticated session for the given identity and roles and returns it as an `OFSM_AUTH` cookie, without a password and without any row in the user table. Use `getCurrentSession` afterwards to see who the session belongs to. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "createTestSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "The session was created. Its cookie is in the `Set-Cookie` header.",
+            "content": { }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
     "/api/test/members": {
       "post": {
         "tags": [ "Test" ],
@@ -4357,6 +4402,41 @@
           }
         },
         "required": [ "firstName", "lastName", "password", "roles", "username" ]
+      },
+      "TestSessionRequest": {
+        "type": "object",
+        "description": "The identity and roles of the session to create.",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Login name of the session's user.",
+            "example": "m.mustermann",
+            "minLength": 1
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Given name.",
+            "example": "Max",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Family name.",
+            "example": "Mustermann",
+            "minLength": 1
+          },
+          "roles": {
+            "type": "array",
+            "description": "Roles the session holds. `ADMIN` implicitly grants every other role, exactly as for a normal login.",
+            "example": [ "USER" ],
+            "items": {
+              "type": "string",
+              "description": "\n        What an account is allowed to do. Roles are cumulative in effect, not exclusive:\n\n        - `USER` — read clothing data, and check garments out and back in.\n        - `KLEIDERWART` — the quartermaster. Additionally create, update, and delete clothing\n          types, items, and locations, run relocations and stock-takes, and see locations\n          flagged `onlyVisibleForKleiderwart`.\n        - `ADMIN` — implicitly granted every other role, so an admin can call every endpoint in\n          this API. Additionally manages user accounts and legal documents.\n        ",
+              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
+            }
+          }
+        },
+        "required": [ "firstName", "lastName", "roles", "username" ]
       },
       "CreateOrUpdateMemberRequest": {
         "type": "object",

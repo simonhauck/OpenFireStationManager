@@ -120,8 +120,9 @@ playwright/.auth/       ← gitignored session state files written by global-set
 ### Authentication
 
 `global-setup.ts` runs once before the test suite. It creates three test personas with
-UUID-suffixed usernames (so parallel runs and shared databases never collide), logs each one
-in via the browser, and saves the resulting session cookies:
+UUID-suffixed usernames (so parallel runs and shared databases never collide), obtains a session
+for each one from the test-only `POST /api/test/session` endpoint (no UI login), and writes the
+session cookie into its `storageState` file:
 
 |    Persona    |     Roles     |              Auth file              |
 |---------------|---------------|-------------------------------------|
