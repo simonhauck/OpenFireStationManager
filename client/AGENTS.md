@@ -130,6 +130,9 @@ session cookie into its `storageState` file:
 | `kleiderwart` | `KLEIDERWART` | `playwright/.auth/kleiderwart.json` |
 | `user`        | `USER`        | `playwright/.auth/user.json`        |
 
+Only `tests/specs/auth.spec.ts` signs in for real: it uses the local Keycloak from
+`infrastructure/local/docker-compose.yml` (demo user `admin` / `admin`), which must be running.
+
 Activate a persona in a spec with `test.use`:
 
 ```ts

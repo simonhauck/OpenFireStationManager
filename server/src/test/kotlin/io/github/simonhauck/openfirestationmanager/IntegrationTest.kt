@@ -1,6 +1,7 @@
 package io.github.simonhauck.openfirestationmanager
 
 import io.github.simonhauck.openfirestationmanager.testing.TestSessionControllerCalls
+import io.github.simonhauck.openfirestationmanager.testutil.MockOAuth2ServerContainer
 import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,12 +53,22 @@ open class IntegrationTest {
                 .withPassword("secret")
                 .apply { start() }
 
+        /**
+         * Shared OpenID Connect provider. The application discovers the provider metadata at
+         * startup, so every context needs a reachable issuer, not only the login flow tests.
+         */
+        val oidcProvider = MockOAuth2ServerContainer().apply { start() }
+
         @DynamicPropertySource
         @JvmStatic
         fun configureDatabaseProperties(registry: DynamicPropertyRegistry) {
             registry.add("spring.datasource.url", postgresContainer::getJdbcUrl)
             registry.add("spring.datasource.username", postgresContainer::getUsername)
             registry.add("spring.datasource.password", postgresContainer::getPassword)
+            registry.add(
+                "spring.security.oauth2.client.provider.ofsm.issuer-uri",
+                oidcProvider::issuerUri,
+            )
         }
     }
 }

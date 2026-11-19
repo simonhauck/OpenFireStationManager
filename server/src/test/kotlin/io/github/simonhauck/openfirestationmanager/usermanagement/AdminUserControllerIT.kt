@@ -21,7 +21,7 @@ class AdminUserControllerIT : IntegrationTest() {
     }
 
     @Test
-    fun `createUser should return 403 when no auth cookie is provided`() {
+    fun `createUser should return 401 when no auth cookie is provided`() {
         val request =
             CreateUserRequest(
                 username = uniqueUsername(),
@@ -33,7 +33,7 @@ class AdminUserControllerIT : IntegrationTest() {
 
         val response = adminUserControllerCalls.createUserExpectingError(request, authCookie = null)
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
     @Test
@@ -80,10 +80,10 @@ class AdminUserControllerIT : IntegrationTest() {
         }
 
     @Test
-    fun `getAllUsers should return 403 when no auth cookie is provided`() {
+    fun `getAllUsers should return 401 when no auth cookie is provided`() {
         val response = adminUserControllerCalls.getAllUsersExpectingError(authCookie = null)
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
     @Test

@@ -23,6 +23,7 @@ repositories { mavenCentral() }
 dependencies {
     implementation(libs.springBootStarterDataJdbc)
     implementation(libs.springBootStarterSecurity)
+    implementation(libs.springBootStarterSecurityOauth2Client)
     implementation(libs.springBootStarterValidation)
     implementation(libs.springBootStarterWebmvc)
     implementation(libs.kotlinReflect)

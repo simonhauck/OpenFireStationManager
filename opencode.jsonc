@@ -15,10 +15,9 @@
 				// Operation ids are all well under the 64-character limit, so keep the
 				// readable names instead of letting the server abbreviate them.
 				"DISABLE_ABBREVIATION": "true",
-				// The API authenticates with a cookie, not a bearer token. The remember-me
-				// cookie authenticates on its own and lasts 30 days, so it needs refreshing
-				// far less often than a session cookie.
-				"API_HEADERS": "Cookie:OFSM_AUTH_REMEMBER_ME={env:OFSM_AUTH_COOKIE}"
+				// The API authenticates with the session cookie of a browser sign-in (OpenID
+				// Connect); see "Consuming the API over MCP" in server/AGENTS.md.
+				"API_HEADERS": "Cookie:OFSM_AUTH={env:OFSM_AUTH_COOKIE}"
 			}
 		},
 		"playwright": {

@@ -29,7 +29,8 @@ JDBC for persistence, PostgreSQL as the database, and SpringDoc OpenAPI for API 
 - Keep all endpoints under the `/api/**` namespace.
 - Use `/api/admin/**` for admin-only endpoints.
 - Keep protected API routes outside `/api/public/**` unless there is an explicit exception.
-- Authentication uses server-side session + remember-me cookies; frontend should use cookie credentials, not browser token storage.
+- Authentication is delegated to an OpenID Connect provider (`spring.security.oauth2.client.*`, registration `ofsm`); the server keeps the result in a server-side session (`OFSM_AUTH` cookie). The frontend uses cookie credentials, not browser token storage.
+- Roles come from the provider's `realm_access.roles` claim, mapped to OFSM roles through `app.auth.roles.mapping`; `ADMIN` implies every role. Integration tests get sessions from the test-only `POST /api/test/session` endpoint; `OidcLoginIT` drives the real flow against `navikt/mock-oauth2-server`.
 
 All commands below are run from the repository root using the Gradle wrapper — there is no
 `gradlew` inside `server/`. Prefix tasks with `:server:` to scope them to this component.
@@ -215,7 +216,7 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
   on the wire, which is what the full-replacement `PATCH` endpoints rely on. See
   `server/docs/adr/0009-nullable-field-representation-in-openapi.md`.
 - Prefer interpolating a configured value over restating it. `OpenApiConfiguration` injects the
-  cookie names and remember-me validity rather than hardcoding them, so the documentation cannot
+  cookie name and session timeout rather than hardcoding them, so the documentation cannot
   contradict `application.yml`. Apply the same instinct to any other configurable fact.
 
 ### Test-profile seeding controllers
@@ -315,38 +316,26 @@ from the `@Parameter` and `@field:Schema` annotations. Poor annotations therefor
 surface, but the rules above are strict because the annotations are the API documentation shared
 by all consumers — MCP is a secondary consumer (`docs/adr/0001`), not the reason for the rules.
 
-**Authenticating.** The API uses cookies, and the MCP server can only send static headers. Rather
-than a session cookie, use the **remember-me** cookie: it authenticates on its own, is stateless
-and signed, survives server restarts, and is valid for 30 days by default
-(`app.remember-me.token-validity`, `P30D`). That turns re-authentication into a monthly chore
-instead of a per-session one.
-
-Start the backend, log in **with `rememberMe: true`**, and export the cookie before starting
+**Authenticating.** The API uses cookies, and the MCP server can only send static headers. There
+is no long-lived credential any more: sign in through the browser (OpenID Connect), copy the value
+of the `OFSM_AUTH` cookie from the browser's developer tools, and export it before starting
 OpenCode:
 
 ```sh
-export OFSM_AUTH_COOKIE=$(curl -s -i -X POST http://localhost:8080/api/public/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"chief","password":"secret","rememberMe":true}' \
-  | grep -i '^set-cookie: OFSM_AUTH_REMEMBER_ME=' \
-  | sed 's/.*OFSM_AUTH_REMEMBER_ME=\([^;]*\).*/\1/')
+export OFSM_AUTH_COOKIE=<value of the OFSM_AUTH cookie>
 ```
 
-Note the cookie name is `OFSM_AUTH_REMEMBER_ME` — it is derived in `application.yml` as
-`${server.servlet.session.cookie.name}_REMEMBER_ME`, so it tracks the session cookie name. If you
-rename either, `OpenApiConfiguration` picks the new names up automatically, but the `curl` above
-and `opencode.jsonc` must be updated by hand.
-
-Re-export and restart OpenCode when calls start returning `401`. The agent inherits the full
-rights of whichever account you use, and because `ADMIN` implicitly holds every role, an admin
-cookie grants reach over user management and legal-document deletion. Pick the account
-accordingly.
+The session expires after the idle timeout (`server.servlet.session.timeout`, 12 hours by default)
+and on server restart. Re-export and restart OpenCode when calls start returning `401`. The agent
+inherits the full rights of whichever account you signed in with, and because `ADMIN` implicitly
+holds every role, an admin session grants reach over user management and legal-document deletion.
+Pick the account accordingly.
 
 **Browser-based login.** There is no built-in flow that opens a login page. The package's
 `AuthProvider` interface is the extension point, but it is library-only and not reachable through
 the `npx` CLI. Implementing one means wrapping `OpenAPIServer` in a small local package — the
-Playwright login in `client/tests/global-setup.ts` is a working precedent for extracting the
-`httpOnly` cookie from a real browser session.
+Keycloak sign-in in `client/tests/specs/auth.spec.ts` is a working precedent for driving a real
+browser login.
 
 **Narrowing the surface.** All 46 operations load by default, which is a lot of context. Two ways
 to trim it, both set via `environment` in `opencode.jsonc`:

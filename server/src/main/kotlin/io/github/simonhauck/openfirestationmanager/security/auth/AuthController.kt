@@ -2,46 +2,24 @@ package io.github.simonhauck.openfirestationmanager.security.auth
 
 import io.github.simonhauck.openfirestationmanager.common.ApiTags
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
+import java.net.URI
 import org.springframework.http.HttpStatus
-import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
-import org.springframework.security.web.context.SecurityContextRepository
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-
-@Schema(description = "Credentials for starting a session.")
-data class LoginRequest(
-    @field:Schema(description = "The account's username.", example = "m.mustermann")
-    @field:NotBlank
-    val username: String,
-    @field:Schema(description = "The account's plaintext password.", example = "correct-horse")
-    @field:NotBlank
-    val password: String,
-    @field:Schema(
-        description =
-            "When true, the server additionally issues a long-lived remember-me cookie " +
-                "(`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer " +
-                "this for long-lived clients rather than holding a session open.",
-        example = "false",
-    )
-    val rememberMe: Boolean = false,
-)
 
 @RestController
 @RequestMapping("/api/public/auth")
@@ -49,79 +27,78 @@ data class LoginRequest(
 @Tag(name = ApiTags.AUTHENTICATION)
 class AuthController(
     private val authService: AuthService,
-    private val securityContextRepository: SecurityContextRepository,
-    private val rememberMeServices: TokenBasedRememberMeServices,
+    private val providerLogoutUrlResolver: ProviderLogoutUrlResolver,
 ) {
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @GetMapping("/login")
+    @ResponseStatus(HttpStatus.FOUND)
     @Operation(
         operationId = "login",
-        summary = "Start a session",
+        summary = "Sign in through the OpenID Connect provider",
         description =
-            "Exchanges a username and password for a session cookie. This API has no bearer " +
-                "tokens: on success the server sets an `OFSM_AUTH` cookie (plus " +
-                "`OFSM_AUTH_REMEMBER_ME` when `rememberMe` is true), and every subsequent request " +
-                "must carry it.\n\n" +
-                "The response body is deliberately empty — call `getCurrentSession` afterwards " +
-                "to find out who you are signed in as and which roles you hold.\n\n" +
-                "Wrong credentials and unknown usernames are reported identically, as `401`, so " +
-                "the response cannot be used to discover which accounts exist.",
+            "Browser entry point for signing in. Navigate to it (a top-level navigation, not a " +
+                "fetch call): the server remembers `redirect` and sends the browser to the " +
+                "provider's login page. After a successful sign-in the provider returns to the " +
+                "server, which sets the `OFSM_AUTH` session cookie and redirects to `redirect`. " +
+                "While the provider session is still valid this happens without a password " +
+                "prompt.\n\n" +
+                "Only relative paths on this site are accepted as `redirect`. Anything else " +
+                "(absolute URLs, `//host` paths) falls back to `/dashboard`, so this endpoint " +
+                "cannot be used as an open redirect. A failed or cancelled sign-in ends on " +
+                "`/login?error`.\n\n" +
+                "Call `getCurrentSession` afterwards to find out who is signed in.",
     )
     @ApiResponses(
         ApiResponse(
-            responseCode = "204",
-            description = "Signed in. The session cookie is in the `Set-Cookie` header.",
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "The username does not exist, or the password is wrong.",
-            content =
-                [
-                    Content(
-                        mediaType = "application/problem+json",
-                        schema = Schema(implementation = ProblemDetail::class),
-                    ),
-                ],
+            responseCode = "302",
+            description = "Redirect towards the provider's login page.",
         ),
     )
     fun login(
-        @Valid @RequestBody requestBody: LoginRequest,
+        @Parameter(
+            description =
+                "Relative path to return to after signing in. Must start with `/`; anything " +
+                    "else is replaced by `/dashboard`.",
+            example = "/pool-clothing/checkout",
+        )
+        @RequestParam(defaultValue = LoginRedirect.FALLBACK)
+        redirect: String,
         request: HttpServletRequest,
-        response: HttpServletResponse,
     ): ResponseEntity<Unit> {
-        val authentication = authService.login(requestBody)
-
-        val securityContext = SecurityContextHolder.createEmptyContext()
-        securityContext.authentication = authentication
-        SecurityContextHolder.setContext(securityContext)
-        securityContextRepository.saveContext(securityContext, request, response)
-
-        if (requestBody.rememberMe) {
-            rememberMeServices.loginSuccess(request, response, authentication)
-        }
-
-        return ResponseEntity.noContent().build()
+        val target = LoginRedirect.sanitize(redirect)
+        request.session.setAttribute(LoginRedirect.SESSION_ATTRIBUTE, target)
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create(AUTHORIZATION_REQUEST_PATH))
+            .build()
     }
 
     @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.FOUND)
     @Operation(
         operationId = "logout",
         summary = "End the current session",
         description =
-            "Invalidates the server-side session and clears both the session and remember-me " +
-                "cookies.\n\n" +
-                "Safe to call when not signed in — it succeeds either way rather than failing, " +
-                "so it can be used unconditionally to guarantee a clean slate.",
+            "Invalidates the server-side session and redirects the browser to the provider's " +
+                "logout endpoint, which ends the provider session too and then returns to the " +
+                "application root. Submit it as a top-level form `POST`, not a fetch call, so " +
+                "the browser can follow the redirect to the provider.\n\n" +
+                "Safe to call when not signed in — it then redirects straight to the application " +
+                "root rather than failing, so it can be used unconditionally to guarantee a " +
+                "clean slate.",
     )
-    @ApiResponses(ApiResponse(responseCode = "204", description = "The session was ended."))
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "302",
+            description =
+                "The session was ended. Redirect to the provider's logout endpoint, or to `/` " +
+                    "when there was no provider session.",
+        ),
+    )
     fun logout(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Unit> {
         val authentication = SecurityContextHolder.getContext().authentication
-        rememberMeServices.logout(request, response, authentication)
-        SecurityContextHolder.clearContext()
-        request.getSession(false)?.invalidate()
-        return ResponseEntity.noContent().build()
+        val target = providerLogoutUrlResolver.resolve(request, response, authentication)
+        SecurityContextLogoutHandler().logout(request, response, authentication)
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(target)).build()
     }
 
     @GetMapping("/me")
@@ -144,6 +121,11 @@ class AuthController(
         ),
     )
     fun me(): AuthStateResponse {
-        return authService.getUserByAuthentication()
+        return authService.getCurrentSession()
+    }
+
+    companion object {
+        /** Spring Security's authorization request endpoint for the `ofsm` registration. */
+        const val AUTHORIZATION_REQUEST_PATH = "/oauth2/authorization/ofsm"
     }
 }

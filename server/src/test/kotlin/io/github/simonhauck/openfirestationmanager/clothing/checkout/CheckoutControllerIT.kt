@@ -14,9 +14,6 @@ import io.github.simonhauck.openfirestationmanager.clothing.movement.MovementRea
 import io.github.simonhauck.openfirestationmanager.clothing.type.ClothingType
 import io.github.simonhauck.openfirestationmanager.clothing.type.CreateOrUpdateClothingTypeRequest
 import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveClothingTypeControllerCalls
-import io.github.simonhauck.openfirestationmanager.security.auth.AuthControllerCalls
-import io.github.simonhauck.openfirestationmanager.usermanagement.AdminUserControllerCalls
-import io.github.simonhauck.openfirestationmanager.usermanagement.CreateUserRequest
 import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -30,8 +27,6 @@ class CheckoutControllerIT : IntegrationTest() {
     @Autowired private lateinit var itemCalls: ClothingItemControllerCalls
     @Autowired private lateinit var typeCalls: ProtectiveClothingTypeControllerCalls
     @Autowired private lateinit var locationCalls: ClothingLocationControllerCalls
-    @Autowired private lateinit var adminUserCalls: AdminUserControllerCalls
-    @Autowired private lateinit var authCalls: AuthControllerCalls
     @Autowired private lateinit var itemRepository: ClothingItemRepository
     @Autowired private lateinit var movementRepository: ClothingMovementRepository
 
@@ -384,19 +379,5 @@ class CheckoutControllerIT : IntegrationTest() {
             )
             .body!!
 
-    private fun createRegularUserCookie(): String {
-        val username = "user-${System.nanoTime()}"
-        adminUserCalls.createUser(
-            CreateUserRequest(
-                username = username,
-                password = "password",
-                firstName = "Test",
-                lastName = "User",
-                roles = listOf(UserRole.USER),
-            ),
-            authCookie = validCookieHeader,
-        )
-        val loginResponse = authCalls.login(username = username, password = "password")
-        return authCalls.extractAuthCookie(loginResponse)!!
-    }
+    private fun createRegularUserCookie(): String = cookieWithRoles(UserRole.USER)
 }

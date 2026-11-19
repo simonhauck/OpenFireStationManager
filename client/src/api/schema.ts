@@ -99,7 +99,7 @@ export interface paths {
     put?: never
     /**
      * Start a session without credentials
-     * @description Test-only fixture endpoint. Creates an authenticated session for the given identity and roles and returns it as an `OFSM_AUTH` cookie, without a password and without any row in the user table. Use `getCurrentSession` afterwards to see who the session belongs to. Available only with the test profile.
+     * @description Test-only fixture endpoint. Creates an authenticated session for the given identity and roles and returns it as an `OFSM_AUTH` cookie, without going through the OpenID Connect provider. The session is indistinguishable from one created by `login`. Use `getCurrentSession` afterwards to see who the session belongs to. Available only with the test profile.
      *
      *     **Authentication:** none — this endpoint is public.
      */
@@ -235,39 +235,13 @@ export interface paths {
     put?: never
     /**
      * End the current session
-     * @description Invalidates the server-side session and clears both the session and remember-me cookies.
+     * @description Invalidates the server-side session and redirects the browser to the provider's logout endpoint, which ends the provider session too and then returns to the application root. Submit it as a top-level form `POST`, not a fetch call, so the browser can follow the redirect to the provider.
      *
-     *     Safe to call when not signed in — it succeeds either way rather than failing, so it can be used unconditionally to guarantee a clean slate.
+     *     Safe to call when not signed in — it then redirects straight to the application root rather than failing, so it can be used unconditionally to guarantee a clean slate.
      *
      *     **Authentication:** none — this endpoint is public.
      */
     post: operations["logout"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/public/auth/login": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Start a session
-     * @description Exchanges a username and password for a session cookie. This API has no bearer tokens: on success the server sets an `OFSM_AUTH` cookie (plus `OFSM_AUTH_REMEMBER_ME` when `rememberMe` is true), and every subsequent request must carry it.
-     *
-     *     The response body is deliberately empty — call `getCurrentSession` afterwards to find out who you are signed in as and which roles you hold.
-     *
-     *     Wrong credentials and unknown usernames are reported identically, as `401`, so the response cannot be used to discover which accounts exist.
-     *
-     *     **Authentication:** none — this endpoint is public.
-     */
-    post: operations["login"]
     delete?: never
     options?: never
     head?: never
@@ -950,6 +924,32 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/public/auth/login": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Sign in through the OpenID Connect provider
+     * @description Browser entry point for signing in. Navigate to it (a top-level navigation, not a fetch call): the server remembers `redirect` and sends the browser to the provider's login page. After a successful sign-in the provider returns to the server, which sets the `OFSM_AUTH` session cookie and redirects to `redirect`. While the provider session is still valid this happens without a password prompt.
+     *
+     *     Only relative paths on this site are accepted as `redirect`. Anything else (absolute URLs, `//host` paths) falls back to `/dashboard`, so this endpoint cannot be used as an open redirect. A failed or cancelled sign-in ends on `/login?error`.
+     *
+     *     Call `getCurrentSession` afterwards to find out who is signed in.
+     *
+     *     **Authentication:** none — this endpoint is public.
+     */
+    get: operations["login"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/clothing/types/{typeId}/images/{imageId}": {
     parameters: {
       query?: never
@@ -1570,24 +1570,6 @@ export interface components {
        */
       lastName: string
     }
-    /** @description Credentials for starting a session. */
-    LoginRequest: {
-      /**
-       * @description The account's username.
-       * @example m.mustermann
-       */
-      username: string
-      /**
-       * @description The account's plaintext password.
-       * @example correct-horse
-       */
-      password: string
-      /**
-       * @description When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.
-       * @example false
-       */
-      rememberMe: boolean
-    }
     /** @description Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`. */
     ClothingTypeImageMetadata: {
       /**
@@ -1810,6 +1792,37 @@ export interface components {
        */
       exists: boolean
     }
+    /** @description The signed-in user as reported by the OpenID Connect provider. Nothing about the user is stored by this API; every value comes from the provider's tokens at sign-in. */
+    CurrentUser: {
+      /**
+       * @description Username from the provider (by default its `preferred_username` claim). This is the name recorded in `createdBy` and `lastModifiedBy`.
+       * @example m.mustermann
+       */
+      username: string
+      /**
+       * @description Given name.
+       * @example Max
+       */
+      firstName: string
+      /**
+       * @description Family name.
+       * @example Mustermann
+       */
+      lastName: string
+      /**
+       * @description Email address, when the provider supplies one.
+       * @example max.mustermann@example.org
+       */
+      email?: string
+      /**
+       * @description Effective roles, derived from the provider's roles through the server's role mapping. `ADMIN` is always reported together with every other role.
+       * @example [
+       *       "USER",
+       *       "KLEIDERWART"
+       *     ]
+       */
+      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
+    }
     /** @description Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session. */
     AuthStateResponse: {
       /**
@@ -1817,8 +1830,8 @@ export interface components {
        * @example true
        */
       authenticated: boolean
-      /** @description The signed-in account, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
-      user?: components["schemas"]["UserAccount"]
+      /** @description The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
+      user?: components["schemas"]["CurrentUser"]
     }
     /** @description Every barcode guide image (`Barcode-Bild`) of one clothing type, with the type's name so a scanner screen can label the group without a second lookup. */
     ClothingTypeBarcodeImages: {
@@ -2465,8 +2478,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description The session was ended. */
-      204: {
+      /** @description The session was ended. Redirect to the provider's logout endpoint, or to `/` when there was no provider session. */
+      302: {
         headers: {
           [name: string]: unknown
         }
@@ -2479,55 +2492,6 @@ export interface operations {
         }
         content: {
           "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  login: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LoginRequest"]
-      }
-    }
-    responses: {
-      /** @description Signed in. The session cookie is in the `Set-Cookie` header. */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description The username does not exist, or the password is wrong. */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */
@@ -4938,6 +4902,48 @@ export interface operations {
         }
         content: {
           "*/*": components["schemas"]["AuthStateResponse"]
+        }
+      }
+      /** @description Unexpected server error. The response body carries no details. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ProblemDetail"]
+        }
+      }
+    }
+  }
+  login: {
+    parameters: {
+      query?: {
+        /**
+         * @description Relative path to return to after signing in. Must start with `/`; anything else is replaced by `/dashboard`.
+         * @example /pool-clothing/checkout
+         */
+        redirect?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Redirect towards the provider's login page. */
+      302: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The request failed validation. The `errors` array names each offending field. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */

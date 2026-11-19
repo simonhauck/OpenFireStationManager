@@ -1,73 +1,78 @@
-import { expect, test } from "@playwright/test"
-import { LoginPage } from "../pages/LoginPage"
+import { expect, type Page, test } from "@playwright/test"
+import { KeycloakLoginPage } from "../pages/KeycloakLoginPage"
+import { PoolKlamottenPage } from "../pages/PoolKlamottenPage"
+import { UserMenu } from "../pages/UserMenu"
 
-function requiredEnv(name: string): string {
-  const value = process.env[name]
-  if (!value) throw new Error(`Missing required environment variable: ${name}`)
-  return value
+// These tests sign in at the real local Keycloak (realm `ofsm`, demo user admin/admin), so they
+// start without a stored session. Every other spec uses the personas from global-setup.ts.
+//
+// Removed with the switch to OpenID Connect: "shows error message on invalid credentials" is
+// consciously dropped, because the provider owns the login form and its error messages.
+
+const KEYCLOAK_URL = /^http:\/\/localhost:8180\/realms\/ofsm\//
+const LOGIN_PAGE = /^http:\/\/localhost:3000\/login(\?|$)/
+// /pool-clothing/checkout is guarded by RoleGuard with allowedRoles=["USER"]; ADMIN holds it.
+const protectedRoute = "/pool-clothing/checkout"
+
+async function signInAtKeycloak(page: Page) {
+  const keycloak = new KeycloakLoginPage(page)
+  await expect(page).toHaveURL(KEYCLOAK_URL)
+  await keycloak.login("admin", "admin")
 }
 
 test.describe("Auth", () => {
-  test("shows error message on invalid credentials", async ({ page }) => {
-    const loginPage = new LoginPage(page)
-    await loginPage.goto()
-    await loginPage.login("nonexistent-user", "wrongpassword")
-    await expect(loginPage.errorMessage()).toBeVisible()
-  })
-
-  test("logs in successfully and redirects away from login", async ({
+  test("signing in returns to the requested page without the login page in history", async ({
     page,
   }) => {
-    const username = requiredEnv("E2E_USER_USERNAME")
-    const password = requiredEnv("E2E_USER_PASSWORD")
-
-    const loginPage = new LoginPage(page)
-    await loginPage.goto()
-    await loginPage.login(username, password)
-    await expect(page).not.toHaveURL(/\/login/)
-  })
-})
-
-test.describe("Auth – redirect after login", () => {
-  // /pool-clothing/checkout is guarded by RoleGuard with allowedRoles=["USER"]
-  const protectedRoute = "/pool-clothing/checkout"
-
-  test("unauthenticated user visiting a protected route is redirected to login", async ({
-    page,
-  }) => {
-    await page.goto(protectedRoute)
-    await expect(page).toHaveURL(/\/login/)
-  })
-
-  test("after login the user is redirected back to the originally requested page", async ({
-    page,
-  }) => {
-    const username = requiredEnv("E2E_USER_USERNAME")
-    const password = requiredEnv("E2E_USER_PASSWORD")
+    const visited: string[] = []
+    page.on("framenavigated", (frame) => {
+      if (frame === page.mainFrame()) visited.push(frame.url())
+    })
 
     await page.goto(protectedRoute)
-    await expect(page).toHaveURL(/\/login/)
+    await signInAtKeycloak(page)
 
-    const loginPage = new LoginPage(page)
-    await loginPage.login(username, password)
-
-    await expect(page).toHaveURL(/\/pool-clothing\/checkout/)
+    await expect(page).toHaveURL(/\/pool-clothing\/checkout$/)
+    await expect(page.getByRole("button", { name: "Abbrechen" })).toBeVisible()
+    const loginPageVisits = visited.filter((url) => LOGIN_PAGE.test(url))
+    expect(loginPageVisits).toEqual([])
   })
 
-  test("after redirect-login the login page is not in the history stack", async ({
+  test("logout ends the provider session and returns to the start page", async ({
     page,
   }) => {
-    const username = requiredEnv("E2E_USER_USERNAME")
-    const password = requiredEnv("E2E_USER_PASSWORD")
+    await page.goto("/dashboard")
+    await signInAtKeycloak(page)
+    await expect(page).toHaveURL(/\/dashboard$/)
 
+    await new UserMenu(page).logout()
+
+    await expect(page).toHaveURL("http://localhost:3000/")
+    await expect(new UserMenu(page).signInButton()).toBeVisible()
+
+    // The provider session is gone too, so the login form shows again.
     await page.goto(protectedRoute)
-    await expect(page).toHaveURL(/\/login/)
+    await expect(page).toHaveURL(KEYCLOAK_URL)
+    await expect(new KeycloakLoginPage(page).usernameInput()).toBeVisible()
+  })
 
-    const loginPage = new LoginPage(page)
-    await loginPage.login(username, password)
-    await expect(page).toHaveURL(/\/pool-clothing\/checkout/)
+  test("an expired session signs in again before the checkout wizard starts", async ({
+    page,
+    context,
+  }) => {
+    const overview = new PoolKlamottenPage(page)
+    await overview.goto()
+    await signInAtKeycloak(page)
+    await expect(page).toHaveURL(/\/pool-clothing$/)
+    await expect(overview.checkoutButton()).toBeVisible()
 
-    await page.goBack()
-    await expect(page).not.toHaveURL(/\/login/)
+    // Expire the OFSM session while the overview stays open; the Keycloak session stays valid.
+    await context.clearCookies({ name: "OFSM_AUTH" })
+
+    await overview.checkoutButton().click()
+
+    // The renewal goes through the provider without a password prompt.
+    await expect(page).toHaveURL(/\/pool-clothing\/checkout$/)
+    await expect(page.getByRole("button", { name: "Abbrechen" })).toBeVisible()
   })
 })

@@ -1,45 +1,37 @@
 package io.github.simonhauck.openfirestationmanager.security.auth
 
-import io.github.simonhauck.openfirestationmanager.usermanagement.UserAccount
-import io.github.simonhauck.openfirestationmanager.usermanagement.UserService
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 
 @Service
-class AuthService(
-    private val authenticationManager: AuthenticationManager,
-    private val userService: UserService,
-    private val currentUserProvider: CurrentUserProvider,
-) {
-    fun login(loginRequest: LoginRequest): Authentication {
-        return authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken.unauthenticated(
-                loginRequest.username,
-                loginRequest.password,
-            ),
-        )
-    }
+class AuthService(private val currentUserProvider: CurrentUserProvider) {
 
-    fun getUserByAuthentication(): AuthStateResponse {
-        val currentUser =
-            currentUserProvider.getCurrentUser() ?: return AuthStateResponse(false, null)
+    fun getCurrentSession(): AuthStateResponse {
+        val username = currentUserProvider.getCurrentUser() ?: return AuthStateResponse(false, null)
+        val authentication =
+            SecurityContextHolder.getContext().authentication
+                ?: return AuthStateResponse(false, null)
 
-        val user = userService.findByUsername(currentUser) ?: sessionPrincipalAccount()
-        return AuthStateResponse(true, user)
-    }
+        val roles =
+            UserRole.entries.filter { role ->
+                authentication.authorities.any {
+                    it.authority == "${OfsmUserFactory.ROLE_PREFIX}${role.name}"
+                }
+            }
+        val oidcUser = authentication.principal as? OidcUser
 
-    private fun sessionPrincipalAccount(): UserAccount? {
-        val principal =
-            SecurityContextHolder.getContext().authentication?.principal as? SessionPrincipal
-                ?: return null
-        return UserAccount(
-            username = principal.username,
-            firstName = principal.firstName,
-            lastName = principal.lastName,
-            roles = principal.roles,
+        return AuthStateResponse(
+            authenticated = true,
+            user =
+                CurrentUser(
+                    username = username,
+                    firstName = oidcUser?.givenName.orEmpty(),
+                    lastName = oidcUser?.familyName.orEmpty(),
+                    email = oidcUser?.email,
+                    roles = roles,
+                ),
         )
     }
 }

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenFireStationManager API",
-    "description": "REST API for **OpenFireStationManager**, an open-source platform for managing a volunteer fire\nstation. The current scope is **protective clothing management** (German: *Kleiderverwaltung*):\ntracking individual garments, where they are stored, and who has taken them out.\n\n## Domain model\n\nThe clothing domain is built from four concepts:\n\n- **Clothing Type** (*Kleidungsart*) — a category of garment, e.g. \"Einsatzjacke\", \"Helm\".\n  Types have a name only; they carry no size or count of their own.\n- **Clothing Item** (*Kleidungsstück*, colloquially *Klamotte*) — one physical garment. It has a\n  type, a size, an optional barcode, and an optional current location. An item with no location\n  is considered unassigned.\n- **Clothing Location** (*Standort*) — anywhere an item can be. Each location has a `type`:\n  `POOL` (shared stock available to everyone), `WAESCHE` (at the laundry), `PERSONAL`\n  (assigned to one member, e.g. a named locker), or `OTHER`. Locations flagged\n  `onlyVisibleForKleiderwart` are hidden from ordinary users in lookup and search results.\n- **Clothing Movement** — an append-only log entry recording that an item moved from one\n  location to another, with a reason. Movements are never written directly; they are a\n  side effect of checkout, relocation, and inventory reconciliation.\n\nOperations that move several items at once return a `batchId`. All movements produced by a\nsingle request share that id, which is what makes a bulk action auditable and reversible.\n\n## Roles\n\nThree roles exist, and they are cumulative rather than exclusive:\n\n- `USER` — may read clothing data and perform checkouts and returns for themselves.\n- `KLEIDERWART` (*quartermaster*) — additionally may create, update, and delete clothing types,\n  items, and locations, and may run relocations and inventory reconciliation.\n- `ADMIN` — implicitly holds every other role, and additionally manages user accounts and the\n  legal documents (Impressum, privacy policy).\n\nBecause `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.\n\n## Authentication\n\nAuthentication is **cookie-based**, not token-based. Call `POST /api/public/auth/login`; on\nsuccess the server sets a `OFSM_AUTH` session cookie, plus a `OFSM_AUTH_REMEMBER_ME`\ncookie when `rememberMe` is `true`. Send the cookie on every subsequent request. There is no\n`Authorization` header and no bearer token.\n\nThe remember-me cookie authenticates on its own and is valid for 30 days, so a\nlong-lived client can log in once and keep using it rather than holding a session open.\n\nEndpoints under `/api/public/**` need no authentication. Everything else under `/api/**`\nrequires a valid session; `/api/admin/**` additionally requires the `ADMIN` role.\n\n## Error format\n\nAll errors return [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`.\nRequest-body validation failures (`400`) additionally carry an `errors` array naming each\noffending field, its message, and the value that was rejected.",
+    "description": "REST API for **OpenFireStationManager**, an open-source platform for managing a volunteer fire\nstation. The current scope is **protective clothing management** (German: *Kleiderverwaltung*):\ntracking individual garments, where they are stored, and who has taken them out.\n\n## Domain model\n\nThe clothing domain is built from four concepts:\n\n- **Clothing Type** (*Kleidungsart*) — a category of garment, e.g. \"Einsatzjacke\", \"Helm\".\n  Types have a name only; they carry no size or count of their own.\n- **Clothing Item** (*Kleidungsstück*, colloquially *Klamotte*) — one physical garment. It has a\n  type, a size, an optional barcode, and an optional current location. An item with no location\n  is considered unassigned.\n- **Clothing Location** (*Standort*) — anywhere an item can be. Each location has a `type`:\n  `POOL` (shared stock available to everyone), `WAESCHE` (at the laundry), `PERSONAL`\n  (assigned to one member, e.g. a named locker), or `OTHER`. Locations flagged\n  `onlyVisibleForKleiderwart` are hidden from ordinary users in lookup and search results.\n- **Clothing Movement** — an append-only log entry recording that an item moved from one\n  location to another, with a reason. Movements are never written directly; they are a\n  side effect of checkout, relocation, and inventory reconciliation.\n\nOperations that move several items at once return a `batchId`. All movements produced by a\nsingle request share that id, which is what makes a bulk action auditable and reversible.\n\n## Roles\n\nThree roles exist, and they are cumulative rather than exclusive:\n\n- `USER` — may read clothing data and perform checkouts and returns for themselves.\n- `KLEIDERWART` (*quartermaster*) — additionally may create, update, and delete clothing types,\n  items, and locations, and may run relocations and inventory reconciliation.\n- `ADMIN` — implicitly holds every other role, and additionally manages user accounts and the\n  legal documents (Impressum, privacy policy).\n\nBecause `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.\n\nThe roles that govern access are derived from the user's roles at the OpenID Connect provider\non every sign-in, through the role mapping configured on the server.\n\n## Authentication\n\nAuthentication is **cookie-based** and delegated to an OpenID Connect provider (for example\nKeycloak). There is no username/password endpoint, no `Authorization` header and no bearer\ntoken.\n\nA browser signs in by navigating to `GET /api/public/auth/login?redirect=<path>`. The server\nsends it to the provider's login page and, after a successful sign-in, back to `<path>` with a\n`OFSM_AUTH` session cookie. Send the cookie on every subsequent request. The session\nends after 12 hours without a request; every request extends it. A new sign-in through\nthe provider needs no password while the provider's own session is still valid.\n`POST /api/public/auth/logout` ends both the session and the provider session.\n\nEndpoints under `/api/public/**` need no authentication. Everything else under `/api/**`\nrequires a valid session; `/api/admin/**` additionally requires the `ADMIN` role.\n\n## Error format\n\nAll errors return [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`.\nRequest-body validation failures (`400`) additionally carry an `errors` array naming each\noffending field, its message, and the value that was rejected.",
     "contact": {
       "name": "OpenFireStationManager",
       "url": "https://github.com/simonhauck/OpenFireStationManager"
@@ -14,7 +14,7 @@
   } ],
   "tags": [ {
     "name": "Authentication",
-    "description": "Log in, log out, and inspect the current session. Public — no session required."
+    "description": "Sign in and out through the OpenID Connect provider, and inspect the current session. Public — no session required."
   }, {
     "name": "Setup",
     "description": "One-time bootstrap of the first administrator. Only usable while no user account exists."
@@ -372,7 +372,7 @@
       "post": {
         "tags": [ "Test" ],
         "summary": "Start a session without credentials",
-        "description": "Test-only fixture endpoint. Creates an authenticated session for the given identity and roles and returns it as an `OFSM_AUTH` cookie, without a password and without any row in the user table. Use `getCurrentSession` afterwards to see who the session belongs to. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
+        "description": "Test-only fixture endpoint. Creates an authenticated session for the given identity and roles and returns it as an `OFSM_AUTH` cookie, without going through the OpenID Connect provider. The session is indistinguishable from one created by `login`. Use `getCurrentSession` afterwards to see who the session belongs to. Available only with the test profile.\n\n**Authentication:** none — this endpoint is public.",
         "operationId": "createTestSession",
         "requestBody": {
           "content": {
@@ -682,67 +682,12 @@
       "post": {
         "tags": [ "Authentication" ],
         "summary": "End the current session",
-        "description": "Invalidates the server-side session and clears both the session and remember-me cookies.\n\nSafe to call when not signed in — it succeeds either way rather than failing, so it can be used unconditionally to guarantee a clean slate.\n\n**Authentication:** none — this endpoint is public.",
+        "description": "Invalidates the server-side session and redirects the browser to the provider's logout endpoint, which ends the provider session too and then returns to the application root. Submit it as a top-level form `POST`, not a fetch call, so the browser can follow the redirect to the provider.\n\nSafe to call when not signed in — it then redirects straight to the application root rather than failing, so it can be used unconditionally to guarantee a clean slate.\n\n**Authentication:** none — this endpoint is public.",
         "operationId": "logout",
         "responses": {
-          "204": {
-            "description": "The session was ended.",
+          "302": {
+            "description": "The session was ended. Redirect to the provider's logout endpoint, or to `/` when there was no provider session.",
             "content": { }
-          },
-          "500": {
-            "description": "Unexpected server error. The response body carries no details.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The request failed validation. The `errors` array names each offending field.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetail"
-                }
-              }
-            }
-          }
-        },
-        "security": [ ]
-      }
-    },
-    "/api/public/auth/login": {
-      "post": {
-        "tags": [ "Authentication" ],
-        "summary": "Start a session",
-        "description": "Exchanges a username and password for a session cookie. This API has no bearer tokens: on success the server sets an `OFSM_AUTH` cookie (plus `OFSM_AUTH_REMEMBER_ME` when `rememberMe` is true), and every subsequent request must carry it.\n\nThe response body is deliberately empty — call `getCurrentSession` afterwards to find out who you are signed in as and which roles you hold.\n\nWrong credentials and unknown usernames are reported identically, as `401`, so the response cannot be used to discover which accounts exist.\n\n**Authentication:** none — this endpoint is public.",
-        "operationId": "login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Signed in. The session cookie is in the `Set-Cookie` header.",
-            "content": { }
-          },
-          "401": {
-            "description": "The username does not exist, or the password is wrong.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetail"
-                }
-              }
-            }
           },
           "500": {
             "description": "Unexpected server error. The response body carries no details.",
@@ -3535,6 +3480,52 @@
         "security": [ ]
       }
     },
+    "/api/public/auth/login": {
+      "get": {
+        "tags": [ "Authentication" ],
+        "summary": "Sign in through the OpenID Connect provider",
+        "description": "Browser entry point for signing in. Navigate to it (a top-level navigation, not a fetch call): the server remembers `redirect` and sends the browser to the provider's login page. After a successful sign-in the provider returns to the server, which sets the `OFSM_AUTH` session cookie and redirects to `redirect`. While the provider session is still valid this happens without a password prompt.\n\nOnly relative paths on this site are accepted as `redirect`. Anything else (absolute URLs, `//host` paths) falls back to `/dashboard`, so this endpoint cannot be used as an open redirect. A failed or cancelled sign-in ends on `/login?error`.\n\nCall `getCurrentSession` afterwards to find out who is signed in.\n\n**Authentication:** none — this endpoint is public.",
+        "operationId": "login",
+        "parameters": [ {
+          "name": "redirect",
+          "in": "query",
+          "description": "Relative path to return to after signing in. Must start with `/`; anything else is replaced by `/dashboard`.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "default": "/dashboard"
+          },
+          "example": "/pool-clothing/checkout"
+        } ],
+        "responses": {
+          "302": {
+            "description": "Redirect towards the provider's login page.",
+            "content": { }
+          },
+          "500": {
+            "description": "Unexpected server error. The response body carries no details.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request failed validation. The `errors` array names each offending field.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
     "/api/clothing/types/{typeId}/images/{imageId}": {
       "get": {
         "tags": [ "Clothing Types" ],
@@ -4704,30 +4695,6 @@
         },
         "required": [ "firstName", "lastName", "password", "username" ]
       },
-      "LoginRequest": {
-        "type": "object",
-        "description": "Credentials for starting a session.",
-        "properties": {
-          "username": {
-            "type": "string",
-            "description": "The account's username.",
-            "example": "m.mustermann",
-            "minLength": 1
-          },
-          "password": {
-            "type": "string",
-            "description": "The account's plaintext password.",
-            "example": "correct-horse",
-            "minLength": 1
-          },
-          "rememberMe": {
-            "type": "boolean",
-            "description": "When true, the server additionally issues a long-lived remember-me cookie (`OFSM_AUTH_REMEMBER_ME`) that authenticates on its own for 30 days. Prefer this for long-lived clients rather than holding a session open.",
-            "example": false
-          }
-        },
-        "required": [ "password", "rememberMe", "username" ]
-      },
       "ClothingTypeImageMetadata": {
         "type": "object",
         "description": "Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`.",
@@ -5030,6 +4997,43 @@
         },
         "required": [ "exists" ]
       },
+      "CurrentUser": {
+        "type": "object",
+        "description": "The signed-in user as reported by the OpenID Connect provider. Nothing about the user is stored by this API; every value comes from the provider's tokens at sign-in.",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username from the provider (by default its `preferred_username` claim). This is the name recorded in `createdBy` and `lastModifiedBy`.",
+            "example": "m.mustermann"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Given name.",
+            "example": "Max"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Family name.",
+            "example": "Mustermann"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address, when the provider supplies one.",
+            "example": "max.mustermann@example.org"
+          },
+          "roles": {
+            "type": "array",
+            "description": "Effective roles, derived from the provider's roles through the server's role mapping. `ADMIN` is always reported together with every other role.",
+            "example": [ "USER", "KLEIDERWART" ],
+            "items": {
+              "type": "string",
+              "description": "\n        What an account is allowed to do. Roles are cumulative in effect, not exclusive:\n\n        - `USER` — read clothing data, and check garments out and back in.\n        - `KLEIDERWART` — the quartermaster. Additionally create, update, and delete clothing\n          types, items, and locations, run relocations and stock-takes, and see locations\n          flagged `onlyVisibleForKleiderwart`.\n        - `ADMIN` — implicitly granted every other role, so an admin can call every endpoint in\n          this API. Additionally manages user accounts and legal documents.\n        ",
+              "enum": [ "USER", "ADMIN", "KLEIDERWART" ]
+            }
+          }
+        },
+        "required": [ "firstName", "lastName", "roles", "username" ]
+      },
       "AuthStateResponse": {
         "type": "object",
         "description": "Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session.",
@@ -5040,8 +5044,8 @@
             "example": true
           },
           "user": {
-            "$ref": "#/components/schemas/UserAccount",
-            "description": "The signed-in account, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false."
+            "$ref": "#/components/schemas/CurrentUser",
+            "description": "The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false."
           }
         },
         "required": [ "authenticated" ]
@@ -5180,14 +5184,8 @@
     "securitySchemes": {
       "sessionCookie": {
         "type": "apiKey",
-        "description": "Server-side session cookie issued by `POST /api/public/auth/login`. Send it on every authenticated request.",
+        "description": "Server-side session cookie issued after signing in through `GET /api/public/auth/login`. Send it on every authenticated request.",
         "name": "OFSM_AUTH",
-        "in": "cookie"
-      },
-      "rememberMeCookie": {
-        "type": "apiKey",
-        "description": "Long-lived cookie issued when logging in with `rememberMe = true`, valid for 30 days. It authenticates on its own, so a long-lived client may send it instead of a session cookie.",
-        "name": "OFSM_AUTH_REMEMBER_ME",
         "in": "cookie"
       }
     }

@@ -18,14 +18,23 @@ const config = defineConfig({
     ],
   },
   server: {
+    // The OpenID Connect flow runs through the backend: /api/public/auth/login hands over to
+    // /oauth2/authorization/*, and the provider returns to /login/oauth2/code/*. The Host header is
+    // kept (no changeOrigin) so the backend builds its redirect URIs for this dev server, and the
+    // browser stays on port 3000 throughout the sign-in and logout redirects.
     proxy: {
       "/api": {
         target: "http://localhost:8080",
-        changeOrigin: true,
       },
       "/privacy-policy": {
         target: "http://localhost:8080",
         changeOrigin: true,
+      },
+      "/oauth2": {
+        target: "http://localhost:8080",
+      },
+      "/login/oauth2": {
+        target: "http://localhost:8080",
       },
     },
   },

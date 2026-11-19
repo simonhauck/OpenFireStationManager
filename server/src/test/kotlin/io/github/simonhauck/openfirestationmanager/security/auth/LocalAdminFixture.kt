@@ -6,8 +6,8 @@ import io.github.simonhauck.openfirestationmanager.usermanagement.UserService
 import org.springframework.stereotype.Component
 
 /**
- * Provides the `chief` / `secret` admin account for tests that exercise local username/password
- * login. Tests that only need an authenticated caller use a test session cookie instead.
+ * Ensures a `chief` row exists in the legacy `users` table, for the user management and initial
+ * setup tests. It cannot sign in; tests that need an authenticated caller use a test session.
  */
 @Component
 class LocalAdminFixture(private val userService: UserService) {

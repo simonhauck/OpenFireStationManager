@@ -1,5 +1,7 @@
 package io.github.simonhauck.openfirestationmanager.testing
 
+import io.github.simonhauck.openfirestationmanager.security.auth.AuthProperties
+import io.github.simonhauck.openfirestationmanager.security.auth.OfsmUserFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -14,6 +16,7 @@ class TestSessionControllerRegistrationTest {
                 SecurityContextRepository::class.java,
                 { mock(SecurityContextRepository::class.java) },
             )
+            .withBean(OfsmUserFactory::class.java, { OfsmUserFactory(AuthProperties()) })
             .withUserConfiguration(TestSessionController::class.java)
 
     @Test

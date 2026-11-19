@@ -4,39 +4,17 @@ import path from "node:path"
 import { request } from "@playwright/test"
 import { backupDatabase } from "./db-backup.js"
 
-// Personas are also created as real users (see createUser) because auth.spec.ts still logs in
-// with their credentials; their browser session comes from the test-only session endpoint.
+// Personas get their browser session from the test-only session endpoint, without a sign-in at
+// the OpenID Connect provider. auth.spec.ts covers the real provider sign-in separately.
 const BASE_URL = "http://localhost:8080"
 const CLIENT_URL = "http://localhost:3000"
 
 interface Persona {
   username: string
-  password: string
   firstName: string
   lastName: string
   roles: string[]
   authFile: string
-}
-
-async function createUser(
-  apiContext: Awaited<ReturnType<typeof request.newContext>>,
-  persona: Omit<Persona, "authFile">,
-) {
-  const response = await apiContext.post(`${BASE_URL}/api/test/users`, {
-    data: {
-      username: persona.username,
-      password: persona.password,
-      firstName: persona.firstName,
-      lastName: persona.lastName,
-      roles: persona.roles,
-    },
-  })
-
-  if (!response.ok() && response.status() !== 409) {
-    throw new Error(
-      `Failed to create test user ${persona.username}: ${response.status()} ${await response.text()}`,
-    )
-  }
 }
 
 async function saveSession(
@@ -80,7 +58,7 @@ async function saveSession(
         expires: -1,
         httpOnly: true,
         secure: true,
-        sameSite: "Strict" as const,
+        sameSite: "Lax" as const,
       },
     ],
     origins: [],
@@ -101,7 +79,6 @@ export default async function globalSetup() {
   const personas: Persona[] = [
     {
       username: `test-admin-${runId}`,
-      password: "testpassword",
       firstName: "Test",
       lastName: "Admin",
       roles: ["ADMIN"],
@@ -109,7 +86,6 @@ export default async function globalSetup() {
     },
     {
       username: `test-kleiderwart-${runId}`,
-      password: "testpassword",
       firstName: "Test",
       lastName: "Kleiderwart",
       roles: ["KLEIDERWART"],
@@ -117,7 +93,6 @@ export default async function globalSetup() {
     },
     {
       username: `test-user-${runId}`,
-      password: "testpassword",
       firstName: "Test",
       lastName: "User",
       roles: ["USER"],
@@ -125,19 +100,7 @@ export default async function globalSetup() {
     },
   ]
 
-  // Write persona credentials to env so specs can read them
-  process.env.E2E_ADMIN_USERNAME = personas[0].username
-  process.env.E2E_ADMIN_PASSWORD = personas[0].password
-  process.env.E2E_KLEIDERWART_USERNAME = personas[1].username
-  process.env.E2E_KLEIDERWART_PASSWORD = personas[1].password
-  process.env.E2E_USER_USERNAME = personas[2].username
-  process.env.E2E_USER_PASSWORD = personas[2].password
-
   const apiContext = await request.newContext()
-
-  for (const persona of personas) {
-    await createUser(apiContext, persona)
-  }
 
   for (const persona of personas) {
     await saveSession(apiContext, persona)

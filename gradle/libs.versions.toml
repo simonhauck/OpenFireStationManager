@@ -9,6 +9,7 @@ testcontainers = "1.21.4"
 [libraries]
 springBootStarterDataJdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc" }
 springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
+springBootStarterSecurityOauth2Client = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-client" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarterWebmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 springBootStarterDataJdbcTest = { module = "org.springframework.boot:spring-boot-starter-data-jdbc-test" }
