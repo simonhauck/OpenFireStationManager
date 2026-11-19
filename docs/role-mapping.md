@@ -1,3 +1,4 @@
+
 # Role mapping
 
 OFSM does not store users or roles. On every sign-in the server reads the roles of the user from

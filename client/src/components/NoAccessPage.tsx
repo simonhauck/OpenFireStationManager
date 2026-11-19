@@ -20,10 +20,7 @@ export default function NoAccessPage({ fullName }: NoAccessPageProps) {
   }
 
   return (
-    <PageSection
-      title="Kein Zugriff"
-      subtitle={`Angemeldet als ${fullName}`}
-    >
+    <PageSection title="Kein Zugriff" subtitle={`Angemeldet als ${fullName}`}>
       <form
         ref={logoutForm}
         method="post"
