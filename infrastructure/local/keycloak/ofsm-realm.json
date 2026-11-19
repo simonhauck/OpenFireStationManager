@@ -1,0 +1,153 @@
+{
+  "realm": "ofsm",
+  "enabled": true,
+  "displayName": "OpenFireStationManager (dev)",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "rememberMe": true,
+  "defaultRole": {
+    "name": "default-roles-ofsm",
+    "description": "${role_default-roles}",
+    "composite": true,
+    "clientRole": false
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "ofsm-admin",
+        "description": "OFSM administrator (maps to ADMIN)"
+      },
+      {
+        "name": "ofsm-kleiderwart",
+        "description": "OFSM clothing warden (maps to KLEIDERWART)"
+      },
+      {
+        "name": "ofsm-user",
+        "description": "OFSM regular user (maps to USER)"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Admin",
+      "email": "admin@ofsm.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-ofsm",
+        "ofsm-admin"
+      ]
+    },
+    {
+      "username": "kleiderwart",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Kleiderwart",
+      "email": "kleiderwart@ofsm.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "kleiderwart",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-ofsm",
+        "ofsm-kleiderwart"
+      ]
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "user@ofsm.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-ofsm",
+        "ofsm-user"
+      ]
+    },
+    {
+      "username": "norole",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "NoRole",
+      "email": "norole@ofsm.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "norole",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-ofsm"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "ofsm",
+      "name": "OpenFireStationManager",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "ofsm-dev-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:8080",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:8080/*",
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080",
+        "http://localhost:3000"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:8080/*##http://localhost:3000/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "ofsm-realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}
