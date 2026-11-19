@@ -44,7 +44,7 @@ jobs:
 
       - name: Print patch
         run: |
-          git add -A -- . ':!client/src/routeTree.gen.ts'
+          git add -A
           git diff --cached --stat
           echo "=====PATCH BEGIN====="
           git diff --cached --binary | base64 -w0
