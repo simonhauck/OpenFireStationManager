@@ -39,21 +39,21 @@ All credentials below are for local development only and must never be used anyw
 
 ### Client
 
-| Setting              | Value                                                          |
-| -------------------- | -------------------------------------------------------------- |
-| Client ID            | `ofsm`                                                         |
-| Client secret        | `ofsm-dev-secret`                                              |
-| Redirect URIs        | `http://localhost:8080/*`, `http://localhost:3000/*`           |
-| Post-logout redirect | `http://localhost:8080/*`, `http://localhost:3000/*`           |
-| Direct access grants | enabled (dev only, for scripted tokens)                        |
+|       Setting        |                        Value                         |
+|----------------------|------------------------------------------------------|
+| Client ID            | `ofsm`                                               |
+| Client secret        | `ofsm-dev-secret`                                    |
+| Redirect URIs        | `http://localhost:8080/*`, `http://localhost:3000/*` |
+| Post-logout redirect | `http://localhost:8080/*`, `http://localhost:3000/*` |
+| Direct access grants | enabled (dev only, for scripted tokens)              |
 
 ### Demo users
 
 The password equals the username. The role names deliberately differ from OFSM's own
 (`USER`, `KLEIDERWART`, `ADMIN`) so the role mapping is exercised.
 
-| Username      | Password      | Realm role         |
-| ------------- | ------------- | ------------------ |
+|   Username    |   Password    |     Realm role     |
+|---------------|---------------|--------------------|
 | `admin`       | `admin`       | `ofsm-admin`       |
 | `kleiderwart` | `kleiderwart` | `ofsm-kleiderwart` |
 | `user`        | `user`        | `ofsm-user`        |
