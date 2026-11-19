@@ -147,7 +147,7 @@ class OidcLoginIT : IntegrationTest() {
             send(appRequest("/login/oauth2/code/ofsm?code=unknown&state=unknown").build())
 
         assertThat(callback.statusCode()).isEqualTo(302)
-        assertThat(callback.location()).isEqualTo("/login?error")
+        assertThat(callback.location().withoutAppOrigin()).isEqualTo("/login?error")
     }
 
     private data class SignInResult(val finalLocation: String, val cookie: String)
@@ -181,7 +181,7 @@ class OidcLoginIT : IntegrationTest() {
         assertThat(callback.statusCode()).isEqualTo(302)
         cookie = callback.sessionCookie() ?: cookie
 
-        return SignInResult(finalLocation = callback.location(), cookie = cookie)
+        return SignInResult(finalLocation = callback.location().withoutAppOrigin(), cookie = cookie)
     }
 
     /** Builds a request against the application; [pathOrUrl] may be absolute or relative. */
@@ -199,6 +199,12 @@ class OidcLoginIT : IntegrationTest() {
 
     private fun HttpResponse<*>.location(): String =
         headers().firstValue("Location").orElseThrow { AssertionError("No Location header") }
+
+    /**
+     * Strips this application's own origin, so absolute and relative redirects to the app compare
+     * equal. Any other origin (an open redirect) is kept and makes the assertion fail.
+     */
+    private fun String.withoutAppOrigin(): String = removePrefix("http://localhost:$port")
 
     /** Returns the session cookie set by this response as a `Cookie` header value. */
     private fun HttpResponse<*>.sessionCookie(): String? =
