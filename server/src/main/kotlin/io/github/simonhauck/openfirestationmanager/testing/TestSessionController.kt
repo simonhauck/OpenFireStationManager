@@ -90,6 +90,10 @@ class TestSessionController(private val securityContextRepository: SecurityConte
                 grantedRoles.map { SimpleGrantedAuthority("ROLE_${it.name}") },
             )
 
+        // Always start a fresh session, so a caller that still sends an older cookie gets a new
+        // one instead of overwriting (and sharing) the previous session.
+        request.getSession(false)?.invalidate()
+
         val securityContext = SecurityContextHolder.createEmptyContext()
         securityContext.authentication = authentication
         SecurityContextHolder.setContext(securityContext)
