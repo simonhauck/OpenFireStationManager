@@ -46,6 +46,7 @@
    Compose deployments based on `infrastructure/ofsm-prod` and `infrastructure/ofsm-dev` use the
    variables `OIDC_ISSUER_URI`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ROLES_CLAIM_PATH`,
    `OIDC_ROLE_ADMIN`, `OIDC_ROLE_KLEIDERWART` and `OIDC_ROLE_USER` in their `.env` file.
+
 7. **Optionally tune long-lived sign-in** for tablets in Keycloak (SSO Session Idle/Max, Remember
    me). See the README section "Staying signed in on a tablet".
 

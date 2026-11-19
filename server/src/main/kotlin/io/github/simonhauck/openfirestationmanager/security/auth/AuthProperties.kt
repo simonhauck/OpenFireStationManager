@@ -47,13 +47,12 @@ data class RoleProperties(
                     "use dot-separated claim names such as 'realm_access.roles'"
             }
         }
-        ofsmMapping =
-            mapping?.mapKeys { (key, _) ->
-                UserRole.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
-                    ?: throw IllegalArgumentException(
-                        "app.auth.roles.mapping contains the unknown OFSM role '$key'; " +
-                            "valid keys are ${UserRole.entries.joinToString { it.name }}",
-                    )
-            }
+        ofsmMapping = mapping?.mapKeys { (key, _) ->
+            UserRole.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
+                ?: throw IllegalArgumentException(
+                    "app.auth.roles.mapping contains the unknown OFSM role '$key'; " +
+                        "valid keys are ${UserRole.entries.joinToString { it.name }}",
+                )
+        }
     }
 }

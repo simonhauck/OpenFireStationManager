@@ -4,8 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 
 /**
- * Authentication is delegated to an OpenID Connect provider, so the local accounts, including
- * their password hashes, are no longer kept.
+ * Authentication is delegated to an OpenID Connect provider, so the local accounts, including their
+ * password hashes, are no longer kept.
  */
 @Component
 class V025DropUsersTable : DatabaseMigration {
