@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component
 @Component
 class OfsmUserFactory(private val authProperties: AuthProperties) {
 
-    private val roleMapper = RoleMapper(authProperties.roles.mapping)
+    private val roleMapper =
+        RoleMapper(authProperties.roles.claimPaths, authProperties.roles.ofsmMapping)
 
     /** Re-creates a user loaded from the provider with the mapped OFSM roles. */
     fun fromProviderUser(providerUser: OidcUser): OidcUser =

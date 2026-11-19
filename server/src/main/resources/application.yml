@@ -47,9 +47,13 @@ app:
   auth:
     username-claim: preferred_username
     roles:
-      # OFSM role -> provider role names (claim realm_access.roles). Matches the realm roles of
-      # the local Keycloak realm. Without a mapping, each OFSM role maps to the provider role of
-      # the same name.
+      # Claims that carry provider roles (dot-separated paths, unioned). Keycloak realm roles are
+      # in realm_access.roles; client roles in resource_access.<client>.roles; groups in `groups`.
+      claim-paths:
+        - realm_access.roles
+      # OFSM role -> provider role names (exact, case-sensitive). Matches the realm roles of the
+      # local Keycloak realm. Without a mapping, each OFSM role maps to the provider role of the
+      # same name. See docs/role-mapping.md.
       mapping:
         ADMIN: [ofsm-admin]
         KLEIDERWART: [ofsm-kleiderwart]

@@ -69,6 +69,39 @@ class OidcLoginIT : IntegrationTest() {
     }
 
     @Test
+    fun `a provider role is mapped to the OFSM role through the configured non identity mapping`() {
+        val claims =
+            """
+            {
+              "preferred_username": "kim.kleiderwart",
+              "realm_access": { "roles": ["ofsm-kleiderwart", "offline_access"] }
+            }
+            """
+                .trimIndent()
+
+        val cookie = signIn(redirect = "/dashboard", claims = claims).cookie
+
+        assertThat(authControllerCalls.me(cookie).body?.user?.roles)
+            .containsExactly(UserRole.KLEIDERWART)
+    }
+
+    @Test
+    fun `provider roles that are not mapped grant no OFSM role`() {
+        val claims =
+            """
+            {
+              "preferred_username": "uli.unmapped",
+              "realm_access": { "roles": ["KLEIDERWART", "ADMIN", "USER"] }
+            }
+            """
+                .trimIndent()
+
+        val cookie = signIn(redirect = "/dashboard", claims = claims).cookie
+
+        assertThat(authControllerCalls.me(cookie).body?.user?.roles).isEmpty()
+    }
+
+    @Test
     fun `login ignores open redirect targets and returns to the dashboard`() {
         val result = signIn(redirect = "//evil.example", claims = adminClaims)
 

@@ -65,6 +65,9 @@ Roles stack rather than compete — an administrator implicitly holds every role
 | `KLEIDERWART` | Everything above, plus manage the catalogue, move stock in bulk, and run stock-takes |
 | `ADMIN`       | Everything above, plus manage accounts and the legal pages                           |
 
+Roles are assigned at your OpenID Connect provider (for example Keycloak) and mapped to these
+three in the server configuration, see [`docs/role-mapping.md`](docs/role-mapping.md).
+
 ---
 
 ## Running it

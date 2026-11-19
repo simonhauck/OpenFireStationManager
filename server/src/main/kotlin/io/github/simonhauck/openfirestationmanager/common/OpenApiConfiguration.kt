@@ -91,8 +91,12 @@ private fun buildApiDescription(sessionCookieName: String, sessionTimeout: Strin
 
     Because `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.
 
-    The roles that govern access are derived from the user's roles at the OpenID Connect provider
-    on every sign-in, through the role mapping configured on the server.
+    Roles are not stored in OFSM and cannot be changed through this API. They come from the
+    OpenID Connect provider: on every sign-in the server reads the roles from the configured claims
+    of the user's tokens (for example Keycloak realm roles, client roles or groups) and translates
+    them through the role mapping in `app.auth.roles` (`claim-paths` and `mapping`). Provider roles
+    that are not mapped are ignored, and a role change at the provider takes effect at the user's
+    next sign-in. A signed-in user without any mapped role holds no OFSM role.
 
     ## Authentication
 
