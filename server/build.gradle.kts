@@ -1,5 +1,6 @@
 import com.google.cloud.tools.jib.gradle.JibTask
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 
 plugins {
     alias(libs.plugins.kotlinJvm)
@@ -115,6 +116,23 @@ tasks.withType<JibTask> {
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
+
+val isProdBuild = project.hasProperty("prod")
+val clientFrontendDirectory = project(":client").layout.buildDirectory.dir("frontend")
+
+tasks.named<ProcessResources>("processResources") {
+    from(clientFrontendDirectory) { into("static") }
+    if (isProdBuild) {
+        dependsOn(":client:buildFrontend")
+    }
+}
+
+tasks.named("generateFrontendRouteMapping") {
+    mustRunAfter(":client:generateRoutes")
+    if (isProdBuild) {
+        dependsOn(":client:buildFrontend")
+    }
+}
 
 frontendRouteMapping {
     routeTreeFile.set(layout.projectDirectory.file("../client/src/routeTree.gen.ts"))

@@ -16,9 +16,12 @@
     "format:check": "biome check .",
     "format:fix": "biome check --write .",
     "build:check": "tsc --noEmit",
-    "prepareEnv": "npx openapi-typescript ./../server/src/main/resources/open-api-contract.json -o ./src/api/schema.ts && biome format --write ./src/api/schema.ts",
+    "generate:routes": "tsr generate",
+    "generate:api": "node tools/api-generation/node_modules/openapi-typescript/bin/cli.js ./../server/src/main/resources/open-api-contract.json -o ./src/api/schema.ts && biome format --write ./src/api/schema.ts",
+    "prepareEnv": "npm run generate:routes && npm run generate:api && npm run theme:build",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "postinstall": "npm ci --prefix tools/api-generation --no-audit --no-fund"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.7.0",
@@ -44,6 +47,7 @@
     "@biomejs/biome": "2.5.15",
     "@playwright/test": "^1.59.1",
     "@tanstack/devtools-vite": "latest",
+    "@tanstack/router-cli": "1.167.46",
     "@tanstack/router-plugin": "latest",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
