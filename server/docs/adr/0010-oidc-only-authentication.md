@@ -48,7 +48,7 @@ reviewed by the maintainer on 2026-11-19.
 - **RP-initiated logout.** The client submits a top-level form `POST` to the logout endpoint
   because a `fetch` cannot follow a cross-origin redirect. The session and the provider session
   both end.
-- **Long-lived tablet use is the provider's job.** Remember-me and `REMEMBER_ME_KEY` are removed.
+- **Long-lived tablet use is the provider's job.** Remember-me and its signing key setting are removed.
   Sessions are persisted in PostgreSQL with Spring Session JDBC (#425), so restarts and updates
   no longer sign anyone out. The provider's SSO session settings decide how long a tablet stays
   signed in, and an expired OFSM session renews silently through it. No offline or refresh tokens
@@ -101,7 +101,7 @@ test session for personas and has one real Keycloak sign-in and one sign-out jou
 
 - A provider outage means nobody can sign in, and the server does not start without the provider.
   Both are accepted.
-- The upgrade is breaking. Deployments must configure the provider, drop `REMEMBER_ME_KEY` and
+- The upgrade is breaking. Deployments must configure the provider, remove the old remember-me key setting and
   create their users and role assignments there. The upgrade guide is part of the rollout (#424).
 - Existing local accounts are not migrated. Their password hashes are deleted with the table.
 - `createdBy` and `lastModifiedBy` remain plain username strings, now taken from the provider.

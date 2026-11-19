@@ -5,6 +5,14 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_URL: ${DB_URL}
-      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY}
+      OIDC_ISSUER_URI: ${OIDC_ISSUER_URI}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      # Role mapping (docs/role-mapping.md): where the provider puts the roles and which provider
+      # role grants which OFSM role. The defaults match the roles of the demo realm.
+      APP_AUTH_ROLES_CLAIMPATHS_0: ${OIDC_ROLES_CLAIM_PATH:-realm_access.roles}
+      APP_AUTH_ROLES_MAPPING_ADMIN_0: ${OIDC_ROLE_ADMIN:-ofsm-admin}
+      APP_AUTH_ROLES_MAPPING_KLEIDERWART_0: ${OIDC_ROLE_KLEIDERWART:-ofsm-kleiderwart}
+      APP_AUTH_ROLES_MAPPING_USER_0: ${OIDC_ROLE_USER:-ofsm-user}
     ports:
       - "${APP_PORT}:8080"

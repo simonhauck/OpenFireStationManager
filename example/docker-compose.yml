@@ -1,12 +1,75 @@
+# One-command evaluation setup: OFSM + PostgreSQL + Keycloak with the demo realm.
+#
+# Sign in at http://localhost:8080 with the demo users admin/admin, kleiderwart/kleiderwart,
+# user/user (the password equals the username) or norole/norole (signs in, but has no access).
+# Keycloak's admin console is at http://localhost:8180/admin (admin/admin).
+#
+# Why the app shares Keycloak's network (network_mode: service:keycloak):
+# OFSM validates tokens against the issuer URL it discovers at startup, and the browser is
+# redirected to that same URL. Both must therefore see the identical issuer,
+# http://localhost:8180/realms/ofsm (fixed through KC_HOSTNAME). Inside the app container,
+# "localhost" would normally be the app itself. By joining Keycloak's network namespace the app
+# reaches Keycloak at localhost:8180, exactly like the browser does on the host, without
+# host-gateway or extra_hosts tricks that behave differently on Linux, macOS and Windows. The
+# price is that the app's port (8080) is published on the keycloak service, and the app resolves
+# "db" through Keycloak's network, which is why both are on the default network. This is for
+# evaluation only. In production, run Keycloak behind its own public https URL and set
+# OIDC_ISSUER_URI to it (see the README).
+#
+# The realm file is mounted from the repository, so run this from a clone of the repository.
+# Keycloak runs in start-dev mode with throwaway state and the dev client secret
+# `ofsm-dev-secret`: never expose this setup to the internet.
+
 services:
   open-fire-station-manager:
     image: ghcr.io/simonhauck/open-fire-station-manager:latest
     restart: unless-stopped
+    network_mode: "service:keycloak"
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        # The app does not start while the provider is unreachable, so wait until it is ready.
+        condition: service_healthy
     environment:
       DB_URL: jdbc:postgresql://db:5432/ofsm?user=postgres&password=postgres
       SPRING_PROFILES_ACTIVE: prod
+      OIDC_ISSUER_URI: http://localhost:8180/realms/ofsm
+      OIDC_CLIENT_ID: ofsm
+      OIDC_CLIENT_SECRET: ofsm-dev-secret
+      # Role mapping matching the realm roles of the demo realm (same as the defaults).
+      APP_AUTH_ROLES_CLAIMPATHS_0: realm_access.roles
+      APP_AUTH_ROLES_MAPPING_ADMIN_0: ofsm-admin
+      APP_AUTH_ROLES_MAPPING_KLEIDERWART_0: ofsm-kleiderwart
+      APP_AUTH_ROLES_MAPPING_USER_0: ofsm-user
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.0
+    restart: unless-stopped
+    command: ["start-dev", "--import-realm"]
     ports:
-      - "13841:8080"
+      - "8080:8080" # OFSM (the app shares this network namespace)
+      - "8180:8180" # Keycloak
+    environment:
+      KC_HTTP_PORT: "8180"
+      KC_HOSTNAME: http://localhost:8180
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes:
+      - ../infrastructure/local/keycloak/ofsm-realm.json:/opt/keycloak/data/import/ofsm-realm.json:ro
+    healthcheck:
+      # The image ships neither curl nor wget; talk to the management port (9000) via bash /dev/tcp.
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          grep -Eq '"status" *: *"UP"' <&3
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
 
   db:
     image: postgres:18
