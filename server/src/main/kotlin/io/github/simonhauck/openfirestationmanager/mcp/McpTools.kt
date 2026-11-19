@@ -223,12 +223,11 @@ class McpToolRegistry(
         fun objectSchema(
             properties: Map<String, Any>,
             required: List<String> = emptyList(),
-        ): Map<String, Any> =
-            buildMap {
-                put("type", "object")
-                put("properties", properties)
-                if (required.isNotEmpty()) put("required", required)
-                put("additionalProperties", false)
-            }
+        ): Map<String, Any> = buildMap {
+            put("type", "object")
+            put("properties", properties)
+            if (required.isNotEmpty()) put("required", required)
+            put("additionalProperties", false)
+        }
     }
 }
