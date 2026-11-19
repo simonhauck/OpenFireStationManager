@@ -4,30 +4,6 @@
  */
 
 export interface paths {
-  "/api/admin/users/{id}/password": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Set a user's password
-     * @description Overwrites an account's password. This is an administrative reset: the account's current password is **not** required, and existing sessions are not invalidated.
-     *
-     *     Returns the account, which as always omits the password hash.
-     *
-     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
-     */
-    put: operations["changeUserPassword"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/admin/impressum": {
     parameters: {
       query?: never
@@ -61,28 +37,6 @@ export interface paths {
      *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
     delete: operations["deleteImpressum"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/test/users": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Seed a user account
-     * @description Test-only fixture endpoint. Creates a user account through the production user service so the Playwright global setup can create one persona per role. Available only with the test profile.
-     *
-     *     **Authentication:** none — this endpoint is public.
-     */
-    post: operations["seedTestUser"]
-    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -198,32 +152,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/public/setup/initial-admin": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Bootstrap the first administrator account
-     * @description Creates the very first user and grants it the `ADMIN` role. This exists to solve the chicken-and-egg problem of a fresh installation: it is the only way to create an account without already holding one.
-     *
-     *     It is therefore public, but usable **exactly once**. The moment any user account exists — including one created here — this endpoint refuses every further call with `409 Conflict`. Create subsequent accounts with `createUser` instead.
-     *
-     *     A `409` is the normal response on an already-configured installation and should be treated as "setup already done", not as an error to retry.
-     *
-     *     **Authentication:** none — this endpoint is public.
-     */
-    post: operations["createInitialAdmin"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/public/auth/logout": {
     parameters: {
       query?: never
@@ -259,7 +187,7 @@ export interface paths {
      * List every member
      * @description Returns the whole roster of people in the brigade (*Mitglied*), in the order they were added. The list is unpaginated.
      *
-     *     A member is a **person**, not a login. User accounts are managed separately under `/api/admin/users`, and the two are not linked — someone can be on the roster without ever signing in. Use this endpoint when you need people; use `listUsers` when you need credentials.
+     *     A member is a **person**, not a login. Sign-in is handled by the OpenID Connect provider, and the roster is not linked to those logins — someone can be on the roster without ever signing in.
      *
      *     **Authorisation:** any signed-in user.
      */
@@ -269,7 +197,7 @@ export interface paths {
      * Add a person to the roster
      * @description Creates a new member. Names are not required to be unique, so check the existing roster first if you want to avoid a duplicate entry for the same person.
      *
-     *     This creates a person, not a login. If they also need to sign in, create a user account separately with `createUser`.
+     *     This creates a person, not a login. Signing in is handled by the OpenID Connect provider and is not affected.
      *
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
@@ -564,38 +492,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/admin/users": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List every user account
-     * @description Returns all accounts with their roles. Password hashes are never included.
-     *
-     *     This is the way to discover which account holds which role — useful before changing someone's permissions, or to find out who the quartermasters are.
-     *
-     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
-     */
-    get: operations["listUsers"]
-    put?: never
-    /**
-     * Create a user account
-     * @description Registers a new account with an initial password and a set of roles. The password is hashed before storage and never returned.
-     *
-     *     Usernames must be unique. Granting `ADMIN` implicitly grants every other role, so there is no need to list `KLEIDERWART` alongside it.
-     *
-     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
-     */
-    post: operations["createUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/admin/privacy-policy": {
     parameters: {
       query?: never
@@ -652,7 +548,7 @@ export interface paths {
     post?: never
     /**
      * Remove a person from the roster
-     * @description Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location beyond clearing their ownership from linked `PERSONAL` locations. Those locations remain present, and no user account is touched.
+     * @description Deletes a member. This removes the person from the roster only — it has no effect on any clothing or storage location beyond clearing their ownership from linked `PERSONAL` locations. Those locations remain present.
      *
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
@@ -778,36 +674,6 @@ export interface paths {
      *     **Authorisation:** requires the `KLEIDERWART` role. An `ADMIN` account implicitly holds every role and may also call this.
      */
     patch: operations["updateClothingItem"]
-    trace?: never
-  }
-  "/api/admin/users/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get one user account by its numeric id
-     * @description Looks up a single account. The password hash is never included.
-     *
-     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
-     */
-    get: operations["getUser"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /**
-     * Replace a user's profile and roles
-     * @description Despite the `PATCH` verb this is a **full replacement** of the name and the role set. The `roles` list you send becomes the account's complete set of roles, so omitting a role revokes it — read the account first if you mean to add one.
-     *
-     *     The username cannot be changed here, and the password is changed through `changeUserPassword`.
-     *
-     *     **Authorisation:** requires the `ADMIN` role. An `ADMIN` account implicitly holds every role and may also call this.
-     */
-    patch: operations["updateUser"]
     trace?: never
   }
   "/privacy-policy": {
@@ -1224,14 +1090,6 @@ export interface components {
       /** @description Every field-level failure detected in this request. */
       errors: components["schemas"]["ValidationError"][]
     }
-    /** @description A new password for an existing account. */
-    ChangePasswordRequest: {
-      /**
-       * @description New plaintext password, between 4 and 32 characters. The current password is not required, because only an administrator may call this.
-       * @example correct-horse
-       */
-      newPassword: string
-    }
     /** @description Audit trail attached to every stored record. Maintained by the server on save — these fields are ignored if supplied in a request. `System` appears as the actor for changes made outside a user session, such as database migrations. */
     EntityMetaData: {
       /**
@@ -1254,44 +1112,6 @@ export interface components {
        * @example m.mustermann
        */
       lastModifiedBy: string
-    }
-    /** @description A user account. The password hash is never serialised, so it is absent from every response. */
-    UserAccount: {
-      /**
-       * @description Login name.
-       * @example m.mustermann
-       */
-      username: string
-      /**
-       * @description Given name.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name.
-       * @example Mustermann
-       */
-      lastName: string
-      /**
-       * @description Roles held by this account, governing what it may call.
-       * @example [
-       *       "USER",
-       *       "KLEIDERWART"
-       *     ]
-       */
-      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
-      /**
-       * @description Whether the account may sign in. Disabled accounts are rejected at login.
-       * @example true
-       */
-      enabled: boolean
-      /**
-       * Format: int64
-       * @description Server-assigned identifier.
-       * @example 5
-       */
-      id: number
-      metaData: components["schemas"]["EntityMetaData"]
     }
     /** @description The legally required site notice (`Impressum`). At most one exists at a time — writing replaces the previous one rather than adding to it. */
     ImpressumDto: {
@@ -1316,36 +1136,6 @@ export interface components {
        * @example +49 1234 567890
        */
       phone?: string
-    }
-    /** @description Details of a new user account, including its initial password. */
-    CreateUserRequest: {
-      /**
-       * @description Login name. Must not already be taken.
-       * @example m.mustermann
-       */
-      username: string
-      /**
-       * @description Initial plaintext password, between 4 and 32 characters. Stored hashed.
-       * @example correct-horse
-       */
-      password: string
-      /**
-       * @description Given name.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name.
-       * @example Mustermann
-       */
-      lastName: string
-      /**
-       * @description Roles to grant. An empty list creates an account that can sign in but has no permissions beyond the defaults.
-       * @example [
-       *       "USER"
-       *     ]
-       */
-      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
     }
     /** @description The identity and roles of the session to create. */
     TestSessionRequest: {
@@ -1380,7 +1170,7 @@ export interface components {
        */
       name: string
     }
-    /** @description A person in the brigade (*Mitglied*). Deliberately distinct from a user account: a member is a person on the roster, an account is a set of login credentials, and the two are not linked. */
+    /** @description A person in the brigade (*Mitglied*). Deliberately distinct from a login: a member is a person on the roster, sign-in is handled by the OpenID Connect provider, and the two are not linked. */
     Member: {
       /**
        * @description Full name of the person.
@@ -1546,29 +1336,6 @@ export interface components {
        */
       id: number
       metaData: components["schemas"]["EntityMetaData"]
-    }
-    /** @description Details of the very first administrator account. */
-    InitialAdminSetupRequest: {
-      /**
-       * @description Username for the new administrator.
-       * @example admin
-       */
-      username: string
-      /**
-       * @description Plaintext password. Between 4 and 32 characters.
-       * @example correct-horse
-       */
-      password: string
-      /**
-       * @description Given name of the administrator.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name of the administrator.
-       * @example Mustermann
-       */
-      lastName: string
     }
     /** @description Details about one barcode guide image (`Barcode-Bild`) stored for a clothing type, without its contents. Download the image itself from `GET /api/clothing/types/{typeId}/images/{imageId}`. */
     ClothingTypeImageMetadata: {
@@ -1755,27 +1522,6 @@ export interface components {
        */
       uploadedAt: string
     }
-    /** @description Replacement values for an existing account's profile and roles. The username cannot be changed, and the password is changed through its own endpoint. */
-    UpdateUserRequest: {
-      /**
-       * @description Given name.
-       * @example Max
-       */
-      firstName: string
-      /**
-       * @description Family name.
-       * @example Mustermann
-       */
-      lastName: string
-      /**
-       * @description The complete set of roles the account should have afterwards. This replaces the existing roles rather than adding to them, so omitting a role revokes it.
-       * @example [
-       *       "USER",
-       *       "KLEIDERWART"
-       *     ]
-       */
-      roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
-    }
     /** @description Whether a privacy policy document has been uploaded. Lets a caller check without downloading the file. */
     PrivacyPolicyExists: {
       /**
@@ -1932,81 +1678,6 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  changeUserPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description Numeric id of the user account.
-         * @example 5
-         */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ChangePasswordRequest"]
-      }
-    }
-    responses: {
-      /** @description The account, with its password changed. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"]
-        }
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description Not authenticated — no valid session cookie was supplied. */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Authenticated, but the account lacks the required role. */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description No user exists with this id. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
   getImpressum: {
     parameters: {
       query?: never
@@ -2155,48 +1826,6 @@ export interface operations {
         }
         content: {
           "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  seedTestUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateUserRequest"]
-      }
-    }
-    responses: {
-      /** @description The newly created account. */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"]
-        }
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */
@@ -2405,57 +2034,6 @@ export interface operations {
         }
         content: {
           "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  createInitialAdmin: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["InitialAdminSetupRequest"]
-      }
-    }
-    responses: {
-      /** @description The administrator account was created and is ready to sign in. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"]
-        }
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description At least one user already exists, so setup has already been completed. */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
         }
       }
       /** @description Unexpected server error. The response body carries no details. */
@@ -3452,122 +3030,6 @@ export interface operations {
       }
       /** @description One of the referenced clothing items or locations does not exist. */
       404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  listUsers: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description All user accounts. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"][]
-        }
-      }
-      /** @description Not authenticated — no valid session cookie was supplied. */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Authenticated, but the account lacks the required role. */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  createUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateUserRequest"]
-      }
-    }
-    responses: {
-      /** @description The newly created account. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"]
-        }
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description Not authenticated — no valid session cookie was supplied. */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Authenticated, but the account lacks the required role. */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description That username is already taken. */
-      409: {
         headers: {
           [name: string]: unknown
         }
@@ -4588,152 +4050,6 @@ export interface operations {
       }
       /** @description Another item already carries this value as its `Barcode` or `Hersteller-Barcode`. */
       409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  getUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description Numeric id of the user account.
-         * @example 5
-         */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description The user account. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"]
-        }
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description Not authenticated — no valid session cookie was supplied. */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Authenticated, but the account lacks the required role. */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description No user exists with this id. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Unexpected server error. The response body carries no details. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-    }
-  }
-  updateUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description Numeric id of the user account to update.
-         * @example 5
-         */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateUserRequest"]
-      }
-    }
-    responses: {
-      /** @description The updated account. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "*/*": components["schemas"]["UserAccount"]
-        }
-      }
-      /** @description The request failed validation. The `errors` array names each offending field. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ValidationProblemDetail"]
-        }
-      }
-      /** @description Not authenticated — no valid session cookie was supplied. */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description Authenticated, but the account lacks the required role. */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["ProblemDetail"]
-        }
-      }
-      /** @description No user exists with this id. */
-      404: {
         headers: {
           [name: string]: unknown
         }

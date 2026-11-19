@@ -24,6 +24,17 @@ class DatabaseMigrationRunnerIT : IntegrationTest() {
         assertThat(appliedIds).contains("V008__seed_example_clothing_items")
         assertThat(appliedIds).contains("V009__rename_protective_clothing_types_to_clothing_types")
         assertThat(appliedIds).contains("V022__migrate_clothing_location_comments_to_members")
+        assertThat(appliedIds).contains("V025__drop_users_table")
+    }
+
+    @Test
+    fun `should drop the legacy users table`() {
+        val usersTableCount =
+            jdbcTemplate.queryForObject<Int>(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'users'",
+            )
+
+        assertThat(usersTableCount).isZero()
     }
 
     @Test

@@ -5,7 +5,7 @@ import { Text } from "@astryxdesign/core/Text"
 import { VStack } from "@astryxdesign/core/VStack"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { Settings, ShieldCheck, Shirt, UserRound, Users } from "lucide-react"
+import { Settings, ShieldCheck, Shirt, UserRound } from "lucide-react"
 import type React from "react"
 
 import { meQuery } from "#/api/auth.queries"
@@ -42,13 +42,6 @@ const DASHBOARD_ITEMS: DashboardItem[] = [
     href: "/members",
     icon: UserRound,
     allowedRoles: ["KLEIDERWART"],
-  },
-  {
-    title: "Nutzer Management",
-    description: "Feuerwehr-Konten anlegen, bearbeiten und Rollen vergeben.",
-    href: "/user-management",
-    icon: Users,
-    allowedRoles: ["ADMIN"],
   },
   {
     title: "Admin Einstellungen",

@@ -3,7 +3,7 @@ import { buildCrumbs, segmentLabel } from "./breadcrumbModel"
 
 describe("segmentLabel", () => {
   it("maps known static segments to their German label", () => {
-    expect(segmentLabel("user-management")).toBe("Nutzer Management")
+    expect(segmentLabel("members")).toBe("Mitglieder")
     expect(segmentLabel("clothing-management")).toBe("Klamotten Management")
     expect(segmentLabel("new")).toBe("Neu")
   })
@@ -16,9 +16,9 @@ describe("segmentLabel", () => {
 
 describe("buildCrumbs", () => {
   const patterns = [
-    "/user-management",
-    "/user-management/new",
-    "/user-management/$userId/edit",
+    "/members",
+    "/members/new",
+    "/members/$memberId/edit",
     "/clothing-management/types",
   ]
 
@@ -40,27 +40,27 @@ describe("buildCrumbs", () => {
   })
 
   it("marks a segment as linked when a route pattern matches it", () => {
-    const crumbs = buildCrumbs("/user-management/new", patterns)
+    const crumbs = buildCrumbs("/members/new", patterns)
 
     expect(crumbs[0]).toMatchObject({
-      label: "Nutzer Management",
-      href: "/user-management",
+      label: "Mitglieder",
+      href: "/members",
       isLinked: true,
     })
     expect(crumbs[1]).toMatchObject({ label: "Neu", isLinked: true })
   })
 
   it("matches dynamic route patterns against concrete path values", () => {
-    const crumbs = buildCrumbs("/user-management/42/edit", patterns)
+    const crumbs = buildCrumbs("/members/42/edit", patterns)
 
     expect(crumbs.map((crumb) => crumb.isLinked)).toEqual([true, false, true])
     expect(crumbs[1].label).toBe("42")
   })
 
   it("does not link a prefix that is not itself a registered route", () => {
-    const crumbs = buildCrumbs("/user-management/unknown", patterns)
+    const crumbs = buildCrumbs("/members/unknown", patterns)
 
-    expect(crumbs[1]).toMatchObject({ href: "/user-management/unknown" })
+    expect(crumbs[1]).toMatchObject({ href: "/members/unknown" })
     expect(crumbs[1].isLinked).toBe(false)
   })
 })

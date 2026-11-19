@@ -76,7 +76,7 @@ container.
 
 - Name test classes with a `Test` or `Tests` suffix.
 - If a test class extends `IntegrationTest`, use the `IT` suffix (for example `AuthIT`,
-  `InitialAdminSetupIT`) instead of `IntegrationTest` in the class name.
+  `OidcLoginIT`) instead of `IntegrationTest` in the class name.
 - One `@Test` method per behaviour.
 - Prefer backtick test names for longer/descriptive Kotlin test cases, for example
   ``fun `should generate valid jwt token`()``.
@@ -187,7 +187,7 @@ Remove unused imports before committing. Do not use wildcard imports (`import fo
     `.tags(...)` list. A constant without a registered description yields an undescribed tag.
   - `@Operation(operationId = …, summary = …, description = …)`. **All three are required.**
     The `operationId` must be unique across the whole API; use `verb + Resource` in camelCase
-    (`listClothingItems`, `changeUserPassword`). The `description` should state what the endpoint
+    (`listClothingItems`, `deleteClothingType`). The `description` should state what the endpoint
     does, when to prefer a sibling endpoint, and any non-obvious consequence.
   - `@ApiResponse` for the success status and for every **domain-specific** failure (`404`,
     `409`, `422`, and any `400` with a meaning beyond schema validation).
@@ -284,7 +284,7 @@ class ClothingTypeController(private val service: ClothingTypeService) {
     and the `Location` header are deliberately **not** used for CRUD resources — every client is the
     generated TypeScript binding, which reads the id from the body. Follow the existing CRUD
     controllers (`ClothingLocationController`, `ClothingTypeController`, `ClothingItemController`,
-    `AdminUserController`) rather than generic REST advice here. The one exception is
+    `MemberController`) rather than generic REST advice here. The one exception is
     `PrivacyPolicyAdminController`'s multipart upload, which returns `201` because it replaces a
     stored document rather than creating an addressable resource.
   - Return `404 Not Found` for missing resources. Where a resource is optional and may legitimately
@@ -328,7 +328,7 @@ export OFSM_AUTH_COOKIE=<value of the OFSM_AUTH cookie>
 The session expires after the idle timeout (`server.servlet.session.timeout`, 12 hours by default)
 and on server restart. Re-export and restart OpenCode when calls start returning `401`. The agent
 inherits the full rights of whichever account you signed in with, and because `ADMIN` implicitly
-holds every role, an admin session grants reach over user management and legal-document deletion.
+holds every role, an admin session grants reach over legal-document deletion.
 Pick the account accordingly.
 
 **Browser-based login.** There is no built-in flow that opens a login page. The package's
@@ -344,7 +344,7 @@ to trim it, both set via `environment` in `opencode.jsonc`:
   (`list-api-endpoints`, `get-api-endpoint-schema`, `invoke-api-endpoint`). Much cheaper, at the
   cost of an extra round trip before each call.
 - Tag filters keep administration out of reach entirely. The tags exist for exactly this:
-  `Admin - Users` and `Admin - Legal` cover every destructive administrative operation.
+  `Admin - Legal` covers the destructive administrative operations.
 
 Tag filtering is a tool-surface control, **not** authorisation — the server still enforces roles.
 
@@ -358,7 +358,7 @@ Tag filtering is a tool-surface control, **not** authorisation — the server st
 - Repositories should expose only the concrete operations needed by the feature (for example `findByUsername`,
   `existsByUsername`, `save`, `count`) to keep behavior obvious.
 - Schema migrations use a **custom Kotlin migration runner** (not Flyway or Liquibase). Each migration is a `@Component` implementing the `DatabaseMigration` interface (`val id: String`, `fun execute(jdbcTemplate: JdbcTemplate)`). The runner fires automatically on startup, sorts migrations by `id`, and skips already-applied ones (tracked in the `schema_migrations` table).
-- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). **Check the highest number actually present in `migration/` before picking one** — this line has gone stale before, and V009 and V017 each ended up used by two different migrations as a result. The runner tolerates it (it sorts by `id`, which stays unique), but the ordering between same-numbered migrations is then alphabetical and not what you intended. The next available version number is **V025**.
+- Name migration classes `V<NNN><PascalCaseDescription>` (e.g. `V017CreatePrivacyPolicyTable`). Set the `id` to `V<NNN>__<snake_case_description>` with two underscores (e.g. `"V017__create_privacy_policy_table"`). **Check the highest number actually present in `migration/` before picking one** — this line has gone stale before, and V009 and V017 each ended up used by two different migrations as a result. The runner tolerates it (it sorts by `id`, which stays unique), but the ordering between same-numbered migrations is then alphabetical and not what you intended. The next available version number is **V027** (V026 is reserved for another change).
 - The `compose.yml` spins up `postgres:latest` on a random host port; `application.yml` uses
   Docker Compose lifecycle `start_only` so the container persists across restarts.
 - Database credentials for local dev: `POSTGRES_USER=myuser`, `POSTGRES_PASSWORD=secret`,

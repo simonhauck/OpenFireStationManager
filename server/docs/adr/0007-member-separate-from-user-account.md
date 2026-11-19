@@ -1,7 +1,7 @@
 
 # ADR-0007: Member as an entity separate from UserAccount
 
-**Status:** Accepted
+**Status:** Accepted, amended by ADR-0010
 **Date:** 2026-08-30
 
 ## Context
@@ -61,3 +61,19 @@ Two people in one organisation genuinely can share a name — a father and son i
 - **Put the FK on `users` (`users.member_id`).** Moot now the link is deferred, but rejected on principle: `users` is the security-critical table and `Member` is the dependent concept, so the pointer belongs on `members`.
 - **Write the location association from the member side.** Reads more naturally given the concept is described member-first, but `MemberService` would be mutating the `clothing_locations` aggregate and two services could write the same column. Rejected in favour of a single write path; the member-centric *view* is preserved read-only.
 - **Denormalise `memberName` onto the `ClothingLocation` response.** Would avoid touching the label helper's call sites, but puts a derived non-persisted field on the entity, and the client needs the members list regardless for three other purposes.
+
+## Amendment (2026-11-19): local accounts are gone
+
+ADR-0010 (OIDC-only authentication) removed `UserAccount`, the `users` table and every local
+login. The decision to keep `Member` a separate aggregate stands: a member is still a person on
+the roster, and most members still never sign in.
+
+- **The "every row in `users` can authenticate" invariant is moot.** There is no `users` table
+  left to protect, so the argument against relaxing `UserAccount` no longer applies. The
+  references above to `UserAccount`, `AdminUserController`, `UserDetailsServiceImpl` and
+  remember-me describe the system as it was when this ADR was written.
+- **The deferred link changes shape.** A future link between a member and a login would store the
+  provider's stable `sub` claim on the member, not a user id, and would be filled by an explicit
+  assignment rather than a name match against `users`. Nothing needs it today.
+- **The audit fields** (`createdBy`, `lastModifiedBy`) keep recording a username string, now taken
+  from the provider's `app.auth.username-claim`.

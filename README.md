@@ -43,7 +43,6 @@ quartermaster sees the current stock at a glance and runs a stock-take without a
 
 ### For administrators
 
-- **Manage accounts and roles** for everyone at the station.
 - **Publish the legal pages** German sites need — *Impressum* and *Datenschutzerklärung* — from the
   admin settings, with no redeploy.
 
@@ -63,7 +62,7 @@ Roles stack rather than compete — an administrator implicitly holds every role
 |---------------|--------------------------------------------------------------------------------------|
 | `USER`        | Look up gear, take it out, and hand it back                                          |
 | `KLEIDERWART` | Everything above, plus manage the catalogue, move stock in bulk, and run stock-takes |
-| `ADMIN`       | Everything above, plus manage accounts and the legal pages                           |
+| `ADMIN`       | Everything above, plus manage the legal pages                                        |
 
 Roles are assigned at your OpenID Connect provider (for example Keycloak) and mapped to these
 three in the server configuration, see [`docs/role-mapping.md`](docs/role-mapping.md).
@@ -85,26 +84,12 @@ The app is then at **http://localhost:13841**.
 > The example compose file uses throwaway database credentials. Change them before putting this
 > anywhere that matters.
 
-### Create the first account
+### Signing in
 
-A fresh installation has no accounts, and there is no sign-up screen — the first administrator is
-created once via the API, after which everyone else is added from inside the app:
-
-```bash
-curl -X POST http://localhost:13841/api/public/setup/initial-admin \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "username": "admin",
-    "password": "change-me",
-    "firstName": "Max",
-    "lastName": "Mustermann"
-  }'
-```
-
-This works exactly once. Afterwards it refuses with `409 Conflict`, so it cannot be used to sneak in
-a second administrator later.
-
-Now sign in at http://localhost:13841 and add the rest of the station under **Nutzer Management**.
+OpenFireStationManager has no accounts of its own. Everyone signs in through an OpenID Connect
+provider such as Keycloak, and the roles in the table above come from that provider. Create users
+and assign their roles there; the server maps the provider's role names to `USER`, `KLEIDERWART`
+and `ADMIN`.
 
 ### On a tablet by the kit room door
 

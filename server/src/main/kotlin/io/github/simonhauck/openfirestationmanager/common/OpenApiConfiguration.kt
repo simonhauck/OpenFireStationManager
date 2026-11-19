@@ -43,8 +43,6 @@ object ApiTags {
     const val CLOTHING_OVERVIEW = "Clothing Overview"
     const val MEMBERS = "Members"
     const val AUTHENTICATION = "Authentication"
-    const val SETUP = "Setup"
-    const val ADMIN_USERS = "Admin - Users"
     const val ADMIN_LEGAL = "Admin - Legal"
     const val LEGAL = "Legal"
     const val TEST = "Test"
@@ -86,8 +84,8 @@ private fun buildApiDescription(sessionCookieName: String, sessionTimeout: Strin
     - `USER` — may read clothing data and perform checkouts and returns for themselves.
     - `KLEIDERWART` (*quartermaster*) — additionally may create, update, and delete clothing types,
       items, and locations, and may run relocations and inventory reconciliation.
-    - `ADMIN` — implicitly holds every other role, and additionally manages user accounts and the
-      legal documents (Impressum, privacy policy).
+    - `ADMIN` — implicitly holds every other role, and additionally manages the legal documents
+      (Impressum, privacy policy).
 
     Because `ADMIN` implies `KLEIDERWART`, an admin account can call every endpoint in this API.
 
@@ -182,11 +180,6 @@ class OpenApiConfiguration(
                                 "Public — no session required.",
                         ),
                     Tag()
-                        .name(ApiTags.SETUP)
-                        .description(
-                            "One-time bootstrap of the first administrator. Only usable while no user account exists.",
-                        ),
-                    Tag()
                         .name(ApiTags.CLOTHING_TYPES)
                         .description(
                             "Categories of garment (*Kleidungsart*), e.g. \"Einsatzjacke\". Reading is open to any " +
@@ -230,20 +223,14 @@ class OpenApiConfiguration(
                         .name(ApiTags.MEMBERS)
                         .description(
                             "People in the organisation (*Mitglied*) — the roster of who is in the " +
-                                "brigade. Deliberately separate from user accounts: a member is a " +
-                                "person, an account is a login, and the two are not linked. " +
+                                "brigade. Deliberately separate from logins: a member is a person, " +
+                                "sign-in is handled by the OpenID Connect provider, and the two are not linked. " +
                                 "Requires the KLEIDERWART role to modify.",
                         ),
                     Tag()
                         .name(ApiTags.LEGAL)
                         .description(
                             "Publicly readable legal documents: Impressum and privacy policy.",
-                        ),
-                    Tag()
-                        .name(ApiTags.ADMIN_USERS)
-                        .description(
-                            "User account administration. Requires the ADMIN role. " +
-                                "Exclude this tag to keep account management out of automated tool surfaces.",
                         ),
                     Tag()
                         .name(ApiTags.ADMIN_LEGAL)

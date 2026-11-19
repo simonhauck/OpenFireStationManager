@@ -4,22 +4,22 @@ import { BreadcrumbPage } from "../pages/BreadcrumbPage"
 test.use({ storageState: "playwright/.auth/admin.json" })
 
 test.describe("Breadcrumb", () => {
-  test("shows breadcrumb on user management page", async ({ page }) => {
+  test("shows breadcrumb on the members page", async ({ page }) => {
     const breadcrumb = new BreadcrumbPage(page)
-    await page.goto("/user-management")
+    await page.goto("/members")
 
-    await expect(breadcrumb.crumb("Nutzer Management")).toBeVisible()
+    await expect(breadcrumb.crumb("Mitglieder")).toBeVisible()
   })
 
   test("breadcrumb link on parent segment navigates to that route", async ({
     page,
   }) => {
     const breadcrumb = new BreadcrumbPage(page)
-    await page.goto("/user-management/new")
+    await page.goto("/members/new")
 
-    // "Nutzer Management" should be a clickable link (not the last crumb)
-    await expect(breadcrumb.crumbLink("Nutzer Management")).toBeVisible()
-    await breadcrumb.crumbLink("Nutzer Management").click()
-    await expect(page).toHaveURL(/\/user-management$/)
+    // "Mitglieder" should be a clickable link (not the last crumb)
+    await expect(breadcrumb.crumbLink("Mitglieder")).toBeVisible()
+    await breadcrumb.crumbLink("Mitglieder").click()
+    await expect(page).toHaveURL(/\/members$/)
   })
 })
