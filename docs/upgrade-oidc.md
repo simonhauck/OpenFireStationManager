@@ -1,3 +1,4 @@
+
 # Upgrade guide: sign-in through OpenID Connect
 
 > **Breaking change.** OpenFireStationManager no longer has its own accounts. Sign-in goes through
@@ -32,15 +33,15 @@
    enabled, otherwise users sign in without roles. See [`role-mapping.md`](role-mapping.md).
 6. **Set the environment variables** of the OFSM container and remove the old remember-me key variable:
 
-|                Variable                |                          Required                           |
-|----------------------------------------|-------------------------------------------------------------|
-| `OIDC_ISSUER_URI`                      | yes, e.g. `https://login.example.org/realms/feuerwehr`      |
-| `OIDC_CLIENT_ID`                       | yes                                                         |
-| `OIDC_CLIENT_SECRET`                   | yes                                                         |
-| `APP_AUTH_ROLES_CLAIMPATHS_0`          | only if the roles are not in `realm_access.roles`           |
-| `APP_AUTH_ROLES_MAPPING_ADMIN_0`       | provider role for `ADMIN`, default `ofsm-admin`             |
-| `APP_AUTH_ROLES_MAPPING_KLEIDERWART_0` | provider role for `KLEIDERWART`, default `ofsm-kleiderwart` |
-| `APP_AUTH_ROLES_MAPPING_USER_0`        | provider role for `USER`, default `ofsm-user`               |
+   |                Variable                |                          Required                           |
+   |----------------------------------------|-------------------------------------------------------------|
+   | `OIDC_ISSUER_URI`                      | yes, e.g. `https://login.example.org/realms/feuerwehr`      |
+   | `OIDC_CLIENT_ID`                       | yes                                                         |
+   | `OIDC_CLIENT_SECRET`                   | yes                                                         |
+   | `APP_AUTH_ROLES_CLAIMPATHS_0`          | only if the roles are not in `realm_access.roles`           |
+   | `APP_AUTH_ROLES_MAPPING_ADMIN_0`       | provider role for `ADMIN`, default `ofsm-admin`             |
+   | `APP_AUTH_ROLES_MAPPING_KLEIDERWART_0` | provider role for `KLEIDERWART`, default `ofsm-kleiderwart` |
+   | `APP_AUTH_ROLES_MAPPING_USER_0`        | provider role for `USER`, default `ofsm-user`               |
 
    Compose deployments based on `infrastructure/ofsm-prod` and `infrastructure/ofsm-dev` use the
    variables `OIDC_ISSUER_URI`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ROLES_CLAIM_PATH`,
