@@ -40,11 +40,11 @@ jobs:
 
       - name: Client type check
         working-directory: client
-        run: npm run build:check || true
+        run: (npm run build && npm run build:check) || true
 
       - name: Print patch
         run: |
-          git add -A
+          git add -A -- . ':!client/src/routeTree.gen.ts'
           git diff --cached --stat
           echo "=====PATCH BEGIN====="
           git diff --cached --binary | base64 -w0

@@ -1792,6 +1792,16 @@ export interface components {
        */
       exists: boolean
     }
+    /** @description Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session. */
+    AuthStateResponse: {
+      /**
+       * @description True when a valid session cookie was supplied.
+       * @example true
+       */
+      authenticated: boolean
+      /** @description The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
+      user?: components["schemas"]["CurrentUser"]
+    }
     /** @description The signed-in user as reported by the OpenID Connect provider. Nothing about the user is stored by this API; every value comes from the provider's tokens at sign-in. */
     CurrentUser: {
       /**
@@ -1822,16 +1832,6 @@ export interface components {
        *     ]
        */
       roles: ("USER" | "ADMIN" | "KLEIDERWART")[]
-    }
-    /** @description Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session. */
-    AuthStateResponse: {
-      /**
-       * @description True when a valid session cookie was supplied.
-       * @example true
-       */
-      authenticated: boolean
-      /** @description The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false. */
-      user?: components["schemas"]["CurrentUser"]
     }
     /** @description Every barcode guide image (`Barcode-Bild`) of one clothing type, with the type's name so a scanner screen can label the group without a second lookup. */
     ClothingTypeBarcodeImages: {

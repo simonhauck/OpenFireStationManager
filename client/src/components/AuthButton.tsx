@@ -6,7 +6,7 @@ import { useLocation } from "@tanstack/react-router"
 import { LogOut } from "lucide-react"
 import { useRef } from "react"
 import { meQuery } from "#/api/auth.queries"
-import { loginUrl, LOGOUT_ENDPOINT } from "#/api/auth.utils"
+import { LOGOUT_ENDPOINT, loginUrl } from "#/api/auth.utils"
 
 export default function AuthButton() {
   const { data, isError } = useQuery(meQuery())

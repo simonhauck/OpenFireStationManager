@@ -32,8 +32,8 @@ import org.springframework.security.web.context.SecurityContextRepository
 /**
  * Authentication is delegated to a single OpenID Connect provider (registration `ofsm`, see
  * `spring.security.oauth2.client.*`). The server is a confidential client: it runs the
- * authorization code flow with PKCE and keeps the result in the server-side session, so the
- * browser only ever holds the `OFSM_AUTH` session cookie.
+ * authorization code flow with PKCE and keeps the result in the server-side session, so the browser
+ * only ever holds the `OFSM_AUTH` session cookie.
  */
 @Configuration
 @EnableWebSecurity

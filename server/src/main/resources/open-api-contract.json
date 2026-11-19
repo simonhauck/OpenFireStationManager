@@ -4997,6 +4997,22 @@
         },
         "required": [ "exists" ]
       },
+      "AuthStateResponse": {
+        "type": "object",
+        "description": "Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session.",
+        "properties": {
+          "authenticated": {
+            "type": "boolean",
+            "description": "True when a valid session cookie was supplied.",
+            "example": true
+          },
+          "user": {
+            "$ref": "#/components/schemas/CurrentUser",
+            "description": "The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false."
+          }
+        },
+        "required": [ "authenticated" ]
+      },
       "CurrentUser": {
         "type": "object",
         "description": "The signed-in user as reported by the OpenID Connect provider. Nothing about the user is stored by this API; every value comes from the provider's tokens at sign-in.",
@@ -5033,22 +5049,6 @@
           }
         },
         "required": [ "firstName", "lastName", "roles", "username" ]
-      },
-      "AuthStateResponse": {
-        "type": "object",
-        "description": "Who the caller is currently signed in as. Returned with `authenticated: false` and a null `user` rather than a `401` when there is no valid session.",
-        "properties": {
-          "authenticated": {
-            "type": "boolean",
-            "description": "True when a valid session cookie was supplied.",
-            "example": true
-          },
-          "user": {
-            "$ref": "#/components/schemas/CurrentUser",
-            "description": "The signed-in user, including the `roles` that govern access to every other endpoint. Null when `authenticated` is false."
-          }
-        },
-        "required": [ "authenticated" ]
       },
       "ClothingTypeBarcodeImages": {
         "type": "object",

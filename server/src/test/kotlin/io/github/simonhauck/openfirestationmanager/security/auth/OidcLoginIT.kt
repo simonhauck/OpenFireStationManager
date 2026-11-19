@@ -20,8 +20,8 @@ import org.springframework.web.util.UriComponentsBuilder
 
 /**
  * Drives the authorization code flow against the mock OpenID Connect provider, following every
- * redirect by hand so each hop can be asserted. The provider's login form accepts any username
- * plus extra claims; `sub` becomes the username.
+ * redirect by hand so each hop can be asserted. The provider's login form accepts any username plus
+ * extra claims; `sub` becomes the username.
  */
 class OidcLoginIT : IntegrationTest() {
 
@@ -153,8 +153,7 @@ class OidcLoginIT : IntegrationTest() {
     private data class SignInResult(val finalLocation: String, val cookie: String)
 
     private fun signIn(redirect: String, claims: String): SignInResult {
-        val entry =
-            send(appRequest("/api/public/auth/login?redirect=${encode(redirect)}").build())
+        val entry = send(appRequest("/api/public/auth/login?redirect=${encode(redirect)}").build())
         assertThat(entry.statusCode()).isEqualTo(302)
         var cookie = entry.sessionCookie() ?: error("Login entry point did not start a session")
 
@@ -210,6 +209,7 @@ class OidcLoginIT : IntegrationTest() {
 
     private fun encode(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8)
 
-    private fun decode(value: String?): String? =
-        value?.let { URLDecoder.decode(it, StandardCharsets.UTF_8) }
+    private fun decode(value: String?): String? = value?.let {
+        URLDecoder.decode(it, StandardCharsets.UTF_8)
+    }
 }

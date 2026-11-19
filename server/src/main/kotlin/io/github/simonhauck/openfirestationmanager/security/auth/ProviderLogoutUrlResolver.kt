@@ -7,9 +7,9 @@ import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInit
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
 /**
- * Resolves where the browser goes after logout: the provider's `end_session_endpoint`
- * (RP-initiated logout) with the application root as `post_logout_redirect_uri`, or the
- * application root itself when the caller was not signed in through the provider.
+ * Resolves where the browser goes after logout: the provider's `end_session_endpoint` (RP-initiated
+ * logout) with the application root as `post_logout_redirect_uri`, or the application root itself
+ * when the caller was not signed in through the provider.
  */
 class ProviderLogoutUrlResolver(clientRegistrationRepository: ClientRegistrationRepository) :
     OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository) {
