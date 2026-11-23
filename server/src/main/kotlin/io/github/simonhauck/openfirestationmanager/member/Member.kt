@@ -24,8 +24,8 @@ data class CreateOrUpdateMemberRequest(
 
 @Schema(
     description =
-        "A person in the brigade (*Mitglied*). Deliberately distinct from a user account: a " +
-            "member is a person on the roster, an account is a set of login credentials, and the " +
+        "A person in the brigade (*Mitglied*). Deliberately distinct from a login: a member is " +
+            "a person on the roster, sign-in is handled by the OpenID Connect provider, and the " +
             "two are not linked.",
 )
 @Table("members")

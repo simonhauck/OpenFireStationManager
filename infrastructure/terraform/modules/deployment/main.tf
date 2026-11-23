@@ -27,7 +27,37 @@ resource "portainer_stack" "this" {
   }
 
   env {
-    name  = "REMEMBER_ME_KEY"
-    value = var.remember_me_key
+    name  = "OIDC_ISSUER_URI"
+    value = var.oidc_issuer_uri
+  }
+
+  env {
+    name  = "OIDC_CLIENT_ID"
+    value = var.oidc_client_id
+  }
+
+  env {
+    name  = "OIDC_CLIENT_SECRET"
+    value = var.oidc_client_secret
+  }
+
+  env {
+    name  = "OIDC_ROLES_CLAIM_PATH"
+    value = var.oidc_roles_claim_path
+  }
+
+  env {
+    name  = "OIDC_ROLE_ADMIN"
+    value = var.oidc_role_admin
+  }
+
+  env {
+    name  = "OIDC_ROLE_KLEIDERWART"
+    value = var.oidc_role_kleiderwart
+  }
+
+  env {
+    name  = "OIDC_ROLE_USER"
+    value = var.oidc_role_user
   }
 }

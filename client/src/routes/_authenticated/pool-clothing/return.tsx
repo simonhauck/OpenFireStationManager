@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
+import { requireFreshSession } from "#/api/session"
 import ReturnPage from "#/clothing/return/components/ReturnPage"
 import RoleGuard from "#/components/base/RoleGuard"
 
 export const Route = createFileRoute("/_authenticated/pool-clothing/return")({
+  beforeLoad: requireFreshSession,
   component: ReturnRoute,
   validateSearch: (
     search: Record<string, unknown>,

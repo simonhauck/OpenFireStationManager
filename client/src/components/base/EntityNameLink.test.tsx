@@ -19,14 +19,6 @@ function renderLink(roles: UserRole[], enabled = true) {
       firstName: "Test",
       lastName: "User",
       roles,
-      enabled: true,
-      id: 1,
-      metaData: {
-        createdAt: "2026-01-01T00:00:00Z",
-        createdBy: "System",
-        lastModifiedAt: "2026-01-01T00:00:00Z",
-        lastModifiedBy: "System",
-      },
     },
   }
   queryClient.setQueryData(meQuery().queryKey, authState)

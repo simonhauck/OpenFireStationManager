@@ -13,21 +13,65 @@ spring:
       idle-timeout: 30000 # release idle connections after 30 s → pool drains to 0
       connection-timeout: 30000 # wait up to 30 s for a connection (handles cold starts)
       initialization-fail-timeout: -1 # don't fail on startup if DB is scaled to 0
+  session:
+    # Sessions live in PostgreSQL (SPRING_SESSION*), so a restart or update keeps users signed in.
+    # The tables come from migration V026, not from Spring Session's auto-init. Cookie settings
+    # and the idle timeout are still read from server.servlet.session.* below.
+    jdbc:
+      initialize-schema: never
+      # Spring cron (with seconds): remove expired sessions every 10 minutes by default.
+      cleanup-cron: ${SESSION_CLEANUP_CRON:0 */10 * * * *}
+  security:
+    oauth2:
+      client:
+        # Exactly one OpenID Connect provider. The defaults point at the local Keycloak from
+        # infrastructure/local/docker-compose.yml. With issuer-uri, the provider metadata is
+        # fetched at startup, so the server does not start while the provider is unreachable.
+        registration:
+          ofsm:
+            provider: ofsm
+            client-id: ${OIDC_CLIENT_ID:ofsm}
+            client-secret: ${OIDC_CLIENT_SECRET:ofsm-dev-secret}
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email
+        provider:
+          ofsm:
+            issuer-uri: ${OIDC_ISSUER_URI:http://localhost:8180/realms/ofsm}
 server:
   forward-headers-strategy: framework
   servlet:
     session:
+      # Idle timeout: every request extends the session.
+      timeout: ${SESSION_TIMEOUT:12h}
       cookie:
         name: OFSM_AUTH
         http-only: true
         secure: true
-        same-site: strict
+        # lax, not strict: the browser must send the cookie on the redirect back from the
+        # provider, or the stored authorization request is lost and every login fails.
+        same-site: lax
 
 app:
-  remember-me:
-    key: ${REMEMBER_ME_KEY:change-me-in-prod}
-    token-validity: ${REMEMBER_ME_TOKEN_VALIDITY:P30D}
-    token-name: ${server.servlet.session.cookie.name}_REMEMBER_ME
+  auth:
+    username-claim: preferred_username
+    roles:
+      # Claims that carry provider roles (dot-separated paths, unioned). Keycloak realm roles are
+      # in realm_access.roles; client roles in resource_access.<client>.roles; groups in `groups`.
+      claim-paths:
+        - realm_access.roles
+      # OFSM role -> provider role names (exact, case-sensitive). Matches the realm roles of the
+      # local Keycloak realm. Without a mapping, each OFSM role maps to the provider role of the
+      # same name. See docs/role-mapping.md.
+      mapping:
+        ADMIN: [ofsm-admin]
+        KLEIDERWART: [ofsm-kleiderwart]
+        USER: [ofsm-user]
+    mcp:
+      # The MCP endpoint (/mcp) accepts bearer access tokens from the provider configured above
+      # (spring.security.oauth2.client.provider.ofsm.issuer-uri) only when their `aud` claim
+      # contains one of these audiences. The local Keycloak adds `ofsm` through the `ofsm-mcp`
+      # client scope. Comma-separated in the environment variable.
+      accepted-audiences: ${MCP_ACCEPTED_AUDIENCES:ofsm}
 
 springdoc:
   model-converters:

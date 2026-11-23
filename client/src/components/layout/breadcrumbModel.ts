@@ -17,7 +17,6 @@ type StaticSegment = Exclude<AllRawSegments, "" | `$${string}`>
 const SEGMENT_LABELS: Record<StaticSegment, string> = {
   admin: "Administration",
   batch: "Stapelverarbeitung",
-  "change-password": "Passwort ändern",
   checkout: "Klamotten tauschen",
   "clothing-management": "Klamotten Management",
   edit: "Bearbeiten",
@@ -31,7 +30,6 @@ const SEGMENT_LABELS: Record<StaticSegment, string> = {
   return: "Klamotten Rückgabe",
   settings: "Einstellungen",
   types: "Typen",
-  "user-management": "Nutzer Management",
   dashboard: "Dashboard",
   impressum: "Impressum",
   "inventory-reconciliation": "Inventarisierung",
@@ -48,8 +46,8 @@ export function segmentLabel(segment: string): string {
 }
 
 // ─── Route pattern matching ───────────────────────────────────────────────────
-// Converts a route pattern like '/user-management/$userId/edit' into a regex
-// that matches concrete paths like '/user-management/42/edit'.
+// Converts a route pattern like '/members/$memberId/edit' into a regex
+// that matches concrete paths like '/members/42/edit'.
 
 function patternToRegex(pattern: string): RegExp {
   const normalized = pattern.replace(/\/+$/, "")

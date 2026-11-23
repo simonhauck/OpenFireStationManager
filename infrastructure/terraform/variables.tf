@@ -10,3 +10,23 @@ variable "ofsm_github_token" {
   sensitive   = true
 }
 
+
+variable "oidc_dev" {
+  description = "OpenID Connect client of the develop deployment (issuer URI, client ID and secret)"
+  type = object({
+    issuer_uri    = string
+    client_id     = string
+    client_secret = string
+  })
+  sensitive = true
+}
+
+variable "oidc_prod" {
+  description = "OpenID Connect client of the production deployment (issuer URI, client ID and secret)"
+  type = object({
+    issuer_uri    = string
+    client_id     = string
+    client_secret = string
+  })
+  sensitive = true
+}

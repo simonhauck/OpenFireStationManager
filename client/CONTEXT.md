@@ -107,7 +107,7 @@ The admin-uploadable privacy policy document, managed under `/admin/settings`. A
 
 ### Mitglied
 
-User-facing label for `Member` — a person in the organisation. Deliberately distinct from **Nutzer Management** (`/user-management`), which manages `UserAccount` logins: Mitglieder are people, Nutzer are credentials, and the two are not linked. Because both now appear in the top nav, the labels carry the whole distinction; retitling "Nutzer Management" to something like "Logins" would sharpen it.
+User-facing label for `Member` — a person in the organisation. Deliberately distinct from the signed-in user: sign-in happens at the OpenID Connect provider and there is no user management in the app, so Mitglieder are people on the roster and the two are not linked.
 
 Top-level route `/members`, `KLEIDERWART`-guarded, with entries in `MENU_ITEMS` (nav config), `DASHBOARD_ITEMS` (`dashboard.tsx`), and `SEGMENT_LABELS` (`Breadcrumb.tsx`) — all three lists are duplicated and must be kept in step. Four routes: list, `/new`, `/$memberId` (detail), `/$memberId/edit`.
 

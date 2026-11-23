@@ -1,60 +1,78 @@
 import { Avatar } from "@astryxdesign/core/Avatar"
 import { Button } from "@astryxdesign/core/Button"
 import { DropdownMenu } from "@astryxdesign/core/DropdownMenu"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useNavigate } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
+import { useLocation } from "@tanstack/react-router"
 import { LogOut } from "lucide-react"
-import { logoutMutation, meQuery } from "#/api/auth.queries"
+import { useRef } from "react"
+import { meQuery } from "#/api/auth.queries"
+import { LOGOUT_ENDPOINT, loginUrl } from "#/api/auth.utils"
 
 export default function AuthButton() {
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
   const { data, isError } = useQuery(meQuery())
+  const location = useLocation()
+  const logoutForm = useRef<HTMLFormElement>(null)
   const isAuthenticated = data?.authenticated === true && !isError
   const user = data?.user
 
-  const { mutate: logout } = useMutation(logoutMutation(queryClient))
-
+  // Logout is a top-level form POST, not a fetch call: the server answers with a redirect to the
+  // provider's logout page, which a fetch cannot follow across origins.
   function handleLogout() {
-    logout(undefined, {
-      onSuccess: () => void navigate({ to: "/", replace: true }),
-    })
+    logoutForm.current?.submit()
   }
 
   if (!isAuthenticated) {
-    return <Button label="Anmelden" variant="primary" size="sm" href="/login" />
+    // Return to the current page after signing in, unless that is the public start page.
+    const returnTo = location.pathname === "/" ? "/dashboard" : location.href
+    return (
+      <Button
+        label="Anmelden"
+        variant="primary"
+        size="sm"
+        href={loginUrl(returnTo)}
+      />
+    )
   }
 
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ")
   const menuTitle = user?.username ? `${fullName} (${user.username})` : fullName
 
   return (
-    <DropdownMenu
-      alignment="end"
-      hasChevron={false}
-      renderTrigger={(triggerProps) => (
-        <Avatar
-          {...triggerProps}
-          name={fullName}
-          alt={`Benutzermenü für ${fullName}`}
-          size={32}
-          tooltip={false}
-        />
-      )}
-      items={[
-        {
-          type: "section",
-          title: menuTitle,
-          items: [
-            {
-              label: "Abmelden",
-              icon: <LogOut className="size-4" />,
-              variant: "destructive",
-              onClick: handleLogout,
-            },
-          ],
-        },
-      ]}
-    />
+    <>
+      <form
+        ref={logoutForm}
+        method="post"
+        action={LOGOUT_ENDPOINT}
+        className="hidden"
+        aria-hidden="true"
+      />
+      <DropdownMenu
+        alignment="end"
+        hasChevron={false}
+        renderTrigger={(triggerProps) => (
+          <Avatar
+            {...triggerProps}
+            name={fullName}
+            alt={`Benutzermenü für ${fullName}`}
+            size={32}
+            tooltip={false}
+          />
+        )}
+        items={[
+          {
+            type: "section",
+            title: menuTitle,
+            items: [
+              {
+                label: "Abmelden",
+                icon: <LogOut className="size-4" />,
+                variant: "destructive",
+                onClick: handleLogout,
+              },
+            ],
+          },
+        ]}
+      />
+    </>
   )
 }

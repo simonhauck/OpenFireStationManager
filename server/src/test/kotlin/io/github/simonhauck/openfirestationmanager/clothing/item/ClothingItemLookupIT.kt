@@ -10,9 +10,6 @@ import io.github.simonhauck.openfirestationmanager.clothing.type.CreateOrUpdateC
 import io.github.simonhauck.openfirestationmanager.clothing.type.ProtectiveClothingTypeControllerCalls
 import io.github.simonhauck.openfirestationmanager.member.CreateOrUpdateMemberRequest
 import io.github.simonhauck.openfirestationmanager.member.MemberControllerCalls
-import io.github.simonhauck.openfirestationmanager.security.auth.AuthControllerCalls
-import io.github.simonhauck.openfirestationmanager.usermanagement.AdminUserControllerCalls
-import io.github.simonhauck.openfirestationmanager.usermanagement.CreateUserRequest
 import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -33,7 +30,6 @@ class ClothingItemLookupIT : IntegrationTest() {
     @Autowired private lateinit var typeCalls: ProtectiveClothingTypeControllerCalls
     @Autowired private lateinit var locationCalls: ClothingLocationControllerCalls
     @Autowired private lateinit var memberCalls: MemberControllerCalls
-    @Autowired private lateinit var adminUserCalls: AdminUserControllerCalls
     @Autowired private lateinit var testRestTemplate: TestRestTemplate
 
     // --- by-barcode ---
@@ -354,23 +350,7 @@ class ClothingItemLookupIT : IntegrationTest() {
         )
     }
 
-    private fun createRegularUserCookie(): String {
-        val username = "user-${System.nanoTime()}"
-        val password = "pass1234"
-        adminUserCalls.createUser(
-            CreateUserRequest(
-                username = username,
-                password = password,
-                firstName = "Regular",
-                lastName = "User",
-                roles = listOf(UserRole.USER),
-            ),
-            authCookie = validCookieHeader,
-        )
-        val authCalls = AuthControllerCalls(testRestTemplate)
-        val loginResponse = authCalls.login(username = username, password = password)
-        return authCalls.extractAuthCookie(loginResponse) ?: error("Login failed for $username")
-    }
+    private fun createRegularUserCookie(): String = cookieWithRoles(UserRole.USER)
 
     private fun createLocation(
         type: LocationType,

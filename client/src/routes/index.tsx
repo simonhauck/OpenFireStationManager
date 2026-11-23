@@ -31,8 +31,8 @@ function App() {
       icon: ShieldCheck,
     },
     {
-      title: "Nutzerverwaltung",
-      text: "Feuerwehr-Konten im Adminbereich anlegen und bearbeiten.",
+      title: "Mitgliederverwaltung",
+      text: "Personen der Feuerwehr zentral pflegen.",
       icon: Users,
     },
   ]

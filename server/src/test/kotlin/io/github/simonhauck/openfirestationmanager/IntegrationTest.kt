@@ -1,8 +1,8 @@
 package io.github.simonhauck.openfirestationmanager
 
-import io.github.simonhauck.openfirestationmanager.security.auth.AuthControllerCalls
-import io.github.simonhauck.openfirestationmanager.setup.InitialAdminSetupRequest
-import io.github.simonhauck.openfirestationmanager.setup.InitialSetupControllerCalls
+import io.github.simonhauck.openfirestationmanager.testing.TestSessionControllerCalls
+import io.github.simonhauck.openfirestationmanager.testutil.MockOAuth2ServerContainer
+import io.github.simonhauck.openfirestationmanager.usermanagement.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.resttestclient.TestRestTemplate
@@ -25,32 +25,22 @@ open class IntegrationTest {
     @BeforeEach
     fun setUp() {
         if (!hasRunInit) {
-            createAdmin()
-            setAdminCookieValue()
+            staticCookieHeader =
+                TestSessionControllerCalls(http)
+                    .createSessionCookie(
+                        roles = listOf(UserRole.ADMIN),
+                        username = "chief",
+                        firstName = "Initial",
+                        lastName = "Admin",
+                    )
             hasRunInit = true
         }
         validCookieHeader = staticCookieHeader
     }
 
-    private fun setAdminCookieValue() {
-        val authCalls = AuthControllerCalls(http)
-        val loginResponse = authCalls.login()
-        staticCookieHeader =
-            authCalls.extractAuthCookie(loginResponse)
-                ?: error("Login failed: no auth cookie returned")
-    }
-
-    private fun createAdmin() {
-        InitialSetupControllerCalls(http)
-            .createInitialAdmin(
-                InitialAdminSetupRequest(
-                    username = "chief",
-                    password = "secret",
-                    firstName = "Initial",
-                    lastName = "Admin",
-                ),
-            )
-    }
+    /** Returns a session cookie for a test user holding exactly the given roles. */
+    protected fun cookieWithRoles(vararg roles: UserRole): String =
+        TestSessionControllerCalls(http).createSessionCookie(roles = roles.toList())
 
     companion object {
         private var hasRunInit = false
@@ -63,12 +53,22 @@ open class IntegrationTest {
                 .withPassword("secret")
                 .apply { start() }
 
+        /**
+         * Shared OpenID Connect provider. The application discovers the provider metadata at
+         * startup, so every context needs a reachable issuer, not only the login flow tests.
+         */
+        val oidcProvider = MockOAuth2ServerContainer().apply { start() }
+
         @DynamicPropertySource
         @JvmStatic
         fun configureDatabaseProperties(registry: DynamicPropertyRegistry) {
             registry.add("spring.datasource.url", postgresContainer::getJdbcUrl)
             registry.add("spring.datasource.username", postgresContainer::getUsername)
             registry.add("spring.datasource.password", postgresContainer::getPassword)
+            registry.add(
+                "spring.security.oauth2.client.provider.ofsm.issuer-uri",
+                oidcProvider::issuerUri,
+            )
         }
     }
 }

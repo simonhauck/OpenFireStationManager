@@ -1,6 +1,4 @@
 export const queryKeys = {
-  users: () => ["users"] as const,
-  user: (id: number) => ["users", id] as const,
   members: () => ["members"] as const,
   member: (id: number) => ["members", id] as const,
   clothingTypes: () => ["clothing", "types"] as const,

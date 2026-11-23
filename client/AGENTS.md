@@ -120,14 +120,18 @@ playwright/.auth/       ← gitignored session state files written by global-set
 ### Authentication
 
 `global-setup.ts` runs once before the test suite. It creates three test personas with
-UUID-suffixed usernames (so parallel runs and shared databases never collide), logs each one
-in via the browser, and saves the resulting session cookies:
+UUID-suffixed usernames (so parallel runs and shared databases never collide), obtains a session
+for each one from the test-only `POST /api/test/session` endpoint (no UI login), and writes the
+session cookie into its `storageState` file:
 
 |    Persona    |     Roles     |              Auth file              |
 |---------------|---------------|-------------------------------------|
 | `admin`       | `ADMIN`       | `playwright/.auth/admin.json`       |
 | `kleiderwart` | `KLEIDERWART` | `playwright/.auth/kleiderwart.json` |
 | `user`        | `USER`        | `playwright/.auth/user.json`        |
+
+Only `tests/specs/auth.spec.ts` signs in for real: it uses the local Keycloak from
+`infrastructure/local/docker-compose.yml` (demo user `admin` / `admin`), which must be running.
 
 Activate a persona in a spec with `test.use`:
 

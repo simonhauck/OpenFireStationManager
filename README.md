@@ -43,7 +43,6 @@ quartermaster sees the current stock at a glance and runs a stock-take without a
 
 ### For administrators
 
-- **Manage accounts and roles** for everyone at the station.
 - **Publish the legal pages** German sites need — *Impressum* and *Datenschutzerklärung* — from the
   admin settings, with no redeploy.
 
@@ -63,7 +62,10 @@ Roles stack rather than compete — an administrator implicitly holds every role
 |---------------|--------------------------------------------------------------------------------------|
 | `USER`        | Look up gear, take it out, and hand it back                                          |
 | `KLEIDERWART` | Everything above, plus manage the catalogue, move stock in bulk, and run stock-takes |
-| `ADMIN`       | Everything above, plus manage accounts and the legal pages                           |
+| `ADMIN`       | Everything above, plus manage the legal pages                                        |
+
+Roles are assigned at your OpenID Connect provider (for example Keycloak) and mapped to these
+three in the server configuration, see [`docs/role-mapping.md`](docs/role-mapping.md).
 
 ---
 
@@ -72,42 +74,113 @@ Roles stack rather than compete — an administrator implicitly holds every role
 You need Docker. Everything else comes in the image, which is published for both `amd64` and
 `arm64` — so a Raspberry Pi works as well as a server.
 
+The example setup starts OpenFireStationManager, PostgreSQL and a Keycloak with a demo realm, so
+the login works right away. Run it from a clone of the repository (Keycloak imports the realm file
+from `infrastructure/local/keycloak/`):
+
 ```bash
-curl -O https://raw.githubusercontent.com/simonhauck/OpenFireStationManager/main/example/docker-compose.yml
+git clone https://github.com/simonhauck/OpenFireStationManager.git
+cd OpenFireStationManager/example
 docker compose up -d
 ```
 
-The app is then at **http://localhost:13841**.
+The app is then at **http://localhost:8080**. Sign in with one of the demo users (the password
+equals the username): `admin` (ADMIN), `kleiderwart` (KLEIDERWART), `user` (USER), or `norole`,
+who can sign in but has no access. Keycloak's admin console is at http://localhost:8180/admin
+(`admin` / `admin`). Startup takes a little longer than before because the app waits for Keycloak
+to become healthy.
 
-> The example compose file uses throwaway database credentials. Change them before putting this
-> anywhere that matters.
+> The example compose file uses throwaway database credentials, a demo realm with well-known
+> passwords and a public client secret. Never expose it to the internet. For a real station, set up
+> your own provider as described under *Authentication*.
 
-### Create the first account
+---
 
-A fresh installation has no accounts, and there is no sign-up screen — the first administrator is
-created once via the API, after which everyone else is added from inside the app:
+## Authentication
+
+OpenFireStationManager has no accounts of its own. Everyone signs in through **one** OpenID Connect
+provider; this guide uses Keycloak. Users, passwords and roles are managed there. OFSM reads the
+roles from the tokens at sign-in and maps them to `USER`, `KLEIDERWART` and `ADMIN`.
+
+### Setting up Keycloak
+
+1. **Realm and users.** Use an existing realm or create one, and create the users of your station.
+2. **Roles.** Create realm roles (for example `ofsm-admin`, `ofsm-kleiderwart`, `ofsm-user`) and
+   assign them to users. A user without any mapped role can sign in but has no access.
+3. **Client.** Create an OpenID Connect client with *Client authentication* **on** (confidential)
+   and the *Standard flow* enabled. Copy the client ID and the secret (tab *Credentials*).
+4. **URLs.** Set the valid redirect URI to `https://<your-host>/login/oauth2/code/ofsm` (or
+   `https://<your-host>/*`) and the valid post logout redirect URI to `https://<your-host>/*`.
+   `<your-host>` is the public address under which users open OFSM.
+5. **Roles in the token.** Keycloak does not put roles into the ID token or UserInfo by default.
+   Add a mapper (*Clients > your client > Client scopes > dedicated scope > Add mapper*), for
+   example *User Realm Role*, with **Add to ID token** and/or **Add to userinfo** enabled. The
+   claim name `realm_access.roles` matches the default configuration. Groups and client roles
+   work as well; see [`docs/role-mapping.md`](docs/role-mapping.md) for each variant.
+
+### Configuration
+
+The server is configured through environment variables:
+
+|                Variable                |                                 Meaning                                 |
+|----------------------------------------|-------------------------------------------------------------------------|
+| `OIDC_ISSUER_URI`                      | Issuer URL, for Keycloak `https://<keycloak>/realms/<realm>`            |
+| `OIDC_CLIENT_ID`                       | Client ID of the client created above                                   |
+| `OIDC_CLIENT_SECRET`                   | Client secret of that client                                            |
+| `APP_AUTH_ROLES_CLAIMPATHS_0`          | Claim path with the provider roles, default `realm_access.roles`        |
+| `APP_AUTH_ROLES_MAPPING_ADMIN_0`       | Provider role that grants `ADMIN` (`_1`, `_2`, ... add further roles)   |
+| `APP_AUTH_ROLES_MAPPING_KLEIDERWART_0` | Provider role that grants `KLEIDERWART`                                 |
+| `APP_AUTH_ROLES_MAPPING_USER_0`        | Provider role that grants `USER`                                        |
+| `SESSION_TIMEOUT`                      | Idle timeout of an OFSM session, default `12h`                          |
+| `SESSION_CLEANUP_CRON`                 | Cron expression for removing expired sessions, default every 10 minutes |
+
+Example for a station that uses realm roles named `Admin`, `Kleiderkammer` and `Mitglied`:
 
 ```bash
-curl -X POST http://localhost:13841/api/public/setup/initial-admin \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "username": "admin",
-    "password": "change-me",
-    "firstName": "Max",
-    "lastName": "Mustermann"
-  }'
+OIDC_ISSUER_URI=https://login.example.org/realms/feuerwehr
+OIDC_CLIENT_ID=ofsm
+OIDC_CLIENT_SECRET=...
+APP_AUTH_ROLES_MAPPING_ADMIN_0=Admin
+APP_AUTH_ROLES_MAPPING_KLEIDERWART_0=Kleiderkammer
+APP_AUTH_ROLES_MAPPING_USER_0=Mitglied
 ```
 
-This works exactly once. Afterwards it refuses with `409 Conflict`, so it cannot be used to sneak in
-a second administrator later.
+Role names are matched exactly and case-sensitively. More mapping examples (client roles, groups,
+several roles per OFSM role) are in [`docs/role-mapping.md`](docs/role-mapping.md). The files in
+[`infrastructure/ofsm-prod`](infrastructure/ofsm-prod) show a complete compose deployment.
 
-Now sign in at http://localhost:13841 and add the rest of the station under **Nutzer Management**.
+> **The app does not start while the provider is unreachable.** At startup the server fetches the
+> provider's metadata from `OIDC_ISSUER_URI`. If Keycloak is down or the URL is wrong, the server
+> logs a message and exits. When Keycloak runs next to OFSM, start it first and wait until it is
+> healthy (the example compose file does this with `depends_on` and a health check). A provider
+> outage later on only prevents new sign-ins; existing sessions keep working until they expire.
+
+Upgrading an installation that still uses local accounts? Read
+[`docs/upgrade-oidc.md`](docs/upgrade-oidc.md) first.
 
 ### On a tablet by the kit room door
 
 The everyday screens are built for exactly this. See
 [`infrastructure/raspberry-pi/README.md`](infrastructure/raspberry-pi/README.md) for the Raspberry Pi
 touchscreen settings that make it behave like a kiosk.
+
+#### Staying signed in on a tablet
+
+An OFSM session ends after `SESSION_TIMEOUT` (12 hours) without activity. Sessions are stored in the
+database, so they survive server restarts and updates. When an OFSM session has expired, the app
+sends the browser to Keycloak. If the Keycloak session is still valid, Keycloak signs the user in
+again without asking for a password and the tablet carries on after a short redirect.
+
+To get a tablet that rarely asks for a password, make Keycloak's session **longer** than OFSM's idle
+timeout (*Realm settings > Sessions*):
+
+- **SSO Session Idle** and **SSO Session Max**: for example 30 days.
+- Optionally enable **Remember me** on the login page (*Realm settings > Login*) and raise
+  **SSO Session Idle Remember Me** and **SSO Session Max Remember Me**. Users who tick the box then
+  stay signed in at Keycloak for that longer time.
+
+When the Keycloak session itself expires, users simply sign in again. No offline tokens or refresh
+tokens are used or needed.
 
 ---
 

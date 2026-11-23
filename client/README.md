@@ -22,8 +22,9 @@ reads live data from the API. Start it first, from the repository root:
 That serves the API on port `8080`. The Vite dev server proxies `/api` and `/privacy-policy` to it,
 so no environment variables are needed for local development.
 
-You will also need a user account to sign in with. A fresh database has none — see
-[Create the first account](../README.md#create-the-first-account) in the root README.
+You will also need a user at the OpenID Connect provider to sign in with; the local Keycloak in
+`infrastructure/local` ships with demo users. See [Signing in](../README.md#signing-in) in the root
+README.
 
 ---
 

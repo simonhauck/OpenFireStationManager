@@ -21,6 +21,24 @@ services:
     networks:
       - devnet
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.0
+    restart: unless-stopped
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_HTTP_PORT: "8180"
+      # Shares the app container's network namespace, so the browser (via the forwarded port)
+      # and the app both reach Keycloak as http://localhost:8180 and the issuer matches for both.
+      KC_HOSTNAME: http://localhost:8180
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes:
+      - ../infrastructure/local/keycloak/ofsm-realm.json:/opt/keycloak/data/import/ofsm-realm.json:ro
+    network_mode: service:app
+    depends_on:
+      - app
+
 networks:
   devnet:
 

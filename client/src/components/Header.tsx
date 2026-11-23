@@ -31,11 +31,6 @@ const MENU_ITEMS: MenuItem[] = [
     allowedRoles: ["KLEIDERWART"],
   },
   {
-    label: "Nutzer Management",
-    href: "/user-management",
-    allowedRoles: ["ADMIN"],
-  },
-  {
     label: "Admin Einstellungen",
     href: "/admin/settings",
     allowedRoles: ["ADMIN"],

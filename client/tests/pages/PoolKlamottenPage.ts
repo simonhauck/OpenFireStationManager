@@ -43,4 +43,8 @@ export class PoolKlamottenPage {
       exact: true,
     })
   }
+
+  checkoutButton() {
+    return this.page.getByText("Klamotten tauschen", { exact: true })
+  }
 }

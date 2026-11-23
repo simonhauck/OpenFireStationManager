@@ -2,6 +2,7 @@
 	"name": "OpenFireStationManager",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
+	"forwardPorts": [8180],
 	"workspaceFolder": "/workspaces/OpenFireStationManager",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
