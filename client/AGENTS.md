@@ -24,26 +24,31 @@ Astryx components.
 - Tailwind CSS for layout/alignment/spacing utilities, wired to Astryx design tokens
 - OpenAPI-based frontend bindings generated via `prepareEnv`
 
-All commands below are run from the `client/` directory.
+Gradle is the canonical build interface and is run from the repository root. The dev server,
+Playwright, and the Astryx CLI stay npm commands run from the `client/` directory.
 
 ---
 
 ## Commands
 
-|            Purpose             |               Command                |
-|--------------------------------|--------------------------------------|
-| Start dev server               | `npm run dev`                        |
-| Production build               | `npm run build`                      |
-| Preview production build       | `npm run preview`                    |
-| Run unit tests                 | `npm run test`                       |
-| Run Playwright tests           | `npm run test:e2e`                   |
-| Run Playwright tests (UI mode) | `npm run test:e2e:ui`                |
-| Format and lint check          | `npm run format:check`               |
-| TypeScript type check          | `npm run build:check`                |
-| Format and lint auto-fix       | `npm run format:fix`                 |
-| Generate frontend API bindings | `npm run prepareEnv`                 |
-| Astryx component docs          | `npm run astryx -- component <Name>` |
-| List Astryx components         | `npm run astryx -- component --list` |
+|            Purpose             |                Command                 |
+|--------------------------------|----------------------------------------|
+| Prepare dependencies/sources   | `./gradlew prepareEnv`                 |
+| Run all checks                 | `./gradlew check`                      |
+| Run unit tests (client+server) | `./gradlew test`                       |
+| Production build               | `./gradlew build -Pprod`               |
+| Format and lint check          | `./gradlew spotlessCheck`              |
+| Format and lint auto-fix       | `./gradlew spotlessApply`              |
+| Start dev server               | `npm run dev` (from `client/`)         |
+| Preview production build       | `npm run preview` (from `client/`)     |
+| Run Playwright tests           | `npm run test:e2e` (from `client/`)    |
+| Run Playwright tests (UI mode) | `npm run test:e2e:ui` (from `client/`) |
+| Astryx component docs          | `npm run astryx -- component <Name>`   |
+| List Astryx components         | `npm run astryx -- component --list`   |
+
+Direct npm equivalents such as `npm run test`, `npm run build:check`, and `npm run format:check`
+remain available for focused local work. `npm run build` writes into `build/frontend/` but is not
+the production entry point; use `./gradlew build -Pprod`.
 
 ---
 
@@ -61,8 +66,8 @@ the behaviour:
    browser-boundary behaviour: auth/session/cookies, redirects/history, scanner input, file
    upload, and real API round-trips.
 
-Run unit/component tests with `npm run test`; run E2E with `npm run test:e2e` (or
-`npm run test:e2e:ui` for interactive UI mode).
+Run unit/component tests with `./gradlew test` (or `npm run test` from `client/`); run E2E with
+`npm run test:e2e` (or `npm run test:e2e:ui` for interactive UI mode).
 
 ### Verification rule
 
@@ -243,12 +248,18 @@ browser-boundary behaviour; everything else belongs in unit or component tests.
 ## API Bindings and Data Layer
 
 - Frontend schema/types are generated from the backend OpenAPI contract.
-- Regenerate bindings with:
+- Regenerate the route tree, API bindings, and Astryx theme with:
 
 ```sh
-npm run prepareEnv
+./gradlew prepareEnv
 ```
 
+- `prepareEnv` installs dependencies with `npm ci` first, so a fresh checkout works with one
+  command. The generated route tree is `src/routeTree.gen.ts` and the API bindings are
+  `src/api/schema.ts`.
+- The OpenAPI generator is pinned in `tools/api-generation/` with its own TypeScript 5 install.
+  `openapi-typescript` does not support the TypeScript 7 API used by the app, so do not move it
+  into the root dev dependencies without replacing the generator.
 - Generated output is written to `src/api/schema.ts`; do not hand-edit generated sections.
 - Keep feature-specific query/mutation definitions inside the corresponding feature folder
   (for example `src/clothing/service/queries/*`) and reuse shared query keys from

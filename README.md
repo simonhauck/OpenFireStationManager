@@ -124,17 +124,23 @@ that is a genuinely useful contribution — see below.
 Contributions are welcome, including bug reports and ideas from people who run a station rather than
 write software.
 
-The repository is a monorepo with two independently built halves:
+The repository is a monorepo with two components:
 
-- **`client/`** — React 19 + TypeScript (Vite, TanStack Router/Query, shadcn/ui)
+- **`client/`** — React 19 + TypeScript (Vite, TanStack Router/Query, Astryx)
 - **`server/`** — Spring Boot 4 + Kotlin (Spring Data JDBC, PostgreSQL)
 
-To get set up, you need Node.js, Java 25, and Docker. Run the backend and frontend in two terminals:
+Gradle is the canonical build interface for both. You need Node.js and npm on your `PATH`, Java 25,
+and Docker. Prepare the checkout, then run the backend and the Vite dev server in two terminals:
 
 ```bash
-./gradlew :server:bootRun     # from the repository root
-cd client && npm install && npm run dev
+./gradlew prepareEnv          # from the repository root
+./gradlew :server:bootRun     # terminal 1
+cd client && npm run dev      # terminal 2
 ```
+
+`./gradlew check` runs the backend and frontend checks; `./gradlew test` runs both unit-test suites.
+A production frontend bundle is opt-in: `./gradlew build -Pprod` builds the client and packages it
+inside the server artifact. Without `-Pprod`, backend builds stay frontend-free.
 
 Then read [`AGENTS.md`](AGENTS.md) — it is the contributor guide, and it links to the detailed
 conventions for each half of the codebase. It is written for both people and AI coding assistants.
