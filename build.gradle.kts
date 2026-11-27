@@ -28,7 +28,7 @@ spotless {
         target("**/*.json", "**/*.jsonc")
         targetExclude("client/**", "server/**", "conventions/**", "build/**", ".gradle/**")
         // renovate: datasource=npm depName=@biomejs/biome
-        biome("2.6.6").configPath(rootProject.file("biome.json"))
+        biome("2.6.7").configPath(rootProject.file("biome.json"))
     }
 
     flexmark {
